@@ -21,15 +21,19 @@
 
 		<section class="content  w3-text-dark-gray" style="margin-top:51px;margin-bottom:80px">
 			<div class="w3-content-edit" style="padding:16px">
-				{% for category, message in get_flashed_messages(with_categories=true) %}
-					<div class="w3-panel w3-padding w3-display-container w3-leftbar w3-pale-{{ category }} w3-border-{{ category }}">
-						<span
-						onclick="this.parentElement.style.display='none'"
-						class="w3-button w3-display-topright">
-						&times;
-						</span>{{ message }}
-					</div>
-				{% endfor %}
+				{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+						{% for category, message in messages %}
+							<div class="w3-flash w3-{{ category }}">
+								<span
+								onclick="this.parentElement.style.display='none'"
+								class="w3-button w3-display-topright">
+								&times;
+								</span>{{ message }}
+							</div>
+						{% endfor %}
+					{% endif %}
+				{% endwith %}
 
 				{% block content %}{% endblock %}
 			</div>
