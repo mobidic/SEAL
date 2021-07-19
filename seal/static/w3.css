@@ -331,3 +331,18 @@ hr{border:0;border-top:1px solid #eee;margin:20px 0}
 }
 
 a { text-decoration: none; }
+
+.w3-flash {
+    padding:8px 16px!important;
+    margin-top:16px;margin-bottom:16px;
+    position:relative;
+    border-left:6px solid #ccc;
+    background-color:#f1f1f1;
+}
+.w3-flash:after,.w3-flash:before{content:"";display:table;clear:both}
+
+.w3-error,.w3-hover-error:hover{color:#000!important;background-color:#ffdddd!important;border-color:#f44336!important}
+.w3-fatal,.w3-hover-fatal:hover{color:#000!important;background-color:#b4a4d0!important;border-color:#9c27b0!important}
+.w3-success,.w3-hover-success:hover{color:#000!important;background-color:#ddffdd!important;border-color:#4CAF50!important}
+.w3-warning,.w3-hover-warning:hover{color:#000!important;background-color:#ffffcc!important;border-color:#ffeb3b!important}
+.w3-info,.w3-hover-info:hover{color:#000!important;background-color:#ddffff!important;border-color:#2196F3!important}
