@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>SEAL - {{ title }}</title>
+		<link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-5.10.1-web/css/all.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
+		<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+		{% block static %}
+		{% endblock %}
+	</head>
+
+	<body>
+
+		<div class="w3-top">
+			<div class="w3-bar w3-flat-green-sea w3-left-align w3-large ">
+				<a href="{{ url_for('index') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-flat-turquoise w3-right"><span class="icon-seal"></span> SEAL</a>
+			</div>
+		</div>
+
+		<section class="content" style="margin-top:51px;margin-bottom:80px">
+			<div class="w3-content-edit" style="padding:16px">
+				{% for category, message in get_flashed_messages(with_categories=true) %}
+					<div class="w3-panel w3-padding w3-display-container w3-leftbar w3-pale-{{ category }} w3-border-{{ category }}">
+						<span
+						onclick="this.parentElement.style.display='none'"
+						class="w3-button w3-display-topright">
+						&times;
+						</span>{{ message }}
+					</div>
+				{% endfor %}
+
+				{% block content %}{% endblock %}
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="w3-bottom w3-container w3-padding w3-center w3-light-grey">
+			<p class="w3-small w3-text-grey" style="margin:0px">
+				<a href="{{ url_for('index') }}" class="w3-hover-text-black"><span class="icon-seal"></span>
+				<span class="w3-hide-small w3-hide-medium">System of Experiments & Analysis for the Lab</span>
+				<span class="w3-hide-large w3-hide-small">SEAL</span></a> |
+				<a href="{{ url_for('about') }}" class="w3-hover-text-black">About</a> |
+				<a href="{{ url_for('contact') }}" class="w3-hover-text-black">Contact</a>
+			</p>
+		</footer>
+
+		<script>
+			{% block script %}{% endblock %}
+		</script>
+	</body>
+</html>
