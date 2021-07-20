@@ -6,3 +6,5 @@ dependencies:
   - flask=1.1.2
   - flask-sqlalchemy=2.5.1
   - flask-wtf=0.15.1
+  - flask-bcrypt=0.7.1
+  - flask-login=0.5.0
