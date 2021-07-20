@@ -1,8 +1,8 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from seal import app, bcrypt
 from seal.forms import LoginForm
 from seal.models import User
-from flask_login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user, login_required
 
 
 ################################################################################
@@ -50,7 +50,8 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             flash(f'You are logged as: {user.username}!', 'success')
             login_user(user, remember=form.remember.data)
-            return redirect(url_for('index'))
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for(index))
         else:
             flash('Login unsucessful. Please check the username and/or password!', 'error')
     return render_template(
@@ -67,6 +68,7 @@ def logout():
 
 
 @app.route("/account")
+@login_required
 def account():
     return render_template('authentication/account.html', title='Account')
 
