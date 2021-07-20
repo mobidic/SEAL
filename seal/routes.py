@@ -66,4 +66,9 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route("/account")
+def account():
+    return render_template('authentication/account.html', title='Account')
+
+
 ################################################################################
