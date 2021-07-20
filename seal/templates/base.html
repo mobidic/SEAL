@@ -4,6 +4,7 @@
 	<head>
 		<title>SEAL - {{ title }}</title>
 		<link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
+		<link rel="stylesheet" href="{{ url_for('static', filename='balloon.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-5.10.1-web/css/all.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
 		<link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
@@ -15,10 +16,15 @@
 
 		<div class="w3-top">
 			<div class="w3-bar w3-flat-green-sea w3-left-align w3-large ">
-				<a href="{{ url_for('index') }}" class="w3-bar-item w3-button w3-padding-large w3-hover-flat-turquoise w3-right"><span class="icon-seal"></span> SEAL</a>
+				<a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-left"><span class="icon-seal"></span> SEAL</a>
+				{% if current_user.is_authenticated %}
+				<a href="{{ url_for('logout') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-right" aria-label="Logout" data-balloon-pos="left"><i class="fas fa-sign-out-alt"></i></a>
+				<a href="{{ url_for('account') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-right"><i class="fas fa-user"></i> Account</a>
+				{% else %}
+				<a href="{{ url_for('login') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-right" aria-label="Login" data-balloon-pos="left"><i class="fas fa-sign-in-alt"></i></a>
+				{% endif %}
 			</div>
 		</div>
-
 		<section class="content  w3-text-dark-gray" style="margin-top:51px;margin-bottom:80px">
 			<div class="w3-content-edit" style="padding:16px">
 				{% with messages = get_flashed_messages(with_categories=true) %}
