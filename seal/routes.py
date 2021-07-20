@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for
-from seal import app, db, bcrypt
+from seal import app, bcrypt
 from seal.forms import LoginForm
-from seal.models import User, Team
+from seal.models import User
 from flask_login import login_user, current_user, logout_user
 
 
