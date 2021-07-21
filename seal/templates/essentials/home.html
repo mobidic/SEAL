@@ -1,18 +1,28 @@
 {% extends 'base.html' %}
 
 {% block content %}
-	<div class="w3-content w3-display-middle w3-padding" style="width:100%">
-		<form class="w3-container w3-card-4" method="post">
-			<h2>Login</h2>
-				<div class="w3-section">
-					<input class="w3-input" type="text"  placeholder="Username" name="username" required>
+	<div class="w3-row" style="width:100%">
+		<div class="w3-col l3 m12 w3-padding">
+			<div class="w3-row w3-display-container w3-margin">
+				<div class="w3-left w3-margin-right">
+					<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-circle w3-margin-top">
 				</div>
-				<div class="w3-section">
-					<input class="w3-input" type="password" placeholder="Password" name="password" required>
+				<div>
+					<h2>{{ current_user.username }} <span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span></h2>
+					<p>
+						{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px" aria-label="Admin" data-balloon-pos="left"><i class="fas fa-shield-alt"></i></span>{% endif %}
+						{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px" aria-label="Bioinfo" data-balloon-pos="left"><i class="fas fa-user-secret"></i></span>{% endif %}
+						{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px" aria-label="Technician" data-balloon-pos="left"><i class="fas fa-vial"></i></span>{% endif %}
+						{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px" aria-label="Biologist" data-balloon-pos="left"><i class="fas fa-user-md"></i></span>{% endif %}
+					</p>
 				</div>
-				<div class="w3-section w3-center">
-					<input  class="w3-button w3-flat-green-sea w3-hover-flat-turquoise" type="submit" value="Log In">
-				</div>
-		</form>
+			</div>
+		</div>
+		<div class="w3-col l9 m12 w3-padding">
+			<div class="w3-margin">
+				<p></p>
+			</div>
+		</div>
+
 	</div>
 {% endblock %}
