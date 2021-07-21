@@ -4,7 +4,7 @@
 	<div class="w3-content w3-padding w3-display-container">
 		<div class="w3-row w3-margin">
 			<div class="w3-col l2 m3 text-center">
-				<img src="{{ profile_pic }}" alt="Avatar" style="width:125px; height:125px" class="w3-circle w3-margin-top">
+				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:125px; height:125px" class="w3-circle w3-margin-top">
 			</div>
 			<div class="w3-col l10 m9 w3-container">
 				<h2>{{ current_user.username }} <span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span></h2>

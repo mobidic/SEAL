@@ -111,10 +111,8 @@ def account():
     else:
         update_account_form.username.data = current_user.username
         update_account_form.mail.data = current_user.mail
-    profile_pic = url_for('static', filename=f'images/profile/{current_user.image_file}')
     return render_template(
         'authentication/account.html', title='Account',
-        profile_pic=profile_pic,
         form=update_account_form,
         form2=update_password_form)
 
