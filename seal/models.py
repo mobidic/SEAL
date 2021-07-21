@@ -7,7 +7,7 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-teams = db.Table(
+team2member = db.Table(
     'teams',
     db.Column(
         'team_ID', db.Integer,
@@ -33,7 +33,7 @@ class User(db.Model, UserMixin):
     technician = db.Column(db.Boolean(), nullable=False, default=False)
     biologist = db.Column(db.Boolean(), nullable=False, default=False)
     teams = db.relationship(
-        'Team', secondary=teams, lazy='subquery',
+        'Team', secondary=team2member, lazy='subquery',
         backref=db.backref('members', lazy=True)
     )
 
