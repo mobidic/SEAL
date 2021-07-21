@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
-from seal import app, bcrypt
-from seal.forms import LoginForm
+from seal import app, db, bcrypt
+from seal.forms import LoginForm, UpdateAccountForm
 from seal.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -51,7 +51,7 @@ def login():
             flash(f'You are logged as: {user.username}!', 'success')
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for(index))
+            return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
             flash('Login unsucessful. Please check the username and/or password!', 'error')
     return render_template(
@@ -67,10 +67,24 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route("/account")
+@app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
-    return render_template('authentication/account.html', title='Account')
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.mail = form.mail.data
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.mail.data = current_user.mail
+    profile_pic = url_for('static', filename=f'images/profile/{current_user.image_file}')
+    return render_template(
+        'authentication/account.html', title='Account',
+        profile_pic=profile_pic,
+        form=form)
 
 
 ################################################################################

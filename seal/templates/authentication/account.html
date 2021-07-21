@@ -1,7 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-	<div class="w3-content w3-padding">
-		<h2>{{ current_user.username }}</h2>
+	<div class="w3-content w3-padding w3-display-container">
+		<div class="w3-row w3-margin">
+			<div class="w3-col m2 text-center">
+				<img src="{{ profile_pic }}" alt="Avatar" style="width:125px" class="w3-circle w3-margin-top">
+			</div>
+			<div class="w3-col m10 w3-container">
+				<h2>{{ current_user.username }} <span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span></h2>
+				<p>{% for team in current_user.teams %}<span class="w3-tag" style="background-color:{{ team.color }}">{{ team.teamname }}</span> {% endfor %}</p>
+				<p>
+					{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="padding:4.25px 8px" aria-label="Admin" data-balloon-pos="left"><i class="fas fa-shield-alt"></i></span>{% endif %}
+					{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="padding:4.25px 8px" aria-label="Bioinfo" data-balloon-pos="left"><i class="fas fa-user-secret"></i></span>{% endif %}
+					{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="padding:4.25px 8px" aria-label="Technician" data-balloon-pos="left"><i class="fas fa-vials"></i></span>{% endif %}
+					{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="padding:4.25px 8px" aria-label="Biologist" data-balloon-pos="left"><i class="fas fa-user-md"></i></span>{% endif %}
+				</p>
+			</div>
+		</div>
+		<div class="w3-content w3-padding w3-margin w3-border" style="width:100%">
+			<div class="w3-container w3-border-bottom">
+				<h3>Update account</h3>
+			</div>
+			<form class="w3-container"  action="" method="post">
+				{{ form.hidden_tag() }}
+				<div class="w3-row w3-section">
+					<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fa fa-user"></i></div>
+					<div class="w3-rest">
+						{% if form.username.errors %}
+							{{ form.username(class="w3-input w3-border w3-border-red") }}
+							<div class="w3-small w3-text-flat-alizarin">
+								{% for error in form.username.errors %}
+									<i class="fas fa-exclamation-circle"></i> {{ error }}
+								{% endfor %}
+							</div>
+						{% else %}
+							{{ form.username(class="w3-input w3-border") }}
+						{% endif %}
+					</div>
+				</div>
+				<div class="w3-row w3-section">
+					<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-envelope"></i></div>
+					<div class="w3-rest">
+						{% if form.mail.errors %}
+							{{ form.mail(class="w3-input w3-border w3-border-red") }}
+							<div class="w3-small w3-text-flat-alizarin">
+								{% for error in form.mail.errors %}
+									<i class="fas fa-exclamation-circle"></i> {{ error }}
+								{% endfor %}
+							</div>
+						{% else %}
+							{{ form.mail(class="w3-input w3-border") }}
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="w3-section w3-center">
+					{{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+				</div>
+			</form>
+		</div>
 	</div>
 {% endblock %}
