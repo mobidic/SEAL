@@ -20,11 +20,42 @@
 		</div>
 		<div class="w3-col l9 m12 w3-padding">
 			<div class="w3-margin">
-				{% for sample in samples %}
-					<p>{{ sample.samplename }} - {{ sample.analysed }}</p>
-				{% endfor %}
+				<table id="samples" class="w3-table-all" style="width:100%">
+					<thead>
+						<tr class="w3-flat-gree-sea">
+							<th>Sample Name</th>
+							<th>Analysis Status</th>
+							<th>Analysis Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for sample in samples %}
+							<tr>
+								<td>{{ sample.samplename }}</td>
+								<td>{{ sample.analysed }}</td>
+								<td>{{ sample.analysed }}</td>
+							</tr>
+				        {% else %}
+							<tr>
+								<td colspan="2" class="w3-center">No data available</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+					<tfoot>
+						<tr class="w3-flat-gren-sea">
+							<th>Sample Name</th>
+							<th>Analysis Status</th>
+							<th>Analysis Status</th>
+						</tr>
+					</tfoot>
 			</div>
 		</div>
 
 	</div>
+{% endblock %}
+
+{% block script %}
+	$(document).ready(function() {
+	    $('#samples').DataTable();
+	} );
 {% endblock %}
