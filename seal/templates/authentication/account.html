@@ -10,10 +10,10 @@
 				<h2>{{ current_user.username }} <span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span></h2>
 				<p>{% for team in current_user.teams %}<span class="w3-tag" style="background-color:{{ team.color }}">{{ team.teamname }}</span> {% endfor %}</p>
 				<p>
-					{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="padding:4.25px 8px" aria-label="Admin" data-balloon-pos="left"><i class="fas fa-shield-alt"></i></span>{% endif %}
-					{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="padding:4.25px 8px" aria-label="Bioinfo" data-balloon-pos="left"><i class="fas fa-user-secret"></i></span>{% endif %}
-					{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="padding:4.25px 8px" aria-label="Technician" data-balloon-pos="left"><i class="fas fa-vials"></i></span>{% endif %}
-					{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="padding:4.25px 8px" aria-label="Biologist" data-balloon-pos="left"><i class="fas fa-user-md"></i></span>{% endif %}
+					{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px" aria-label="Admin" data-balloon-pos="left"><i class="fas fa-shield-alt"></i></span>{% endif %}
+					{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px" aria-label="Bioinfo" data-balloon-pos="left"><i class="fas fa-user-secret"></i></span>{% endif %}
+					{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px" aria-label="Technician" data-balloon-pos="left"><i class="fas fa-vial"></i></span>{% endif %}
+					{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px" aria-label="Biologist" data-balloon-pos="left"><i class="fas fa-user-md"></i></span>{% endif %}
 				</p>
 			</div>
 		</div>
