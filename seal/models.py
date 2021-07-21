@@ -23,10 +23,15 @@ teams = db.Table(
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
+    mail = db.Column(db.String(40), unique=True, nullable=True)
     image_file = db.Column(
-        db.String(20), unique=True,
+        db.String(20), unique=False,
         nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), unique=True, nullable=False)
+    password = db.Column(db.String(60), unique=False, nullable=False)
+    admin = db.Column(db.Boolean(), nullable=False, default=False)
+    bioinfo = db.Column(db.Boolean(), nullable=False, default=False)
+    technician = db.Column(db.Boolean(), nullable=False, default=False)
+    biologist = db.Column(db.Boolean(), nullable=False, default=False)
     teams = db.relationship(
         'Team', secondary=teams, lazy='subquery',
         backref=db.backref('members', lazy=True)
@@ -39,6 +44,7 @@ class User(db.Model, UserMixin):
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     teamname = db.Column(db.String(20), unique=True, nullable=False)
+    color = db.Column(db.String(7), unique=False, nullable=False, default="#95A5A6")
 
     def __repr__(self):
-        return f"Team('{self.teamname}')"
+        return f"Team('{self.teamname}','{self.color}')"
