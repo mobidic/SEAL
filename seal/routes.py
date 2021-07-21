@@ -46,7 +46,7 @@ def contact():
 
 
 ################################################################################
-# Authentication related pages
+# Authentication
 
 
 @app.route("/login", methods=['GET', 'POST'])

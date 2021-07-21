@@ -7,6 +7,10 @@ from seal.models import User
 from seal import bcrypt
 
 
+################################################################################
+# Authentication
+
+
 class LoginForm(FlaskForm):
     username = StringField(
         'Username',
@@ -66,3 +70,6 @@ class UpdatePasswordForm(FlaskForm):
     def validate_old_password(self, old_password):
         if not bcrypt.check_password_hash(current_user.password, self.old_password.data):
             raise ValidationError('That password is incorrect!')
+
+
+################################################################################
