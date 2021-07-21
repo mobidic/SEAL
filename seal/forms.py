@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError
-from wtforms.validators import DataRequired, Length, Email, Optional
+from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
 from seal.models import User
+from seal import bcrypt
 
 
 class LoginForm(FlaskForm):
@@ -12,7 +14,7 @@ class LoginForm(FlaskForm):
     )
     password = PasswordField(
         'Password',
-        validators=[DataRequired(), Length(min=6, max=40)]
+        validators=[DataRequired(), Length(min=6, max=20)]
     )
     remember = BooleanField('Remember me')
     submit = SubmitField('Login')
@@ -27,7 +29,11 @@ class UpdateAccountForm(FlaskForm):
         'Mail',
         validators=[Optional(), Email()]
     )
-    submit = SubmitField('Update')
+    image_file = FileField(
+        'Update Profile Picture',
+        validators=[FileAllowed(['png', 'jpg', 'jpeg'])]
+    )
+    submit = SubmitField('Update Profile')
 
     def validate_username(self, username):
         if username.data != current_user.username:
@@ -40,3 +46,23 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(mail=mail.data).first()
             if user:
                 raise ValidationError('That mail is already taken. Please choose another one.')
+
+
+class UpdatePasswordForm(FlaskForm):
+    old_password = PasswordField(
+        'Old Password',
+        validators=[DataRequired(), Length(min=6, max=20)]
+    )
+    new_password = PasswordField(
+        'New Password',
+        validators=[DataRequired(), Length(min=6, max=20)]
+    )
+    confirm_password = PasswordField(
+        'Confirm Password',
+        validators=[DataRequired(), EqualTo('new_password')]
+    )
+    submit_password = SubmitField('Update Password')
+
+    def validate_old_password(self, old_password):
+        if not bcrypt.check_password_hash(current_user.password, self.old_password.data):
+            raise ValidationError('That password is incorrect!')

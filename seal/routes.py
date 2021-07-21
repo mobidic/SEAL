@@ -1,6 +1,9 @@
+import os
+import secrets
+from PIL import Image
 from flask import render_template, flash, redirect, url_for, request
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm
 from seal.models import User
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -61,6 +64,20 @@ def login():
     )
 
 
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/images/profile', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
+
 @app.route("/logout", methods=['GET', 'POST'])
 def logout():
     logout_user()
@@ -70,21 +87,34 @@ def logout():
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
 def account():
-    form = UpdateAccountForm()
-    if form.validate_on_submit():
-        current_user.username = form.username.data
-        current_user.mail = form.mail.data
+    update_account_form = UpdateAccountForm()
+    update_password_form = UpdatePasswordForm()
+    if "submit" in request.form and update_account_form.validate_on_submit():
+        if update_account_form.image_file.data:
+            picture_file = save_picture(update_account_form.image_file.data)
+            current_user.image_file = picture_file
+        current_user.mail = update_account_form.mail.data
+        current_user.username = update_account_form.username.data
         db.session.commit()
         flash('Your account has been updated!', 'success')
         return redirect(url_for('account'))
+    elif "submit_password" in request.form and update_password_form.validate_on_submit():
+        current_user.password = bcrypt.generate_password_hash(update_password_form.new_password.data).decode('utf-8')
+        db.session.commit()
+        flash('Your password has been changed!', 'success')
+        return redirect(url_for('account'))
     elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.mail.data = current_user.mail
+        update_account_form.username.data = current_user.username
+        update_account_form.mail.data = current_user.mail
+    else:
+        update_account_form.username.data = current_user.username
+        update_account_form.mail.data = current_user.mail
     profile_pic = url_for('static', filename=f'images/profile/{current_user.image_file}')
     return render_template(
         'authentication/account.html', title='Account',
         profile_pic=profile_pic,
-        form=form)
+        form=update_account_form,
+        form2=update_password_form)
 
 
 ################################################################################
