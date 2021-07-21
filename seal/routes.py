@@ -4,7 +4,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm
-from seal.models import User
+from seal.models import User, Sample
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -16,9 +16,13 @@ from flask_login import login_user, current_user, logout_user, login_required
 def index():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
+
+    samples = Sample.query.all()
+
     return render_template(
         "essentials/home.html",
-        title="Home"
+        title="Home",
+        samples=samples
     )
 
 

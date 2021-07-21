@@ -20,7 +20,9 @@
 		</div>
 		<div class="w3-col l9 m12 w3-padding">
 			<div class="w3-margin">
-				<p></p>
+				{% for sample in samples %}
+					<p>{{ sample.samplename }} - {{ sample.analysed }}</p>
+				{% endfor %}
 			</div>
 		</div>
 
