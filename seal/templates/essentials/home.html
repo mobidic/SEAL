@@ -30,7 +30,7 @@
 					</thead>
 					<tbody>
 						{% for sample in samples %}
-							<tr>
+							<tr style="cursor: pointer;" data-href="{{ url_for('sample', id=sample.id) }}" class="w3-hover-flat-turquoise">
 								<td>{{ sample.samplename }}</td>
 								<td>{{ sample.analysed }}</td>
 							</tr>
@@ -46,9 +46,9 @@
 							<th>Analysis Status</th>
 						</tr>
 					</tfoot>
+				</table>
 			</div>
 		</div>
-
 	</div>
 {% endblock %}
 
@@ -57,6 +57,10 @@
 	$(document).ready(function() {
 	    $('#samples').DataTable();
 	} );
+
+	$('tr[data-href]').on("click", function() {
+	    document.location = $(this).data('href');
+	});
 {% endblock %}
 
 

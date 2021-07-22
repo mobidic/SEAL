@@ -122,3 +122,15 @@ def account():
 
 
 ################################################################################
+
+
+################################################################################
+# Analysis
+
+
+@app.route("/sample/<int:id>", methods=['GET', 'POST'])
+@login_required
+def sample(id):
+    return render_template(
+        'analysis/sample.html', title=f'sample-{id}',
+    )
