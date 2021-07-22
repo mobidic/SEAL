@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
 	<div class="w3-row" style="width:100%">
 		<div class="w3-col l3 m12 w3-padding">
@@ -22,9 +23,8 @@
 			<div class="w3-margin">
 				<table id="samples" class="w3-table-all" style="width:100%">
 					<thead>
-						<tr class="w3-flat-gree-sea">
+						<tr class="w3-flat-green-sea w3-text-flat-orange">
 							<th>Sample Name</th>
-							<th>Analysis Status</th>
 							<th>Analysis Status</th>
 						</tr>
 					</thead>
@@ -32,7 +32,6 @@
 						{% for sample in samples %}
 							<tr>
 								<td>{{ sample.samplename }}</td>
-								<td>{{ sample.analysed }}</td>
 								<td>{{ sample.analysed }}</td>
 							</tr>
 				        {% else %}
@@ -42,9 +41,8 @@
 						{% endfor %}
 					</tbody>
 					<tfoot>
-						<tr class="w3-flat-gren-sea">
+						<tr class="w3-flat-green-sea">
 							<th>Sample Name</th>
-							<th>Analysis Status</th>
 							<th>Analysis Status</th>
 						</tr>
 					</tfoot>
@@ -54,8 +52,43 @@
 	</div>
 {% endblock %}
 
+
 {% block script %}
 	$(document).ready(function() {
 	    $('#samples').DataTable();
 	} );
+{% endblock %}
+
+
+{% block static %}
+	<style>
+		table.dataTable thead th {
+		    position: relative;
+		    background-image: none !important;
+		}
+		table.dataTable thead .sorting{
+		    background-image: none !important;
+		}
+		table.dataTable thead th.sorting:after,
+		table.dataTable thead th.sorting_asc:after,
+		table.dataTable thead th.sorting_desc:after {
+		    position: absolute !important;
+		    top: 12px !important;
+		    right: 8px !important;
+		    font-size: 0.8em !important;
+		    font-family: 'Font Awesome\ 5 Free' !important;
+		}
+		table.dataTable thead th.sorting:after {
+		    content: "\f30c\f309" !important;
+			opacity:0.5;
+		}
+		table.dataTable thead th.sorting_asc:after {
+			opacity:1;
+		    content: "\f15d" !important;
+		}
+		table.dataTable thead th.sorting_desc:after {
+			opacity:1;
+		    content: "\f882" !important;
+		}
+		</style>
 {% endblock %}
