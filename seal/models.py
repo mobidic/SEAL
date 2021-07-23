@@ -12,7 +12,7 @@ def load_user(user_id):
 
 
 team2member = db.Table(
-    'teams',
+    'team2member',
     db.Column(
         'team_ID', db.Integer,
         db.ForeignKey('team.id'), primary_key=True
@@ -58,15 +58,62 @@ class Team(db.Model):
 
 
 ################################################################################
-# Patient
+# Analysis
+
+
+var2sample = db.Table(
+    'var2sample',
+    db.Column(
+        'variant_ID', db.Integer,
+        db.ForeignKey('variant.id'), primary_key=True
+    ),
+    db.Column(
+        'sample_ID', db.Integer,
+        db.ForeignKey('sample.id'), primary_key=True
+    ),
+    db.Column(
+        'depth', db.Integer, nullable=True, unique=False
+    ),
+    db.Column(
+        'allelic_depth', db.Integer, nullable=True, unique=False
+    ),
+    db.Column(
+        'analyse1', db.Boolean(), nullable=False, unique=False, default=False
+    ),
+    db.Column(
+        'analyse2', db.Boolean(), nullable=False, unique=False, default=False
+    ),
+    db.Column(
+        'reported', db.Boolean(), nullable=False, unique=False, default=False
+    )
+)
+
 
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(20), unique=False, nullable=False)
     analysed = db.Column(db.Boolean(), unique=False, nullable=False, default=False)
+    variants = db.relationship(
+        'Variant', secondary=var2sample, lazy='subquery',
+        backref=db.backref('samples', lazy=True)
+    )
 
     def __repr__(self):
         return f"Sample('{self.samplename}','{self.analysed}')"
+
+
+class Variant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    chr = db.Column(db.String(10), unique=False, nullable=False)
+    pos = db.Column(db.Integer, unique=False, nullable=False)
+    ref = db.Column(db.String(20), unique=False, nullable=False)
+    alt = db.Column(db.String(20), unique=False, nullable=False)
+    __table_args__ = (
+        db.UniqueConstraint('chr', 'pos', 'ref', 'alt', name='_varUC'),
+    )
+
+    def __repr__(self):
+        return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
 
 
 ################################################################################
