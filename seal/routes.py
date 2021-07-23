@@ -131,6 +131,11 @@ def account():
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
+    sample = Sample.query.get(int(id))
+    if not sample:
+        flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
+        return redirect(url_for('index'))
     return render_template(
         'analysis/sample.html', title=f'sample-{id}',
+        sample=sample
     )
