@@ -136,6 +136,6 @@ def sample(id):
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
     return render_template(
-        'analysis/sample.html', title=f'sample-{id}',
+        'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample
     )

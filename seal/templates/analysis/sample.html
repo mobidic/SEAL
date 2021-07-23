@@ -7,12 +7,44 @@
 		<div class="w3-bar w3-flat-silver w3-left-align w3-padding">
 			<h3><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
 		</div>
+		<div class="w3-padding">
+			<table id="variants" class="w3-table-all" style="width:100%">
+				<thead>
+					<tr class="w3-flat-green-sea w3-text-flat-orange">
+						<th>Sample Name</th>
+						<th>Analysis Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for variant in sample.variants %}
+						<tr>
+							<td>{{ variant.chr }}</td>
+							<td>{{ variant.chr }}</td>
+						</tr>
+			        {% else %}
+						<tr>
+							<td colspan="2" class="w3-center">No data available</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr class="w3-flat-green-sea">
+						<th>Sample Name</th>
+						<th>Analysis Status</th>
+					</tr>
+				</tfoot>
+			</table>
+		</div>
 
 	</div>
 {% endblock %}
 
 
 {% block script %}
+	$(document).ready(function() {
+	    $('#variants').DataTable();
+	} );
+
 	// Script to open and close sidebar
 	function w3_open() {
 		document.getElementById("sidebar").style.display = "block";
