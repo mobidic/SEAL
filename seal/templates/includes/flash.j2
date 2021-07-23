@@ -1,0 +1,15 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+	{% if messages %}
+		<div class="w3-container w3-col l3">
+		{% for category, message in messages %}
+			<div class="w3-flash w3-{{ category }}">
+				<span
+				onclick="this.parentElement.style.display='none'"
+				class="w3-button w3-display-topright">
+				&times;
+				</span>{{ message }}
+			</div>
+		{% endfor %}
+		</div>
+	{% endif %}
+{% endwith %}

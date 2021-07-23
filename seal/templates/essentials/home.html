@@ -2,52 +2,35 @@
 
 
 {% block content %}
-	<div class="w3-row" style="width:100%">
-		<div class="w3-col l3 m12 w3-padding">
-			<div class="w3-row w3-display-container w3-margin">
-				<div class="w3-left w3-margin-right">
-					<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-circle w3-margin-top">
-				</div>
-				<div>
-					<h2>{{ current_user.username }} <span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span></h2>
-					<p>
-						{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px" aria-label="Admin" data-balloon-pos="left"><i class="fas fa-shield-alt"></i></span>{% endif %}
-						{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px" aria-label="Bioinfo" data-balloon-pos="left"><i class="fas fa-user-secret"></i></span>{% endif %}
-						{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px" aria-label="Technician" data-balloon-pos="left"><i class="fas fa-vial"></i></span>{% endif %}
-						{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px" aria-label="Biologist" data-balloon-pos="left"><i class="fas fa-user-md"></i></span>{% endif %}
-					</p>
-				</div>
-			</div>
-		</div>
-		<div class="w3-col l9 m12 w3-padding">
-			<div class="w3-margin">
-				<table id="samples" class="w3-table-all" style="width:100%">
-					<thead>
-						<tr class="w3-flat-green-sea w3-text-flat-orange">
-							<th>Sample Name</th>
-							<th>Analysis Status</th>
+	{% include 'includes/sidebar.j2' %}
+	<div class="w3-main" style="margin-left:350px">
+		<div class="w3-padding">
+			<table id="samples" class="w3-table-all" style="width:100%">
+				<thead>
+					<tr class="w3-flat-green-sea w3-text-flat-orange">
+						<th>Sample Name</th>
+						<th>Analysis Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for sample in samples %}
+						<tr style="cursor: pointer;" data-href="{{ url_for('sample', id=sample.id) }}" class="w3-hover-flat-turquoise">
+							<td>{{ sample.samplename }}</td>
+							<td>{{ sample.analysed }}</td>
 						</tr>
-					</thead>
-					<tbody>
-						{% for sample in samples %}
-							<tr style="cursor: pointer;" data-href="{{ url_for('sample', id=sample.id) }}" class="w3-hover-flat-turquoise">
-								<td>{{ sample.samplename }}</td>
-								<td>{{ sample.analysed }}</td>
-							</tr>
-				        {% else %}
-							<tr>
-								<td colspan="2" class="w3-center">No data available</td>
-							</tr>
-						{% endfor %}
-					</tbody>
-					<tfoot>
-						<tr class="w3-flat-green-sea">
-							<th>Sample Name</th>
-							<th>Analysis Status</th>
+			        {% else %}
+						<tr>
+							<td colspan="2" class="w3-center">No data available</td>
 						</tr>
-					</tfoot>
-				</table>
-			</div>
+					{% endfor %}
+				</tbody>
+				<tfoot>
+					<tr class="w3-flat-green-sea">
+						<th>Sample Name</th>
+						<th>Analysis Status</th>
+					</tr>
+				</tfoot>
+			</table>
 		</div>
 	</div>
 {% endblock %}
@@ -61,6 +44,17 @@
 	$('tr[data-href]').on("click", function() {
 	    document.location = $(this).data('href');
 	});
+	
+	// Script to open and close sidebar
+	function w3_open() {
+		document.getElementById("sidebar").style.display = "block";
+		document.getElementById("overlay").style.display = "block";
+	}
+
+	function w3_close() {
+		document.getElementById("sidebar").style.display = "none";
+		document.getElementById("overlay").style.display = "none";
+	}
 {% endblock %}
 
 

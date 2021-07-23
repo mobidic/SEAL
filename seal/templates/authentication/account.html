@@ -1,24 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-	<div class="w3-content w3-padding w3-display-container">
-		<div class="w3-row w3-margin">
-			<div class="w3-col l2 m3 text-center">
-				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:125px; height:125px" class="w3-circle w3-margin-top">
-			</div>
-			<div class="w3-col l10 m9 w3-container">
-				<h2>{{ current_user.username }} <span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span></h2>
-				<p>{% for team in current_user.teams %}<span class="w3-tag" style="background-color:{{ team.color }}">{{ team.teamname }}</span> {% endfor %}</p>
-				<p>
-					{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px" aria-label="Admin" data-balloon-pos="left"><i class="fas fa-shield-alt"></i></span>{% endif %}
-					{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px" aria-label="Bioinfo" data-balloon-pos="left"><i class="fas fa-user-secret"></i></span>{% endif %}
-					{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px" aria-label="Technician" data-balloon-pos="left"><i class="fas fa-vial"></i></span>{% endif %}
-					{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px" aria-label="Biologist" data-balloon-pos="left"><i class="fas fa-user-md"></i></span>{% endif %}
-				</p>
-			</div>
-		</div>
-		<div class="w3-content w3-container w3-padding w3-card-4" >
-			<div class="w3-half w3-padding">
+	{% include 'includes/sidebar.j2' %}
+	<div class="w3-main w3-padding" style="margin-left:350px">
+		<div class="w3-half w3-padding w3-mobile">
+			<div class="w3-card w3-mobile">
 				<div class="w3-container w3-border-bottom">
 					<h3>Update account</h3>
 				</div>
@@ -75,7 +61,10 @@
 					</div>
 				</form>
 			</div>
-			<div class="w3-half w3-padding">
+		</div>
+
+		<div class="w3-half w3-padding ">
+			<div class="w3-card">
 				<div class="w3-container w3-border-bottom">
 					<h3>Update Password</h3>
 				</div>
@@ -134,4 +123,18 @@
 			</div>
 		</div>
 	</div>
+{% endblock %}
+
+
+{% block script %}
+	// Script to open and close sidebar
+	function w3_open() {
+		document.getElementById("sidebar").style.display = "block";
+		document.getElementById("overlay").style.display = "block";
+	}
+
+	function w3_close() {
+		document.getElementById("sidebar").style.display = "none";
+		document.getElementById("overlay").style.display = "none";
+	}
 {% endblock %}

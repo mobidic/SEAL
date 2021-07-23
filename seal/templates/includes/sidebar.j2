@@ -1,0 +1,33 @@
+
+
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-flat-clouds" style="z-index:3;width:350px;" id="sidebar">
+	<a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-small w3-padding w3-hover-normal w3-opacity-max w3-hover-opacity" title="close menu"><i class="far fa-times-circle"></i></a>
+	<div class="w3-container">
+		<div class="w3-row w3-display-container w3-margin">
+			<div class="w3-left w3-margin-right">
+				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-white w3-circle w3-margin-top">
+			</div>
+			<div class="w3-right w3-margin-ight">
+				<h2 style="margin-bottom:0">{{ current_user.username }}</h2>
+				<span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span>
+				<p>
+					{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px" aria-label="Admin" data-balloon-pos="up"><i class="fas fa-shield-alt"></i></span>{% endif %}
+					{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px" aria-label="Bioinfo" data-balloon-pos="up"><i class="fas fa-user-secret"></i></span>{% endif %}
+					{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px" aria-label="Technician" data-balloon-pos="up"><i class="fas fa-vial"></i></span>{% endif %}
+					{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px" aria-label="Biologist" data-balloon-pos="up"><i class="fas fa-user-md"></i></span>{% endif %}
+				</p>
+			</div>
+		</div>
+		<div class="w3-row w3-display-container w3-margin">
+			{% for team in current_user.teams %}
+				{% if loop.first %}
+					<h3><i>Team(s) :</i></h3>
+				{% endif %}
+				<span class="w3-tag" style="background-color:{{ team.color }}">{{ team.teamname }}</span>
+			{% endfor %}
+		</div>
+	</div>
+</nav>
+
+<div class="w3-overlay  w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="overlay"></div>
