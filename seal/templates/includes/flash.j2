@@ -1,15 +1,13 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
 	{% if messages %}
-		<div class="w3-container w3-col l3">
 		{% for category, message in messages %}
-			<div class="w3-flash w3-{{ category }}">
+			<div class="w3-flash w3-padding w3-{{ category }}" style="width:100%">
 				<span
 				onclick="this.parentElement.style.display='none'"
-				class="w3-button w3-display-topright">
-				&times;
+				class="w3-margin-riht w3-display-topright w3-opacity-max w3-hover-opacity" style="margin-right:5px">
+				<i class="far fa-times-circle"></i>
 				</span>{{ message }}
 			</div>
 		{% endfor %}
-		</div>
 	{% endif %}
 {% endwith %}

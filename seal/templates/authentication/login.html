@@ -6,45 +6,48 @@
 			<div class="w3-container w3-flat-green-sea">
 				<h2>Login</h2>
 			</div>
-			<form class="w3-container"  action="" method="post">
-				{{ form.hidden_tag() }}
-				<div class="w3-row w3-section">
-					<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fa fa-user"></i></div>
-					<div class="w3-rest">
-						{% if form.username.errors %}
-							{{ form.username(class="w3-input w3-border w3-border-red") }}
-							<div class="w3-small w3-text-flat-alizarin">
-								{% for error in form.username.errors %}
-									<i class="fas fa-exclamation-circle"></i> {{ error }}
-								{% endfor %}
-							</div>
-						{% else %}
-							{{ form.username(class="w3-input w3-border") }}
-						{% endif %}
+			<div class="w3-container">
+				{% include "includes/flash.j2" %}
+				<form action="" method="post">
+					{{ form.hidden_tag() }}
+					<div class="w3-row w3-section">
+						<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fa fa-user"></i></div>
+						<div class="w3-rest">
+							{% if form.username.errors %}
+								{{ form.username(class="w3-input w3-border w3-border-red") }}
+								<div class="w3-small w3-text-flat-alizarin">
+									{% for error in form.username.errors %}
+										<i class="fas fa-exclamation-circle"></i> {{ error }}
+									{% endfor %}
+								</div>
+							{% else %}
+								{{ form.username(class="w3-input w3-border") }}
+							{% endif %}
+						</div>
 					</div>
-				</div>
-				<div class="w3-row w3-section">
-					<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-unlock-alt"></i></div>
-					<div class="w3-rest">
-						{% if form.password.errors %}
-							{{ form.password(class="w3-input w3-border w3-border-red") }}
-							<div class="w3-small w3-text-flat-alizarin">
-								{% for error in form.password.errors %}
-									<i class="fas fa-exclamation-circle"></i> {{ error }}
-								{% endfor %}
-							</div>
-						{% else %}
-							{{ form.password(class="w3-input w3-border") }}
-						{% endif %}
+					<div class="w3-row w3-section">
+						<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-unlock-alt"></i></div>
+						<div class="w3-rest">
+							{% if form.password.errors %}
+								{{ form.password(class="w3-input w3-border w3-border-red") }}
+								<div class="w3-small w3-text-flat-alizarin">
+									{% for error in form.password.errors %}
+										<i class="fas fa-exclamation-circle"></i> {{ error }}
+									{% endfor %}
+								</div>
+							{% else %}
+								{{ form.password(class="w3-input w3-border") }}
+							{% endif %}
+						</div>
 					</div>
-				</div>
-				{{ form.remember(class="w3-check") }}
-				{{ form.remember.label() }}
+					{{ form.remember(class="w3-check") }}
+					{{ form.remember.label() }}
 
-				<div class="w3-section w3-center">
-					{{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
-				</div>
-			</form>
+					<div class="w3-section w3-center">
+						{{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+					</div>
+				</form>
+			</div>
 		</div>
 	</div>
 {% endblock %}

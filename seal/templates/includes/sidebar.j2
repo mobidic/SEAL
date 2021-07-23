@@ -2,8 +2,9 @@
 
 <!-- Sidebar/menu -->
 <nav class="w3-sidebar w3-collapse w3-white w3-flat-clouds" style="z-index:3;width:350px;" id="sidebar">
-	<a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-small w3-padding w3-hover-normal w3-opacity-max w3-hover-opacity" title="close menu"><i class="far fa-times-circle"></i></a>
+	<a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-small w3-padding w3-opacity-max w3-hover-opacity" title="close menu"><i class="far fa-times-circle"></i></a>
 	<div class="w3-container">
+		{% include "includes/flash.j2" %}
 		<div class="w3-row w3-display-container w3-margin">
 			<div class="w3-left w3-margin-right">
 				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-white w3-circle w3-margin-top">
