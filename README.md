@@ -18,6 +18,7 @@ conda activate seal-v1
 export FLASK_APP=seal
 export FLASK_ENV=development
 export PYTHONPATH=${PWD}
-flask init-db
+initdb -D ${PWD}/seal/seal.db
+pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 flask run
 ```
