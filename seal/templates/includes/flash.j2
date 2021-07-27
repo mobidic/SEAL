@@ -4,9 +4,10 @@
 			<div class="w3-flash w3-padding w3-{{ category }}" style="width:100%">
 				<span
 				onclick="this.parentElement.style.display='none'"
-				class="w3-margin-riht w3-display-topright w3-opacity-max w3-hover-opacity" style="margin-right:5px">
-				<i class="far fa-times-circle"></i>
-				</span>{{ message }}
+				class="w3-button w3-display-topright">
+				&times;
+				</span>
+				<div style="padding-right:30px">{{ message }}</div>
 			</div>
 		{% endfor %}
 	{% endif %}
