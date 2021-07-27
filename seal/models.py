@@ -108,6 +108,8 @@ class Variant(db.Model):
     pos = db.Column(db.Integer, unique=False, nullable=False)
     ref = db.Column(db.String(20), unique=False, nullable=False)
     alt = db.Column(db.String(20), unique=False, nullable=False)
+    annotations = db.Column(db.JSON, nullable=True)
+
     __table_args__ = (
         db.UniqueConstraint('chr', 'pos', 'ref', 'alt', name='_varUC'),
     )
