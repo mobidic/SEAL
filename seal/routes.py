@@ -1,7 +1,7 @@
 import os
 import secrets
 from PIL import Image
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm
 from seal.models import User, Sample
@@ -140,3 +140,23 @@ def sample(id):
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample
     )
+
+
+@app.route("/sample/variants/<int:id>", methods=['GET', 'POST'])
+@login_required
+def variants(id):
+    sample = Sample.query.get(int(id))
+    if not sample:
+        flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
+        return redirect(url_for('index'))
+
+    variants = {"data": list()}
+    for variant in sample.variants:
+        variants["data"].append({
+            "chr": f"{variant.chr}",
+            "pos": f"{variant.pos}",
+            "ref": f"{variant.ref}",
+            "alt": f"{variant.alt}"
+        })
+
+    return jsonify(variants)
