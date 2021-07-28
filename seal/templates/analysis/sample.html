@@ -10,27 +10,29 @@
 		<div class="w3-padding">
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
-					<tr class="w3-flat-green-sea w3-text-flat-orange">
-						<th>Sample Name</th>
-						<th>Analysis Status</th>
+					<tr class="w3-flat-green-sea">
+                        <th title="chr">chr</th>
+                        <th title="pos">pos</th>
+                        <th title="ref">ref</th>
+                        <th title="alt">alt</th>
 					</tr>
 				</thead>
 				<tbody>
 					{% for variant in sample.variants %}
 						<tr>
 							<td>{{ variant.chr }}</td>
-							<td>{{ variant.chr }}</td>
-						</tr>
-			        {% else %}
-						<tr>
-							<td colspan="2" class="w3-center">No data available</td>
+							<td>{{ variant.pos }}</td>
+							<td>{{ variant.ref }}</td>
+							<td>{{ variant.alt }}</td>
 						</tr>
 					{% endfor %}
 				</tbody>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
-						<th>Sample Name</th>
-						<th>Analysis Status</th>
+                        <th title="chr">chr</th>
+                        <th title="pos">pos</th>
+                        <th title="ref">ref</th>
+                        <th title="alt">alt</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -42,7 +44,17 @@
 
 {% block script %}
 	$(document).ready(function() {
-	    $('#variants').DataTable();
+	    $('#variants').DataTable({
+			scrollX: true,
+    		ajax: '/sample/variants/{{ sample.id }}',
+    		"columns": [
+		        { "className": 'showTitle control-size-100', "data": "chr"},
+		        { "className": 'showTitle control-size-150', "data": "pos"},
+		        { "className": 'showTitle control-size-150', "data": "ref"},
+		        { "className": 'showTitle control-size-200', "data": "alt"},
+			]
+		});
+
 	} );
 
 	// Script to open and close sidebar
@@ -55,4 +67,38 @@
 		document.getElementById("sidebar").style.display = "none";
 		document.getElementById("overlay").style.display = "none";
 	}
+{% endblock %}
+
+
+{% block static %}
+	<style>
+		.dataTables_scrollHead table.dataTable thead th {
+		    position: relative;
+		    background-image: none !important;
+		}
+		.dataTables_scrollHead table.dataTable thead .sorting{
+		    background-image: none !important;
+		}
+		.dataTables_scrollHead table.dataTable thead th.sorting:after,
+		.dataTables_scrollHead table.dataTable thead th.sorting_asc:after,
+		.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
+		    position: absolute !important;
+		    top: 12px !important;
+		    right: 8px !important;
+		    font-size: 0.8em !important;
+		    font-family: 'Font Awesome\ 5 Free' !important;
+		}
+		.dataTables_scrollHead table.dataTable thead th.sorting:after {
+		    content: "\f30c\f309" !important;
+			opacity:0.5;
+		}
+		.dataTables_scrollHead table.dataTable thead th.sorting_asc:after {
+			opacity:1;
+		    content: "\f15d" !important;
+		}
+		.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
+			opacity:1;
+		    content: "\f882" !important;
+		}
+	</style>
 {% endblock %}
