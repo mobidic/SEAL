@@ -11,28 +11,22 @@
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
 					<tr class="w3-flat-green-sea">
-                        <th title="chr">chr</th>
-                        <th title="pos">pos</th>
-                        <th title="ref">ref</th>
-                        <th title="alt">alt</th>
+                        <th>chr</th>
+                        <th>pos</th>
+                        <th>ref</th>
+                        <th>alt</th>
+                        <th>annotations</th>
 					</tr>
 				</thead>
 				<tbody>
-					{% for variant in sample.variants %}
-						<tr>
-							<td>{{ variant.chr }}</td>
-							<td>{{ variant.pos }}</td>
-							<td>{{ variant.ref }}</td>
-							<td>{{ variant.alt }}</td>
-						</tr>
-					{% endfor %}
 				</tbody>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
-                        <th title="chr">chr</th>
-                        <th title="pos">pos</th>
-                        <th title="ref">ref</th>
-                        <th title="alt">alt</th>
+                        <th>chr</th>
+                        <th>pos</th>
+                        <th>ref</th>
+                        <th>alt</th>
+                        <th>annotations</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -51,7 +45,8 @@
 		        { "className": 'showTitle control-size-100', "data": "chr"},
 		        { "className": 'showTitle control-size-150', "data": "pos"},
 		        { "className": 'showTitle control-size-150', "data": "ref"},
-		        { "className": 'showTitle control-size-200', "data": "alt"},
+				{ "className": 'showTitle control-size-200', "data": "alt"},
+		        { "className": 'showTitle control-size-200', "data": "annotations"},
 			]
 		});
 

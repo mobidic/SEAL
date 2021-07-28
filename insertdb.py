@@ -2,6 +2,7 @@ import os
 from seal import db, app
 from seal.models import User, Team, Sample, Variant
 from datetime import datetime
+from sqlalchemy.orm.attributes import flag_modified
 
 pathDB = os.path.join(app.root_path, 'site.db')
 if os.path.exists(pathDB):
@@ -54,13 +55,11 @@ sample.variants.append(variant1)
 db.session.commit()
 
 variant = Variant.query.get(1)
-variant.annotations = {
-    datetime.now().strftime("%Y-%m-%d_%H-%M-%S"): {
-        "key1": "value1",
-        "key2": ["value3", "value2"]
-    }
-}
+variant.annotations = [{
+    "key1": "value1",
+    "key2": ["value3", "value2"]
+}, {
+    "key1": "value1 - new",
+    "key2": ["value3", "value2"]
+}]
 db.session.commit()
-
-# variant.annotations.append(annotation3)
-# db.session.commit()

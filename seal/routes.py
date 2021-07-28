@@ -143,8 +143,9 @@ def sample(id):
 
 
 @app.route("/sample/variants/<int:id>", methods=['GET', 'POST'])
+@app.route("/sample/variants/<int:id>/<int:version>", methods=['GET', 'POST'])
 @login_required
-def variants(id):
+def variants(id, version=-1):
     sample = Sample.query.get(int(id))
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
@@ -156,7 +157,8 @@ def variants(id):
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
-            "alt": f"{variant.alt}"
+            "alt": f"{variant.alt}",
+            "annotations": f"{variant.annotations}",
         })
 
     return jsonify(variants)
