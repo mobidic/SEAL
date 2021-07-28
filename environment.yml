@@ -1,4 +1,4 @@
-name: seal-v1
+name: seal
 channels:
   - conda-forge
   - defaults

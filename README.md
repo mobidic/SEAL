@@ -14,11 +14,12 @@ Please install conda (see : https://docs.conda.io/projects/conda/en/latest/user-
 #### Launch the app
 
 ```bash
-conda activate seal-v1
+conda activate seal
 export FLASK_APP=seal
 export FLASK_ENV=development
 export PYTHONPATH=${PWD}
 initdb -D ${PWD}/seal/seal.db
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 flask run
+pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```
