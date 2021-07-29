@@ -97,7 +97,7 @@ def logout():
 def account():
     update_account_form = UpdateAccountForm()
     update_password_form = UpdatePasswordForm()
-    if "submit" in request.form and update_account_form.validate_on_submit():
+    if "submit_update" in request.form and update_account_form.validate_on_submit():
         if update_account_form.image_file.data:
             picture_file = save_picture(update_account_form.image_file.data)
             current_user.image_file = picture_file
@@ -119,8 +119,8 @@ def account():
         update_account_form.mail.data = current_user.mail
     return render_template(
         'authentication/account.html', title='Account',
-        form=update_account_form,
-        form2=update_password_form)
+        update_account_form=update_account_form,
+        update_password_form=update_password_form)
 
 
 ################################################################################
