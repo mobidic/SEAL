@@ -28,6 +28,10 @@
 				<span class="w3-tag" style="background-color:{{ team.color }}">{{ team.teamname }}</span>
 			{% endfor %}
 		</div>
+		<div class="w3-row w3-display-container w3-margin">
+			<a href="{{ url_for('create_variant') }}" class="w3-text-flat-green-sea w3-hover-text-flat-turquoise"><span class="w3-left"><i class="w3-xlarge fas fa-plus-circle"></i></span> <span class="w3-margin-left w3-left"><b>Add A New Sample</b></span></a>
+		</div>
+
 	</div>
 </nav>
 

@@ -1,12 +1,13 @@
 import os
 import secrets
+import json
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
 from seal.models import User, Sample
 from flask_login import login_user, current_user, logout_user, login_required
-
+from anacore import annotVcf
 
 ################################################################################
 # Essentials pages
@@ -165,22 +166,43 @@ def variants(id, version=-1):
     return jsonify(variants)
 
 
+def add_vcf(samplename, vcf_file):
+    random_hex = secrets.token_hex(8)
+
+    _, f_ext = os.path.splitext(vcf_file.filename)
+
+    vcf_fn = random_hex + f_ext
+    vcf_path = os.path.join(app.root_path, 'static/temp/vcf/', vcf_fn)
+    vcf_file.save(vcf_path)
+
+    token_fn = random_hex + ".token"
+    token_path = os.path.join(app.root_path, 'static/temp/vcf/', token_fn)
+    with open(token_path, "w") as tf:
+        tf.write(json.dumps({
+            "samplename": samplename
+        }))
+
+    return vcf_fn
+
+
 @app.route("/create/sample", methods=['GET', 'POST'])
 @login_required
 def create_variant():
-    uploadSample = UploadVariantForm()
+    uploadSampleForm = UploadVariantForm()
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-    if "submit" in request.form and uploadSample.validate_on_submit():
-        sample = Sample.query.filter_by(samplename=uploadSample.samplename.data).first()
+    if "submit" in request.form and uploadSampleForm.validate_on_submit():
+        sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data).first()
         if sample:
             flash("This Sample Name is already in database!", "error")
             return redirect(url_for('index'))
+
+        add_vcf(uploadSampleForm.samplename.data, uploadSampleForm.vcf_file.data)
 
         flash('Sample Added!', 'success')
         return redirect(url_for('index'))
 
     return render_template(
         'analysis/create_sample.html', title="Add Sample",
-        form=uploadSample
+        form=uploadSampleForm
     )
