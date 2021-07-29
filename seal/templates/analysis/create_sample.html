@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+	{% include 'includes/sidebar.j2' %}
+	<div class="w3-main" style="margin-left:350px">
+		<div class="w3-padding w3-mobile">
+			<div class="w3-card w3-padding w3-mobile">
+				<div class="w3-container w3-border-bottom">
+					<h3>Upload A New Sample</h3>
+				</div>
+				<form class="w3-container"  action="" method="post" enctype="multipart/form-data">
+					{{ form.hidden_tag() }}
+					<div class="w3-row w3-section">
+						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-address-card"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+						<div class="w3-rest">
+							{% if form.samplename.errors %}
+								{{ form.samplename(class="w3-input w3-border w3-border-red") }}
+								<div class="w3-small w3-text-flat-alizarin">
+									{% for error in form.samplename.errors %}
+										<i class="fas fa-exclamation-circle"></i> {{ error }}
+									{% endfor %}
+								</div>
+							{% else %}
+								{{ form.samplename(class="w3-input w3-border") }}
+							{% endif %}
+						</div>
+					</div>
+					<div class="w3-row w3-section">
+						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+						<div class="w3-rest">
+							{% if form.vcf_file.errors %}
+								{{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}
+								<div class="w3-small w3-text-flat-alizarin">
+									{% for error in form.vcf_file.errors %}
+										<i class="fas fa-exclamation-circle"></i> {{ error }}
+									{% endfor %}
+								</div>
+							{% else %}
+								{{ form.vcf_file(class="w3-input w3-border-0") }}
+							{% endif %}
+						</div>
+					</div>
+
+					<div class="w3-section w3-center">
+						{{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+
+{% block script %}
+	// Script to open and close sidebar
+	function w3_open() {
+		document.getElementById("sidebar").style.display = "block";
+		document.getElementById("overlay").style.display = "block";
+	}
+
+	function w3_close() {
+		document.getElementById("sidebar").style.display = "none";
+		document.getElementById("overlay").style.display = "none";
+	}
+{% endblock %}
+
+
+{% block static %}
+{% endblock %}

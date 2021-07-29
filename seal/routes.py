@@ -3,13 +3,14 @@ import secrets
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
 from seal.models import User, Sample
 from flask_login import login_user, current_user, logout_user, login_required
 
 
 ################################################################################
 # Essentials pages
+
 
 @app.route("/")
 @app.route("/home")
@@ -162,3 +163,24 @@ def variants(id, version=-1):
         })
 
     return jsonify(variants)
+
+
+@app.route("/create/sample", methods=['GET', 'POST'])
+@login_required
+def create_variant():
+    uploadSample = UploadVariantForm()
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    if "submit" in request.form and uploadSample.validate_on_submit():
+        sample = Sample.query.filter_by(samplename=uploadSample.samplename.data).first()
+        if sample:
+            flash("This Sample Name is already in database!", "error")
+            return redirect(url_for('index'))
+
+        flash('Sample Added!', 'success')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'analysis/create_sample.html', title="Add Sample",
+        form=uploadSample
+    )
