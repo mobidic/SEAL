@@ -7,7 +7,7 @@ from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
 from seal.models import User, Sample
 from flask_login import login_user, current_user, logout_user, login_required
-from anacore import annotVcf
+
 
 ################################################################################
 # Essentials pages
@@ -199,7 +199,7 @@ def create_variant():
 
         add_vcf(uploadSampleForm.samplename.data, uploadSampleForm.vcf_file.data)
 
-        flash('Sample Added!', 'success')
+        flash(f'The sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
         return redirect(url_for('index'))
 
     return render_template(
