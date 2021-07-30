@@ -106,8 +106,8 @@ class Variant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     chr = db.Column(db.String(10), unique=False, nullable=False)
     pos = db.Column(db.Integer, unique=False, nullable=False)
-    ref = db.Column(db.String(20), unique=False, nullable=False)
-    alt = db.Column(db.String(20), unique=False, nullable=False)
+    ref = db.Column(db.String(500), unique=False, nullable=False)
+    alt = db.Column(db.String(500), unique=False, nullable=False)
     annotations = db.Column(db.JSON, nullable=True)
 
     __table_args__ = (
