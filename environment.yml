@@ -16,3 +16,4 @@ dependencies:
   - postgresql=13.3
   - psycopg2=2.8.6
   - anacore=2.9
+  - flask-apscheduler=1.12.2
