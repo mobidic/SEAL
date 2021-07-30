@@ -26,3 +26,4 @@ scheduler.start()
 
 
 from seal import routes
+from seal import schedulers
