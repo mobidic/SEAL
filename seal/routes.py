@@ -19,12 +19,9 @@ def index():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
 
-    samples = Sample.query.all()
-
     return render_template(
         "essentials/home.html",
-        title="Home",
-        samples=samples
+        title="Home"
     )
 
 
@@ -142,6 +139,20 @@ def sample(id):
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample
     )
+
+
+@app.route("/json/samples", methods=['GET', 'POST'])
+@login_required
+def samples():
+    samples = Sample.query.all()
+    samples_json = {"data": list()}
+    for sample in samples:
+        samples_json["data"].append({
+            "id": sample.id,
+            "samplename": sample.samplename,
+            "analysed": sample.analysed
+        })
+    return jsonify(samples_json)
 
 
 @app.route("/json/variants/sample/<int:id>", methods=['GET', 'POST'])

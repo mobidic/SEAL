@@ -5,25 +5,13 @@
 	{% include 'includes/sidebar.j2' %}
 	<div class="w3-main" style="margin-left:350px">
 		<div class="w3-padding">
-			<table id="samples" class="w3-table-all" style="width:100%">
+			<table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
 				<thead>
 					<tr class="w3-flat-green-sea">
 						<th>Sample Name</th>
 						<th>Analysis Status</th>
 					</tr>
 				</thead>
-				<tbody>
-					{% for sample in samples %}
-						<tr style="cursor: pointer;" data-href="{{ url_for('sample', id=sample.id) }}" class="w3-hover-flat-turquoise">
-							<td>{{ sample.samplename }}</td>
-							<td>{{ sample.analysed }}</td>
-						</tr>
-			        {% else %}
-						<tr>
-							<td colspan="2" class="w3-center">No data available</td>
-						</tr>
-					{% endfor %}
-				</tbody>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
 						<th>Sample Name</th>
@@ -38,12 +26,21 @@
 
 {% block script %}
 	$(document).ready(function() {
-	    $('#samples').DataTable();
+	    table = $('#samples').DataTable({
+			scrollX: true,
+    		ajax: '/json/samples',
+    		"columns": [
+		        { "className": 'showTitle control-size-100', "data": "samplename"},
+		        { "className": 'showTitle control-size-150', "data": "analysed"}
+			]
+		});
+
+		$('#samples tbody').on( 'click', 'tr', function () {
+			id = table.row( this ).data().id ;
+		    document.location.href = "/sample/" + id;
+		} );
 	} );
 
-	$('tr[data-href]').on("click", function() {
-	    document.location = $(this).data('href');
-	});
 
 	// Script to open and close sidebar
 	function w3_open() {
@@ -60,33 +57,9 @@
 
 {% block static %}
 	<style>
-		table.dataTable thead th {
-		    position: relative;
-		    background-image: none !important;
+		tbody tr:hover {
+			cursor: pointer;
+
 		}
-		table.dataTable thead .sorting{
-		    background-image: none !important;
-		}
-		table.dataTable thead th.sorting:after,
-		table.dataTable thead th.sorting_asc:after,
-		table.dataTable thead th.sorting_desc:after {
-		    position: absolute !important;
-		    top: 12px !important;
-		    right: 8px !important;
-		    font-size: 0.8em !important;
-		    font-family: 'Font Awesome\ 5 Free' !important;
-		}
-		table.dataTable thead th.sorting:after {
-		    content: "\f30c\f309" !important;
-			opacity:0.5;
-		}
-		table.dataTable thead th.sorting_asc:after {
-			opacity:1;
-		    content: "\f15d" !important;
-		}
-		table.dataTable thead th.sorting_desc:after {
-			opacity:1;
-		    content: "\f882" !important;
-		}
-		</style>
+	</style>
 {% endblock %}
