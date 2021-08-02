@@ -30,25 +30,28 @@
 			scrollX: true,
     		ajax: '/json/samples',
     		"columns": [
-		        { "className": 'showTitle control-size-100', "data": "samplename"},
-		        { "className": 'showTitle control-size-150', "data": "status"}
+		        { "className": 'showTitle', "data": "samplename"},
+		        { "className": 'showTitle w3-center control-size-100', "data": "status"}
 			],
 			"columnDefs": [
 	            {
-	                "render": function ( data, type, row ) {
-						response = "UUU";
-						if (data == -1) {
-							response = '<i class="w3-text-flat-alizarin fas fa-times-circle"></i>';
-						} else if (data == '0') {
-							response = '<i class="w3-text-flat-peter-river fa-spin fas fa-circle-notch"></i>';
-						} else if (data == 1) {
-							response = '<i class="w3-text-flat-emerald fas fa-check-circle"></i>';
-						} else {
-							response = '<i class="w3-text-flat-orange fas fa-exclamation-triangle"></i>';
-						}
-
-						return response;
-	                },
+	                "render": {
+						"display": function ( data, type, row ) {
+							if (data == -1) {
+								response = '<i title="Error" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
+							} else if (data == '0') {
+								response = '<i title="In Proceedings" class="w3-text-flat-peter-river fa-spin fas fa-circle-notch"></i>';
+							} else if (data == 1) {
+								response = '<i title="Valid" class="w3-text-flat-emerald fas fa-check-circle"></i>';
+							} else {
+								response = '<i title="Warning" class="w3-text-flat-orange fas fa-exclamation-triangle"></i>';
+							}
+							return response;
+		                },
+						"sort": function ( data, type, row ) {
+							return data;
+		                },
+					},
 	                "targets": 1
 	            }
 			],
