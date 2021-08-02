@@ -9,13 +9,13 @@
 				<thead>
 					<tr class="w3-flat-green-sea">
 						<th>Sample Name</th>
-						<th>Analysis Status</th>
+						<th>Status</th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
 						<th>Sample Name</th>
-						<th>Analysis Status</th>
+						<th>Status</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -31,8 +31,27 @@
     		ajax: '/json/samples',
     		"columns": [
 		        { "className": 'showTitle control-size-100', "data": "samplename"},
-		        { "className": 'showTitle control-size-150', "data": "analysed"}
-			]
+		        { "className": 'showTitle control-size-150', "data": "status"}
+			],
+			"columnDefs": [
+	            {
+	                "render": function ( data, type, row ) {
+						response = "UUU";
+						if (data == -1) {
+							response = '<i class="w3-text-flat-alizarin fas fa-times-circle"></i>';
+						} else if (data == '0') {
+							response = '<i class="w3-text-flat-peter-river fa-spin fas fa-circle-notch"></i>';
+						} else if (data == 1) {
+							response = '<i class="w3-text-flat-emerald fas fa-check-circle"></i>';
+						} else {
+							response = '<i class="w3-text-flat-orange fas fa-exclamation-triangle"></i>';
+						}
+
+						return response;
+	                },
+	                "targets": 1
+	            }
+			],
 		});
 
 		$('#samples tbody').on( 'click', 'tr', function () {

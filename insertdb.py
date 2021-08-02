@@ -31,15 +31,17 @@ user.teams.append(team1)
 db.session.commit()
 
 sample1 = Sample(samplename="sample1")
-sample2 = Sample(samplename="sample2", analysed=True)
+sample2 = Sample(samplename="sample2", status=-1)
 sample3 = Sample(samplename="sample3")
+sample4 = Sample(samplename="sample4", status=2)
 db.session.add(sample1)
 db.session.add(sample2)
 db.session.add(sample3)
+db.session.add(sample4)
 db.session.commit()
 
 sample1 = Sample.query.get(1)
-sample1.analysed = True
+sample1.status = 1
 db.session.commit()
 
 variant1 = Variant(id="chr1-12-a-c", chr="chr1", pos=12, ref="a", alt="c")

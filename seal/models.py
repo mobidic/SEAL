@@ -92,14 +92,14 @@ var2sample = db.Table(
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(20), unique=False, nullable=False)
-    analysed = db.Column(db.Boolean(), unique=False, nullable=False, default=False)
+    status = db.Column(db.Integer, unique=False, nullable=False, default=0)
     variants = db.relationship(
         'Variant', secondary=var2sample, lazy='subquery',
         backref=db.backref('samples', lazy=True)
     )
 
     def __repr__(self):
-        return f"Sample('{self.samplename}','{self.analysed}')"
+        return f"Sample('{self.samplename}','{self.status}')"
 
 
 class Variant(db.Model):

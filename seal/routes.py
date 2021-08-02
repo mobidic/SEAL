@@ -150,7 +150,7 @@ def samples():
         samples_json["data"].append({
             "id": sample.id,
             "samplename": sample.samplename,
-            "analysed": sample.analysed
+            "status": sample.status
         })
     return jsonify(samples_json)
 
