@@ -14,6 +14,7 @@ app.config['SECRET_KEY'] = '78486cd05859fc8c6baa29c430f06638'
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///seal"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SCHEDULER_API_ENABLED'] = True
+app.config['SCHEDULER_JOB_DEFAULTS'] = {"coalesce": False, "max_instances": 2}
 
 
 db = SQLAlchemy(app)
@@ -23,6 +24,9 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 scheduler.init_app(app)
 scheduler.start()
+
+
+app.logger.info(app.config)
 
 
 from seal import routes

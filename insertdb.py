@@ -3,7 +3,6 @@ from seal import db, app
 from seal.models import User, Team, Sample, Variant
 from datetime import datetime
 from sqlalchemy.orm.attributes import flag_modified
-
 pathDB = os.path.join(app.root_path, 'site.db')
 if os.path.exists(pathDB):
     os.remove(pathDB)
@@ -43,8 +42,8 @@ sample1 = Sample.query.get(1)
 sample1.analysed = True
 db.session.commit()
 
-variant1 = Variant(chr="chr1", pos=12, ref="a", alt="c")
-variant2 = Variant(chr="chr1", pos=12, ref="a", alt="g")
+variant1 = Variant(id="chr1-12-a-c", chr="chr1", pos=12, ref="a", alt="c")
+variant2 = Variant(id="chr1-12-a-g", chr="chr1", pos=12, ref="a", alt="g")
 db.session.add(variant1)
 db.session.add(variant2)
 db.session.commit()
@@ -54,7 +53,7 @@ sample.variants.append(variant2)
 sample.variants.append(variant1)
 db.session.commit()
 
-variant = Variant.query.get(1)
+variant = Variant.query.get("chr1-12-a-c")
 variant.annotations = [{
     "key1": "value1",
     "key2": ["value3", "value2"]

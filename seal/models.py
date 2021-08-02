@@ -64,7 +64,7 @@ class Team(db.Model):
 var2sample = db.Table(
     'var2sample',
     db.Column(
-        'variant_ID', db.Integer,
+        'variant_ID', db.Text,
         db.ForeignKey('variant.id'), primary_key=True
     ),
     db.Column(
@@ -103,16 +103,12 @@ class Sample(db.Model):
 
 
 class Variant(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Text, primary_key=True)
     chr = db.Column(db.String(10), unique=False, nullable=False)
     pos = db.Column(db.Integer, unique=False, nullable=False)
     ref = db.Column(db.String(500), unique=False, nullable=False)
     alt = db.Column(db.String(500), unique=False, nullable=False)
     annotations = db.Column(db.JSON, nullable=True)
-
-    __table_args__ = (
-        db.UniqueConstraint('chr', 'pos', 'ref', 'alt', name='_varUC'),
-    )
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
