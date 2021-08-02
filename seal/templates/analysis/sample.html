@@ -18,8 +18,6 @@
                         <th>annotations</th>
 					</tr>
 				</thead>
-				<tbody>
-				</tbody>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
                         <th>chr</th>
@@ -62,38 +60,4 @@
 		document.getElementById("sidebar").style.display = "none";
 		document.getElementById("overlay").style.display = "none";
 	}
-{% endblock %}
-
-
-{% block static %}
-	<style>
-		.dataTables_scrollHead table.dataTable thead th {
-		    position: relative;
-		    background-image: none !important;
-		}
-		.dataTables_scrollHead table.dataTable thead .sorting{
-		    background-image: none !important;
-		}
-		.dataTables_scrollHead table.dataTable thead th.sorting:after,
-		.dataTables_scrollHead table.dataTable thead th.sorting_asc:after,
-		.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
-		    position: absolute !important;
-		    top: 12px !important;
-		    right: 8px !important;
-		    font-size: 0.8em !important;
-		    font-family: 'Font Awesome\ 5 Free' !important;
-		}
-		.dataTables_scrollHead table.dataTable thead th.sorting:after {
-		    content: "\f30c\f309" !important;
-			opacity:0.5;
-		}
-		.dataTables_scrollHead table.dataTable thead th.sorting_asc:after {
-			opacity:1;
-		    content: "\f15d" !important;
-		}
-		.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
-			opacity:1;
-		    content: "\f882" !important;
-		}
-	</style>
 {% endblock %}
