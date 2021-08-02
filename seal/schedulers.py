@@ -1,6 +1,5 @@
 import os
 import json
-import time
 from seal import app, scheduler, db
 from seal.models import Sample, Variant
 from anacore import annotVcf
