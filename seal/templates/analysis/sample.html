@@ -40,7 +40,7 @@
 	$(document).ready(function() {
 	    $('#variants').DataTable({
 			scrollX: true,
-    		ajax: '/sample/variants/{{ sample.id }}',
+    		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
 		        { "className": 'showTitle control-size-100', "data": "chr"},
 		        { "className": 'showTitle control-size-150', "data": "pos"},

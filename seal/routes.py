@@ -144,8 +144,8 @@ def sample(id):
     )
 
 
-@app.route("/sample/variants/<int:id>", methods=['GET', 'POST'])
-@app.route("/sample/variants/<int:id>/<int:version>", methods=['GET', 'POST'])
+@app.route("/json/variants/sample/<int:id>", methods=['GET', 'POST'])
+@app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
 def variants(id, version=-1):
     sample = Sample.query.get(int(id))
