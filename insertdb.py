@@ -1,6 +1,6 @@
 import os
 from seal import db, app
-from seal.models import User, Team, Sample, Variant
+from seal.models import User, Team, Sample, Variant, Filter
 from datetime import datetime
 from sqlalchemy.orm.attributes import flag_modified
 pathDB = os.path.join(app.root_path, 'site.db')
@@ -13,7 +13,13 @@ os.system('psql postgres -c "CREATE DATABASE seal;"')
 db.create_all()
 
 
-user1 = User(username="admin", password="$2b$12$a41mGjwpAWjVNEJirzsbVOBVmn6dv2Cmj/xTye13j7qZg1nNMkUIS", admin=True, technician=True, bioinfo=True, biologist=True)
+filter1 = Filter(filtername="Default")
+filter2 = Filter(filtername="Other", gnomAD_AF=1)
+db.session.add(filter1)
+db.session.add(filter2)
+db.session.commit()
+
+user1 = User(username="admin", password="$2b$12$a41mGjwpAWjVNEJirzsbVOBVmn6dv2Cmj/xTye13j7qZg1nNMkUIS", admin=True, technician=True, bioinfo=True, biologist=True, filter_id=2)
 user2 = User(username="user", mail="mail@mail.com", password="$2b$12$a41mGjwpAWjVNEJirzsbVOBVmn6dv2Cmj/xTye13j7qZg1nNMkUIS")
 db.session.add(user1)
 db.session.add(user2)
