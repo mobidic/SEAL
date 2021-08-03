@@ -8,6 +8,12 @@
 			<h3><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
 		</div>
 		<div class="w3-padding">
+			<table cellspacing="5" cellpadding="5" border="0">
+		        <tbody><tr>
+		            <td>Gnomad Max:</td>
+		            <td><input type="text" id="gnomadMax" name="gnomadMax" value="{{ filter.gnomAD_AF }}"></td>
+		        </tr>
+		    </tbody></table>
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
 					<tr class="w3-flat-green-sea">
@@ -36,7 +42,7 @@
 
 {% block script %}
 	$(document).ready(function() {
-	    $('#variants').DataTable({
+	    table = $('#variants').DataTable({
 			scrollX: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
@@ -47,6 +53,11 @@
 		        { "className": 'showTitle control-size-200', "data": "annotations"},
 			]
 		});
+
+	      // Event listener to the two range filtering inputs to redraw on input
+	      $('#gnomadMax').keyup( function() {
+	          table.draw();
+	      } );
 
 	} );
 
@@ -60,4 +71,18 @@
 		document.getElementById("sidebar").style.display = "none";
 		document.getElementById("overlay").style.display = "none";
 	}
+
+	$.fn.dataTable.ext.search.push(
+	    function( settings, data, dataIndex ) {
+	        var gnomadMax = parseFloat( $('#gnomadMax').val());
+	        var gnomaAD_AF = parseInt( data[1] ) || 0; // use data for the age column
+
+	        if ( isNaN( gnomadMax ) || ( gnomaAD_AF >= gnomadMax ) )
+	        {
+	            return true;
+	        }
+	        return false;
+	    }
+	);
+
 {% endblock %}

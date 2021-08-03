@@ -4,8 +4,8 @@ import json
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
-from seal.models import User, Sample
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, SelectFilterForm
+from seal.models import User, Sample, Filter
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -99,22 +99,21 @@ def account():
         if update_account_form.image_file.data:
             picture_file = save_picture(update_account_form.image_file.data)
             current_user.image_file = picture_file
+
         current_user.mail = update_account_form.mail.data
         current_user.username = update_account_form.username.data
         db.session.commit()
+
         flash('Your account has been updated!', 'success')
-        return redirect(url_for('account'))
     elif "submit_password" in request.form and update_password_form.validate_on_submit():
         current_user.password = bcrypt.generate_password_hash(update_password_form.new_password.data).decode('utf-8')
         db.session.commit()
+
         flash('Your password has been changed!', 'success')
-        return redirect(url_for('account'))
-    elif request.method == 'GET':
-        update_account_form.username.data = current_user.username
-        update_account_form.mail.data = current_user.mail
-    else:
-        update_account_form.username.data = current_user.username
-        update_account_form.mail.data = current_user.mail
+
+    update_account_form.username.data = current_user.username
+    update_account_form.mail.data = current_user.mail
+
     return render_template(
         'authentication/account.html', title='Account',
         update_account_form=update_account_form,
@@ -135,9 +134,27 @@ def sample(id):
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
+
+    filters = list()
+    for filter in Filter.query.all():
+        if current_user.filter_id == filter.id:
+            filters.append((filter.id, f'{filter.filtername} (default)'))
+        else:
+            filters.append((filter.id, f'{filter.filtername}'))
+
+    selectFilterForm = SelectFilterForm()
+    selectFilterForm.filter.choices = filters
+    if "submit_filter" in request.form and selectFilterForm.validate_on_submit():
+        filter = Filter.query.get(selectFilterForm.filter.data)
+        flash(f"You are using '{filter.filtername}' as filter!", 'warning')
+    else:
+        filter = Filter.query.get(current_user.filter_id)
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
-        sample=sample
+        selectFilterForm=selectFilterForm,
+        sample=sample,
+        filter=filter
     )
 
 

@@ -1,7 +1,7 @@
 
 
 <!-- Sidebar/menu -->
-<nav class="w3-sidebar w3-bar-block w3-collapse w3-white w3-flat-clouds" style="z-index:3;width:350px" id="sidebar">
+<nav class="w3-sidebar w3-bar-block w3-collapse w3-flat-clouds" style="z-index:3;width:350px" id="sidebar">
 	<a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-small w3-padding w3-opacity-max w3-hover-opacity" title="close menu"><i class="far fa-times-circle"></i></a>
 	<div class="w3-container">
 		{% include "includes/flash.j2" %}
@@ -31,6 +31,21 @@
 		<div class="w3-row w3-display-container w3-margin">
 			<a href="{{ url_for('create_variant') }}" class="w3-text-flat-green-sea w3-hover-text-flat-turquoise"><span class="w3-left"><i class="w3-xlarge fas fa-plus-circle"></i></span> <span class="w3-margin-left w3-left"><b>Add A New Sample</b></span></a>
 		</div>
+		{% if selectFilterForm %}
+			<div class="w3-row w3-display-container w3-margin w3-border-top">
+				<form class="w3-display-container"  action="" method="post" enctype="multipart/form-data">
+					{{ selectFilterForm.hidden_tag() }}
+					<h3><i>Filter</i></h3>
+					<div>
+						<div class="w3-text-flat-green-sea w3-left w3-padding"><i class="w3-large fas fa-filter"></i></div>
+						<div class="w3-rest">
+							{{ selectFilterForm.filter(class="w3-input", style="border-bottom:0; width") }}
+						</div>
+					</div>
+						{{ selectFilterForm.submit_filter(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise" , style="width:100%") }}
+				</form>
+			</div>
+		{% endif %}
 
 	</div>
 </nav>
