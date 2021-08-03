@@ -36,6 +36,8 @@ class User(db.Model, UserMixin):
     bioinfo = db.Column(db.Boolean(), nullable=False, default=False)
     technician = db.Column(db.Boolean(), nullable=False, default=False)
     biologist = db.Column(db.Boolean(), nullable=False, default=False)
+    filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), default=1)
+
     teams = db.relationship(
         'Team', secondary=team2member, lazy='subquery',
         backref=db.backref('members', lazy=True)
@@ -93,6 +95,7 @@ class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(20), unique=False, nullable=False)
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
+
     variants = db.relationship(
         'Variant', secondary=var2sample, lazy='subquery',
         backref=db.backref('samples', lazy=True)
@@ -114,4 +117,43 @@ class Variant(db.Model):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
 
 
+class Filter(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    filtername = db.Column(db.String(20), unique=True, nullable=False)
+    consequences = db.Column(db.ARRAY(db.String(40)), default=[
+        "transcript_ablation",
+        "splice_acceptor_variant",
+        "splice_donor_variant",
+        "stop_gained",
+        "frameshift_variant",
+        "stop_lost",
+        "start_lost",
+        "transcript_amplification",
+        "inframe_insertion",
+        "inframe_deletion",
+        "missense_variant",
+        "protein_altering_variant",
+        "splice_region_variant",
+        "incomplete_terminal_codon_variant",
+        "start_retained_variant",
+        "stop_retained_variant",
+        "coding_sequence_variant",
+        "regulatory_region_ablation",
+        "regulatory_region_amplification",
+        "feature_elongation",
+        "regulatory_region_variant",
+        "feature_truncation",
+    ])
+    impacts = db.Column(db.ARRAY(db.String(8)), default=["HIGH", "MODERATE", "MODIFIER"])
+    gnomAD_AF = db.Column(db.Float(4), unique=False, nullable=True, default=0.01)
+    clinsig = db.Column(db.ARRAY(db.String(40)), default=[
+        "uncertain_significance",
+        "conflicting_interpretations_of_pathogenicity",
+        "pathogenic",
+        "likely_pathogenic",
+        "pathogenic_likely_pathogenic",
+    ])
+
+    def __repr__(self):
+        return f"{self.filtername}"
 ################################################################################
