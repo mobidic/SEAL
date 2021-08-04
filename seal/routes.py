@@ -161,13 +161,13 @@ def sample(id):
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
 def samples():
-    samples = Sample.query.all()
+    samples = db.session.query(Sample.id, Sample.samplename, Sample.status).all()
     samples_json = {"data": list()}
     for sample in samples:
         samples_json["data"].append({
-            "id": sample.id,
-            "samplename": sample.samplename,
-            "status": sample.status
+            "id": sample[0],
+            "samplename": sample[1],
+            "status": sample[2]
         })
     return jsonify(samples_json)
 
@@ -183,7 +183,10 @@ def variants(id, version=-1):
 
     variants = {"data": list()}
     for variant in sample.variants:
-        annotations = variant.annotations[-1]["ANN"]
+        try:
+            annotations = variant.annotations[-1]["ANN"]
+        except TypeError:
+            annotations = None
         variants["data"].append({
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",

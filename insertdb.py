@@ -63,10 +63,9 @@ db.session.commit()
 
 variant = Variant.query.get("chr1-12-a-c")
 variant.annotations = [{
-    "key1": "value1",
-    "key2": ["value3", "value2"]
-}, {
-    "key1": "value1 - new",
-    "key2": ["value3", "value2"]
+    "date": "aaa",
+    "ANN": {
+        "TEST": "A"
+    }
 }]
 db.session.commit()
