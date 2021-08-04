@@ -183,12 +183,13 @@ def variants(id, version=-1):
 
     variants = {"data": list()}
     for variant in sample.variants:
+        annotations = variant.annotations[-1]["ANN"]
         variants["data"].append({
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
             "alt": f"{variant.alt}",
-            "annotations": f"{variant.annotations}",
+            "annotations": f"{annotations}",
         })
 
     return jsonify(variants)
