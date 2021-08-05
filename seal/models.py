@@ -1,6 +1,6 @@
 from seal import db, login_manager
 from flask_login import UserMixin
-
+from sqlalchemy.orm import relationship
 
 ################################################################################
 # Authentication
@@ -156,4 +156,25 @@ class Filter(db.Model):
 
     def __repr__(self):
         return f"{self.filtername}"
+
+
+class Gene(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    hgnc = db.Column(db.String(20), unique=True, nullable=False)
+    transcripts = relationship("Transcript")
+
+    def __repr__(self):
+        return f"Gene('{self.hgnc}')"
+
+
+class Transcript(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    transcriptname = db.Column(db.String(20), unique=True, nullable=False)
+    gene_id = db.Column(db.Integer, db.ForeignKey('gene.id'))
+    gene = relationship("Gene", back_populates="transcripts")
+
+    def __repr__(self):
+        return f"Transcript('{self.transcriptname}')"
+
+
 ################################################################################

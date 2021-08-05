@@ -1,6 +1,6 @@
 import os
 from seal import db, app
-from seal.models import User, Team, Sample, Variant, Filter
+from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript
 from datetime import datetime
 from sqlalchemy.orm.attributes import flag_modified
 pathDB = os.path.join(app.root_path, 'site.db')
@@ -65,7 +65,25 @@ variant = Variant.query.get("chr1-12-a-c")
 variant.annotations = [{
     "date": "aaa",
     "ANN": {
-        "TEST": "A"
+        "feature1": {
+            "annot1": "A"
+        },
+        "feature2": {
+            "annot1": "B"
+        }
     }
 }]
+db.session.commit()
+
+gene1 = Gene(hgnc="GENE_A")
+gene2 = Gene(hgnc="GENE_B")
+db.session.add(gene1)
+db.session.add(gene2)
+db.session.commit()
+
+
+transcript1 = Transcript(transcriptname="feature1", gene_id=1)
+transcript2 = Transcript(transcriptname="feature2", gene_id=1)
+db.session.add(transcript1)
+db.session.add(transcript2)
 db.session.commit()
