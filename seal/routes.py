@@ -5,7 +5,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, SelectFilterForm
-from seal.models import User, Sample, Filter
+from seal.models import User, Sample, Filter, Transcript
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -196,6 +196,27 @@ def variants(id, version=-1):
         })
 
     return jsonify(variants)
+
+
+@app.route("/json/transcripts")
+@login_required
+def transcripts():
+    transcripts = db.session.query(Transcript).all()
+    transcripts_json = {"data": list()}
+    print(transcripts)
+    for transcript in transcripts:
+        # for transcript in gene.transcripts:
+        transcripts_json["data"].append({
+            "hgncname": transcript.gene.hgncname,
+            "hgncid": transcript.gene.hgncid,
+            "chromosome": transcript.gene.chromosome,
+            "strand": transcript.gene.strand,
+            "refSeq": transcript.refSeq,
+            "canonical": transcript.canonical,
+            "refProt": transcript.refProt,
+            "uniprot": transcript.uniprot
+        })
+    return jsonify(transcripts_json)
 
 
 def add_vcf(samplename, vcf_file):
