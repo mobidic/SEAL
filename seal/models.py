@@ -160,21 +160,28 @@ class Filter(db.Model):
 
 class Gene(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    hgnc = db.Column(db.String(20), unique=True, nullable=False)
+    hgncname = db.Column(db.String(20), unique=True, nullable=False)
+    hgncid = db.Column(db.String(20), unique=True, nullable=False)
+    chromosome = db.Column(db.String(5))
+    strand = db.Column(db.CHAR)
     transcripts = relationship("Transcript")
 
     def __repr__(self):
-        return f"Gene('{self.hgnc}')"
+        return f"Gene('{self.hgncname}','{self.hgncid}')"
 
 
 class Transcript(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    transcriptname = db.Column(db.String(20), unique=True, nullable=False)
-    gene_id = db.Column(db.Integer, db.ForeignKey('gene.id'))
+    refSeq = db.Column(db.String(20), unique=True, nullable=False)
+    canonical = db.Column(db.Boolean(), nullable=False, unique=False, default=False)
+    refProt = db.Column(db.String(30))
+    uniprot = db.Column(db.String(30))
+
+    geneid = db.Column(db.Integer, db.ForeignKey('gene.id'))
     gene = relationship("Gene", back_populates="transcripts")
 
     def __repr__(self):
-        return f"Transcript('{self.transcriptname}')"
+        return f"Transcript('{self.refSeq}','{self.canonical}')"
 
 
 ################################################################################

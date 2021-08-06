@@ -75,15 +75,15 @@ variant.annotations = [{
 }]
 db.session.commit()
 
-gene1 = Gene(hgnc="GENE_A")
-gene2 = Gene(hgnc="GENE_B")
+gene1 = Gene(hgncname="GENE_A", hgncid="IDA")
+gene2 = Gene(hgncname="GENE_B", hgncid="IDB")
 db.session.add(gene1)
 db.session.add(gene2)
 db.session.commit()
 
 
-transcript1 = Transcript(transcriptname="feature1", gene_id=1)
-transcript2 = Transcript(transcriptname="feature2", gene_id=1)
+transcript1 = Transcript(refSeq="feature1", geneid=1)
+transcript2 = Transcript(refSeq="feature2", geneid=1)
 db.session.add(transcript1)
 db.session.add(transcript2)
 db.session.commit()
