@@ -22,6 +22,7 @@ def importvcf():
         if f.endswith(".token"):
             curr_token = f
             continue
+
     if curr_token:
         f_base, f_ext = os.path.splitext(curr_token)
         old_fn = os.path.join(app.root_path, 'static/temp/vcf/', curr_token)
@@ -44,28 +45,32 @@ def importvcf():
             "PHENO",
             "PUBMED"
         ]
+        vcf_fn = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.vcf')
+
         try:
-            vcf_fn = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.vcf')
             with annotVcf.AnnotVCFIO(vcf_fn) as vcf_io:
                 for v in vcf_io:
-                    if v.alt == "*":
+                    if v.alt[0] == "*":
                         continue
                     variant = Variant.query.get(f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}")
                     if not variant:
                         annotations = [{
                             "date": current_date,
-                            "ANN": list()
+                            "ANN": dict()
                         }]
 
                         for annot in v.info["ANN"]:
                             for splitAnn in annot_to_split:
                                 annot[splitAnn] = splitAnnot(annot[splitAnn])
-                            annotations[-1]["ANN"][annot["Feature"]] = annot
+
+                            wout_version = annot["Feature"].split('.')[0]
+                            annotations[-1]["ANN"][wout_version] = annot
                         # app.logger.debug(f"       - Create Variant : {sample}")
                         variant = Variant(id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", chr=v.chrom, pos=v.pos, ref=v.ref, alt=v.alt[0], annotations=annotations)
                         db.session.add(variant)
 
                     sample.variants.append(variant)
+
         except Exception:
             sample.status = -1
         else:
