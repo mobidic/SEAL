@@ -45,6 +45,15 @@ def importvcf():
             "PHENO",
             "PUBMED"
         ]
+        gnomADg = [
+            "gnomADg_AF_AFR",
+            "gnomADg_AF_AMR",
+            "gnomADg_AF_ASJ",
+            "gnomADg_AF_EAS",
+            "gnomADg_AF_FIN",
+            "gnomADg_AF_NFE",
+            "gnomADg_AF_OTH"
+        ]
         vcf_fn = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.vcf')
 
         try:
@@ -63,6 +72,23 @@ def importvcf():
                             for splitAnn in annot_to_split:
                                 annot[splitAnn] = splitAnnot(annot[splitAnn])
 
+                            gnomadg_max = None
+                            gnomadg_max_pop = "ALL"
+                            for gnomADg_key in gnomADg:
+                                try:
+                                    print(annot[gnomADg_key])
+                                    annot[gnomADg_key] = float(annot[gnomADg_key])
+                                except ValueError:
+                                    annot[gnomADg_key] = 0
+                                except TypeError:
+                                    annot[gnomADg_key] = None
+
+                                if gnomadg_max is not None and annot[gnomADg_key] > annot[gnomADg_key]:
+                                    gnomadg_max = annot[gnomADg_key]
+                                    gnomadg_max_pop = "gnomADg_key"
+                            annot["GnomADg_max"] = gnomadg_max
+                            annot["GnomADg_max_pop"] = gnomadg_max_pop
+
                             wout_version = annot["Feature"].split('.')[0]
                             annotations[-1]["ANN"][wout_version] = annot
                         # app.logger.debug(f"       - Create Variant : {sample}")
@@ -70,8 +96,8 @@ def importvcf():
                         db.session.add(variant)
 
                     sample.variants.append(variant)
-
-        except Exception:
+        except Exception as e:
+            print(e)
             sample.status = -1
         else:
             sample.status = 1
