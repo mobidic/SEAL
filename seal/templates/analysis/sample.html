@@ -17,20 +17,30 @@
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
 					<tr class="w3-flat-green-sea">
-                        <th>chr</th>
-                        <th>pos</th>
-                        <th>ref</th>
-                        <th>alt</th>
-                        <th>annotations</th>
+						<th class='showTitle control-size-100'>Gene</th>
+						<th class='showTitle control-size-100'>Feature</th>
+						<th class='showTitle control-size-100'>Exon/Intron</th>
+                        <th class='showTitle control-size-300'>HGVSg</th>
+                        <th class='showTitle control-size-300'>HGVSc</th>
+						<th class='showTitle control-size-300'>HGVSp</th>
+						<th class='showTitle control-size-100'>GnomAD</th>
+						<th class='showTitle control-size-300'>ClinSig</th>
+						<th class='showTitle control-size-100'>Impact</th>
+                        <th class='showTitle control-size-300'>Consequence</th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
-                        <th>chr</th>
-                        <th>pos</th>
-                        <th>ref</th>
-                        <th>alt</th>
-                        <th>annotations</th>
+						<th class='showTitle control-size-100'>Gene</th>
+						<th class='showTitle control-size-100'>Feature</th>
+						<th class='showTitle control-size-100'>Exon/Intron</th>
+                        <th class='showTitle control-size-300'>HGVSg</th>
+                        <th class='showTitle control-size-300'>HGVSc</th>
+						<th class='showTitle control-size-300'>HGVSp</th>
+						<th class='showTitle control-size-100'>GnomAD</th>
+						<th class='showTitle control-size-300'>ClinSig</th>
+						<th class='showTitle control-size-100'>Impact</th>
+                        <th class='showTitle control-size-300'>Consequence</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -41,16 +51,329 @@
 
 
 {% block script %}
+
+	const clinsig_dict = {
+		"uncertain_significance": {
+			"color": "orange",
+			"score": 4
+		},
+		"conflicting_interpretations_of_pathogenicity": {
+			"color": "orange",
+			"score": 4
+		},
+		"pathogenic": {
+			"color": "alizarin",
+			"score": 10
+		},
+		"likely_pathogenic": {
+			"color": "alizarin",
+			"score": 7
+		},
+		"pathogenic/likely_pathogenic": {
+			"color": "alizarin",
+			"score": 6
+		},
+		"benign": {
+			"color": "turquoise",
+			"score": -1.5
+		},
+		"likely_benign": {
+			"color": "turquoise",
+			"score": -0.25
+		},
+		"benign/likely_benign": {
+			"color": "turquoise",
+			"score": -1
+		},
+		"not_provided": {
+			"color": "peter-river",
+			"score": 0
+		},
+		"other": {
+			"color": "peter-river",
+			"score": 0
+		},
+		"protective": {
+			"color": "peter-river",
+			"score": 0
+		},
+		"association": {
+			"color": "peter-river",
+			"score": 0
+		},
+		"risk_factor": {
+			"color": "peter-river",
+			"score": 0
+		},
+		"affects": {
+			"color": "peter-river",
+			"score": 0
+		}
+	};
+
+	const impact_dict = {
+		"MODERATE": {
+			"color": "orange",
+			"score" : 2
+		},
+		"MODIFIER": {
+			"color": "orange",
+			"score" : 1.5
+		},
+		"HIGH": {
+			"color": "alizarin",
+			"score" : 3
+		},
+		"LOW": {
+			"color": "turquoise",
+			"score" : 1
+		}
+	};
+
+	const consequences_dict = {
+		"transcript_ablation": {
+			"color": "ff0000",
+			"score": 0,
+		},
+		"stop_gained": {
+			"color": "ff0000",
+			"score": 0,
+		},
+		"stop_lost": {
+			"color": "ff0000",
+			"score": 0,
+		},
+		"splice_acceptor_variant": {
+			"color": "FF581A",
+			"score": 0,
+		},
+		"splice_donor_variant": {
+			"color": "FF581A",
+			"score": 0,
+		},
+		"frameshift_variant": {
+			"color": "9400D3",
+			"score": 0,
+		},
+		"start_lost": {
+			"color": "ffd700",
+			"score": 0,
+		},
+		"missense_variant": {
+			"color": "ffd700",
+			"score": 0,
+		},
+		"transcript_amplification": {
+			"color": "ff69b4",
+			"score": 0,
+		},
+		"inframe_insertion": {
+			"color": "ff69b4",
+			"score": 0,
+		},
+		"inframe_deletion": {
+			"color": "ff69b4",
+			"score": 0,
+		},
+		"protein_altering_variant": {
+			"color": "FF0080",
+			"score": 0,
+		},
+		"splice_region_variant": {
+			"color": "ff7f50",
+			"score": 0,
+		},
+		"incomplete_terminal_codon_variant": {
+			"color": "ff00ff",
+			"score": 0,
+		},
+		"start_retained_variant": {
+			"color": "76ee00",
+			"score": 0,
+		},
+		"stop_retained_variant": {
+			"color": "76ee00",
+			"score": 0,
+		},
+		"synonymous_variant": {
+			"color": "76ee00",
+			"score": 0,
+		},
+		"coding_sequence_variant": {
+			"color": "458b00",
+			"score": 0,
+		},
+		"mature_miRNA_variant": {
+			"color": "458b00",
+			"score": 0,
+		},
+		"3_prime_UTR_variant": {
+			"color": "7ac5cd",
+			"score": 0,
+		},
+		"5_prime_UTR_variant": {
+			"color": "7ac5cd",
+			"score": 0,
+		},
+		"non_coding_transcript_exon_variant": {
+			"color": "32cd32",
+			"score": 0,
+		},
+		"non_coding_transcript_variant": {
+			"color": "32cd32",
+			"score": 0,
+		},
+		"intron_variant": {
+			"color": "02599c",
+			"score": 0,
+		},
+		"NMD_transcript_variant": {
+			"color": "ff4500",
+			"score": 0,
+		},
+		"upstream_gene_variant": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"downstream_gene_variant": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"TFBS_ablation": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"TFBS_amplification": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"TF_binding_site_variant": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"regulatory_region_ablation": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"regulatory_region_amplification": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"regulatory_region_variant": {
+			"color": "a52a2a",
+			"score": 0,
+		},
+		"feature_elongation": {
+			"color": "7f7f7f",
+			"score": 0,
+		},
+		"feature_truncation": {
+			"color": "7f7f7f",
+			"score": 0,
+		},
+		"intergenic_variant": {
+			"color": "636363",
+			"score": 0,
+		}
+	};
+
 	$(document).ready(function() {
 	    table = $('#variants').DataTable({
 			scrollX: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
-		        { "className": 'showTitle control-size-100', "data": "chr"},
-		        { "className": 'showTitle control-size-150', "data": "pos"},
-		        { "className": 'showTitle control-size-150', "data": "ref"},
-				{ "className": 'showTitle control-size-200', "data": "alt"},
-		        { "className": 'showTitle control-size-200', "data": "annotations"},
+				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
+				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
+				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
+				{ "className": 'showTitle control-size-300', "data": "annotations.HGVSg"},
+				{ "className": 'showTitle control-size-300', "data": "annotations.HGVSc"},
+				{ "className": 'showTitle control-size-300', "data": "annotations.HGVSp"},
+				{
+					"className": 'showTitle control-size-100',
+					"data": "annotations.gnomADg_AF_EAS",
+					"render" : {
+						"_" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(6);
+							} else {
+								return "NA";
+							}
+					    },
+	            		"sort" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(6);
+							} else {
+								num = -1
+								return num.toFixed(6);
+							}
+					    }
+					},
+				},
+				{
+					"className": 'showTitle size-300',
+					"data": "annotations.CLIN_SIG",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							cell = {
+								"orange": "",
+								"alizarin": "",
+								"turquoise": "",
+								"peter-river": "",
+								"asbestos": ""
+							}
+							style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+
+							for (idx in data) {
+								color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
+								cell[color] += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
+							}
+							return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
+					    },
+						"filter": function ( data, type, row, meta ) {
+							return data.toString();
+					    },
+						"sort": function ( data, type, row, meta ) {
+							score = 0;
+							for (idx in data) {
+								score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
+							}
+							return score;
+					    },
+					}
+				},
+				{
+					"className": 'showTitle size-100',
+					"data": "annotations.IMPACT",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+							cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
+							return cell;
+					    },
+						"filter": function ( data, type, row, meta ) {
+							return data.toString();
+					    },
+						"sort": function ( data, type, row, meta ) {
+							return impact_dict[data]["score"];
+					    },
+					}
+
+				},
+				{
+					"className": 'showTitle size-300',
+					"data": "annotations.Consequence",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							cell = "";
+							for (idx in data) {
+								color = data[idx] in consequences_dict ? consequences_dict[data[idx]]["color"] : "7f8c8d";
+								style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
+								cell += " <span class='w3-tag' " + style + ">" + data[idx] + "</span>"
+							}
+							return cell;
+					    }
+					},
+				},
 			]
 		});
 
@@ -75,9 +398,9 @@
 	$.fn.dataTable.ext.search.push(
 	    function( settings, data, dataIndex ) {
 	        var gnomadMax = parseFloat( $('#gnomadMax').val());
-	        var gnomaAD_AF = parseInt( data[1] ) || 0; // use data for the age column
+	        var gnomaAD_AF = parseFloat( data[6] ) || 0; // use data for the age column
 
-	        if ( isNaN( gnomadMax ) || ( gnomaAD_AF >= gnomadMax ) )
+	        if ( isNaN( gnomadMax ) || ( gnomaAD_AF <= gnomadMax ) )
 	        {
 	            return true;
 	        }
