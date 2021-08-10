@@ -1,6 +1,7 @@
 import os
 import secrets
 import json
+import itertools
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
@@ -15,10 +16,8 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 @app.route("/")
 @app.route("/home")
+@login_required
 def index():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-
     return render_template(
         "essentials/home.html",
         title="Home"
@@ -176,23 +175,37 @@ def samples():
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
 def variants(id, version=-1):
+
     sample = Sample.query.get(int(id))
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
 
     variants = {"data": list()}
+
+    transcripts = db.session.query(Transcript.refSeq).filter_by(canonical=True).all()
+    transcripts = list(itertools.chain(*transcripts))
+    transcripts = [each.split('.')[0] for each in transcripts]
+
     for variant in sample.variants:
         try:
-            annotations = variant.annotations[-1]["ANN"]
+            annotations = variant.annotations[version]["ANN"]
+            features = list(annotations.keys())
+            select = [value for value in features if value in transcripts]
+            if len(select) > 0:
+                feature1 = select[0]
+            else:
+                feature1 = list(annotations.keys())[0]
         except TypeError:
             annotations = None
+            feature1 = None
+
         variants["data"].append({
+            "annotations": annotations[feature1],
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
             "alt": f"{variant.alt}",
-            "annotations": f"{annotations}",
         })
 
     return jsonify(variants)
