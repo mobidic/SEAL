@@ -2,6 +2,7 @@ import os
 import secrets
 import json
 import itertools
+import re
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
@@ -187,21 +188,74 @@ def variants(id, version=-1):
     transcripts = list(itertools.chain(*transcripts))
     transcripts = [each.split('.')[0] for each in transcripts]
 
+    consequences_dict = {
+        "stop_gained": 20,
+        "stop_lost": 20,
+        "splice_acceptor_variant": 10,
+        "splice_donor_variant": 10,
+        "frameshift_variant": 10,
+        "transcript_ablation": 10,
+        "start_lost": 10,
+        "transcript_amplification": 10,
+        "missense_variant": 10,
+        "protein_altering_variant": 10,
+        "splice_region_variant": 10,
+        "inframe_insertion": 10,
+        "inframe_deletion": 10,
+        "incomplete_terminal_codon_variant": 10,
+        "stop_retained_variant": 10,
+        "start_retained_variant": 10,
+        "synonymous_variant": 10,
+        "coding_sequence_variant": 10,
+        "mature_miRNA_variant": 10,
+        "intron_variant": 10,
+        "NMD_transcript_variant": 10,
+        "non_coding_transcript_exon_variant": 5,
+        "non_coding_transcript_variant": 5,
+        "3_prime_UTR_variant": 2,
+        "5_prime_UTR_variant": 2,
+        "upstream_gene_variant": 0,
+        "downstream_gene_variant": 0,
+        "TFBS_ablation": 0,
+        "TFBS_amplification": 0,
+        "TF_binding_site_variant": 0,
+        "regulatory_region_ablation": 0,
+        "regulatory_region_amplification": 0,
+        "regulatory_region_variant": 0,
+        "feature_elongation": 0,
+        "feature_truncation": 0,
+        "intergenic_variant": 0
+    }
+
     for variant in sample.variants:
         try:
             annotations = variant.annotations[version]["ANN"]
             features = list(annotations.keys())
-            select = [value for value in features if value in transcripts]
-            if len(select) > 0:
-                feature1 = select[0]
-            else:
-                feature1 = list(annotations.keys())[0]
+            feature = None
+            consequence_score_max = 0
+            for value in features:
+                consequence_score = 0
+                for consequence in annotations[value]["Consequence"]:
+                    consequence_score += consequences_dict[consequence]
+
+                annotations[value]["canonical"] = False
+                if value in transcripts:
+                    if consequence_score_max <= consequence_score:
+                        feature = value
+                        annotations[feature]["canonical"] = True
+                        consequence_score_max = consequence_score
+                elif re.search("NM_", value) and not annotations[feature]["canonical"]:
+                    feature = value
+                elif feature is None:
+                    feature = value
+
         except TypeError:
             annotations = None
-            feature1 = None
+            feature = None
 
         variants["data"].append({
-            "annotations": annotations[feature1],
+            "annotations": annotations[feature],
+            "annotations_all": str(list(annotations.keys())),
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
