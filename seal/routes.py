@@ -238,6 +238,15 @@ def variants(id, version=-1):
                 for consequence in annotations[value]["Consequence"]:
                     consequence_score += consequences_dict[consequence]
 
+                if annotations[value]["EXON"] is not None:
+                    pos = annotations[value]["EXON"]
+                    annotations[value]["EI"] = f"Exon {pos}"
+                elif annotations[value]["INTRON"] is not None:
+                    pos = annotations[value]["INTRON"]
+                    annotations[value]["EI"] = f"Intron {pos}"
+                else:
+                    annotations[value]["EI"] = "NA"
+
                 annotations[value]["canonical"] = False
                 if value in transcripts:
                     if consequence_score_max <= consequence_score:
@@ -248,14 +257,12 @@ def variants(id, version=-1):
                     feature = value
                 elif feature is None:
                     feature = value
-
         except TypeError:
             annotations = None
             feature = None
 
         variants["data"].append({
             "annotations": annotations[feature],
-            "annotations_all": str(list(annotations.keys())),
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
