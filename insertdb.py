@@ -1,8 +1,8 @@
 import os
 from seal import db, app
 from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript
-from datetime import datetime
-from sqlalchemy.orm.attributes import flag_modified
+
+
 pathDB = os.path.join(app.root_path, 'site.db')
 if os.path.exists(pathDB):
     os.remove(pathDB)
@@ -66,7 +66,10 @@ variant.annotations = [{
     "date": "aaa",
     "ANN": {
         "feature1": {
-            "annot1": "A"
+            "Consequences": ["ConsequenceA"],
+            "IMPACT": ["impact"],
+            "SYMBOL": "GENE",
+
         },
         "feature2": {
             "annot1": "B"
