@@ -226,6 +226,23 @@ def variants(id, version=-1):
         "feature_truncation": 0,
         "intergenic_variant": 0
     }
+    gnomADg = [
+        "gnomADg_AF_AFR",
+        "gnomADg_AF_AMR",
+        "gnomADg_AF_ASJ",
+        "gnomADg_AF_EAS",
+        "gnomADg_AF_FIN",
+        "gnomADg_AF_NFE",
+        "gnomADg_AF_OTH"
+    ]
+    annot_to_split = [
+        "Existing_variation",
+        "Consequence",
+        "CLIN_SIG",
+        "SOMATIC",
+        "PHENO",
+        "PUBMED"
+    ]
 
     for variant in sample.variants:
         try:
@@ -234,6 +251,12 @@ def variants(id, version=-1):
             feature = None
             consequence_score_max = 0
             for value in features:
+                for splitAnn in annot_to_split:
+                    try:
+                        annotations[value][splitAnn] = annotations[value][splitAnn].split("&")
+                    except AttributeError:
+                        annotations[value][splitAnn] = ["NA"]
+
                 consequence_score = 0
                 for consequence in annotations[value]["Consequence"]:
                     consequence_score += consequences_dict[consequence]
@@ -246,6 +269,23 @@ def variants(id, version=-1):
                     annotations[value]["EI"] = f"Intron {pos}"
                 else:
                     annotations[value]["EI"] = "NA"
+
+                gnomadg_max = None
+                gnomadg_max_pop = "ALL"
+                for gnomADg_key in gnomADg:
+                    try:
+                        annotations[value][gnomADg_key] = float(annotations[value][gnomADg_key])
+                    except ValueError:
+                        annotations[value][gnomADg_key] = 0
+                    except TypeError:
+                        annotations[value][gnomADg_key] = None
+
+                    if annotations[value][gnomADg_key] is not None:
+                        if gnomadg_max is None or annotations[value][gnomADg_key] > gnomadg_max:
+                            gnomadg_max = annotations[value][gnomADg_key]
+                            gnomadg_max_pop = gnomADg_key
+                annotations[value]["GnomADg_max"] = gnomadg_max
+                annotations[value]["GnomADg_max_pop"] = gnomadg_max_pop
 
                 annotations[value]["canonical"] = False
                 if value in transcripts:
