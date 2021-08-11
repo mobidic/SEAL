@@ -76,16 +76,16 @@ def importvcf():
                             gnomadg_max_pop = "ALL"
                             for gnomADg_key in gnomADg:
                                 try:
-                                    print(annot[gnomADg_key])
                                     annot[gnomADg_key] = float(annot[gnomADg_key])
                                 except ValueError:
                                     annot[gnomADg_key] = 0
                                 except TypeError:
                                     annot[gnomADg_key] = None
 
-                                if gnomadg_max is not None and annot[gnomADg_key] > annot[gnomADg_key]:
-                                    gnomadg_max = annot[gnomADg_key]
-                                    gnomadg_max_pop = "gnomADg_key"
+                                if annot[gnomADg_key] is not None:
+                                    if gnomadg_max is None or annot[gnomADg_key] > gnomadg_max:
+                                        gnomadg_max = annot[gnomADg_key]
+                                        gnomadg_max_pop = gnomADg_key
                             annot["GnomADg_max"] = gnomadg_max
                             annot["GnomADg_max_pop"] = gnomadg_max_pop
 
