@@ -6,13 +6,6 @@ from seal.models import Sample, Variant
 from anacore import annotVcf
 
 
-def splitAnnot(annot, char="&"):
-    try:
-        return annot.split(char)
-    except AttributeError:
-        return ["NA"]
-
-
 # cron examples
 @scheduler.task('cron', id='import vcf', minute="*/1")
 def importvcf():
