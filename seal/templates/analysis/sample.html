@@ -19,26 +19,46 @@
 					<tr class="w3-flat-green-sea">
 						<th class='showTitle control-size-100'>Gene</th>
 						<th class='showTitle control-size-100'>Feature</th>
-						<th class='showTitle control-size-100'>Canonical</th>
+						<th class='showTitle control-size-50'>Canonical</th>
 						<th class='showTitle control-size-100'>Exon/Intron</th>
-                        <th class='showTitle control-size-300'>HGVSg</th>
-                        <th class='showTitle control-size-300'>HGVSc</th>
-						<th class='showTitle control-size-300'>HGVSp</th>
-						<th class='showTitle control-size-100'>GnomAD</th>
-						<th class='showTitle control-size-300'>ClinSig</th>
-						<th class='showTitle control-size-100'>Impact</th>
-                        <th class='showTitle control-size-300'>Consequence</th>
+                        <th class='showTitle control-size-250'>HGVSg</th>
+                        <th class='showTitle control-size-250'>HGVSc</th>
+						<th class='showTitle control-size-250'>HGVSp</th>
+						<th class='showTitle control-size-100'>
+							GnomAD
+							<span onclick="openmodal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 (GRCh37/hg19) spans 125,748 exome sequences and 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class=" fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-300'>
+							ClinSig
+							<span onclick="openmodal(title='ClinSig', content='Representation of clinical significance in ClinVar and other variation resources at NCBI.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class=" fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							Impact
+							<span onclick="openmodal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class=" fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-300'>
+							Consequence
+							<span onclick="openmodal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class=" fas fa-question-circle"></i>
+							</span>
+						</th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
 						<th class='showTitle control-size-100'>Gene</th>
 						<th class='showTitle control-size-100'>Feature</th>
-						<th class='showTitle control-size-100'>Canonical</th>
+						<th class='showTitle control-size-50'>Canonical</th>
 						<th class='showTitle control-size-100'>Exon/Intron</th>
-                        <th class='showTitle control-size-300'>HGVSg</th>
-                        <th class='showTitle control-size-300'>HGVSc</th>
-						<th class='showTitle control-size-300'>HGVSp</th>
+                        <th class='showTitle control-size-250'>HGVSg</th>
+                        <th class='showTitle control-size-250'>HGVSc</th>
+						<th class='showTitle control-size-250'>HGVSp</th>
 						<th class='showTitle control-size-100'>GnomAD</th>
 						<th class='showTitle control-size-300'>ClinSig</th>
 						<th class='showTitle control-size-100'>Impact</th>
@@ -47,7 +67,23 @@
 				</tfoot>
 			</table>
 		</div>
+	</div>
 
+	<!-- MODALS -->
+	<div id="help-modal" class="w3-modal">
+		<div class="w3-modal-content w3-card-4">
+			<header class="w3-container w3-teal">
+				<span onclick="document.getElementById('help-modal').style.display='none'"
+					class="w3-button w3-display-topright">&times;</span>
+				<h5 id="help-modal-title"></h5>
+			</header>
+			<div class="w3-container">
+				<p id="help-modal-content"></p>
+			</div>
+			<footer class="w3-container w3-teal">
+				<p id="help-modal-footer"></p>
+			</footer>
+		</div>
 	</div>
 {% endblock %}
 
@@ -287,7 +323,7 @@
 				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
 				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
 				{
-					"className": 'showTitle control-size-100',
+					"className": 'showTitle w3-center control-size-50',
 					"data": "annotations.canonical",
 	                "render": {
 						"_": function ( data, type, row ) {
@@ -324,9 +360,9 @@
 						},
 					}
 				},
-				{ "className": 'showTitle control-size-300', "data": "annotations.HGVSg"},
-				{ "className": 'showTitle control-size-300', "data": "annotations.HGVSc"},
-				{ "className": 'showTitle control-size-300', "data": "annotations.HGVSp"},
+				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSg"},
+				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
+				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
 				{
 					"className": 'showTitle control-size-100',
 					"data": "annotations.GnomADg_max",
@@ -459,4 +495,10 @@
 	    }
 	);
 
+	function openmodal(title="Some help", content='Some Content', footer='footer') {
+		document.getElementById("help-modal-title").innerHTML = title;
+		document.getElementById("help-modal-content").innerHTML = content;
+		document.getElementById("help-modal-footer").innerHTML = footer;
+		document.getElementById('help-modal').style.display='block'
+	}
 {% endblock %}
