@@ -127,6 +127,12 @@ def account():
 # Analysis
 
 
+@app.route("/transcripts", methods=['GET', 'POST'])
+@login_required
+def transcripts():
+    return render_template('analysis/transcripts.html', title='Transcripts',)
+
+
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
@@ -160,7 +166,7 @@ def sample(id):
 
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
-def samples():
+def json_samples():
     samples = db.session.query(Sample.id, Sample.samplename, Sample.status).all()
     samples_json = {"data": list()}
     for sample in samples:
@@ -175,7 +181,7 @@ def samples():
 @app.route("/json/variants/sample/<int:id>", methods=['GET', 'POST'])
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
-def variants(id, version=-1):
+def json_variants(id, version=-1):
     sample = Sample.query.get(int(id))
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
@@ -323,7 +329,7 @@ def variants(id, version=-1):
 
 @app.route("/json/transcripts")
 @login_required
-def transcripts():
+def json_transcripts():
     transcripts = db.session.query(Transcript).all()
     transcripts_json = {"data": list()}
     for transcript in transcripts:

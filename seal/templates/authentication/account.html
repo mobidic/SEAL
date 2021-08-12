@@ -122,73 +122,11 @@
 				</form>
 			</div>
 		</div>
-		<table id="genes" class="w3-table-all w3-hoverable" style="width:100%">
-			<thead>
-				<tr class="w3-flat-green-sea">
-					<th>HGNC Name</th>
-					<th>HGNC ID</th>
-					<th>Canonical</th>
-					<th>Transcript</th>
-					<th>Ref Protein</th>
-					<th>UNIPROT</th>
-					<th>chr</th>
-					<th>strand</th>
-				</tr>
-			</thead>
-			<tfoot>
-				<tr class="w3-flat-green-sea">
-					<th>HGNC Name</th>
-					<th>HGNC ID</th>
-					<th>Canonical</th>
-					<th>RefSeq</th>
-					<th>Ref Protein</th>
-					<th>UNIPROT</th>
-					<th>chr</th>
-					<th>strand</th>
-				</tr>
-			</tfoot>
-		</table>
 	</div>
 {% endblock %}
 
 
 {% block script %}
-	$(document).ready(function() {
-	    table = $('#genes').DataTable({
-			scrollX: true,
-    		ajax: '/json/transcripts',
-    		"columns": [
-				{ "className": 'showTitle control-size-200', "data": "hgncname"},
-		        { "className": 'showTitle control-size-100', "data": "hgncid"},
-				{ "className": 'showTitle w3-center control-size-100', "data": "canonical"},
-				{ "className": 'showTitle control-size-500', "data": "refSeq"},
-				{ "className": 'showTitle control-size-500', "data": "refProt"},
-				{ "className": 'showTitle control-size-100', "data": "uniprot"},
-				{ "className": 'showTitle control-size-50', "data": "chromosome"},
-				{ "className": 'showTitle control-size-50', "data": "strand"},
-			],
-			"columnDefs": [
-	            {
-	                "render": {
-						"display": function ( data, type, row ) {
-							if (data) {
-								response = '<i title="CANONICAL" class="w3-text-flat-peter-river fas fa-star"></i>';
-							} else {
-								response = '<i title="" class="w3-text-flat-peter-river far fa-star"></i>';
-							}
-							return response;
-		                },
-						"sort": function ( data, type, row ) {
-							return data;
-		                },
-					},
-	                "targets": 2
-	            }
-			],
-		});
-
-	} );
-
 	// Script to open and close sidebar
 	function w3_open() {
 		document.getElementById("sidebar").style.display = "block";
