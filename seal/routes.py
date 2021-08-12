@@ -176,7 +176,6 @@ def samples():
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
 def variants(id, version=-1):
-
     sample = Sample.query.get(int(id))
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
@@ -184,10 +183,13 @@ def variants(id, version=-1):
 
     variants = {"data": list()}
 
+    # Get all canonical trancripts
     transcripts = db.session.query(Transcript.refSeq).filter_by(canonical=True).all()
     transcripts = list(itertools.chain(*transcripts))
     transcripts = [each.split('.')[0] for each in transcripts]
 
+    ##################################################
+    # Define some dict/array for calculation
     consequences_dict = {
         "stop_gained": 20,
         "stop_lost": 20,
@@ -243,6 +245,7 @@ def variants(id, version=-1):
         "PHENO",
         "PUBMED"
     ]
+    ##################################################
 
     for variant in sample.variants:
         try:
@@ -251,16 +254,19 @@ def variants(id, version=-1):
             feature = None
             consequence_score_max = 0
             for value in features:
+                # Split annotations
                 for splitAnn in annot_to_split:
                     try:
                         annotations[value][splitAnn] = annotations[value][splitAnn].split("&")
                     except AttributeError:
                         annotations[value][splitAnn] = ["NA"]
 
+                # Get consequence score
                 consequence_score = 0
                 for consequence in annotations[value]["Consequence"]:
                     consequence_score += consequences_dict[consequence]
 
+                # Calcul position into the gene (Exons or Intron)
                 if annotations[value]["EXON"] is not None:
                     pos = annotations[value]["EXON"]
                     annotations[value]["EI"] = f"Exon {pos}"
@@ -270,6 +276,7 @@ def variants(id, version=-1):
                 else:
                     annotations[value]["EI"] = "NA"
 
+                # Calcul GnomAD AF for all population and get the max
                 gnomadg_max = None
                 gnomadg_max_pop = "ALL"
                 for gnomADg_key in gnomADg:
@@ -287,6 +294,8 @@ def variants(id, version=-1):
                 annotations[value]["GnomADg_max"] = gnomadg_max
                 annotations[value]["GnomADg_max_pop"] = gnomadg_max_pop
 
+                # Get the canonical transcript with max consequences or
+                # random NM or another one...
                 annotations[value]["canonical"] = False
                 if value in transcripts:
                     if consequence_score_max <= consequence_score:
