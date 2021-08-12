@@ -326,7 +326,6 @@ def variants(id, version=-1):
 def transcripts():
     transcripts = db.session.query(Transcript).all()
     transcripts_json = {"data": list()}
-    print(transcripts)
     for transcript in transcripts:
         # for transcript in gene.transcripts:
         transcripts_json["data"].append({

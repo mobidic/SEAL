@@ -25,17 +25,17 @@
 						</th>
 						<th class='showTitle control-size-100'>
 							Feature
-							<span onclick="openmodal(title='Feature', content='The feature ID. Mainly corresponding to the RefSeq transcript, or th ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+							<span onclick="openmodal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
-						<th class='showTitle control-size-50'>
-							Canonical
-							<span onclick="openmodal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript. Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+						<th class='showTitle control-size-75'>
+							Can.
+							<span onclick="openmodal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript.<br />Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
-						<th class='showTitle control-size-100'>
+						<th class='showTitle control-size-150'>
 							Exon/Intron
 							<span onclick="openmodal(title='Exon', content='', footer='For more information see : <a  href=\'\' target=\'_blank\' style=\'text-decoration:underline\'><i></i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
@@ -89,7 +89,7 @@
 					<tr class="w3-flat-green-sea">
 						<th class='showTitle control-size-100'>Gene</th>
 						<th class='showTitle control-size-100'>Feature</th>
-						<th class='showTitle control-size-50'>Canonical</th>
+						<th class='showTitle control-size-75'>Can.</th>
 						<th class='showTitle control-size-100'>Exon/Intron</th>
                         <th class='showTitle control-size-250'>HGVSg</th>
                         <th class='showTitle control-size-250'>HGVSc</th>
@@ -358,7 +358,7 @@
 				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
 				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
 				{
-					"className": 'showTitle w3-center control-size-50',
+					"className": 'showTitle w3-center control-size-75',
 					"data": "annotations.canonical",
 	                "render": {
 						"_": function ( data, type, row ) {
@@ -375,7 +375,7 @@
 					},
 				},
 				{
-					"className": 'showTitle control-size-100',
+					"className": 'showTitle control-size-150',
 					"data": "annotations.EI",
 					"render": {
 						"_": function ( data, type, row ) {
