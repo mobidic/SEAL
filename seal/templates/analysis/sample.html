@@ -17,35 +17,70 @@
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
 					<tr class="w3-flat-green-sea">
-						<th class='showTitle control-size-100'>Gene</th>
-						<th class='showTitle control-size-100'>Feature</th>
-						<th class='showTitle control-size-50'>Canonical</th>
-						<th class='showTitle control-size-100'>Exon/Intron</th>
-                        <th class='showTitle control-size-250'>HGVSg</th>
-                        <th class='showTitle control-size-250'>HGVSc</th>
-						<th class='showTitle control-size-250'>HGVSp</th>
+						<th class='showTitle control-size-100'>
+							Gene
+							<span onclick="openmodal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							Feature
+							<span onclick="openmodal(title='Feature', content='The feature ID. Mainly corresponding to the RefSeq transcript, or th ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-50'>
+							Canonical
+							<span onclick="openmodal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript. Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							Exon/Intron
+							<span onclick="openmodal(title='Exon', content='', footer='For more information see : <a  href=\'\' target=\'_blank\' style=\'text-decoration:underline\'><i></i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+                        <th class='showTitle control-size-250'>
+							HGVSg
+							<span onclick="openmodal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+                        <th class='showTitle control-size-250'>
+							HGVSc
+							<span onclick="openmodal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-250'>
+							HGVSp
+							<span onclick="openmodal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
 						<th class='showTitle control-size-100'>
 							GnomAD
 							<span onclick="openmodal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 (GRCh37/hg19) spans 125,748 exome sequences and 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
-								<i class=" fas fa-question-circle"></i>
+								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
 						<th class='showTitle control-size-300'>
 							ClinSig
-							<span onclick="openmodal(title='ClinSig', content='Representation of clinical significance in ClinVar and other variation resources at NCBI.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-								<i class=" fas fa-question-circle"></i>
+							<span onclick="openmodal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
 						<th class='showTitle control-size-100'>
 							Impact
 							<span onclick="openmodal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-								<i class=" fas fa-question-circle"></i>
+								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
 						<th class='showTitle control-size-300'>
 							Consequence
 							<span onclick="openmodal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-								<i class=" fas fa-question-circle"></i>
+								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
 					</tr>
