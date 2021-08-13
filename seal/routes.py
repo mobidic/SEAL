@@ -41,6 +41,14 @@ def contact():
     )
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template(
+        "essentials/404.html",
+        title="404"
+    )
+
+
 ################################################################################
 
 

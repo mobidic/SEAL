@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block static %}
+        <style>
+
+
+        .container {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          background: white;
+          color: black;
+          font-family: arial, sans-serif;
+          overflow: hidden;
+        }
+
+        .content {
+          position: relative;
+          width: 600px;
+          max-width: 100%;
+          margin: 20px;
+          background: white;
+          padding: 60px 40px;
+          text-align: center;
+          box-shadow: -10px 10px 67px -12px rgba(0, 0, 0, 0.2);
+          opacity: 0;
+          animation: apparition 0.8s 1.2s cubic-bezier(0.39, 0.575, 0.28, 0.995) forwards;
+        }
+        .content p {
+          font-size: 1.3rem;
+          margin-top: 0;
+          margin-bottom: 0.6rem;
+          letter-spacing: 0.1rem;
+          color: #595959;
+        }
+
+        .particle {
+          position: absolute;
+          display: block;
+          pointer-events: none;
+        }
+c = bleu
+T = rouge
+A = vert
+
+        {% for i in range(120) %}
+            .particle:nth-child({{ i+1 }}) {
+              top: {{ range(0,100) | random }}%;
+              left: {{ range(0,100) | random }}%;
+              font-weight: {{ ['normal', 'bold', 'bolder', 'lighter'] | random }};
+              font-size: {{ range(12,22) | random }}px;
+              filter: blur({{ (range(2,240,4) | random)/100 }}px);
+              animation: {{ range(20,40) | random }}s {{ ['float', 'floatReverse', 'float2','floatReverse2']|random }} infinite;
+            }
+        {% endfor %}
+        @keyframes apparition {
+          from {
+            opacity: 0;
+            transform: translateY(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(180px);
+          }
+        }
+        @keyframes floatReverse {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-180px);
+          }
+        }
+        @keyframes float2 {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(28px);
+          }
+        }
+        @keyframes floatReverse2 {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-28px);
+          }
+        }
+
+        .w3-text-flat-black{
+            color: #595959;
+        }
+
+        </style>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="w3-main">
+        {% for i in range(120) %}
+            {% set test = ([{'value':'A','color':'emerald'},{'value':'C','color':"peter-river"},{'value':'G','color':"black"},{'value':'T','color':"alizarin"}]| random()) %}
+            <span class='particle w3-text-flat-{{ test["color"] }}'>{{ test["value"] }}</span>
+        {% endfor %}
+        <div class="w3-content w3-display-middle w3-padding w3-white" style="width:100%;min-width:400px">
+            <div class="w3-content w3-card-4 content" style="width:100%">
+
+            <p>Damnit stranger,</p>
+            <p>You got lost in the <strong>404</strong> sea.</p>
+            <p>
+                <a href="#" class="w3-btn" style="border:3px solid #595959; font-weight: bold">Go back to the port</a>
+            </p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
