@@ -42,10 +42,15 @@ def contact():
 
 
 @app.errorhandler(404)
+@app.errorhandler(403)
+@app.errorhandler(405)
+@app.errorhandler(408)
+@app.errorhandler(410)
+@app.errorhandler(500)
 def page_not_found(e):
     return render_template(
-        "essentials/404.html",
-        title="404"
+        "essentials/error.html",
+        title=e.code, e=e
     )
 
 
