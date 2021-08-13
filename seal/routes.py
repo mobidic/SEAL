@@ -188,6 +188,7 @@ def json_variants(id, version=-1):
         return redirect(url_for('index'))
 
     variants = {"data": list()}
+    total_samples = db.session.query(Sample).count()
 
     # Get all canonical trancripts
     transcripts = db.session.query(Transcript.refSeq).filter_by(canonical=True).all()
@@ -316,12 +317,17 @@ def json_variants(id, version=-1):
             annotations = None
             feature = None
 
+        occurrences = len(variant.samples)
         variants["data"].append({
             "annotations": annotations[feature],
             "chr": f"{variant.chr}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
             "alt": f"{variant.alt}",
+            "inseal": {
+                "occurrences": occurrences,
+                "total_samples": total_samples
+            }
         })
 
     return jsonify(variants)

@@ -65,6 +65,12 @@
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
+						<th class='showTitle control-size-100'>
+							In Seal
+							<span onclick="openmodal(title='In Seal', content='The number of occurences that this variant appear in the SEAL database (ie. internally)', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
 						<th class='showTitle control-size-300'>
 							ClinSig
 							<span onclick="openmodal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
@@ -90,10 +96,11 @@
 						<th class='showTitle control-size-100'>Gene</th>
 						<th class='showTitle control-size-100'>Feature</th>
 						<th class='showTitle control-size-75'>Can.</th>
-						<th class='showTitle control-size-100'>Exon/Intron</th>
+						<th class='showTitle control-size-150'>Exon/Intron</th>
                         <th class='showTitle control-size-250'>HGVSg</th>
                         <th class='showTitle control-size-250'>HGVSc</th>
 						<th class='showTitle control-size-250'>HGVSp</th>
+						<th class='showTitle control-size-100'>GnomAD</th>
 						<th class='showTitle control-size-100'>GnomAD</th>
 						<th class='showTitle control-size-300'>ClinSig</th>
 						<th class='showTitle control-size-100'>Impact</th>
@@ -416,6 +423,23 @@
 								num = -1
 								return num.toFixed(6);
 							}
+					    }
+					},
+				},
+				{
+					"className": 'showTitle control-size-125',
+					"data": "inseal",
+					"render" : {
+						"_" : function ( data, type, row, meta ) {
+							percent = (data["occurrences"]/data["total_samples"]).toFixed(4)
+							return percent + " (" + data["occurrences"] + "/" + data["total_samples"] + ")";
+					    }
+						"sort" : function ( data, type, row, meta ) {
+							return data["occurrences"];
+					    }
+						"filter" : function ( data, type, row, meta ) {
+							percent = (data["occurrences"]/data["total_samples"]).toFixed(4)
+							return percent;
 					    }
 					},
 				},
