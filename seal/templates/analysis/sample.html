@@ -431,14 +431,14 @@
 					"data": "inseal",
 					"render" : {
 						"_" : function ( data, type, row, meta ) {
-							percent = (data["occurrences"]/data["total_samples"]).toFixed(4)
+							percent = (data["occurrences"]/data["total_samples"]).toFixed(4);
 							return percent + " (" + data["occurrences"] + "/" + data["total_samples"] + ")";
-					    }
+					    },
 						"sort" : function ( data, type, row, meta ) {
 							return data["occurrences"];
-					    }
+					    },
 						"filter" : function ( data, type, row, meta ) {
-							percent = (data["occurrences"]/data["total_samples"]).toFixed(4)
+							percent = (data["occurrences"]/data["total_samples"]).toFixed(4);
 							return percent;
 					    }
 					},
