@@ -90,6 +90,24 @@
 							</span>
 						</th>
 						<th class='showTitle control-size-100'>
+							MES ref
+							<span onclick="openmodal(title='MES ref', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							MES diff
+							<span onclick="openmodal(title='MES diff', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							MES alt
+							<span onclick="openmodal(title='MES alt', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
 							Missense
 							<span onclick="openmodal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
@@ -111,6 +129,9 @@
 						<th class='showTitle control-size-300'>ClinSig</th>
 						<th class='showTitle control-size-100'>Impact</th>
 						<th class='showTitle control-size-300'>Consequence</th>
+						<th class='showTitle control-size-100'>MES ref</th>
+						<th class='showTitle control-size-100'>MES diff</th>
+						<th class='showTitle control-size-100'>MES alt</th>
                         <th class='showTitle control-size-100'>Missense</th>
 					</tr>
 				</tfoot>
@@ -537,11 +558,77 @@
 				},
 				{
 					"className": 'showTitle size-100',
+					"data": "annotations.MaxEntScan_ref",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							if (data == null){
+								return -999;
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+						"display": function ( data, type, row, meta ) {
+							if (data == null){
+								return "NA";
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+					},
+				},
+				{
+					"className": 'showTitle size-100',
+					"data": "annotations.MaxEntScan_diff",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							if (data == null){
+								return -999;
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+						"display": function ( data, type, row, meta ) {
+							if (data == null){
+								return "NA";
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+					},
+				},
+				{
+					"className": 'showTitle size-100',
+					"data": "annotations.MaxEntScan_alt",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							if (data == null){
+								return -999;
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+						"display": function ( data, type, row, meta ) {
+							if (data == null){
+								return "NA";
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+					},
+				},
+				{
+					"className": 'showTitle size-100',
 					"data": "annotations.missenseMean",
 					"render": {
 						"_": function ( data, type, row, meta ) {
 							if (data == "NA"){
 								return data;
+							}
+							return data.toFixed(4);
+					    },
+						"filter": function ( data, type, row, meta ) {
+							if (data == "NA"){
+								return -1;
+							}
+							return data.toFixed(4);
+					    },
+						"sort": function ( data, type, row, meta ) {
+							if (data == "NA"){
+								return -1;
 							}
 							return data.toFixed(4);
 					    }
