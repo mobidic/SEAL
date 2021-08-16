@@ -37,7 +37,7 @@
 						</th>
 						<th class='showTitle control-size-150'>
 							Exon/Intron
-							<span onclick="openmodal(title='Exon', content='', footer='For more information see : <a  href=\'\' target=\'_blank\' style=\'text-decoration:underline\'><i></i></a>')" class="w3-opacity-max w3-hover-opacity">
+							<span onclick="openmodal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -89,6 +89,12 @@
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
+						<th class='showTitle control-size-100'>
+							Missense
+							<span onclick="openmodal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
 					</tr>
 				</thead>
 				<tfoot>
@@ -104,7 +110,8 @@
 						<th class='showTitle control-size-100'>GnomAD</th>
 						<th class='showTitle control-size-300'>ClinSig</th>
 						<th class='showTitle control-size-100'>Impact</th>
-                        <th class='showTitle control-size-300'>Consequence</th>
+						<th class='showTitle control-size-300'>Consequence</th>
+                        <th class='showTitle control-size-100'>Missense</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -114,7 +121,7 @@
 	<!-- MODALS -->
 	<div id="help-modal" class="w3-modal">
 		<div class="w3-modal-content w3-card-4">
-			<header class="w3-container w3-teal">
+			<header class="w3-container w3-flat-turquoise">
 				<span onclick="document.getElementById('help-modal').style.display='none'"
 					class="w3-button w3-display-topright">&times;</span>
 				<h5 id="help-modal-title"></h5>
@@ -122,7 +129,7 @@
 			<div class="w3-container">
 				<p id="help-modal-content"></p>
 			</div>
-			<footer class="w3-container w3-teal">
+			<footer class="w3-container w3-flat-turquoise">
 				<p id="help-modal-footer"></p>
 			</footer>
 		</div>
@@ -423,6 +430,14 @@
 								num = -1
 								return num.toFixed(6);
 							}
+					    },
+	            		"filter" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(6);
+							} else {
+								num = -1
+								return num.toFixed(6);
+							}
 					    }
 					},
 				},
@@ -520,6 +535,18 @@
 					    }
 					},
 				},
+				{
+					"className": 'showTitle size-100',
+					"data": "annotations.missenseMean",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							if (data == "NA"){
+								return data;
+							}
+							return data.toFixed(4);
+					    }
+					},
+				},
 			]
 		});
 
@@ -544,7 +571,7 @@
 	$.fn.dataTable.ext.search.push(
 	    function( settings, data, dataIndex ) {
 	        var gnomadMax = parseFloat( $('#gnomadMax').val());
-	        var gnomaAD_AF = parseFloat( data[6] ) || 0; // use data for the age column
+	        var gnomaAD_AF = parseFloat( data[7] ) || 0; // use data for the age column
 
 	        if ( isNaN( gnomadMax ) || ( gnomaAD_AF <= gnomadMax ) )
 	        {
