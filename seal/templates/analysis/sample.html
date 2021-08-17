@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block static %}
+<link rel="stylesheet" href="https://cdn.datatables.net/searchbuilder/1.1.0/css/searchBuilder.dataTables.min.css" />
+<script src="https://cdn.datatables.net/searchbuilder/1.1.0/js/dataTables.searchBuilder.min.js"></script>
+{% endblock %}
 
 {% block content %}
 	{% include 'includes/sidebar.j2' %}
@@ -8,14 +12,30 @@
 			<h3><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
 		</div>
 		<div class="w3-padding">
-			<table cellspacing="5" cellpadding="5" border="0">
-		        <tbody><tr>
-		            <td>Gnomad Max:</td>
-		            <td><input type="text" id="gnomadMax" name="gnomadMax" value="{{ filter.gnomAD_AF }}"></td>
-		        </tr>
-		    </tbody></table>
+			<button class="w3-button w3-flat-green-sea w3-hover-flat-turquoise w3-ripple" onclick="save_filters()">Save filters</button>
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
+					<tr class="w3-flat-green-sea">
+						<th class='showTitle control-size-100'>Gene</th>
+						<th class='showTitle control-size-100'>Feature</th>
+						<th class='showTitle control-size-75'>Can.</th>
+						<th class='showTitle control-size-150'>Exon/Intron</th>
+						<th class='showTitle control-size-250'>HGVSg</th>
+						<th class='showTitle control-size-250'>HGVSc</th>
+						<th class='showTitle control-size-250'>HGVSp</th>
+						<th class='showTitle control-size-100'>GnomAD</th>
+						<th class='showTitle control-size-100'>In Seal (pct)</th>
+						<th class='showTitle control-size-100'>In Seal (count)</th>
+						<th class='showTitle control-size-300'>ClinSig</th>
+						<th class='showTitle control-size-100'>Impact</th>
+						<th class='showTitle control-size-300'>Consequence</th>
+						<th class='showTitle control-size-100'>MES ref</th>
+						<th class='showTitle control-size-100'>MES diff</th>
+						<th class='showTitle control-size-100'>MES alt</th>
+						<th class='showTitle control-size-100'>Missense</th>
+					</tr>
+				</thead>
+				<tfoot>
 					<tr class="w3-flat-green-sea">
 						<th class='showTitle control-size-100'>
 							Gene
@@ -66,8 +86,14 @@
 							</span>
 						</th>
 						<th class='showTitle control-size-100'>
-							In Seal
-							<span onclick="openmodal(title='In Seal', content='The number of occurences that this variant appear in the SEAL database (ie. internally)', footer='')" class="w3-opacity-max w3-hover-opacity">
+							In Seal (pct)
+							<span onclick="openmodal(title='In Seal (pct)', content='The percentage this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							In Seal (count)
+							<span onclick="openmodal(title='In Seal (count)', content='The number of occurences this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -113,26 +139,6 @@
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
-					</tr>
-				</thead>
-				<tfoot>
-					<tr class="w3-flat-green-sea">
-						<th class='showTitle control-size-100'>Gene</th>
-						<th class='showTitle control-size-100'>Feature</th>
-						<th class='showTitle control-size-75'>Can.</th>
-						<th class='showTitle control-size-150'>Exon/Intron</th>
-                        <th class='showTitle control-size-250'>HGVSg</th>
-                        <th class='showTitle control-size-250'>HGVSc</th>
-						<th class='showTitle control-size-250'>HGVSp</th>
-						<th class='showTitle control-size-100'>GnomAD</th>
-						<th class='showTitle control-size-100'>GnomAD</th>
-						<th class='showTitle control-size-300'>ClinSig</th>
-						<th class='showTitle control-size-100'>Impact</th>
-						<th class='showTitle control-size-300'>Consequence</th>
-						<th class='showTitle control-size-100'>MES ref</th>
-						<th class='showTitle control-size-100'>MES diff</th>
-						<th class='showTitle control-size-100'>MES alt</th>
-                        <th class='showTitle control-size-100'>Missense</th>
 					</tr>
 				</tfoot>
 			</table>
@@ -387,6 +393,10 @@
 
 	$(document).ready(function() {
 	    table = $('#variants').DataTable({
+			dom: 'Qlfrtip',
+			searchBuilder: {
+				preDefined: {{ filter.filter | safe }},
+			},
 			scrollX: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
@@ -441,18 +451,17 @@
 							if(data != null) {
 					    		return data.toFixed(6);
 							} else {
+								return null;
+							}
+					    },
+						"display" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(6);
+							} else {
 								return "NA";
 							}
 					    },
 	            		"sort" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(6);
-							} else {
-								num = -1
-								return num.toFixed(6);
-							}
-					    },
-	            		"filter" : function ( data, type, row, meta ) {
 							if(data != null) {
 					    		return data.toFixed(6);
 							} else {
@@ -468,14 +477,19 @@
 					"render" : {
 						"_" : function ( data, type, row, meta ) {
 							percent = (data["occurrences"]/data["total_samples"]).toFixed(4);
-							return percent + " (" + data["occurrences"] + "/" + data["total_samples"] + ")";
+							return percent;
+					    },
+					},
+				},
+				{
+					"className": 'showTitle control-size-125',
+					"data": "inseal",
+					"render" : {
+						"_" : function ( data, type, row, meta ) {
+							return data["occurrences"];
 					    },
 						"sort" : function ( data, type, row, meta ) {
 							return data["occurrences"];
-					    },
-						"filter" : function ( data, type, row, meta ) {
-							percent = (data["occurrences"]/data["total_samples"]).toFixed(4);
-							return percent;
 					    }
 					},
 				},
@@ -614,23 +628,27 @@
 					"className": 'showTitle size-100',
 					"data": "annotations.missenseMean",
 					"render": {
-						"_": function ( data, type, row, meta ) {
-							if (data == "NA"){
-								return data;
+						"_" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(4);
+							} else {
+								return null;
 							}
-							return data.toFixed(4);
 					    },
-						"filter": function ( data, type, row, meta ) {
-							if (data == "NA"){
-								return -1;
+						"display" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(4);
+							} else {
+								return "NA";
 							}
-							return data.toFixed(4);
 					    },
-						"sort": function ( data, type, row, meta ) {
-							if (data == "NA"){
-								return -1;
+	            		"sort" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(4);
+							} else {
+								num = -1
+								return num.toFixed(4);
 							}
-							return data.toFixed(4);
 					    }
 					},
 				},
@@ -642,8 +660,15 @@
 	          table.draw();
 	      } );
 
+
+
 	} );
 
+	function save_filters() {
+		var d = table.searchBuilder.getDetails();
+		console.log(JSON.stringify(d));
+		console.log({{ filter.filter | safe }});
+	}
 	// Script to open and close sidebar
 	function w3_open() {
 		document.getElementById("sidebar").style.display = "block";

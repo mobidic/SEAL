@@ -346,7 +346,7 @@ def json_variants(id, version=-1):
                     missenseScores.append(float(annotations[feature][missense]))
             mean = numpy.mean(missenseScores)
             if numpy.isnan(mean):
-                annotations[feature]["missenseMean"] = "NA"
+                annotations[feature]["missenseMean"] = None
             else:
                 annotations[feature]["missenseMean"] = mean
 

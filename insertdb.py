@@ -1,6 +1,7 @@
 import os
 from seal import db, app
 from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript
+import json
 
 
 pathDB = os.path.join(app.root_path, 'site.db')
@@ -12,9 +13,9 @@ os.system('psql postgres -c "CREATE DATABASE seal;"')
 
 db.create_all()
 
-
-filter1 = Filter(filtername="Default")
-filter2 = Filter(filtername="Other", gnomAD_AF=1)
+filterBasic = {"criteria":[{"criteria":[{"condition":"<=","data":"GnomAD","value":["0.01"]},{"criteria":[{"condition":"<=","data":"In Seal (pct)","value":["0.20"]},{"condition":"<=","data":"In Seal (count)","value":["10"]}],"logic":"OR"}],"logic":"AND"},{"criteria":[{"condition":"contains","data":"Consequence","value":["transcript_ablation"]},{"condition":"contains","data":"Consequence","value":["splice_acceptor_variant"]},{"condition":"contains","data":"Consequence","value":["splice_donor_variant"]},{"condition":"contains","data":"Consequence","value":["stop_gained"]},{"condition":"contains","data":"Consequence","value":["frameshift_variant"]},{"condition":"contains","data":"Consequence","value":["stop_lost"]},{"condition":"contains","data":"Consequence","value":["start_lost"]},{"condition":"contains","data":"Consequence","value":["transcript_amplification"]},{"condition":"contains","data":"Consequence","value":["inframe_insertion"]},{"condition":"contains","data":"Consequence","value":["inframe_deletion"]},{"condition":"contains","data":"Consequence","value":["missense_variant"]},{"condition":"contains","data":"Consequence","value":["protein_altering_variant"]},{"condition":"contains","data":"Consequence","value":["splice_region_variant"]},{"condition":"contains","data":"Consequence","value":["incomplete_terminal_codon_variant"]},{"condition":"contains","data":"Consequence","value":["start_retained_variant"]},{"condition":"contains","data":"Consequence","value":["stop_retained_variant"]}],"logic":"OR"},{"criteria":[{"condition":"contains","data":"ClinSig","value":["pathogenic"]},{"condition":"contains","data":"ClinSig","value":["uncertain"]},{"condition":"=","data":"ClinSig","value":["NA"]}],"logic":"OR"},{"criteria":[{"condition":"=","data":"Missense","value":[]}],"logic":"AND"}],"logic":"AND"}
+filter1 = Filter(filtername="No Filter", filter={"criteria": []})
+filter2 = Filter(filtername="Default", filter=filterBasic)
 db.session.add(filter1)
 db.session.add(filter2)
 db.session.commit()
