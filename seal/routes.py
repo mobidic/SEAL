@@ -278,6 +278,12 @@ def json_variants(id, version=-1):
         "BayesDel_noAF_rankscore",
         "ClinPred_rankscore"
     ]
+    spliceAI = [
+        "AG",
+        "AL",
+        "DG",
+        "DL"
+    ]
     ##################################################
 
     for variant in sample.variants:
@@ -349,6 +355,26 @@ def json_variants(id, version=-1):
                 annotations[feature]["missenseMean"] = None
             else:
                 annotations[feature]["missenseMean"] = mean
+
+            # Get Max spliceAI
+            maxSpliceAI_DS = None
+            maxSpliceAI_DP = None
+            maxSpliceAI_type = None
+            for type in spliceAI:
+                key_DS = f"SpliceAI_pred_DS_{type}"
+                key_DP = f"SpliceAI_pred_DS_{type}"
+                score = annotations[feature][key_DS]
+                pos = annotations[feature][key_DP]
+                if score is None:
+                    continue
+                if maxSpliceAI_DS is None or score > maxSpliceAI_DS:
+                    maxSpliceAI_DS = score
+                    maxSpliceAI_DP = pos
+                    maxSpliceAI_type = type
+
+            annotations[feature]["maxSpliceAI_DS"] = maxSpliceAI_DS
+            annotations[feature]["maxSpliceAI_DP"] = maxSpliceAI_DP
+            annotations[feature]["maxSpliceAI_type"] = maxSpliceAI_type
 
         occurrences = len(variant.samples)
         variants["data"].append({
