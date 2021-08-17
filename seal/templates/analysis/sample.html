@@ -34,6 +34,9 @@
 						<th class='showTitle control-size-100'>MES ref</th>
 						<th class='showTitle control-size-100'>MES diff</th>
 						<th class='showTitle control-size-100'>MES alt</th>
+						<th class='showTitle control-size-125'>SpliceAI DS</th>
+						<th class='showTitle control-size-125'>SpliceAI DP</th>
+						<th class='showTitle control-size-125'>SpliceAI Type</th>
 						<th class='showTitle control-size-100'>Missense</th>
 					</tr>
 				</thead>
@@ -132,6 +135,24 @@
 						<th class='showTitle control-size-100'>
 							MES alt
 							<span onclick="openmodal(title='MES alt', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-125'>
+							SpliceAI DS
+							<span onclick="openmodal(title='SpliceAI DS', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-125'>
+							SpliceAI DP
+							<span onclick="openmodal(title='SpliceAI DP', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-125'>
+							SpliceAI Type
+							<span onclick="openmodal(title='SpliceAI Type', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -626,6 +647,54 @@
 								return "NA";
 							}
 							return parseFloat(data).toFixed(3);
+					    },
+					},
+				},
+				{
+					"className": 'showTitle size-125',
+					"data": "annotations.maxSpliceAI_DS",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							if (data == null){
+								return null;
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+						"display": function ( data, type, row, meta ) {
+							if (data == null){
+								return "NA";
+							}
+							return parseFloat(data).toFixed(3);
+					    },
+					},
+				},
+				{
+					"className": 'showTitle size-125',
+					"data": "annotations.maxSpliceAI_DP",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							return data;
+					    },
+						"display": function ( data, type, row, meta ) {
+							if (data == null){
+								return "NA";
+							}
+							return data;
+					    },
+					},
+				},
+				{
+					"className": 'showTitle size-125',
+					"data": "annotations.maxSpliceAI_type",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							return data;
+					    },
+						"display": function ( data, type, row, meta ) {
+							if (data == null){
+								return "NA";
+							}
+							return data;
 					    },
 					},
 				},
