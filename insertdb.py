@@ -1,7 +1,6 @@
 import os
 from seal import db, app
-from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript
-import json
+from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript, Family
 
 
 pathDB = os.path.join(app.root_path, 'site.db')
@@ -13,7 +12,192 @@ os.system('psql postgres -c "CREATE DATABASE seal;"')
 
 db.create_all()
 
-filterBasic = {"criteria":[{"criteria":[{"condition":"<=","data":"GnomAD","value":["0.01"]},{"criteria":[{"condition":"<=","data":"In Seal (pct)","value":["0.20"]},{"condition":"<=","data":"In Seal (count)","value":["10"]}],"logic":"OR"}],"logic":"AND"},{"criteria":[{"condition":"contains","data":"Consequence","value":["transcript_ablation"]},{"condition":"contains","data":"Consequence","value":["splice_acceptor_variant"]},{"condition":"contains","data":"Consequence","value":["splice_donor_variant"]},{"condition":"contains","data":"Consequence","value":["stop_gained"]},{"condition":"contains","data":"Consequence","value":["frameshift_variant"]},{"condition":"contains","data":"Consequence","value":["stop_lost"]},{"condition":"contains","data":"Consequence","value":["start_lost"]},{"condition":"contains","data":"Consequence","value":["transcript_amplification"]},{"condition":"contains","data":"Consequence","value":["inframe_insertion"]},{"condition":"contains","data":"Consequence","value":["inframe_deletion"]},{"condition":"contains","data":"Consequence","value":["missense_variant"]},{"condition":"contains","data":"Consequence","value":["protein_altering_variant"]},{"condition":"contains","data":"Consequence","value":["splice_region_variant"]},{"condition":"contains","data":"Consequence","value":["incomplete_terminal_codon_variant"]},{"condition":"contains","data":"Consequence","value":["start_retained_variant"]},{"condition":"contains","data":"Consequence","value":["stop_retained_variant"]}],"logic":"OR"},{"criteria":[{"condition":"contains","data":"ClinSig","value":["pathogenic"]},{"condition":"contains","data":"ClinSig","value":["uncertain_significance"]},{"condition":"=","data":"ClinSig","value":["NA"]},{"condition":"=","data":"ClinSig","value":["not_provided"]}],"logic":"OR"}],"logic":"AND"}
+filterBasic = {
+    "criteria": [
+        {
+            "criteria": [
+                {
+                    "condition": "<=",
+                    "data": "GnomAD",
+                    "value": [
+                        "0.01"
+                    ]
+                },
+                {
+                    "criteria": [
+                        {
+                            "condition": "<=",
+                            "data": "In Seal (pct)",
+                            "value": [
+                                "0.20"
+                            ]
+                        },
+                        {
+                            "condition": "<=",
+                            "data": "In Seal (count)",
+                            "value": [
+                                "10"
+                            ]
+                        }
+                    ],
+                    "logic": "OR"
+                }
+            ],
+            "logic": "AND"
+        },
+        {
+            "criteria": [
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "transcript_ablation"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "splice_acceptor_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "splice_donor_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "stop_gained"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "frameshift_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "stop_lost"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "start_lost"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "transcript_amplification"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "inframe_insertion"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "inframe_deletion"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "missense_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "protein_altering_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "splice_region_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "incomplete_terminal_codon_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "start_retained_variant"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "Consequence",
+                    "value": [
+                        "stop_retained_variant"
+                    ]
+                }
+            ],
+            "logic": "OR"
+        },
+        {
+            "criteria": [
+                {
+                    "condition": "contains",
+                    "data": "ClinSig",
+                    "value": [
+                        "pathogenic"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "ClinSig",
+                    "value": [
+                        "uncertain_significance"
+                    ]
+                },
+                {
+                    "condition": "=",
+                    "data": "ClinSig",
+                    "value": [
+                        "NA"
+                    ]
+                },
+                {
+                    "condition": "=",
+                    "data": "ClinSig",
+                    "value": [
+                        "not_provided"
+                    ]
+                }
+            ],
+            "logic": "OR"
+        }
+    ],
+    "logic": "AND"
+}
 filter1 = Filter(filtername="No Filter", filter={"criteria": []})
 filter2 = Filter(filtername="Default", filter=filterBasic)
 db.session.add(filter1)
@@ -37,9 +221,16 @@ user.teams.append(team2)
 user.teams.append(team1)
 db.session.commit()
 
-sample1 = Sample(samplename="sample1")
+family1 = Family(family="family1")
+db.session.add(family1)
+db.session.commit()
+
+family2 = Family(family="family2")
+db.session.add(family2)
+
+sample1 = Sample(samplename="sample1", familyid=family1.id)
 sample2 = Sample(samplename="sample2", status=-1)
-sample3 = Sample(samplename="sample3")
+sample3 = Sample(samplename="sample3", familyid=family2.id)
 sample4 = Sample(samplename="sample4", status=2)
 db.session.add(sample1)
 db.session.add(sample2)

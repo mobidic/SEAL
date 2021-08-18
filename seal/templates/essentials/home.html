@@ -9,11 +9,13 @@
 				<thead>
 					<tr class="w3-flat-green-sea">
 						<th>Sample Name</th>
+						<th>Sample Name</th>
 						<th>Status</th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
+						<th>Sample Name</th>
 						<th>Sample Name</th>
 						<th>Status</th>
 					</tr>
@@ -30,7 +32,8 @@
 			scrollX: true,
     		ajax: '/json/samples',
     		"columns": [
-		        { "className": 'showTitle', "data": "samplename"},
+				{ "className": 'showTitle', "data": "samplename"},
+		        { "className": 'showTitle', "data": "family"},
 		        { "className": 'showTitle w3-center control-size-100', "data": "status"}
 			],
 			"columnDefs": [
@@ -52,7 +55,7 @@
 							return data;
 		                },
 					},
-	                "targets": 1
+	                "targets": 2
 	            }
 			],
 		});

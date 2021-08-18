@@ -95,6 +95,10 @@ class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(20), unique=False, nullable=False)
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
+    carrier = db.Column(db.Boolean(), default=False)
+
+    familyid = db.Column(db.Integer, db.ForeignKey('family.id'))
+    family = relationship("Family", back_populates="samples")
 
     variants = db.relationship(
         'Variant', secondary=var2sample, lazy='subquery',
@@ -103,6 +107,15 @@ class Sample(db.Model):
 
     def __repr__(self):
         return f"Sample('{self.samplename}','{self.status}')"
+
+
+class Family(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    family = db.Column(db.String(20), unique=True, nullable=False)
+    samples = relationship("Sample")
+
+    def __repr__(self):
+        return f"Family('{self.family}')"
 
 
 class Variant(db.Model):

@@ -2,12 +2,12 @@ import os
 import json
 import datetime
 from seal import app, scheduler, db
-from seal.models import Sample, Variant
+from seal.models import Sample, Variant, Family
 from anacore import annotVcf
 
 
 # cron examples
-@scheduler.task('cron', id='import vcf', minute="*/1")
+@scheduler.task('cron', id='import vcf', second="*/20")
 def importvcf():
     files = os.listdir(os.path.join(app.root_path, 'static/temp/vcf/'))
     curr_token = False
@@ -24,7 +24,20 @@ def importvcf():
         with open(current_fn, "r") as tf:
             data = json.load(tf)
             samplename = data['samplename']
-            sample = Sample(samplename=samplename)
+
+            # Add family in database if necessary
+            familyid = None
+            if "family" in data:
+                print("true")
+                familyname = data['family']
+                family = Family.query.filter_by(family=familyname).first()
+                if not family:
+                    family = Family(family=familyname)
+                    db.session.add(family)
+                    db.session.commit()
+                familyid = family.id
+
+            sample = Sample(samplename=samplename, familyid=familyid)
             app.logger.info(f"---- Add sample : {sample} ----")
             db.session.add(sample)
             db.session.commit()

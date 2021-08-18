@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, SelectFilterForm
-from seal.models import User, Sample, Filter, Transcript
+from seal.models import User, Sample, Filter, Transcript, Family
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -181,13 +181,16 @@ def sample(id):
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
 def json_samples():
-    samples = db.session.query(Sample.id, Sample.samplename, Sample.status).all()
+    samples = db.session.query(Sample.id, Sample.samplename, Sample.status, Sample.familyid).all()
     samples_json = {"data": list()}
     for sample in samples:
+        family = None
+        family = Family.query.get(sample.familyid)
         samples_json["data"].append({
-            "id": sample[0],
-            "samplename": sample[1],
-            "status": sample[2]
+            "id": sample.id,
+            "samplename": sample.samplename,
+            "family": family.family if family else None,
+            "status": sample.status
         })
     return jsonify(samples_json)
 
