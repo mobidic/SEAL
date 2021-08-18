@@ -300,7 +300,7 @@ def json_variants(id, version=-1):
                 try:
                     annotations[value][splitAnn] = annotations[value][splitAnn].split("&")
                 except AttributeError:
-                    annotations[value][splitAnn] = ["NA"]
+                    annotations[value][splitAnn] = []
 
             # Get consequence score
             consequence_score = 0
@@ -315,7 +315,7 @@ def json_variants(id, version=-1):
                 pos = annotations[value]["INTRON"]
                 annotations[value]["EI"] = f"Intron {pos}"
             else:
-                annotations[value]["EI"] = "NA"
+                annotations[value]["EI"] = None
 
             # Calcul GnomAD AF for all population and get the max
             gnomadg_max = None
