@@ -17,3 +17,4 @@ dependencies:
   - psycopg2=2.8.6
   - anacore=2.9
   - flask-apscheduler=1.12.2
+  - ensembl-vep=104.3
