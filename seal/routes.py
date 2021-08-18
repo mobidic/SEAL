@@ -380,6 +380,13 @@ def json_variants(id, version=-1):
             annotations[feature]["maxSpliceAI_type"] = maxSpliceAI_type
 
         occurrences = len(variant.samples)
+        occurences_family = 0
+        members = []
+        for sam in variant.samples:
+            if sam.familyid is not None and sam.familyid == sample.familyid and sam.id != sample.id:
+                occurences_family += 1
+                members.append(sam.samplename)
+
         variants["data"].append({
             "annotations": annotations[feature],
             "chr": f"{variant.chr}",
@@ -388,7 +395,9 @@ def json_variants(id, version=-1):
             "alt": f"{variant.alt}",
             "inseal": {
                 "occurrences": occurrences,
-                "total_samples": total_samples
+                "total_samples": total_samples,
+                "occurences_family": occurences_family,
+                "members": members
             }
         })
 

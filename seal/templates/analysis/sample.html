@@ -28,6 +28,7 @@
 						<th class='showTitle control-size-100'>GnomAD</th>
 						<th class='showTitle control-size-100'>SEAL (pct)</th>
 						<th class='showTitle control-size-100'>SEAL (cnt)</th>
+						<th class='showTitle control-size-100'>In Family</th>
 						<th class='showTitle control-size-300'>ClinSig</th>
 						<th class='showTitle control-size-100'>Impact</th>
 						<th class='showTitle control-size-300'>Consequence</th>
@@ -99,6 +100,12 @@
 						<th class='showTitle control-size-100'>
 							SEAL (cnt)
 							<span onclick="openmodal(title='SEAL (count)', content='The number of occurences this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+								<i class="fas fa-question-circle"></i>
+							</span>
+						</th>
+						<th class='showTitle control-size-100'>
+							In Family
+							<span onclick="openmodal(title='In Family', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -468,6 +475,9 @@
 							return data;
 						},
 						"sort": function ( data, type, row ) {
+							if (data == null) {
+								return "NA";
+							}
 							pos_split = data.split(/\s|\//);
 							if(pos_split[0] == "Exon") {
 								myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_0";
@@ -476,7 +486,6 @@
 							} else {
 								myvar = "NA"
 							}
-							console.log(myvar);
 							return myvar
 						},
 					}
@@ -531,6 +540,21 @@
 					    },
 						"sort" : function ( data, type, row, meta ) {
 							return data["occurrences"];
+					    }
+					},
+				},
+				{
+					"className": 'showTitle size-125',
+					"data": "inseal",
+					"render" : {
+						"_" : function ( data, type, row, meta ) {
+							if (data["members"].length > 1) {
+								members =" (" + data["members"].join(", ") + ")"
+							}
+							return data["occurences_family"] + " (" + data["members"].join(", ") + ")";
+					    },
+						"sort" : function ( data, type, row, meta ) {
+							return data["occurences_family"];
 					    }
 					},
 				},
