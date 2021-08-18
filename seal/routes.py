@@ -362,7 +362,7 @@ def json_variants(id, version=-1):
             maxSpliceAI_type = None
             for type in spliceAI:
                 key_DS = f"SpliceAI_pred_DS_{type}"
-                key_DP = f"SpliceAI_pred_DS_{type}"
+                key_DP = f"SpliceAI_pred_DP_{type}"
                 score = annotations[feature][key_DS]
                 pos = annotations[feature][key_DP]
                 if score is None:

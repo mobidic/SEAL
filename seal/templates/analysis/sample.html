@@ -140,19 +140,19 @@
 						</th>
 						<th class='showTitle control-size-125'>
 							SpliceAI DS
-							<span onclick="openmodal(title='SpliceAI DS', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+							<span onclick="openmodal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
 						<th class='showTitle control-size-125'>
 							SpliceAI DP
-							<span onclick="openmodal(title='SpliceAI DP', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+							<span onclick="openmodal(title='SpliceAI DP', content='Delta positions (DP)', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
 						<th class='showTitle control-size-125'>
 							SpliceAI Type
-							<span onclick="openmodal(title='SpliceAI Type', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+							<span onclick="openmodal(title='SpliceAI Type', content='Acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL).', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 								<i class="fas fa-question-circle"></i>
 							</span>
 						</th>
@@ -414,6 +414,21 @@
 		}
 	};
 
+	const spliceAI_Type_dict = {
+		"AG": {
+			"color": "w3-flat-amethyst"
+		},
+		"AL": {
+			"color": "w3-flat-wisteria"
+		},
+		"DG": {
+			"color": "w3-flat-carrot"
+		},
+		"DL": {
+			"color": "w3-flat-pumpkin"
+		}
+	};
+
 	$(document).ready(function() {
 	    table = $('#variants').DataTable({
 			buttons:[{
@@ -422,7 +437,7 @@
 				    preDefined:{{ filter.filter | safe }},
 				}
 	        }],
-			dom: 'Bfrtip',
+			dom: 'Blfrtip',
 			scrollX: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
@@ -664,12 +679,20 @@
 							if (data == null){
 								return "NA";
 							}
-							return parseFloat(data).toFixed(3);
+							value = parseFloat(data).toFixed(3)
+							classw3css = "w3-text-black";
+							if (value >= 0.8) {
+								classw3css = "w3-text-flat-orange";
+							}
+							if (value >= 0.5) {
+								classw3css = "w3-text-flat-alizarin";
+							}
+							return "<span class='" + classw3css + "'>" + value + "</span>";
 					    },
 					},
 				},
 				{
-					"className": 'showTitle size-125',
+					"className": 'w3-center showTitle size-125',
 					"data": "annotations.maxSpliceAI_DP",
 					"render": {
 						"_": function ( data, type, row, meta ) {
@@ -684,17 +707,16 @@
 					},
 				},
 				{
-					"className": 'showTitle size-125',
+					"className": 'w3-center showTitle size-125',
 					"data": "annotations.maxSpliceAI_type",
 					"render": {
 						"_": function ( data, type, row, meta ) {
 							return data;
 					    },
 						"display": function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							return data;
+							color = data in spliceAI_Type_dict ? spliceAI_Type_dict[data]["color"] : "w3-flat-asbestos";
+							data = data == null ? "NA" : data;
+							return "<span class='w3-tag " + color + "'>" + data + "</span>";
 					    },
 					},
 				},
