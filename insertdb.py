@@ -22,25 +22,6 @@ filterBasic = {
                     "value": [
                         "0.01"
                     ]
-                },
-                {
-                    "criteria": [
-                        {
-                            "condition": "<=",
-                            "data": "In Seal (pct)",
-                            "value": [
-                                "0.20"
-                            ]
-                        },
-                        {
-                            "condition": "<=",
-                            "data": "In Seal (count)",
-                            "value": [
-                                "10"
-                            ]
-                        }
-                    ],
-                    "logic": "OR"
                 }
             ],
             "logic": "AND"
@@ -179,18 +160,48 @@ filterBasic = {
                     ]
                 },
                 {
-                    "condition": "=",
+                    "condition": "null",
                     "data": "ClinSig",
-                    "value": [
-                        "NA"
-                    ]
+                    "value": []
+                }
+            ],
+            "logic": "OR"
+        },
+        {
+            "criteria": [
+                {
+                    "criteria": [
+                        {
+                            "condition": ">=",
+                            "data": "Missense",
+                            "value": [
+                                "0.35"
+                            ]
+                        },
+                        {
+                            "condition": "null",
+                            "data": "Missense",
+                            "value": []
+                        }
+                    ],
+                    "logic": "OR"
                 },
                 {
-                    "condition": "=",
-                    "data": "ClinSig",
-                    "value": [
-                        "not_provided"
-                    ]
+                    "criteria": [
+                        {
+                            "condition": ">=",
+                            "data": "SpliceAI DS",
+                            "value": [
+                                "0.5"
+                            ]
+                        },
+                        {
+                            "condition": "null",
+                            "data": "SpliceAI DS",
+                            "value": []
+                        }
+                    ],
+                    "logic": "OR"
                 }
             ],
             "logic": "OR"
@@ -198,6 +209,7 @@ filterBasic = {
     ],
     "logic": "AND"
 }
+
 filter1 = Filter(filtername="No Filter", filter={"criteria": []})
 filter2 = Filter(filtername="Default", filter=filterBasic)
 db.session.add(filter1)
