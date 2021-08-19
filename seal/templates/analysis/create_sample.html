@@ -84,4 +84,23 @@
 		document.getElementById("sidebar").style.display = "none";
 		document.getElementById("overlay").style.display = "none";
 	}
+
+	$(document).ready(function(){
+		var countries=["sample"];
+		function loadFamilies(){
+			$.getJSON('/json/families', function(data, status, xhr){
+				console.log(data);
+				for (var i = 0; i < data['data'].length; i++ ) {
+					console.log(data["data"][i]["family"])
+					countries.push(data["data"][i]["family"]);
+				}
+			});
+		};
+		loadFamilies();
+
+		$('#family').autocomplete({
+			source: countries,
+		});
+
+	});
 {% endblock %}

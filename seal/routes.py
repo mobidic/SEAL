@@ -228,6 +228,18 @@ def create_variant():
 ################################################################################
 # JSON views
 
+@app.route("/json/families", methods=['GET', 'POST'])
+@login_required
+def json_families():
+    families = db.session.query(Family.id, Family.family).all()
+    families_json = {"data": list()}
+    for family in families:
+        families_json["data"].append({
+            "id": family.id,
+            "family": family.family
+        })
+    return jsonify(families_json)
+
 
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
@@ -236,7 +248,8 @@ def json_samples():
     samples_json = {"data": list()}
     for sample in samples:
         family = None
-        family = Family.query.get(sample.familyid)
+        if sample.familyid is not None:
+            family = Family.query.get(sample.familyid)
         samples_json["data"].append({
             "id": sample.id,
             "samplename": sample.samplename,
