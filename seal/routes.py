@@ -178,6 +178,55 @@ def sample(id):
     )
 
 
+def add_vcf(samplename, vcf_file):
+    random_hex = secrets.token_hex(8)
+
+    _, f_ext = os.path.splitext(vcf_file.filename)
+
+    vcf_fn = random_hex + f_ext
+    vcf_path = os.path.join(app.root_path, 'static/temp/vcf/', vcf_fn)
+    vcf_file.save(vcf_path)
+
+    token_fn = random_hex + ".token"
+    token_path = os.path.join(app.root_path, 'static/temp/vcf/', token_fn)
+    with open(token_path, "w") as tf:
+        tf.write(json.dumps({
+            "samplename": samplename
+        }))
+
+    return vcf_fn
+
+
+@app.route("/create/sample", methods=['GET', 'POST'])
+@login_required
+def create_variant():
+    uploadSampleForm = UploadVariantForm()
+    if not current_user.is_authenticated:
+        return redirect(url_for('login'))
+    if "submit" in request.form and uploadSampleForm.validate_on_submit():
+        sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data).first()
+        if sample:
+            flash("This Sample Name is already in database!", "error")
+            return redirect(url_for('index'))
+
+        add_vcf(uploadSampleForm.samplename.data, uploadSampleForm.vcf_file.data)
+
+        flash(f'The sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
+        return redirect(url_for('index'))
+
+    return render_template(
+        'analysis/create_sample.html', title="Add Sample",
+        form=uploadSampleForm
+    )
+
+
+################################################################################
+
+
+################################################################################
+# JSON views
+
+
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
 def json_samples():
@@ -424,43 +473,4 @@ def json_transcripts():
     return jsonify(transcripts_json)
 
 
-def add_vcf(samplename, vcf_file):
-    random_hex = secrets.token_hex(8)
-
-    _, f_ext = os.path.splitext(vcf_file.filename)
-
-    vcf_fn = random_hex + f_ext
-    vcf_path = os.path.join(app.root_path, 'static/temp/vcf/', vcf_fn)
-    vcf_file.save(vcf_path)
-
-    token_fn = random_hex + ".token"
-    token_path = os.path.join(app.root_path, 'static/temp/vcf/', token_fn)
-    with open(token_path, "w") as tf:
-        tf.write(json.dumps({
-            "samplename": samplename
-        }))
-
-    return vcf_fn
-
-
-@app.route("/create/sample", methods=['GET', 'POST'])
-@login_required
-def create_variant():
-    uploadSampleForm = UploadVariantForm()
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    if "submit" in request.form and uploadSampleForm.validate_on_submit():
-        sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data).first()
-        if sample:
-            flash("This Sample Name is already in database!", "error")
-            return redirect(url_for('index'))
-
-        add_vcf(uploadSampleForm.samplename.data, uploadSampleForm.vcf_file.data)
-
-        flash(f'The sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
-        return redirect(url_for('index'))
-
-    return render_template(
-        'analysis/create_sample.html', title="Add Sample",
-        form=uploadSampleForm
-    )
+################################################################################
