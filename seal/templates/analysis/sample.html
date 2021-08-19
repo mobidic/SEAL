@@ -548,10 +548,11 @@
 					"data": "inseal",
 					"render" : {
 						"_" : function ( data, type, row, meta ) {
-							if (data["members"].length > 1) {
-								members =" (" + data["members"].join(", ") + ")"
+							members = null
+							if (data["members"].length > 0) {
+								members = " (" + data["members"].join(", ") + ")"
 							}
-							return data["occurences_family"] + " (" + data["members"].join(", ") + ")";
+							return data["occurences_family"] + members;
 					    },
 						"sort" : function ( data, type, row, meta ) {
 							return data["occurences_family"];
