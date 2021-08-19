@@ -178,7 +178,7 @@ def sample(id):
     )
 
 
-def add_vcf(samplename, vcf_file):
+def add_vcf(info, vcf_file):
     random_hex = secrets.token_hex(8)
 
     _, f_ext = os.path.splitext(vcf_file.filename)
@@ -190,9 +190,7 @@ def add_vcf(samplename, vcf_file):
     token_fn = random_hex + ".token"
     token_path = os.path.join(app.root_path, 'static/temp/vcf/', token_fn)
     with open(token_path, "w") as tf:
-        tf.write(json.dumps({
-            "samplename": samplename
-        }))
+        tf.write(json.dumps(info))
 
     return vcf_fn
 
@@ -209,7 +207,11 @@ def create_variant():
             flash("This Sample Name is already in database!", "error")
             return redirect(url_for('index'))
 
-        add_vcf(uploadSampleForm.samplename.data, uploadSampleForm.vcf_file.data)
+        info = {
+            "samplename": uploadSampleForm.samplename.data,
+            "family": uploadSampleForm.family.data
+        }
+        add_vcf(info, uploadSampleForm.vcf_file.data)
 
         flash(f'The sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
         return redirect(url_for('index'))

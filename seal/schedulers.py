@@ -27,8 +27,7 @@ def importvcf():
 
             # Add family in database if necessary
             familyid = None
-            if "family" in data:
-                print("true")
+            if "family" in data and data["family"] != "":
                 familyname = data['family']
                 family = Family.query.filter_by(family=familyname).first()
                 if not family:

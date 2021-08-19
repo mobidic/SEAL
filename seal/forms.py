@@ -80,6 +80,10 @@ class UploadVariantForm(FlaskForm):
         'Sample Name',
         validators=[DataRequired(), Length(min=2, max=20)]
     )
+    family = StringField(
+        'Family ID',
+        validators=[Optional(), Length(min=2, max=20)]
+    )
     vcf_file = FileField(
         'Upload VCF file',
         validators=[DataRequired(), FileAllowed(['vcf', 'vcf.gz'])]

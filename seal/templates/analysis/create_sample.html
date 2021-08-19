@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block static %}
+	<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+{% endblock %}
 
 {% block content %}
 	{% include 'includes/sidebar.j2' %}
@@ -27,6 +32,21 @@
 						</div>
 					</div>
 					<div class="w3-row w3-section">
+						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-address-card"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+						<div class="w3-rest">
+							{% if form.family.errors %}
+								{{ form.family(class="w3-input w3-border w3-border-red") }}
+								<div class="w3-small w3-text-flat-alizarin">
+									{% for error in form.family.errors %}
+										<i class="fas fa-exclamation-circle"></i> {{ error }}
+									{% endfor %}
+								</div>
+							{% else %}
+								{{ form.family(class="w3-input w3-border") }}
+							{% endif %}
+						</div>
+					</div>
+					<div class="w3-row w3-section">
 						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
 						<div class="w3-rest">
 							{% if form.vcf_file.errors %}
@@ -46,6 +66,7 @@
 						{{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
 					</div>
 				</form>
+				<div id="result"></div>
 			</div>
 		</div>
 	</div>
@@ -63,8 +84,4 @@
 		document.getElementById("sidebar").style.display = "none";
 		document.getElementById("overlay").style.display = "none";
 	}
-{% endblock %}
-
-
-{% block static %}
 {% endblock %}
