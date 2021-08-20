@@ -5,6 +5,56 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" />
 <script src="https://cdn.datatables.net/searchbuilder/1.1.0/js/dataTables.searchBuilder.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+
+<style>
+	/*
+	©Raj Rajhans
+	rajrajhans.com
+	Day #4 : 30 Days CSS
+	*/
+
+	.animation-bar-1 span {
+	    position: relative;
+	    display: inline-block;
+	    vertical-align: middle;
+	    height: 20px;
+	    border-radius: 10px;
+	    overflow: hidden;
+	    background-size: 100%;
+	    background: #f56982 linear-gradient(to bottom, #3498db, #2980b9);
+	    animation: progress-anim-1 5s infinite linear;
+	}
+
+	.animation-bar-1 span:after {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    content: "";
+	    background-image: linear-gradient(45deg, #ffffff 25%,
+	                                        rgba(0, 0, 0, 0) 25%,
+	                                        rgba(0, 0, 0, 0) 50%,
+	                                        #ffffff 50%,
+	                                        #ffffff 75%,
+	                                        rgba(0, 0, 0, 0) 75%,
+	                                        rgba(0, 0, 0, 0));
+
+	    background-size: 30px 30px;
+	    opacity: 0.3;
+	    animation: progress-anim-1-after 0.5s infinite linear;
+	}
+
+	@-webkit-keyframes progress-anim-1-after {
+	    0% {
+	        background-position: 0 100%;
+	    }
+	    100% {
+	        background-position: 30px 100%;
+	    }
+	}
+</style>
+
 {% endblock %}
 
 {% block content %}
@@ -14,6 +64,7 @@
 			<h3><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
 		</div>
 		<div class="w3-padding">
+			<button onclick="myFunction()">Click me</button>
 			<button class="w3-button w3-flat-green-sea w3-hover-flat-turquoise w3-ripple" onclick="save_filters()">Save filters</button>
 			<table id="variants" class="w3-table-all" style="width:100%">
 				<thead>
@@ -188,6 +239,22 @@
 			</div>
 			<footer class="w3-container w3-flat-turquoise">
 				<p id="help-modal-footer"></p>
+			</footer>
+		</div>
+	</div>
+
+	<div id="details-modal" class="w3-modal">
+		<div class="w3-modal-content w3-card-4">
+			<header class="w3-container w3-flat-turquoise">
+				<span onclick="document.getElementById('details-modal').style.display='none'"
+					class="w3-button w3-display-topright">&times;</span>
+				<h5 id="details-modal-title"></h5>
+			</header>
+			<div class="w3-container">
+				<p id="details-modal-content"></p>
+			</div>
+			<footer class="w3-container w3-flat-turquoise">
+				<p id="details-modal-footer"></p>
 			</footer>
 		</div>
 	</div>
@@ -440,10 +507,10 @@
 	    table = $('#variants').DataTable({
 			buttons:[{
 				extend: 'searchBuilder',
-				config: {
-				    preDefined:{{ filter.filter | safe }},
-				}
 	        }],
+			"language": {
+				"loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
+			},
 			dom: 'Blfrtip',
 			scrollX: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
@@ -819,5 +886,11 @@
 		document.getElementById("help-modal-content").innerHTML = content;
 		document.getElementById("help-modal-footer").innerHTML = footer;
 		document.getElementById('help-modal').style.display='block'
+	}
+ // console.log({{ filter.filter | safe }})
+	function myFunction() {
+		//$('#variants').DataTable().searchBuilder.rebuild({"criteria": []});
+		$('#variants').DataTable().searchBuilder.rebuild({{ filter.filter | safe }});
+
 	}
 {% endblock %}
