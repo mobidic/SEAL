@@ -10,7 +10,7 @@ from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, SelectFilterForm
 from seal.models import User, Sample, Filter, Transcript, Family
 from flask_login import login_user, current_user, logout_user, login_required
-
+from datetime import datetime
 
 ################################################################################
 # Essentials pages
@@ -150,31 +150,17 @@ def transcripts():
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
-    sample = Sample.query.get(int(id))
+    sample = db.session.query(Sample.samplename, Sample.id).filter(Sample.id==id).first()
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
 
-    filters = list()
-    for filter in Filter.query.all():
-        if current_user.filter_id == filter.id:
-            filters.append((filter.id, f'{filter.filtername} (default)'))
-        else:
-            filters.append((filter.id, f'{filter.filtername}'))
-
-    selectFilterForm = SelectFilterForm()
-    selectFilterForm.filter.choices = filters
-    if "submit_filter" in request.form and selectFilterForm.validate_on_submit():
-        filter = Filter.query.get(selectFilterForm.filter.data)
-        flash(f"You are using '{filter.filtername}' as filter!", 'warning')
-    else:
-        filter = Filter.query.get(current_user.filter_id)
+    filters = Filter.query.all()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
-        selectFilterForm=selectFilterForm,
         sample=sample,
-        filter=filter
+        filters=filters
     )
 
 
@@ -486,6 +472,17 @@ def json_transcripts():
             "uniprot": transcript.uniprot
         })
     return jsonify(transcripts_json)
+
+
+@app.route("/json/filter/<int:id>")
+@login_required
+def json_filter(id=1):
+    filter = Filter.query.get(int(id))
+    if not filter:
+        flash(f"Error filter not found! Please contact your administrator! (id - {id})", category="error")
+        return redirect(url_for('index'))
+
+    return jsonify(filter.filter)
 
 
 ################################################################################
