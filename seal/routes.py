@@ -7,10 +7,10 @@ import numpy
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, SelectFilterForm
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
 from seal.models import User, Sample, Filter, Transcript, Family
 from flask_login import login_user, current_user, logout_user, login_required
-from datetime import datetime
+
 
 ################################################################################
 # Essentials pages
@@ -150,7 +150,7 @@ def transcripts():
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
-    sample = db.session.query(Sample.samplename, Sample.id).filter(Sample.id==id).first()
+    sample = db.session.query(Sample.samplename, Sample.id).filter(Sample.id == id).first()
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
