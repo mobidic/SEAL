@@ -103,127 +103,127 @@
 						<tr class="w3-flat-green-sea">
 							<th class='showTitle control-size-100'>
 								Gene
-								<span onclick="openmodal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								Feature
-								<span onclick="openmodal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-75'>
 								Can.
-								<span onclick="openmodal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript.<br />Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript.<br />Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-150'>
 								Exon/Intron
-								<span onclick="openmodal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 	                        <th class='showTitle control-size-250'>
 								HGVSg
-								<span onclick="openmodal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 	                        <th class='showTitle control-size-250'>
 								HGVSc
-								<span onclick="openmodal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-250'>
 								HGVSp
-								<span onclick="openmodal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								GnomAD
-								<span onclick="openmodal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 (GRCh37/hg19) spans 125,748 exome sequences and 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 (GRCh37/hg19) spans 125,748 exome sequences and 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								SEAL (pct)
-								<span onclick="openmodal(title='SEAL (pct)', content='The percentage this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SEAL (pct)', content='The percentage this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								SEAL (cnt)
-								<span onclick="openmodal(title='SEAL (count)', content='The number of occurences this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SEAL (count)', content='The number of occurences this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								In Family
-								<span onclick="openmodal(title='In Family', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='In Family', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-300'>
 								ClinSig
-								<span onclick="openmodal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								Impact
-								<span onclick="openmodal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-300'>
 								Consequence
-								<span onclick="openmodal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								MES ref
-								<span onclick="openmodal(title='MES ref', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='MES ref', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								MES diff
-								<span onclick="openmodal(title='MES diff', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='MES diff', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								MES alt
-								<span onclick="openmodal(title='MES alt', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='MES alt', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-125'>
 								SpliceAI DS
-								<span onclick="openmodal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-125'>
 								SpliceAI DP
-								<span onclick="openmodal(title='SpliceAI DP', content='Delta positions (DP)', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SpliceAI DP', content='Delta positions (DP)', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-125'>
 								SpliceAI Type
-								<span onclick="openmodal(title='SpliceAI Type', content='Acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL).', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SpliceAI Type', content='Acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL).', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
 								Missense
-								<span onclick="openmodal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -875,7 +875,7 @@
 		document.getElementById("overlay").style.display = "none";
 	}
 
-	function openmodal(title="Some help", content='Some Content', footer='footer') {
+	function openHelpModal(title="Some help", content='Some Content', footer='footer') {
 		document.getElementById("help-modal-title").innerHTML = title;
 		document.getElementById("help-modal-content").innerHTML = content;
 		document.getElementById("help-modal-footer").innerHTML = footer;
