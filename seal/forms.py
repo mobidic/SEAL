@@ -96,9 +96,4 @@ class UploadVariantForm(FlaskForm):
             raise ValidationError('This Sample Name is already in database!')
 
 
-class SelectFilterForm(FlaskForm):
-    filter = SelectField('Filter')
-    submit_filter = SubmitField('Validate')
-
-
 ################################################################################
