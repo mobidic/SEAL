@@ -976,4 +976,11 @@
 		document.getElementById(detailName).style.display = "block";
 		evt.currentTarget.classList.add("w3-light-grey");
 	}
+
+	function changeFilter(id) {
+		$.getJSON("http://127.0.0.1:5000/json/filter/" + id, function(data) {
+		    $('#variants').DataTable().searchBuilder.rebuild(data);
+		});
+
+	}
 {% endblock %}
