@@ -58,7 +58,10 @@ def importvcf():
                         }]
 
                         for annot in v.info["ANN"]:
-                            wout_version = annot["Feature"].split('.')[0]
+                            try:
+                                wout_version = annot["Feature"].split('.')[0]
+                            except AttributeError:
+                                wout_version = "intergenic"
                             annotations[-1]["ANN"][wout_version] = annot
                         # app.logger.debug(f"       - Create Variant : {sample}")
                         variant = Variant(id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", chr=v.chrom, pos=v.pos, ref=v.ref, alt=v.alt[0], annotations=annotations)
@@ -66,7 +69,7 @@ def importvcf():
 
                     sample.variants.append(variant)
         except Exception as e:
-            print(e)
+            app.logger.info(f"{type(e).__name__} : {e}")
             sample.status = -1
         else:
             sample.status = 1
