@@ -3,7 +3,7 @@
 ## Installation
 
 First of all clone the repo :
-https://github.com/Char-Al/seal.git
+https://github.com/mobidic/seal.git
 
 ### Install dependencies
 #### Conda
