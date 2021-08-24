@@ -12,7 +12,7 @@ os.system('psql postgres -c "CREATE DATABASE seal;"')
 
 db.create_all()
 
-filterBasic = {
+filterSlow = {
     "criteria": [
         {
             "criteria": [
@@ -210,10 +210,109 @@ filterBasic = {
     "logic": "AND"
 }
 
+filterDefault = {
+    "criteria": [
+        {
+            "criteria": [
+                {
+                    "condition": "<=",
+                    "data": "GnomAD",
+                    "value": [
+                        "0.01"
+                    ]
+                },
+                {
+                    "criteria": [
+                        {
+                            "condition": "<=",
+                            "data": "SEAL (pct)",
+                            "value": [
+                                "0.1"
+                            ]
+                        },
+                        {
+                            "condition": "<=",
+                            "data": "SEAL (cnt)",
+                            "value": [
+                                "10"
+                            ]
+                        }
+                    ],
+                    "logic": "OR"
+                }
+            ],
+            "logic": "AND"
+        },
+        {
+            "criteria": [
+                {
+                    "condition": ">=",
+                    "data": "Missense",
+                    "value": [
+                        "0.35"
+                    ]
+                },
+                {
+                    "condition": "null",
+                    "data": "Missense",
+                    "value": []
+                }
+            ],
+            "logic": "OR"
+        },
+        {
+            "criteria": [
+                {
+                    "condition": "!=",
+                    "data": "Impact",
+                    "value": [
+                        "LOW"
+                    ]
+                },
+                {
+                    "condition": "!=",
+                    "data": "Impact",
+                    "value": [
+                        "MODIFIER"
+                    ]
+                }
+            ],
+            "logic": "AND"
+        },
+        {
+            "criteria": [
+                {
+                    "condition": "contains",
+                    "data": "ClinSig",
+                    "value": [
+                        "pathogenicity"
+                    ]
+                },
+                {
+                    "condition": "contains",
+                    "data": "ClinSig",
+                    "value": [
+                        "uncertain"
+                    ]
+                },
+                {
+                    "condition": "null",
+                    "data": "ClinSig",
+                    "value": []
+                }
+            ],
+            "logic": "OR"
+        }
+    ],
+    "logic": "AND"
+}
+
 filter1 = Filter(filtername="No Filter", filter={"criteria": []})
-filter2 = Filter(filtername="Default", filter=filterBasic)
+filter2 = Filter(filtername="Slow", filter=filterSlow)
+filter3 = Filter(filtername="Default", filter=filterDefault)
 db.session.add(filter1)
 db.session.add(filter2)
+db.session.add(filter3)
 db.session.commit()
 
 user1 = User(username="admin", password="$2b$12$a41mGjwpAWjVNEJirzsbVOBVmn6dv2Cmj/xTye13j7qZg1nNMkUIS", admin=True, technician=True, bioinfo=True, biologist=True, filter_id=2)
