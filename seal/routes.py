@@ -13,6 +13,85 @@ from flask_login import login_user, current_user, logout_user, login_required
 
 
 ################################################################################
+# Define global variables
+# TODO: create values in database
+
+CONSEQUENCES_DICT = {
+    "stop_gained": 20,
+    "stop_lost": 20,
+    "splice_acceptor_variant": 10,
+    "splice_donor_variant": 10,
+    "frameshift_variant": 10,
+    "transcript_ablation": 10,
+    "start_lost": 10,
+    "transcript_amplification": 10,
+    "missense_variant": 10,
+    "protein_altering_variant": 10,
+    "splice_region_variant": 10,
+    "inframe_insertion": 10,
+    "inframe_deletion": 10,
+    "incomplete_terminal_codon_variant": 10,
+    "stop_retained_variant": 10,
+    "start_retained_variant": 10,
+    "synonymous_variant": 10,
+    "coding_sequence_variant": 10,
+    "mature_miRNA_variant": 10,
+    "intron_variant": 10,
+    "NMD_transcript_variant": 10,
+    "non_coding_transcript_exon_variant": 5,
+    "non_coding_transcript_variant": 5,
+    "3_prime_UTR_variant": 2,
+    "5_prime_UTR_variant": 2,
+    "upstream_gene_variant": 0,
+    "downstream_gene_variant": 0,
+    "TFBS_ablation": 0,
+    "TFBS_amplification": 0,
+    "TF_binding_site_variant": 0,
+    "regulatory_region_ablation": 0,
+    "regulatory_region_amplification": 0,
+    "regulatory_region_variant": 0,
+    "feature_elongation": 0,
+    "feature_truncation": 0,
+    "intergenic_variant": 0
+}
+GNOMADG = [
+    "gnomADg_AF_AFR",
+    "gnomADg_AF_AMR",
+    "gnomADg_AF_ASJ",
+    "gnomADg_AF_EAS",
+    "gnomADg_AF_FIN",
+    "gnomADg_AF_NFE",
+    "gnomADg_AF_OTH"
+]
+ANNOT_TO_SPLIT = [
+    "Existing_variation",
+    "Consequence",
+    "CLIN_SIG",
+    "SOMATIC",
+    "PHENO",
+    "PUBMED"
+]
+MISSENSES = [
+    "CADD_raw_rankscore_hg19",
+    "VEST4_rankscore",
+    "MetaSVM_rankscore",
+    "MetaLR_rankscore",
+    "Eigen-raw_coding_rankscore",
+    "Eigen-PC-raw_coding_rankscore",
+    "REVEL_rankscore",
+    "BayesDel_addAF_rankscore",
+    "BayesDel_noAF_rankscore",
+    "ClinPred_rankscore"
+]
+SPLICEAI = [
+    "AG",
+    "AL",
+    "DG",
+    "DL"
+]
+
+
+################################################################################
 # Essentials pages
 
 
@@ -263,90 +342,17 @@ def json_variants(id, version=-1):
     transcripts = [each.split('.')[0] for each in transcripts]
 
     ##################################################
-    # Define some dict/array for calculation
-    consequences_dict = {
-        "stop_gained": 20,
-        "stop_lost": 20,
-        "splice_acceptor_variant": 10,
-        "splice_donor_variant": 10,
-        "frameshift_variant": 10,
-        "transcript_ablation": 10,
-        "start_lost": 10,
-        "transcript_amplification": 10,
-        "missense_variant": 10,
-        "protein_altering_variant": 10,
-        "splice_region_variant": 10,
-        "inframe_insertion": 10,
-        "inframe_deletion": 10,
-        "incomplete_terminal_codon_variant": 10,
-        "stop_retained_variant": 10,
-        "start_retained_variant": 10,
-        "synonymous_variant": 10,
-        "coding_sequence_variant": 10,
-        "mature_miRNA_variant": 10,
-        "intron_variant": 10,
-        "NMD_transcript_variant": 10,
-        "non_coding_transcript_exon_variant": 5,
-        "non_coding_transcript_variant": 5,
-        "3_prime_UTR_variant": 2,
-        "5_prime_UTR_variant": 2,
-        "upstream_gene_variant": 0,
-        "downstream_gene_variant": 0,
-        "TFBS_ablation": 0,
-        "TFBS_amplification": 0,
-        "TF_binding_site_variant": 0,
-        "regulatory_region_ablation": 0,
-        "regulatory_region_amplification": 0,
-        "regulatory_region_variant": 0,
-        "feature_elongation": 0,
-        "feature_truncation": 0,
-        "intergenic_variant": 0
-    }
-    gnomADg = [
-        "gnomADg_AF_AFR",
-        "gnomADg_AF_AMR",
-        "gnomADg_AF_ASJ",
-        "gnomADg_AF_EAS",
-        "gnomADg_AF_FIN",
-        "gnomADg_AF_NFE",
-        "gnomADg_AF_OTH"
-    ]
-    annot_to_split = [
-        "Existing_variation",
-        "Consequence",
-        "CLIN_SIG",
-        "SOMATIC",
-        "PHENO",
-        "PUBMED"
-    ]
-    missenses = [
-        "CADD_raw_rankscore_hg19",
-        "VEST4_rankscore",
-        "MetaSVM_rankscore",
-        "MetaLR_rankscore",
-        "Eigen-raw_coding_rankscore",
-        "Eigen-PC-raw_coding_rankscore",
-        "REVEL_rankscore",
-        "BayesDel_addAF_rankscore",
-        "BayesDel_noAF_rankscore",
-        "ClinPred_rankscore"
-    ]
-    spliceAI = [
-        "AG",
-        "AL",
-        "DG",
-        "DL"
-    ]
-    ##################################################
 
     for variant in sample.variants:
         annotations = variant.annotations[version]["ANN"]
         features = list(annotations.keys())
         feature = None
         consequence_score_max = 0
+        consequence_score_max_nc = 0
+        canonical = False
         for value in features:
             # Split annotations
-            for splitAnn in annot_to_split:
+            for splitAnn in ANNOT_TO_SPLIT:
                 try:
                     annotations[value][splitAnn] = annotations[value][splitAnn].split("&")
                 except AttributeError:
@@ -355,7 +361,7 @@ def json_variants(id, version=-1):
             # Get consequence score
             consequence_score = 0
             for consequence in annotations[value]["Consequence"]:
-                consequence_score += consequences_dict[consequence]
+                consequence_score += CONSEQUENCES_DICT[consequence]
 
             # Calcul position into the gene (Exons or Intron)
             if annotations[value]["EXON"] is not None:
@@ -370,7 +376,7 @@ def json_variants(id, version=-1):
             # Calcul GnomAD AF for all population and get the max
             gnomadg_max = None
             gnomadg_max_pop = "ALL"
-            for gnomADg_key in gnomADg:
+            for gnomADg_key in GNOMADG:
                 try:
                     annotations[value][gnomADg_key] = float(annotations[value][gnomADg_key])
                 except ValueError:
@@ -388,19 +394,22 @@ def json_variants(id, version=-1):
             # Get the canonical transcript with max consequences or
             # random NM or another one...
             annotations[value]["canonical"] = False
-            if value in transcripts:
-                if consequence_score_max <= consequence_score:
+            if feature is None:
+                feature = value
+            elif value in transcripts:
+                if consequence_score >= consequence_score_max:
                     feature = value
-                    annotations[feature]["canonical"] = True
                     consequence_score_max = consequence_score
-            elif re.search("NM_", value) and not annotations[feature]["canonical"]:
-                feature = value
-            elif feature is None:
-                feature = value
+                    annotations[feature]["canonical"] = True
+                    canonical = True
+            elif re.search("NM_", value) and not canonical:
+                if consequence_score >= consequence_score_max_nc:
+                    feature = value
+                    consequence_score_max_nc = consequence_score
 
             # Calcul missenses scores
             missenseScores = list()
-            for missense in missenses:
+            for missense in MISSENSES:
                 if annotations[feature][missense] is not None:
                     missenseScores.append(float(annotations[feature][missense]))
             mean = numpy.mean(missenseScores)
@@ -413,7 +422,7 @@ def json_variants(id, version=-1):
             maxSpliceAI_DS = None
             maxSpliceAI_DP = None
             maxSpliceAI_type = None
-            for type in spliceAI:
+            for type in SPLICEAI:
                 key_DS = f"SpliceAI_pred_DS_{type}"
                 key_DP = f"SpliceAI_pred_DP_{type}"
                 score = annotations[feature][key_DS]
@@ -440,6 +449,7 @@ def json_variants(id, version=-1):
         variants["data"].append({
             "annotations": annotations[feature],
             "chr": f"{variant.chr}",
+            "id": f"{variant.id}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
             "alt": f"{variant.alt}",
