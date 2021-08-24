@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
-from seal.models import User, Sample, Filter, Transcript, Family
+from seal.models import User, Sample, Filter, Transcript, Family, Variant
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -494,5 +494,30 @@ def json_filter(id=1):
 
     return jsonify(filter.filter)
 
+
+@app.route("/json/variant/<string:id>")
+@app.route("/json/variant/<string:id>/version/<int:version>")
+@login_required
+def json_variant(id, version=-1):
+    variant = Variant.query.get(id)
+
+    for key in variant.annotations[version]["ANN"]:
+        variant.annotations[version]["ANN"][key]["EI"] = None
+        if variant.annotations[version]["ANN"][key]["EXON"] is not None:
+            pos = variant.annotations[version]["ANN"][key]["EXON"]
+            variant.annotations[version]["ANN"][key]["EI"] = f"Exon {pos}"
+        elif variant.annotations[version]["ANN"][key]["INTRON"] is not None:
+            pos = variant.annotations[version]["ANN"][key]["INTRON"]
+            variant.annotations[version]["ANN"][key]["EI"] = f"Intron {pos}"
+
+    variant_json = {
+        "id": variant.id,
+        "chr": variant.chr,
+        "pos": variant.pos,
+        "ref": variant.ref,
+        "alt": variant.alt,
+        "annotations": variant.annotations[version]
+    }
+    return jsonify(variant_json)
 
 ################################################################################
