@@ -7,6 +7,15 @@
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
 
 <style>
+
+	.tableFixHead {
+	    overflow-y: auto;
+	    height: 300px;
+	}
+	.tableFixHead thead th {
+	    position: sticky;
+	    top: 0;
+	}
 	/*
 	©Raj Rajhans
 	rajrajhans.com
@@ -76,6 +85,7 @@
 				<table id="variants" class="w3-table-all" style="width:100%">
 					<thead>
 						<tr class="w3-flat-green-sea">
+	                        <th class="w3-center control-size-25"></th>
 							<th class='showTitle control-size-100'>Gene</th>
 							<th class='showTitle control-size-100'>Feature</th>
 							<th class='showTitle control-size-75'>Can.</th>
@@ -101,6 +111,7 @@
 					</thead>
 					<tfoot>
 						<tr class="w3-flat-green-sea">
+							<th class="w3-center control-size-25"></th>
 							<th class='showTitle control-size-100'>
 								Gene
 								<span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
@@ -251,21 +262,29 @@
 		</div>
 	</div>
 
-	<div id="details-modal" class="w3-modal">
-		<div class="w3-modal-content w3-card-4">
-			<header class="w3-container w3-flat-turquoise">
-				<span onclick="document.getElementById('details-modal').style.display='none'"
-					class="w3-button w3-display-topright">&times;</span>
-				<h5 id="details-modal-title"></h5>
+	<div id="modal-details-variant" class="w3-modal">
+		<div class="w3-modal-content w3-card-4 w3-animate-zoom">
+			<header class="w3-container w3-flat-emerald">
+				<span onclick="document.getElementById('modal-details-variant').style.display='none'"
+				class="w3-button w3-flat-emerald w3-xlarge w3-display-topright">&times;</span>
+				<h2>Variant : <span id="variant-id"><span></h2>
 			</header>
-			<div class="w3-container">
-				<p id="details-modal-content"></p>
+
+			<div class="w3-bar w3-border-bottom">
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allFeatures')">All Features</button>
 			</div>
-			<footer class="w3-container w3-flat-turquoise">
-				<p id="details-modal-footer"></p>
-			</footer>
+
+			<div id="allFeatures" class="w3-container detail">
+				<h1>All features</h1>
+				<div id="allFeaturesTable"></div>
+			</div>
+			<div class="w3-container w3-light-grey w3-padding">
+				<button class="w3-button w3-right w3-white w3-border"
+				onclick="document.getElementById('modal-details-variant').style.display='none'">Close</button>
+			</div>
 		</div>
 	</div>
+
 {% endblock %}
 
 
@@ -523,6 +542,20 @@
 			scrollX: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
+		        {
+		            "className":      'details-control',
+		            "orderable":      false,
+		            "data":           "id",
+	                "render": {
+						"_": function ( data, type, row ) {
+							return data;
+						},
+						"display": function ( data, type, row ) {
+							response = '<i onclick="openDetailsVariantModal(\'' + data + '\')" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
+							return response;
+		                },
+					},
+		        },
 				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
 				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
 				{
@@ -882,10 +915,65 @@
 		document.getElementById('help-modal').style.display='block'
 	}
 
-	function changeFilter(id) {
-		$.getJSON("http://127.0.0.1:5000/json/filter/" + id, function(data) {
-		    $('#variants').DataTable().searchBuilder.rebuild(data);
+	function openDetailsVariantModal(id) {
+		$.getJSON("/json/variant/" + id, function(data) {
+		    allFeature = '<div class="tableFixHead">';
+			allFeature = allFeature + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			allFeature = allFeature + '<thead class="w3-flat-silver"><tr>'+
+		        '<th class="w3-flat-silver control-size-100" >Gene</th>'+
+				'<th class="w3-flat-silver control-size-200">Transcript</th>'+
+		        '<th class="w3-flat-silver control-size-150" title="Exon-Intron">Ex-In</th>'+
+		        '<th class="w3-flat-silver control-size-300" >HGVSc</th>'+
+		        '<th class="w3-flat-silver control-size-300" >HGVSp</th>'+
+		        '<th class="w3-flat-silver size-250">Consequences</th>'+
+				'<th class="showTitle w3-flat-silver control-size-100">MES ref</th>'+
+				'<th class="showTitle w3-flat-silver control-size-100">MES diff</th>'+
+				'<th class="showTitle w3-flat-silver control-size-100">MES alt</th>'+
+			'</tr></thead>';
+			allFeature = allFeature + '<tbody>';
+			for (x in data["annotations"]["ANN"]) {
+				cell = "";
+				for (idx in consequences_dict) {
+					if (data["annotations"]["ANN"][x]["Consequence"].includes(idx)){
+						color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
+						style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
+						cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
+					}
+				}
+				allFeature = allFeature + '<tr>'+
+					'<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+
+		            '<td class="w3-text-black showTitle control-size-200" >'+data["annotations"]["ANN"][x]["Feature"]+'</td>'+
+		            '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["EI"]+'</td>'+
+					'<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSc"]+'</td>'+
+		            '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSp"]+'</td>'+
+		            '<td class="w3-text-black showTitle size-250">'+cell+'</td>'+
+					'<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_ref"]+'</td>'+
+					'<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_diff"]+'</td>'+
+		            '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_alt"]+'</td>'+
+		        '</tr>';
+			}
+		    allFeature = allFeature + '</tbody>';
+		    allFeature = allFeature + '</table>';
+		    allFeature = allFeature + '</div>';
+			document.getElementById("allFeaturesTable").innerHTML = allFeature;
 		});
+		document.getElementById("variant-id").innerHTML = id;
+		document.getElementById('modal-details-variant').style.display='block'
+	}
 
+	document.getElementsByClassName("tablink")[0].click();
+
+	function openDetails(evt, detailName) {
+		var i, x, tablinks;
+		x = document.getElementsByClassName("detail");
+		for (i = 0; i < x.length; i++) {
+			x[i].style.display = "none";
+		}
+		tablinks = document.getElementsByClassName("tablink");
+		for (i = 0; i < x.length; i++) {
+			tablinks[i].classList.remove("w3-light-grey");
+		}
+		document.getElementById(detailName).style.display = "block";
+		evt.currentTarget.classList.add("w3-light-grey");
 	}
 {% endblock %}
