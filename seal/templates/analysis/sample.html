@@ -275,6 +275,7 @@
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allFeatures')">All Features</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
 			</div>
 
 			<div id="allFeatures" class="w3-container detail">
@@ -302,6 +303,15 @@
 				</div>
 			</div>
 
+			<div id="population" class="w3-container detail">
+				<h1>Population</h1>
+				<div class="w3-row">
+					<div id='radarPopulation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
+					<div class="w3-col l6 m12 s12">
+						<div id="tableScoresPopulation"></div>
+					</div>
+				</div>
+			</div>
 
 			<div class="w3-container w3-light-grey w3-padding">
 				<button class="w3-button w3-right w3-white w3-border"
@@ -1008,6 +1018,16 @@
 				"SiPhy_29way_logOdds_rankscore": null
 			}
 
+			var allScoresPopulation = {
+				"gnomADg_AF_AFR": null,
+				"gnomADg_AF_AMR": null,
+				"gnomADg_AF_ASJ": null,
+				"gnomADg_AF_EAS": null,
+				"gnomADg_AF_FIN": null,
+				"gnomADg_AF_NFE": null,
+				"gnomADg_AF_OTH": null
+			}
+
 			for (x in data["annotations"]["ANN"]) {
 				cell = "";
 				for (idx in consequences_dict) {
@@ -1040,30 +1060,17 @@
 							allScoresConservation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresConservation[nameScore]);
 					}
 				};
+
+				for (nameScore in allScoresPopulation) {
+					if (data["annotations"]["ANN"][x][nameScore] != null) {
+							allScoresPopulation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPopulation[nameScore]);
+					}
+				};
 			}
 		    allFeature = allFeature + '</tbody>';
 		    allFeature = allFeature + '</table>';
 		    allFeature = allFeature + '</div>';
 			document.getElementById("allFeaturesTable").innerHTML = allFeature;
-
-			tableScoresPredictions = '<div class="tableFixHead">';
-			tableScoresPredictions = tableScoresPredictions + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
-			tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver">Name</th>'+
-				'<th class="w3-flat-silver">Score</th>'+
-			'</tr></thead>';
-			tableScoresPredictions = tableScoresPredictions + '<tbody>';
-			for (nameScore in allScoresPredictions) {
-				tableScoresPredictions = tableScoresPredictions + '<tr>'+
-					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
-					'<td class="w3-text-black showTitle">'+allScoresPredictions[nameScore]+'</td>'+
-				'</tr>';
-			};
-			tableScoresPredictions = tableScoresPredictions + '</tbody>';
-			tableScoresPredictions = tableScoresPredictions + '</table>';
-			tableScoresPredictions = tableScoresPredictions + '</div>';
-			document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
-
 
 			tableScoresPredictions = '<div class="tableFixHead">';
 			tableScoresPredictions = tableScoresPredictions + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
@@ -1100,6 +1107,24 @@
 			tableScoresConservation = tableScoresConservation + '</table>';
 			tableScoresConservation = tableScoresConservation + '</div>';
 			document.getElementById("tableScoresConservation").innerHTML = tableScoresConservation;
+
+			tableScoresPopulation = '<div class="tableFixHead">';
+			tableScoresPopulation = tableScoresPopulation + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
+				'<th class="w3-flat-silver">Name</th>'+
+				'<th class="w3-flat-silver">Score</th>'+
+			'</tr></thead>';
+			tableScoresPopulation = tableScoresPopulation + '<tbody>';
+			for (nameScore in allScoresPopulation) {
+				tableScoresPopulation = tableScoresPopulation + '<tr>'+
+					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+					'<td class="w3-text-black showTitle">'+allScoresPopulation[nameScore]+'</td>'+
+				'</tr>';
+			};
+			tableScoresPopulation = tableScoresPopulation + '</tbody>';
+			tableScoresPopulation = tableScoresPopulation + '</table>';
+			tableScoresPopulation = tableScoresPopulation + '</div>';
+			document.getElementById("tableScoresPopulation").innerHTML = tableScoresPopulation;
 
 			wi1 = window.screen.width;
 			var apply = 433.983;
@@ -1189,8 +1214,37 @@
 				showlegend: false
 			}
 
+			radarData = [];
+			radarLabels = [];
+			for (nameScore in allScoresPopulation) {
+				radarData.push(Math.max(allScoresPopulation[nameScore], 0));
+				radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+			};
+			radarData.push(radarData[0]);
+			radarLabels.push(radarLabels[0]);
+
+			data3 = [{
+				type: 'scatterpolar',
+				r: radarData,
+				theta: radarLabels,
+				fill: 'toself'
+			}]
+
+			layout3 = {
+				width: apply,
+				polar: {
+					radialaxis: {
+						visible: true,
+						range: [0, 1]
+					}
+				},
+				showlegend: false
+			}
+
+
 			Plotly.newPlot("radarMissense", data, layout)
 			Plotly.newPlot("radarConservation", data2, layout2)
+			Plotly.newPlot("radarPopulation", data3, layout3)
 
 		});
 		document.getElementById("variant-id").innerHTML = id;
