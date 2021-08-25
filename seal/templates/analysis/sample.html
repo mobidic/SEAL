@@ -274,6 +274,7 @@
 			<div class="w3-bar w3-border-bottom">
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allFeatures')">All Features</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
 			</div>
 
 			<div id="allFeatures" class="w3-container detail">
@@ -287,6 +288,16 @@
 					<div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
 					<div class="w3-col l6 m12 s12">
 						<div id="tableScoresPredictions"></div>
+					</div>
+				</div>
+			</div>
+
+			<div id="conservation" class="w3-container detail">
+				<h1>Conservation</h1>
+				<div class="w3-row">
+					<div id='radarConservation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
+					<div class="w3-col l6 m12 s12">
+						<div id="tableScoresConservation"></div>
 					</div>
 				</div>
 			</div>
@@ -985,6 +996,18 @@
 				"LIST-S2_rankscore": null
 			}
 
+			var allScoresConservation = {
+				"bStatistic_converted_rankscore": null,
+				"phyloP100way_vertebrate_rankscore": null,
+				"phyloP30way_mammalian_rankscore": null,
+				"phyloP17way_primate_rankscore": null,
+				"phastCons100way_vertebrate_rankscore": null,
+				"phastCons30way_mammalian_rankscore": null,
+				"phastCons17way_primate_rankscore": null,
+				"GERP++_RS_rankscore": null,
+				"SiPhy_29way_logOdds_rankscore": null
+			}
+
 			for (x in data["annotations"]["ANN"]) {
 				cell = "";
 				for (idx in consequences_dict) {
@@ -1011,21 +1034,35 @@
 							allScoresPredictions[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPredictions[nameScore]);
 					}
 				};
-				phyloP100way_vertebrate_rankscore = Math.max(data["annotations"]["ANN"][x]["phyloP100way_vertebrate_rankscore"], phyloP100way_vertebrate_rankscore);
-				phyloP30way_mammalian_rankscore = Math.max(data["annotations"]["ANN"][x]["phyloP30way_mammalian_rankscore"], phyloP30way_mammalian_rankscore);
-				phyloP17way_primate_rankscore = Math.max(data["annotations"]["ANN"][x]["phyloP17way_primate_rankscore"], phyloP17way_primate_rankscore);
-				phastCons100way_vertebrate_rankscore = Math.max(data["annotations"]["ANN"][x]["phastCons100way_vertebrate_rankscore"], phastCons100way_vertebrate_rankscore);
-				phastCons30way_mammalian_rankscore = Math.max(data["annotations"]["ANN"][x]["phastCons30way_mammalian_rankscore"], phastCons30way_mammalian_rankscore);
-				phastCons17way_primate_rankscore = Math.max(data["annotations"]["ANN"][x]["phastCons17way_primate_rankscore"], phastCons17way_primate_rankscore);
-				GERP___RS_rankscore = Math.max(data["annotations"]["ANN"][x]["GERP++_RS_rankscore"], GERP___RS_rankscore);
-				SiPhy_29way_logOdds_rankscore = Math.max(data["annotations"]["ANN"][x]["SiPhy_29way_logOdds_rankscore"], SiPhy_29way_logOdds_rankscore);
-				bStatistic_converted_rankscore = Math.max(data["annotations"]["ANN"][x]["bStatistic_converted_rankscore"], bStatistic_converted_rankscore);
+
+				for (nameScore in allScoresConservation) {
+					if (data["annotations"]["ANN"][x][nameScore] != null) {
+							allScoresConservation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresConservation[nameScore]);
+					}
+				};
 			}
 		    allFeature = allFeature + '</tbody>';
 		    allFeature = allFeature + '</table>';
 		    allFeature = allFeature + '</div>';
 			document.getElementById("allFeaturesTable").innerHTML = allFeature;
 
+			tableScoresPredictions = '<div class="tableFixHead">';
+			tableScoresPredictions = tableScoresPredictions + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
+				'<th class="w3-flat-silver">Name</th>'+
+				'<th class="w3-flat-silver">Score</th>'+
+			'</tr></thead>';
+			tableScoresPredictions = tableScoresPredictions + '<tbody>';
+			for (nameScore in allScoresPredictions) {
+				tableScoresPredictions = tableScoresPredictions + '<tr>'+
+					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+					'<td class="w3-text-black showTitle">'+allScoresPredictions[nameScore]+'</td>'+
+				'</tr>';
+			};
+			tableScoresPredictions = tableScoresPredictions + '</tbody>';
+			tableScoresPredictions = tableScoresPredictions + '</table>';
+			tableScoresPredictions = tableScoresPredictions + '</div>';
+			document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
 
 
 			tableScoresPredictions = '<div class="tableFixHead">';
@@ -1045,6 +1082,24 @@
 			tableScoresPredictions = tableScoresPredictions + '</table>';
 			tableScoresPredictions = tableScoresPredictions + '</div>';
 			document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
+
+			tableScoresConservation = '<div class="tableFixHead">';
+			tableScoresConservation = tableScoresConservation + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresConservation = tableScoresConservation + '<thead class="w3-flat-silver"><tr>'+
+				'<th class="w3-flat-silver">Name</th>'+
+				'<th class="w3-flat-silver">Score</th>'+
+			'</tr></thead>';
+			tableScoresConservation = tableScoresConservation + '<tbody>';
+			for (nameScore in allScoresConservation) {
+				tableScoresConservation = tableScoresConservation + '<tr>'+
+					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+					'<td class="w3-text-black showTitle">'+allScoresConservation[nameScore]+'</td>'+
+				'</tr>';
+			};
+			tableScoresConservation = tableScoresConservation + '</tbody>';
+			tableScoresConservation = tableScoresConservation + '</table>';
+			tableScoresConservation = tableScoresConservation + '</div>';
+			document.getElementById("tableScoresConservation").innerHTML = tableScoresConservation;
 
 			wi1 = window.screen.width;
 			var apply = 433.983;
@@ -1107,7 +1162,36 @@
 				showlegend: false
 			}
 
+			radarData = [];
+			radarLabels = [];
+			for (nameScore in allScoresConservation) {
+				radarData.push(Math.max(allScoresConservation[nameScore], 0));
+				radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+			};
+			radarData.push(radarData[0]);
+			radarLabels.push(radarLabels[0]);
+
+			data2 = [{
+				type: 'scatterpolar',
+				r: radarData,
+				theta: radarLabels,
+				fill: 'toself'
+			}]
+
+			layout2 = {
+				width: apply,
+				polar: {
+					radialaxis: {
+						visible: true,
+						range: [0, 1]
+					}
+				},
+				showlegend: false
+			}
+
 			Plotly.newPlot("radarMissense", data, layout)
+			Plotly.newPlot("radarConservation", data2, layout2)
+
 		});
 		document.getElementById("variant-id").innerHTML = id;
 		document.getElementById('modal-details-variant').style.display='block'
