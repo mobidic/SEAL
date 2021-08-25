@@ -5,12 +5,13 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" />
 <script src="https://cdn.datatables.net/searchbuilder/1.1.0/js/dataTables.searchBuilder.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
+<script src='https://cdn.plot.ly/plotly-2.3.1.min.js'></script>
 
 <style>
 
 	.tableFixHead {
 	    overflow-y: auto;
-	    height: 300px;
+	    height: 434.5px;
 	}
 	.tableFixHead thead th {
 	    position: sticky;
@@ -272,12 +273,25 @@
 
 			<div class="w3-bar w3-border-bottom">
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allFeatures')">All Features</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
 			</div>
 
 			<div id="allFeatures" class="w3-container detail">
 				<h1>All features</h1>
 				<div id="allFeaturesTable"></div>
 			</div>
+
+			<div id="missense" class="w3-container detail">
+				<h1>Missense</h1>
+				<div class="w3-row">
+					<div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
+					<div class="w3-col l6 m12 s12">
+						<div id="tableScoresPredictions"></div>
+					</div>
+				</div>
+			</div>
+
+
 			<div class="w3-container w3-light-grey w3-padding">
 				<button class="w3-button w3-right w3-white w3-border"
 				onclick="document.getElementById('modal-details-variant').style.display='none'">Close</button>
@@ -914,7 +928,7 @@
 		document.getElementById("help-modal-footer").innerHTML = footer;
 		document.getElementById('help-modal').style.display='block'
 	}
-
+	const missenseScores = []
 	function openDetailsVariantModal(id) {
 		$.getJSON("/json/variant/" + id, function(data) {
 		    allFeature = '<div class="tableFixHead">';
@@ -931,6 +945,46 @@
 				'<th class="showTitle w3-flat-silver control-size-100">MES alt</th>'+
 			'</tr></thead>';
 			allFeature = allFeature + '<tbody>';
+
+			var allScoresPredictions = {
+				"SIFT_converted_rankscore": null,
+				"SIFT4G_converted_rankscore": null,
+				"Polyphen2_HDIV_rankscore": null,
+				"Polyphen2_HVAR_rankscore": null,
+				"PROVEAN_converted_rankscore": null,
+				"LRT_converted_rankscore": null,
+				"MutationTaster_converted_rankscore": null,
+				"MutationAssessor_rankscore": null,
+				"FATHMM_converted_rankscore": null,
+				"fathmm-MKL_coding_rankscore": null,
+				"fathmm-XF_coding_rankscore": null,
+				"CADD_raw_rankscore": null,
+				"CADD_raw_rankscore_hg19": null,
+				"VEST4_rankscore": null,
+				"integrated_fitCons_rankscore": null,
+				"GM12878_fitCons_rankscore": null,
+				"H1-hESC_fitCons_rankscore": null,
+				"HUVEC_fitCons_rankscore": null,
+				"LINSIGHT_rankscore": null,
+				"DANN_rankscore": null,
+				"MetaSVM_rankscore": null,
+				"MetaLR_rankscore": null,
+				"GenoCanyon_rankscore": null,
+				"Eigen-raw_coding_rankscore": null,
+				"Eigen-PC-raw_coding_rankscore": null,
+				"M-CAP_rankscore": null,
+				"REVEL_rankscore": null,
+				"MutPred_rankscore": null,
+				"MVP_rankscore": null,
+				"MPC_rankscore": null,
+				"PrimateAI_rankscore": null,
+				"DEOGEN2_rankscore": null,
+				"BayesDel_addAF_rankscore": null,
+				"BayesDel_noAF_rankscore": null,
+				"ClinPred_rankscore": null,
+				"LIST-S2_rankscore": null
+			}
+
 			for (x in data["annotations"]["ANN"]) {
 				cell = "";
 				for (idx in consequences_dict) {
@@ -951,15 +1005,114 @@
 					'<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_diff"]+'</td>'+
 		            '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_alt"]+'</td>'+
 		        '</tr>';
+
+				for (nameScore in allScoresPredictions) {
+					if (data["annotations"]["ANN"][x][nameScore] != null) {
+							allScoresPredictions[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPredictions[nameScore]);
+					}
+				};
+				phyloP100way_vertebrate_rankscore = Math.max(data["annotations"]["ANN"][x]["phyloP100way_vertebrate_rankscore"], phyloP100way_vertebrate_rankscore);
+				phyloP30way_mammalian_rankscore = Math.max(data["annotations"]["ANN"][x]["phyloP30way_mammalian_rankscore"], phyloP30way_mammalian_rankscore);
+				phyloP17way_primate_rankscore = Math.max(data["annotations"]["ANN"][x]["phyloP17way_primate_rankscore"], phyloP17way_primate_rankscore);
+				phastCons100way_vertebrate_rankscore = Math.max(data["annotations"]["ANN"][x]["phastCons100way_vertebrate_rankscore"], phastCons100way_vertebrate_rankscore);
+				phastCons30way_mammalian_rankscore = Math.max(data["annotations"]["ANN"][x]["phastCons30way_mammalian_rankscore"], phastCons30way_mammalian_rankscore);
+				phastCons17way_primate_rankscore = Math.max(data["annotations"]["ANN"][x]["phastCons17way_primate_rankscore"], phastCons17way_primate_rankscore);
+				GERP___RS_rankscore = Math.max(data["annotations"]["ANN"][x]["GERP++_RS_rankscore"], GERP___RS_rankscore);
+				SiPhy_29way_logOdds_rankscore = Math.max(data["annotations"]["ANN"][x]["SiPhy_29way_logOdds_rankscore"], SiPhy_29way_logOdds_rankscore);
+				bStatistic_converted_rankscore = Math.max(data["annotations"]["ANN"][x]["bStatistic_converted_rankscore"], bStatistic_converted_rankscore);
 			}
 		    allFeature = allFeature + '</tbody>';
 		    allFeature = allFeature + '</table>';
 		    allFeature = allFeature + '</div>';
 			document.getElementById("allFeaturesTable").innerHTML = allFeature;
+
+
+
+			tableScoresPredictions = '<div class="tableFixHead">';
+			tableScoresPredictions = tableScoresPredictions + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
+				'<th class="w3-flat-silver">Name</th>'+
+				'<th class="w3-flat-silver">Score</th>'+
+			'</tr></thead>';
+			tableScoresPredictions = tableScoresPredictions + '<tbody>';
+			for (nameScore in allScoresPredictions) {
+				tableScoresPredictions = tableScoresPredictions + '<tr>'+
+					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+					'<td class="w3-text-black showTitle">'+allScoresPredictions[nameScore]+'</td>'+
+				'</tr>';
+			};
+			tableScoresPredictions = tableScoresPredictions + '</tbody>';
+			tableScoresPredictions = tableScoresPredictions + '</table>';
+			tableScoresPredictions = tableScoresPredictions + '</div>';
+			document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
+
+			wi1 = window.screen.width;
+			var apply = 433.983;
+			if (wi1 <= 768) {
+				apply = 467.983;
+			} else if (wi1 <= 992) {
+				apply = 567.983;
+			}
+
+
+			radarData = [];
+			radarLabels = [];
+			for (nameScore in allScoresPredictions) {
+				if (allScoresPredictions[nameScore] != null) {
+					radarData.push(allScoresPredictions[nameScore]);
+					radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+				}
+			};
+			radarData.push(radarData[0]);
+			radarLabels.push(radarLabels[0]);
+			data = [{
+				type: 'scatterpolar',
+				r: [
+					Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
+					Math.max(allScoresPredictions["VEST4_rankscore"], 0),
+					Math.max(allScoresPredictions["MetaSVM_rankscore"], 0),
+					Math.max(allScoresPredictions["MetaLR_rankscore"], 0),
+					Math.max(allScoresPredictions["Eigen-raw_coding_rankscore"], 0),
+					Math.max(allScoresPredictions["Eigen-PC-raw_coding_rankscore"], 0),
+					Math.max(allScoresPredictions["REVEL_rankscore"], 0),
+					Math.max(allScoresPredictions["BayesDel_addAF_rankscore"], 0),
+					Math.max(allScoresPredictions["BayesDel_noAF_rankscore"], 0),
+					Math.max(allScoresPredictions["ClinPred_rankscore"], 0),
+					Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
+				],
+				theta: [
+					"CADD",
+					"VEST4",
+					"MetaSVM",
+					"MetaLR",
+					"Eigen",
+					"Eigen_PC",
+					"REVEL",
+					"BayesDel_addAF",
+					"BayesDel_noAF",
+					"ClinPred",
+					"CADD"
+				],
+				fill: 'toself'
+			}]
+
+			layout = {
+				width: apply,
+				polar: {
+					radialaxis: {
+						visible: true,
+						range: [0, 1]
+					}
+				},
+				showlegend: false
+			}
+
+			Plotly.newPlot("radarMissense", data, layout)
 		});
 		document.getElementById("variant-id").innerHTML = id;
 		document.getElementById('modal-details-variant').style.display='block'
 	}
+
 
 	document.getElementsByClassName("tablink")[0].click();
 
