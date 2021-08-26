@@ -433,10 +433,15 @@ def json_variants(id, version=-1):
                     maxSpliceAI_DS = score
                     maxSpliceAI_DP = pos
                     maxSpliceAI_type = type
-
             annotations[feature]["maxSpliceAI_DS"] = maxSpliceAI_DS
             annotations[feature]["maxSpliceAI_DP"] = maxSpliceAI_DP
             annotations[feature]["maxSpliceAI_type"] = maxSpliceAI_type
+
+            # Calc MaxEntScan
+            annotations[value]["MESvar"] = None
+            if annotations[value]["MaxEntScan_alt"] is not None:
+                MESvar = -100 + (float(annotations[value]["MaxEntScan_alt"]) * 100) / float(annotations[value]["MaxEntScan_ref"])
+                annotations[value]["MESvar"] = MESvar
 
         occurrences = len(variant.samples)
         occurences_family = 0

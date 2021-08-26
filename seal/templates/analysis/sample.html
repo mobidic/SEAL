@@ -101,12 +101,8 @@
 							<th class='showTitle control-size-300'>ClinSig</th>
 							<th class='showTitle control-size-100'>Impact</th>
 							<th class='showTitle control-size-300'>Consequence</th>
-							<th class='showTitle control-size-100'>MES ref</th>
-							<th class='showTitle control-size-100'>MES diff</th>
-							<th class='showTitle control-size-100'>MES alt</th>
+							<th class='showTitle control-size-100'>MES var</th>
 							<th class='showTitle control-size-125'>SpliceAI DS</th>
-							<th class='showTitle control-size-125'>SpliceAI DP</th>
-							<th class='showTitle control-size-125'>SpliceAI Type</th>
 							<th class='showTitle control-size-100'>Missense</th>
 						</tr>
 					</thead>
@@ -198,19 +194,7 @@
 								</span>
 							</th>
 							<th class='showTitle control-size-100'>
-								MES ref
-								<span onclick="openHelpModal(title='MES ref', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='showTitle control-size-100'>
-								MES diff
-								<span onclick="openHelpModal(title='MES diff', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='showTitle control-size-100'>
-								MES alt
+								MES var
 								<span onclick="openHelpModal(title='MES alt', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
@@ -218,18 +202,6 @@
 							<th class='showTitle control-size-125'>
 								SpliceAI DS
 								<span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='showTitle control-size-125'>
-								SpliceAI DP
-								<span onclick="openHelpModal(title='SpliceAI DP', content='Delta positions (DP)', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='showTitle control-size-125'>
-								SpliceAI Type
-								<span onclick="openHelpModal(title='SpliceAI Type', content='Acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL).', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -781,55 +753,24 @@
 				},
 				{
 					"className": 'showTitle size-100',
-					"data": "annotations.MaxEntScan_ref",
+					"data": "annotations.MESvar",
 					"render": {
 						"_": function ( data, type, row, meta ) {
 							if (data == null){
 								return -999;
 							}
-							return parseFloat(data).toFixed(3);
+							return Math.abs(parseFloat(data).toFixed(3));
 					    },
 						"display": function ( data, type, row, meta ) {
 							if (data == null){
 								return "NA";
 							}
-							return parseFloat(data).toFixed(3);
-					    },
-					},
-				},
-				{
-					"className": 'showTitle size-100',
-					"data": "annotations.MaxEntScan_diff",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							if (data == null){
-								return -999;
+							value = parseFloat(data).toFixed(3)
+							classw3css = "w3-text-black";
+							if (Math.abs(value) >= 15) {
+								classw3css = "w3-text-flat-alizarin";
 							}
-							return parseFloat(data).toFixed(3);
-					    },
-						"display": function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							return parseFloat(data).toFixed(3);
-					    },
-					},
-				},
-				{
-					"className": 'showTitle size-100',
-					"data": "annotations.MaxEntScan_alt",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							if (data == null){
-								return -999;
-							}
-							return parseFloat(data).toFixed(3);
-					    },
-						"display": function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							return parseFloat(data).toFixed(3);
+							return "<span class='" + classw3css + "'>" + value + "</span>";
 					    },
 					},
 				},
@@ -860,35 +801,6 @@
 					},
 				},
 				{
-					"className": 'w3-center showTitle size-125',
-					"data": "annotations.maxSpliceAI_DP",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							return data;
-					    },
-						"display": function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							return data;
-					    },
-					},
-				},
-				{
-					"className": 'w3-center showTitle size-125',
-					"data": "annotations.maxSpliceAI_type",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							return data;
-					    },
-						"display": function ( data, type, row, meta ) {
-							color = data in spliceAI_Type_dict ? spliceAI_Type_dict[data]["color"] : "w3-flat-asbestos";
-							data = data == null ? "NA" : data;
-							return "<span class='w3-tag " + color + "'>" + data + "</span>";
-					    },
-					},
-				},
-				{
 					"className": 'showTitle size-100',
 					"data": "annotations.missenseMean",
 					"render": {
@@ -900,11 +812,18 @@
 							}
 					    },
 						"display" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(4);
-							} else {
+							if (data == null){
 								return "NA";
 							}
+							value = parseFloat(data).toFixed(3)
+							classw3css = "w3-text-black";
+							if (value >= 0.45) {
+								classw3css = "w3-text-flat-orange";
+							}
+							if (value >= 0.65) {
+								classw3css = "w3-text-flat-alizarin";
+							}
+							return "<span class='" + classw3css + "'>" + value + "</span>";
 					    },
 	            		"sort" : function ( data, type, row, meta ) {
 							if(data != null) {
