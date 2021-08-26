@@ -1191,6 +1191,17 @@
 		$.getJSON("http://127.0.0.1:5000/json/filter/" + id, function(data) {
 		    $('#variants').DataTable().searchBuilder.rebuild(data);
 		});
-
 	}
+
+
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(event) {
+	  if (event.target == document.getElementById('modal-details-variant')) {
+	    document.getElementById('modal-details-variant').style.display = "none";
+	  }
+  	  if (event.target == document.getElementById('help-modal')) {
+  	    document.getElementById('help-modal').style.display = "none";
+  	  }
+	}
+
 {% endblock %}
