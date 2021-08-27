@@ -1,11 +1,7 @@
 {% extends 'base.html' %}
 
 {% block static %}
-<link rel="stylesheet" href="https://cdn.datatables.net/searchbuilder/1.1.0/css/searchBuilder.dataTables.min.css" />
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css" />
-<script src="https://cdn.datatables.net/searchbuilder/1.1.0/js/dataTables.searchBuilder.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.7.1/js/dataTables.buttons.min.js"></script>
-<script src='https://cdn.plot.ly/plotly-2.3.1.min.js'></script>
+<script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
 
 <style>
 
