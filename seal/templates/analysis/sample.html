@@ -248,6 +248,7 @@
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
 			</div>
 
 			<div id="allFeatures" class="w3-container detail">
@@ -280,6 +281,16 @@
 				<div class="w3-row">
 					<div id='radarPopulation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
 					<div class="w3-col l6 m12 s12">
+						<div id="tableScoresPopulation"></div>
+					</div>
+				</div>
+			</div>
+
+			<div id="splicing" class="w3-container detail">
+				<h1>Splicing</h1>
+				<div class="w3-row">
+					<div id='chartSplicing' class="w3-col l3 m6 s6"><!-- Plotly chart will be drawn inside this DIV --></div>
+					<div class="w3-col l3 m6 s6" style="background-color:#FF00FF">
 						<div id="tableScoresPopulation"></div>
 					</div>
 				</div>
@@ -947,6 +958,18 @@
 				"gnomADg_AF_OTH": null
 			}
 
+			var MaxEntScan_alt = null;
+			var MaxEntScan_ref = null;
+			var MaxEntScan_ratio = null;
+
+			var SpliceAI_pred_DS_AG = null;
+			var SpliceAI_pred_DP_AG = null;
+			var SpliceAI_pred_DS_DG = null;
+			var SpliceAI_pred_DP_DG = null;
+			var SpliceAI_pred_DS_AL = null;
+			var SpliceAI_pred_DP_AL = null;
+			var SpliceAI_pred_DS_DL = null;
+			var SpliceAI_pred_DP_DL = null;
 			for (x in data["annotations"]["ANN"]) {
 				cell = "";
 				for (idx in consequences_dict) {
@@ -970,19 +993,57 @@
 
 				for (nameScore in allScoresPredictions) {
 					if (data["annotations"]["ANN"][x][nameScore] != null) {
-							allScoresPredictions[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPredictions[nameScore]);
+						allScoresPredictions[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPredictions[nameScore]);
 					}
 				};
 
 				for (nameScore in allScoresConservation) {
 					if (data["annotations"]["ANN"][x][nameScore] != null) {
-							allScoresConservation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresConservation[nameScore]);
+						allScoresConservation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresConservation[nameScore]);
 					}
 				};
 
 				for (nameScore in allScoresPopulation) {
 					if (data["annotations"]["ANN"][x][nameScore] != null) {
-							allScoresPopulation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPopulation[nameScore]);
+						allScoresPopulation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPopulation[nameScore]);
+					}
+				};
+				if (data["annotations"]["ANN"][x]["MaxEntScan_ref"] != null && data["annotations"]["ANN"][x]["MaxEntScan_alt"] != null) {
+					MES_ref = Math.abs(data["annotations"]["ANN"][x]["MaxEntScan_ref"]);
+					MES_alt = Math.abs(data["annotations"]["ANN"][x]["MaxEntScan_alt"]);
+					MES_ratio = -100 + (MES_alt*100) / MES_ref;
+					if (Math.abs(MES_ratio) > Math.abs(MaxEntScan_ratio)) {
+						MaxEntScan_ratio = MES_ratio;
+						MaxEntScan_ref = data["annotations"]["ANN"][x]["MaxEntScan_ref"];
+						MaxEntScan_alt = data["annotations"]["ANN"][x]["MaxEntScan_alt"];
+					}
+				};
+
+				if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_AG"] != null) {
+					if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_AG"] > SpliceAI_pred_DS_AG) {
+						SpliceAI_pred_DS_AG = data["annotations"]["ANN"][x]["SpliceAI_pred_DS_AG"];
+						SpliceAI_pred_DP_AG = data["annotations"]["ANN"][x]["SpliceAI_pred_DP_AG"];
+					}
+				};
+
+				if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_DG"] != null) {
+					if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_DG"] > SpliceAI_pred_DS_DG) {
+						SpliceAI_pred_DS_DG = data["annotations"]["ANN"][x]["SpliceAI_pred_DS_DG"];
+						SpliceAI_pred_DP_DG = data["annotations"]["ANN"][x]["SpliceAI_pred_DP_DG"];
+					}
+				};
+
+				if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_AL"] != null) {
+					if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_AL"] > SpliceAI_pred_DS_AL) {
+						SpliceAI_pred_DS_AL = data["annotations"]["ANN"][x]["SpliceAI_pred_DS_AL"];
+						SpliceAI_pred_DP_AL = data["annotations"]["ANN"][x]["SpliceAI_pred_DP_AL"];
+					}
+				};
+
+				if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_DL"] != null) {
+					if (data["annotations"]["ANN"][x]["SpliceAI_pred_DS_DL"] > SpliceAI_pred_DS_DL) {
+						SpliceAI_pred_DS_DL = data["annotations"]["ANN"][x]["SpliceAI_pred_DS_DL"];
+						SpliceAI_pred_DP_DL = data["annotations"]["ANN"][x]["SpliceAI_pred_DP_DL"];
 					}
 				};
 			}
@@ -1164,6 +1225,102 @@
 			Plotly.newPlot("radarMissense", data, layout)
 			Plotly.newPlot("radarConservation", data2, layout2)
 			Plotly.newPlot("radarPopulation", data3, layout3)
+
+			var gauge = {
+				shape: "bullet",
+				text:"t",
+				axis: { range: [null, 1] },
+				bar: {thickness:0.5, color: "#7f8c8d" },
+				steps: [
+					{ range: [0, 0.5], color: "#ecf0f1" },
+					{ range: [0.5, 0.8], color: "#f39c12" },
+					{ range: [0.8, 1], color: "#e74c3c", },
+				],
+			};
+			var trace1 = {
+			  x: ['MaxEntScan'],
+			  y: [MaxEntScan_ref],
+			  name: 'MaxEntScan_ref',
+			  type: 'bar',
+			  text: MaxEntScan_ref,
+			  textposition: 'auto',
+			  hoverinfo: 'none',
+			};
+			var trace2 = {
+			  x: ['MaxEntScan'],
+			  y: [MaxEntScan_alt],
+			  name: 'MaxEntScan_alt',
+			  type: 'bar',
+			  text: MaxEntScan_alt,
+			  textposition: 'auto',
+			  hoverinfo: 'none',
+			};
+
+			var trace3 = {
+				domain: { x: [0.35, 1], y: [0.85, 1] },
+			    type: "indicator",
+			    mode: "number+gauge",
+			    gauge: gauge,
+			    value: SpliceAI_pred_DS_AG,
+			    title: {
+			      text:
+			        "<b>Acceptor Gain</b><br><span style='color: gray; font-size:0.8em'>" + SpliceAI_pred_DP_AG + "</span>",
+			      font: { size: 14 }
+			    },
+			}
+			var trace4 = {
+				domain: { x: [0.35, 1], y: [0.57, 0.72] },
+			    type: "indicator",
+			    mode: "number+gauge",
+			    gauge: gauge,
+			    value: SpliceAI_pred_DS_DG,
+			    title: {
+			      text:
+			        "<b>Donor Gain</b><br><span style='color: gray; font-size:0.8em'>" + SpliceAI_pred_DP_DG + "</span>",
+			      font: { size: 14 }
+			    },
+			}
+			var trace5 = {
+				domain: { x: [0.35, 1], y: [0.28, 0.43] },
+			    type: "indicator",
+			    mode: "number+gauge",
+			    gauge: gauge,
+			    value: SpliceAI_pred_DS_AL,
+			    title: {
+			      text:
+			        "<b>Acceptor Loss</b><br><span style='color: gray; font-size:0.8em'>" + SpliceAI_pred_DP_AL + "</span>",
+			      font: { size: 14 }
+			    },
+			}
+			var trace6 = {
+				domain: { x: [0.35, 1], y: [0, 0.15] },
+			    type: "indicator",
+			    mode: "number+gauge",
+			    gauge: gauge,
+			    value: SpliceAI_pred_DS_DL,
+			    title: {
+			      text:
+			        "<b>Donor Loss</b><br><span style='color: gray; font-size:0.8em'>" + SpliceAI_pred_DP_DL + "</span>",
+			      font: { size: 14 }
+			    },
+			}
+
+			var data = [trace1, trace2, trace3, trace4, trace5, trace6];
+
+			var layout = {
+			  width: apply*2,
+			  showlegend: false,
+			  xaxis: {
+			    domain: [0, 0.15],
+			    anchor: 'y1'
+			  },
+			  yaxis: {
+			    domain: [0, 1],
+			    anchor: 'x1'
+			  },
+			};
+
+			Plotly.newPlot('chartSplicing', data, layout);
 
 		});
 		document.getElementById("variant-id").innerHTML = id;
