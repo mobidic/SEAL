@@ -63,34 +63,6 @@ class Team(db.Model):
 # Analysis
 
 
-var2sample = db.Table(
-    'var2sample',
-    db.Column(
-        'variant_ID', db.Text,
-        db.ForeignKey('variant.id'), primary_key=True
-    ),
-    db.Column(
-        'sample_ID', db.Integer,
-        db.ForeignKey('sample.id'), primary_key=True
-    ),
-    db.Column(
-        'depth', db.Integer, nullable=True, unique=False
-    ),
-    db.Column(
-        'allelic_depth', db.Integer, nullable=True, unique=False
-    ),
-    db.Column(
-        'analyse1', db.Boolean(), nullable=False, unique=False, default=False
-    ),
-    db.Column(
-        'analyse2', db.Boolean(), nullable=False, unique=False, default=False
-    ),
-    db.Column(
-        'reported', db.Boolean(), nullable=False, unique=False, default=False
-    )
-)
-
-
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(20), unique=False, nullable=False)
@@ -99,11 +71,6 @@ class Sample(db.Model):
 
     familyid = db.Column(db.Integer, db.ForeignKey('family.id'))
     family = relationship("Family", back_populates="samples")
-
-    variants = db.relationship(
-        'Variant', secondary=var2sample, lazy='subquery',
-        backref=db.backref('samples', lazy=True)
-    )
 
     def __repr__(self):
         return f"Sample('{self.samplename}','{self.status}')"
@@ -128,6 +95,22 @@ class Variant(db.Model):
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
+
+
+class Var2Sample(db.Model):
+    variant_ID = db.Column(db.Text, db.ForeignKey('variant.id'), primary_key=True)
+    sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+    depth = db.Column(db.Integer, nullable=True, unique=False)
+    allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
+    analyse1 = db.Column(db.Integer, nullable=True, unique=False)
+    analyse2 = db.Column(db.Integer, nullable=True, unique=False)
+    reported = db.Column(db.Integer, nullable=True, unique=False)
+
+    sample = db.relationship(Sample, backref="variants")
+    variant = db.relationship(Variant, backref="samples")
+
+    def __repr__(self):
+        return f"Var2Sample('{self.sample}','{self.variant}')"
 
 
 class Filter(db.Model):

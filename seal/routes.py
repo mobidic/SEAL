@@ -343,8 +343,8 @@ def json_variants(id, version=-1):
 
     ##################################################
 
-    for variant in sample.variants:
-        annotations = variant.annotations[version]["ANN"]
+    for var2sample in sample.variants:
+        annotations = var2sample.variant.annotations[version]["ANN"]
         features = list(annotations.keys())
         feature = None
         consequence_score_max = 0
@@ -443,21 +443,27 @@ def json_variants(id, version=-1):
                 MESvar = -100 + (float(annotations[value]["MaxEntScan_alt"]) * 100) / float(annotations[value]["MaxEntScan_ref"])
                 annotations[value]["MESvar"] = MESvar
 
-        occurrences = len(variant.samples)
+        occurrences = 0
+        for sam in var2sample.variant.samples:
+            if sam.sample.status == 1:
+                occurrences += 1
         occurences_family = 0
         members = []
-        for sam in variant.samples:
-            if sam.familyid is not None and sam.familyid == sample.familyid and sam.id != sample.id:
+        for sam in var2sample.variant.samples:
+            if sam.sample.familyid is not None and \
+               sam.sample.familyid == sample.familyid and \
+               sam.sample.id != sample.id and \
+               sam.sample.status == 1:
                 occurences_family += 1
-                members.append(sam.samplename)
+                members.append(sam.sample.samplename)
 
         variants["data"].append({
             "annotations": annotations[feature],
-            "chr": f"{variant.chr}",
-            "id": f"{variant.id}",
-            "pos": f"{variant.pos}",
-            "ref": f"{variant.ref}",
-            "alt": f"{variant.alt}",
+            "chr": f"{var2sample.variant.chr}",
+            "id": f"{var2sample.variant.id}",
+            "pos": f"{var2sample.variant.pos}",
+            "ref": f"{var2sample.variant.ref}",
+            "alt": f"{var2sample.variant.alt}",
             "inseal": {
                 "occurrences": occurrences,
                 "total_samples": total_samples,

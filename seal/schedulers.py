@@ -1,8 +1,9 @@
+import random
 import os
 import json
 import datetime
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family
+from seal.models import Sample, Variant, Family, Var2Sample
 from anacore import annotVcf
 
 
@@ -67,9 +68,16 @@ def importvcf():
                         variant = Variant(id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", chr=v.chrom, pos=v.pos, ref=v.ref, alt=v.alt[0], annotations=annotations)
                         db.session.add(variant)
 
-                    sample.variants.append(variant)
+                    # sample.variants.append(variant)
+                    depth = random.randint(1, 250)
+                    allDepth = random.randint(1, depth)
+                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=depth, allelic_depth=allDepth, analyse1=random.choice([0, 1]), analyse2=random.choice([0, 1]), reported=0)
+                    db.session.add(v2s)
+
         except Exception as e:
+            db.session.remove()
             app.logger.info(f"{type(e).__name__} : {e}")
+            sample = Sample.query.get(sample.id)
             sample.status = -1
         else:
             sample.status = 1
