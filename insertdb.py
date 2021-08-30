@@ -19,6 +19,7 @@ filterSlow = {
                 {
                     "condition": "<=",
                     "data": "GnomAD",
+                    "type": "num",
                     "value": [
                         "0.01"
                     ]
@@ -31,6 +32,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "transcript_ablation"
                     ]
@@ -38,6 +40,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "splice_acceptor_variant"
                     ]
@@ -45,6 +48,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "splice_donor_variant"
                     ]
@@ -52,6 +56,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "stop_gained"
                     ]
@@ -59,6 +64,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "frameshift_variant"
                     ]
@@ -66,6 +72,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "stop_lost"
                     ]
@@ -73,6 +80,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "start_lost"
                     ]
@@ -80,6 +88,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "transcript_amplification"
                     ]
@@ -87,6 +96,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "inframe_insertion"
                     ]
@@ -94,6 +104,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "inframe_deletion"
                     ]
@@ -101,6 +112,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "missense_variant"
                     ]
@@ -108,6 +120,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "protein_altering_variant"
                     ]
@@ -115,6 +128,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "splice_region_variant"
                     ]
@@ -122,6 +136,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "incomplete_terminal_codon_variant"
                     ]
@@ -129,6 +144,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "start_retained_variant"
                     ]
@@ -136,6 +152,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "Consequence",
+                    "type": "html",
                     "value": [
                         "stop_retained_variant"
                     ]
@@ -148,6 +165,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "ClinSig",
+                    "type": "html",
                     "value": [
                         "pathogenic"
                     ]
@@ -155,6 +173,7 @@ filterSlow = {
                 {
                     "condition": "contains",
                     "data": "ClinSig",
+                    "type": "html",
                     "value": [
                         "uncertain_significance"
                     ]
@@ -162,6 +181,7 @@ filterSlow = {
                 {
                     "condition": "null",
                     "data": "ClinSig",
+                    "type": "html",
                     "value": []
                 }
             ],
@@ -174,6 +194,7 @@ filterSlow = {
                         {
                             "condition": ">=",
                             "data": "Missense",
+                            "type": "num",
                             "value": [
                                 "0.35"
                             ]
@@ -181,6 +202,7 @@ filterSlow = {
                         {
                             "condition": "null",
                             "data": "Missense",
+                            "type": "num",
                             "value": []
                         }
                     ],
@@ -191,6 +213,7 @@ filterSlow = {
                         {
                             "condition": ">=",
                             "data": "SpliceAI DS",
+                            "type": "num",
                             "value": [
                                 "0.5"
                             ]
@@ -198,6 +221,7 @@ filterSlow = {
                         {
                             "condition": "null",
                             "data": "SpliceAI DS",
+                            "type": "num",
                             "value": []
                         }
                     ],
@@ -217,6 +241,7 @@ filterDefault = {
                 {
                     "condition": "<=",
                     "data": "GnomAD",
+                    "type": "num",
                     "value": [
                         "0.01"
                     ]
@@ -226,6 +251,7 @@ filterDefault = {
                         {
                             "condition": "<=",
                             "data": "SEAL (pct)",
+                            "type": "num",
                             "value": [
                                 "0.1"
                             ]
@@ -233,6 +259,7 @@ filterDefault = {
                         {
                             "condition": "<=",
                             "data": "SEAL (cnt)",
+                            "type": "num",
                             "value": [
                                 "10"
                             ]
@@ -248,13 +275,15 @@ filterDefault = {
                 {
                     "condition": ">=",
                     "data": "Missense",
+                    "type": "num",
                     "value": [
                         "0.35"
                     ]
                 },
                 {
-                    "condition": "None",
+                    "condition": "null",
                     "data": "Missense",
+                    "type": "num",
                     "value": []
                 }
             ],
@@ -265,6 +294,7 @@ filterDefault = {
                 {
                     "condition": "!=",
                     "data": "Impact",
+                    "type": "html",
                     "value": [
                         "LOW"
                     ]
@@ -272,6 +302,7 @@ filterDefault = {
                 {
                     "condition": "!=",
                     "data": "Impact",
+                    "type": "html",
                     "value": [
                         "MODIFIER"
                     ]
@@ -284,6 +315,7 @@ filterDefault = {
                 {
                     "condition": "contains",
                     "data": "ClinSig",
+                    "type": "html",
                     "value": [
                         "pathogenicity"
                     ]
@@ -291,13 +323,15 @@ filterDefault = {
                 {
                     "condition": "contains",
                     "data": "ClinSig",
+                    "type": "html",
                     "value": [
                         "uncertain"
                     ]
                 },
                 {
-                    "condition": "None",
+                    "condition": "null",
                     "data": "ClinSig",
+                    "type": "html",
                     "value": []
                 }
             ],
