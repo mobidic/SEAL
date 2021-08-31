@@ -4,10 +4,10 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#dt/jq-3.3.1/dt-1.11.0/b-2.0.0/sb-1.2.0
+ *   https://datatables.net/download/#dt/jq-3.3.1/dt-1.11.0/b-2.0.0/fc-3.3.3/fh-3.1.9/sb-1.2.0
  *
  * Included libraries:
- *   jQuery 3 3.3.1, DataTables 1.11.0, Buttons 2.0.0, SearchBuilder 1.2.0
+ *   jQuery 3 3.3.1, DataTables 1.11.0, Buttons 2.0.0, FixedColumns 3.3.3, FixedHeader 3.1.9, SearchBuilder 1.2.0
  */
 
 td.dt-control {
@@ -940,6 +940,51 @@ button.dt-btn-split-drop-button {
 }
 button.dt-btn-split-drop-button:hover {
   background-color: white;
+}
+
+
+table.DTFC_Cloned thead,
+table.DTFC_Cloned tfoot {
+  background-color: white;
+}
+
+div.DTFC_Blocker {
+  background-color: white;
+}
+
+div.DTFC_LeftWrapper table.dataTable,
+div.DTFC_RightWrapper table.dataTable {
+  margin-bottom: 0;
+  z-index: 2;
+}
+div.DTFC_LeftWrapper table.dataTable.no-footer,
+div.DTFC_RightWrapper table.dataTable.no-footer {
+  border-bottom: none;
+}
+
+table.dataTable.display tbody tr.DTFC_NoData {
+  background-color: transparent;
+}
+
+
+table.fixedHeader-floating {
+  position: fixed !important;
+  background-color: white;
+}
+
+table.fixedHeader-floating.no-footer {
+  border-bottom-width: 0;
+}
+
+table.fixedHeader-locked {
+  position: absolute !important;
+  background-color: white;
+}
+
+@media print {
+  table.fixedHeader-floating {
+    display: none;
+  }
 }
 
 
