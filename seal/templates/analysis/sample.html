@@ -4,7 +4,14 @@
 <script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
 
 <style>
-
+	/* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
+	.DTFC_LeftBodyLiner {
+		overflow-x: hidden;
+	}
+	/* End */
+	.DTFC_LeftFootWrapper {
+		visibility: hidden;
+	}
 	.tableFixHead {
 	    overflow-y: auto;
 	    height: 434.5px;
@@ -575,6 +582,8 @@
 			},
 			dom: 'Blfrtip',
 			scrollX: true,
+			"order": [[ 5, "asc" ]],
+	        fixedColumns: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
 		        {
