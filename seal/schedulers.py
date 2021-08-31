@@ -73,9 +73,7 @@ def importvcf():
                         db.session.add(variant)
 
                     # sample.variants.append(variant)
-                    depth = random.randint(1, 250)
-                    allDepth = random.randint(1, depth)
-                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=depth, allelic_depth=allDepth, analyse1=random.choice([0, 1]), analyse2=random.choice([0, 1]), reported=0)
+                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0], analyse1=random.choice([0, 1]), analyse2=random.choice([0, 1]), reported=0)
                     db.session.add(v2s)
 
         except Exception as e:
