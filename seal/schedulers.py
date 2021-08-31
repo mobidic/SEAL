@@ -83,6 +83,8 @@ def importvcf():
             sample.status = -1
         else:
             sample.status = 1
+            os.remove(current_fn)
+            os.remove(vcf_fn)
         finally:
             db.session.commit()
             app.logger.info(f"---- End added sample : {sample} ----")
