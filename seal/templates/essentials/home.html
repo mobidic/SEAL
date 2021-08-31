@@ -64,6 +64,9 @@
 			id = table.row( this ).data().id ;
 		    document.location.href = "/sample/" + id;
 		} );
+		setInterval( function () {
+		    table.ajax.reload();
+		}, 10000 );
 	} );
 
 
