@@ -457,6 +457,7 @@ def json_variants(id, version=-1):
                 occurences_family += 1
                 members.append(sam.sample.samplename)
 
+        allelic_frequency = var2sample.allelic_depth / var2sample.depth
         variants["data"].append({
             "annotations": annotations[feature],
             "chr": f"{var2sample.variant.chr}",
@@ -464,6 +465,9 @@ def json_variants(id, version=-1):
             "pos": f"{var2sample.variant.pos}",
             "ref": f"{var2sample.variant.ref}",
             "alt": f"{var2sample.variant.alt}",
+            "depth": f"{var2sample.depth}",
+            "allelic_depth": f"{var2sample.allelic_depth}",
+            "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
                 "occurrences": occurrences,
                 "total_samples": total_samples,
