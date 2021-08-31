@@ -90,6 +90,9 @@
 							<th class='showTitle control-size-250'>HGVSg</th>
 							<th class='showTitle control-size-250'>HGVSc</th>
 							<th class='showTitle control-size-250'>HGVSp</th>
+							<th class='showTitle control-size-100'>Depth</th>
+							<th class='showTitle control-size-100'>Allelic depth</th>
+							<th class='showTitle control-size-100'>Allelic frequencies</th>
 							<th class='showTitle control-size-100'>GnomAD</th>
 							<th class='showTitle control-size-100'>SEAL (pct)</th>
 							<th class='showTitle control-size-100'>SEAL (cnt)</th>
@@ -144,6 +147,24 @@
 							<th class='showTitle control-size-250'>
 								HGVSp
 								<span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</th>
+							<th class='showTitle control-size-100'>
+								Depth
+								<span onclick="openHelpModal(title='Depth', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</th>
+							<th class='showTitle control-size-100'>
+								Allelic depth
+								<span onclick="openHelpModal(title='Allelic depth', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</th>
+							<th class='showTitle control-size-100'>
+								Allelic frequencies
+								<span onclick="openHelpModal(title='Allelic frequencies', content='', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -615,6 +636,9 @@
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSg"},
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
+				{ "className": 'showTitle control-size-100', "data": "depth"},
+				{ "className": 'showTitle control-size-100', "data": "allelic_depth"},
+				{ "className": 'showTitle control-size-100', "data": "allelic_frequency"},
 				{
 					"className": 'showTitle control-size-100',
 					"data": "annotations.GnomADg_max",
@@ -1214,7 +1238,6 @@
 				},
 				showlegend: false
 			}
-
 
 			Plotly.newPlot("radarMissense", data, layout)
 			Plotly.newPlot("radarConservation", data2, layout2)
