@@ -642,7 +642,32 @@
 						},
 					}
 				},
-				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSg"},
+				{
+					"className": 'showTitle control-size-250',
+					"data": "annotations.HGVSg",
+					"render" : {
+						"_" : function ( data, type, row, meta ) {
+							return data;
+					    },
+						"sort" : function ( data, type, row, meta ) {
+							if(data != null) {
+								var regExp = /(chr)?([0-9XYM]+):g\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|[ACGT]+)/;
+								var matches = regExp.exec(data);
+								var zero = "000000000"
+								var chr;
+								if (Number.isInteger(parseInt(matches[2]))) {
+									chr = (zero + matches[2]).slice(-2);
+								} else {
+									chr = (matches[2])
+								}
+					    		return chr + "_" + (zero + matches[3]).slice(-9) + "_" + matches[6];
+							} else {
+								num = -1
+								return num.toFixed(6);
+							}
+					    },
+					},
+				},
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
 				{ "className": 'showTitle control-size-100', "data": "depth"},
