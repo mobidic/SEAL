@@ -17,7 +17,11 @@ def importvcf():
             curr_token = f
             continue
 
-    if curr_token:
+    if curr_token and not os.path.exists(os.path.join(app.root_path, 'static/temp/vcf/.lock')):
+        # Create lock file
+        lockFile = open(os.path.join(app.root_path, 'static/temp/vcf/.lock'), 'x')
+        lockFile.close()
+
         f_base, f_ext = os.path.splitext(curr_token)
         old_fn = os.path.join(app.root_path, 'static/temp/vcf/', curr_token)
         current_fn = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.treat')
@@ -84,3 +88,4 @@ def importvcf():
         finally:
             db.session.commit()
             app.logger.info(f"---- End added sample : {sample} ----")
+            os.remove(os.path.join(app.root_path, 'static/temp/vcf/.lock'))
