@@ -12,6 +12,11 @@
 	.DTFC_LeftFootWrapper {
 		visibility: hidden;
 	}
+
+	.v-middle {
+		vertical-align: middle!important;
+	}
+
 	.tableFixHead {
 	    overflow-y: auto;
 	    height: 434.5px;
@@ -587,7 +592,7 @@
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
 		        {
-		            "className":      'details-control',
+		            "className":      'details-control v-middle',
 		            "orderable":      false,
 		            "data":           "id",
 	                "render": {
