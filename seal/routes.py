@@ -525,13 +525,28 @@ def json_variant(id, version=-1):
             pos = variant.annotations[version]["ANN"][key]["INTRON"]
             variant.annotations[version]["ANN"][key]["EI"] = f"Intron {pos}"
 
+    samples = list()
+    for v2s in variant.samples:
+        if v2s.sample.status == 1:
+            allelic_frequency = v2s.allelic_depth / v2s.depth
+            samples.append({
+                "samplename": v2s.sample.samplename,
+                "carrier": v2s.sample.carrier,
+                "family": v2s.sample.family.family if v2s.sample.family else "",
+                "depth": v2s.depth,
+                "allelic_depth": v2s.allelic_depth,
+                "allelic_frequency": f"{allelic_frequency:.4f}",
+                "reported": v2s.reported
+            })
+
     variant_json = {
         "id": variant.id,
         "chr": variant.chr,
         "pos": variant.pos,
         "ref": variant.ref,
         "alt": variant.alt,
-        "annotations": variant.annotations[version]
+        "annotations": variant.annotations[version],
+        "samples": samples
     }
     return jsonify(variant_json)
 
