@@ -1121,11 +1121,11 @@
 			inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
 				'<th class="w3-flat-silver control-size-100">Sample</th>'+
 				'<th class="w3-flat-silver control-size-100">Family</th>'+
-				'<th class="w3-flat-silver control-size-100">Carrier</th>'+
-				'<th class="w3-flat-silver control-size-100">Depth</th>'+
-				'<th class="w3-flat-silver control-size-100">Allelic Depth</th>'+
-				'<th class="w3-flat-silver control-size-100">Allelic Depth</th>'+
-				'<th class="w3-flat-silver control-size-100">Reported</th>'+
+				'<th class="w3-flat-silver control-size-75 w3-center">Carrier</th>'+
+				'<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
+				'<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
+				'<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
+				'<th class="w3-flat-silver control-size-100 w3-center">Reported</th>'+
 			'</tr></thead>';
 			inSeal = inSeal + '<tbody>';
 
@@ -1143,8 +1143,8 @@
 				inSeal = inSeal + '<tr>'+
 					'<td class="control-size-100">' + data["samples"][x]["samplename"] + '</td>'+
 					'<td class="control-size-100">' + data["samples"][x]["family"] + '</td>'+
-					'<td class="control-size-100 w3-center">' + carrier + '</td>'+
-					'<td class="control-size-100 w3-center">' + data["samples"][x]["depth"] + '</td>'+
+					'<td class="control-size-75 w3-center">' + carrier + '</td>'+
+					'<td class="control-size-75 w3-center">' + data["samples"][x]["depth"] + '</td>'+
 					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_depth"] + '</td>'+
 					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_frequency"] + '</td>'+
 					'<td class="control-size-100 w3-center">' + reported + '</td>'+
