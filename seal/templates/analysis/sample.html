@@ -278,6 +278,7 @@
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal</button>
 			</div>
 
 			<div id="allFeatures" class="w3-container detail">
@@ -323,6 +324,11 @@
 						<div id="tableScoresPopulation"></div>
 					</div>
 				</div>
+			</div>
+
+			<div id="inseal" class="w3-container detail">
+				<h1>In Seal</h1>
+				<div id="inSEALTable"></div>
 			</div>
 
 			<div class="w3-container w3-light-grey w3-padding">
@@ -1108,6 +1114,48 @@
 		    allFeature = allFeature + '</table>';
 		    allFeature = allFeature + '</div>';
 			document.getElementById("allFeaturesTable").innerHTML = allFeature;
+
+
+			inSeal = '<div class="tableFixHead">';
+			inSeal = inSeal + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
+				'<th class="w3-flat-silver control-size-100">Sample</th>'+
+				'<th class="w3-flat-silver control-size-100">Family</th>'+
+				'<th class="w3-flat-silver control-size-100">Carrier</th>'+
+				'<th class="w3-flat-silver control-size-100">Depth</th>'+
+				'<th class="w3-flat-silver control-size-100">Allelic Depth</th>'+
+				'<th class="w3-flat-silver control-size-100">Allelic Depth</th>'+
+				'<th class="w3-flat-silver control-size-100">Reported</th>'+
+			'</tr></thead>';
+			inSeal = inSeal + '<tbody>';
+
+			for (x in data["samples"]) {
+				if (data["samples"][x]["reported"]) {
+					reported = '<i title="Reported" class="w3-text-flat-emerald fas fa-check-circle"></i>'
+				} else {
+					reported = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-times-circle"></i>'
+				}
+				if (data["samples"][x]["carrier"]) {
+					carrier = '<i title="Reported" class="w3-text-flat-emerald fas fa-user-check"></i>'
+				} else {
+					carrier = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-user-times"></i>'
+				}
+				inSeal = inSeal + '<tr>'+
+					'<td class="control-size-100">' + data["samples"][x]["samplename"] + '</td>'+
+					'<td class="control-size-100">' + data["samples"][x]["family"] + '</td>'+
+					'<td class="control-size-100 w3-center">' + carrier + '</td>'+
+					'<td class="control-size-100 w3-center">' + data["samples"][x]["depth"] + '</td>'+
+					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_depth"] + '</td>'+
+					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_frequency"] + '</td>'+
+					'<td class="control-size-100 w3-center">' + reported + '</td>'+
+				'</tr>'
+			}
+
+		    inSeal = inSeal + '</tbody>';
+		    inSeal = inSeal + '</table>';
+		    inSeal = inSeal + '</div>';
+			document.getElementById("inSEALTable").innerHTML = inSeal;
+
 
 			tableScoresPredictions = '<div class="tableFixHead">';
 			tableScoresPredictions = tableScoresPredictions + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
