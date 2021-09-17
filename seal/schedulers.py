@@ -41,7 +41,14 @@ def importvcf():
                     db.session.commit()
                 familyid = family.id
 
-            sample = Sample(samplename=samplename, familyid=familyid)
+            carrier = False
+            if "carrier" in data and data["carrier"] != "":
+                carrier = data['carrier']
+            index = False
+            if "index" in data and data["index"] != "":
+                index = data['index']
+
+            sample = Sample(samplename=samplename, familyid=familyid, carrier=carrier, index=index)
             app.logger.info(f"---- Add sample : {sample} ----")
             db.session.add(sample)
             db.session.commit()

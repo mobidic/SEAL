@@ -274,7 +274,9 @@ def create_variant():
 
         info = {
             "samplename": uploadSampleForm.samplename.data,
-            "family": uploadSampleForm.family.data
+            "family": uploadSampleForm.family.data,
+            "carrier": uploadSampleForm.carrier.data,
+            "index": uploadSampleForm.index.data,
         }
         add_vcf(info, uploadSampleForm.vcf_file.data)
 

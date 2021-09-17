@@ -88,6 +88,9 @@ class UploadVariantForm(FlaskForm):
         'Upload VCF file',
         validators=[DataRequired(), FileAllowed(['vcf', 'vcf.gz'])]
     )
+    carrier = BooleanField('Carrier')
+    index = BooleanField('Index')
+
     submit = SubmitField('Create New Sample')
 
     def validate_samplename(self, samplename):
