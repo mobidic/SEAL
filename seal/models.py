@@ -103,9 +103,9 @@ class Var2Sample(db.Model):
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
     depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
-    analyse1 = db.Column(db.Integer, nullable=True, unique=False)
-    analyse2 = db.Column(db.Integer, nullable=True, unique=False)
-    reported = db.Column(db.Integer, nullable=True, unique=False)
+    analyse1 = db.Column(db.Boolean, nullable=False, unique=False)
+    analyse2 = db.Column(db.Boolean, nullable=False, unique=False)
+    reported = db.Column(db.Boolean, nullable=False, unique=False)
 
     sample = db.relationship(Sample, backref="variants")
     variant = db.relationship(Variant, backref="samples")

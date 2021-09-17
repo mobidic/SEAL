@@ -80,7 +80,7 @@ def importvcf():
                         db.session.add(variant)
 
                     # sample.variants.append(variant)
-                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0], analyse1=random.choice([0, 1]), analyse2=random.choice([0, 1]), reported=0)
+                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0], analyse1=random.choice([True, False]), analyse2=random.choice([True, False]), reported=random.choice([True, False]))
                     db.session.add(v2s)
 
         except Exception as e:
