@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -554,5 +554,29 @@ def json_variant(id, version=-1):
         "samples": samples
     }
     return jsonify(variant_json)
+
+
+################################################################################
+
+
+################################################################################
+# Toggle boolean variables in DB
+
+@app.route("/toggle/samples/variant/status/<string:id_var>/<int:sample_id>/<string:type>", methods=['GET', 'POST'])
+@login_required
+def toggle_varStatus(id_var, sample_id, type):
+    v2s = Var2Sample.query.get((id_var, sample_id))
+    if type == "analyse1":
+        v2s.analyse1 = False if v2s.analyse1 else True
+        return_value = v2s.analyse1
+    if type == "analyse2":
+        v2s.analyse2 = False if v2s.analyse2 else True
+        return_value = v2s.analyse2
+    if type == "reported":
+        v2s.reported = False if v2s.reported else True
+        return_value = v2s.reported
+    db.session.commit()
+    return f"{return_value}"
+
 
 ################################################################################
