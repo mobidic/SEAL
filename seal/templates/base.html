@@ -206,11 +206,12 @@
 			</p>
 		</footer>
 
-		<script>
+		<script type="text/javascript">
 			$(document).on("mouseenter", ".showTitle", function() {
 				$(this).attr('title', this.innerText);
 			});
-			{% block script %}{% endblock %}
 		</script>
+
+		{% block script %}{% endblock %}
 	</body>
 </html>
