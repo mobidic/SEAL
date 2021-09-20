@@ -1481,7 +1481,7 @@
 	}
 
 	function changeFilter(id) {
-		$.getJSON("http://127.0.0.1:5000/json/filter/" + id, function(data) {
+		$.getJSON("/json/filter/" + id, function(data) {
 		    $('#variants').DataTable().searchBuilder.rebuild(data);
 		});
 	}
