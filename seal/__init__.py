@@ -3,10 +3,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_apscheduler import APScheduler
+from flask_wtf import CSRFProtect
 
 
 app = Flask(__name__)
 scheduler = APScheduler()
+csrf = CSRFProtect()
 
 
 # Configure application option
@@ -24,7 +26,7 @@ login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
 scheduler.init_app(app)
 scheduler.start()
-
+csrf.init_app(app)
 
 app.logger.info(app.config)
 
