@@ -867,10 +867,11 @@
 							value = parseFloat(data).toFixed(3)
 							classw3css = "w3-text-black";
 							if (value >= 0.8) {
-								classw3css = "w3-text-flat-orange";
-							}
-							if (value >= 0.5) {
 								classw3css = "w3-text-flat-alizarin";
+							} else if (value >= 0.5) {
+								classw3css = "w3-text-flat-carrot";
+							} else if (value >= 0.2) {
+								classw3css = "w3-text-flat-sun-flower";
 							}
 							return "<span class='" + classw3css + "'>" + value + "</span>";
 					    },
@@ -893,11 +894,10 @@
 							}
 							value = parseFloat(data).toFixed(3)
 							classw3css = "w3-text-black";
-							if (value >= 0.45) {
-								classw3css = "w3-text-flat-orange";
-							}
 							if (value >= 0.65) {
 								classw3css = "w3-text-flat-alizarin";
+							} else if (value >= 0.45) {
+								classw3css = "w3-text-flat-carrot";
 							}
 							return "<span class='" + classw3css + "'>" + value + "</span>";
 					    },
@@ -1330,23 +1330,16 @@
 			Plotly.newPlot("radarConservation", data2, layout2)
 			Plotly.newPlot("radarPopulation", data3, layout3)
 
-			var trace1 = {
-			  x: ['MaxEntScan'],
-			  y: [MaxEntScan_ref],
-			  name: 'MaxEntScan_ref',
-			  type: 'bar',
-			  text: MaxEntScan_ref,
-			  textposition: 'auto',
-			  hoverinfo: 'none',
-			};
-			var trace2 = {
-			  x: ['MaxEntScan'],
-			  y: [MaxEntScan_alt],
-			  name: 'MaxEntScan_alt',
-			  type: 'bar',
-			  text: MaxEntScan_alt,
-			  textposition: 'auto',
-			  hoverinfo: 'none',
+			var traceMES = {
+				x: ['Ref', 'Alt'],
+				y: [MaxEntScan_ref, MaxEntScan_alt],
+				text: [MaxEntScan_ref, MaxEntScan_alt],
+				name: "",
+				marker:{
+					color: ['#3498db', '#34495e']
+				},
+				type: 'bar',
+				hovertemplate: "<b>MES %{x} : %{y:.0f}</b>"
 			};
 
 			var traceSpliceAI = []
@@ -1357,7 +1350,9 @@
 				if (spliceAI[site]["score"] >= 0.8) {
 					color = "#e74c3c";
 				} else if (spliceAI[site]["score"] >= 0.5) {
-					color = "#f39c12";
+					color = "#e67e22";
+				} else if (spliceAI[site]["score"] >= 0.2) {
+					color = "#f1c40f";
 				}
 				var trace = {
 					domain: { x: [0.35, 1], y: [min, max] },
@@ -1374,6 +1369,7 @@
 						},
 						steps: [
 							{ range: [0, 0.5], color: "#ecf0f1" },
+							{ range: [0, 0.2], color: "#bdc3c7" },
 						],
 						bar: {thickness:0.5, color: color },
 					},
@@ -1388,7 +1384,7 @@
 				max = min - 0.13
 			}
 
-			var data = [trace1, trace2];
+			var data = [traceMES];
 			data = data.concat(traceSpliceAI);
 			var layout = {
 			  width: apply*2,
@@ -1396,7 +1392,7 @@
 			  xaxis: {
 			    domain: [0, 0.15],
 			    anchor: 'y1'
-			  },
+			},title: "Splicing prediction scores (MaxEntScan & spliceAI)",
 			  yaxis: {
 			    domain: [0, 1],
 			    anchor: 'x1'
