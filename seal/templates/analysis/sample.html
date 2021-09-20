@@ -115,6 +115,9 @@
 							<th class='showTitle control-size-100'>MES var</th>
 							<th class='showTitle control-size-125'>SpliceAI DS</th>
 							<th class='showTitle control-size-100'>Missense</th>
+							<th class='showTitle control-size-100'>Analyse 1</th>
+							<th class='showTitle control-size-100'>Analyse 2</th>
+							<th class='showTitle control-size-100'>Report</th>
 						</tr>
 					</thead>
 					<tfoot>
@@ -239,6 +242,15 @@
 								<span onclick="openHelpModal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
+							</th>
+							<th class='showTitle control-size-100'>
+								Analyse 1
+							</th>
+							<th class='showTitle control-size-100'>
+								Analyse 2
+							</th>
+							<th class='showTitle control-size-100'>
+								Report
 							</th>
 						</tr>
 					</tfoot>
@@ -911,6 +923,51 @@
 					    }
 					},
 				},
+				{
+					"className": 'showTitle size-100',
+					"data": {
+						"_": "analyse1",
+						"display" : function ( data, type, row, meta ) {
+							const id_var=data["id"];
+							const id=data["id"] + "_analyse1";
+							if (data["analyse1"]) {
+								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
+							} else {
+								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
+							}
+					    }
+					}
+				},
+				{
+					"className": 'showTitle size-100',
+					"data": {
+						"_": "analyse2",
+						"display" : function ( data, type, row, meta ) {
+							const id_var=data["id"];
+							const id=data["id"] + "_analyse2";
+							if (data["analyse2"]) {
+								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
+							} else {
+								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
+							}
+					    }
+					}
+				},
+				{
+					"className": 'showTitle size-100',
+					"data": {
+						"_": "reported",
+						"display" : function ( data, type, row, meta ) {
+							const id_var=data["id"];
+							const id=data["id"] + "reported";
+							if (data["reported"]) {
+								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
+							} else {
+								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
+							}
+					    }
+					}
+				},
 			]
 		});
 
@@ -1438,6 +1495,19 @@
   	  if (event.target == document.getElementById('help-modal')) {
   	    document.getElementById('help-modal').style.display = "none";
   	  }
+	}
+
+	function toggle_var2sample_status(id, id_var, sample_id, type) {
+		$.ajax({
+			type: "POST",
+			url: "/toggle/samples/variant/status/"+id_var+"/"+sample_id+"/"+type,
+			data: {
+				id_var: id_var, sample_id: sample_id
+			}
+		})
+		.done(function(return_code) {
+			$('#' + id).attr("checked", return_code);
+		});
 	}
 </script>
 {% endblock %}
