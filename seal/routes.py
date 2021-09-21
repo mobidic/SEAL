@@ -544,6 +544,14 @@ def json_variant(id, version=-1):
                 "reported": v2s.reported
             })
 
+    comments = list()
+
+    for comment in variant.comments:
+        comments.append({
+            "comment": comment.comment,
+            "date": comment.date.strftime("%Y/%m/%d at %H:%M:%S")
+        })
+
     variant_json = {
         "id": variant.id,
         "chr": variant.chr,
@@ -551,7 +559,8 @@ def json_variant(id, version=-1):
         "ref": variant.ref,
         "alt": variant.alt,
         "annotations": variant.annotations[version],
-        "samples": samples
+        "samples": samples,
+        "comments": comments
     }
     return jsonify(variant_json)
 
