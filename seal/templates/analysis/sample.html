@@ -291,6 +291,7 @@
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'comments')">Comments (<span class="commentsCount"></span>)</button>
 			</div>
 
 			<div id="allFeatures" class="w3-container detail">
@@ -341,6 +342,11 @@
 			<div id="inseal" class="w3-container detail">
 				<h1>In Seal</h1>
 				<div id="inSEALTable"></div>
+			</div>
+
+			<div id="comments" class="w3-container detail">
+				<h1>Comments (<span class="commentsCount"></span>)</h1>
+				<div id="commentsTable"></div>
 			</div>
 
 			<div class="w3-container w3-light-grey w3-padding">
@@ -1308,7 +1314,7 @@
 			};
 			radarData.push(radarData[0]);
 			radarLabels.push(radarLabels[0]);
-			data = [{
+			data1 = [{
 				type: 'scatterpolar',
 				r: [
 					Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
@@ -1404,7 +1410,7 @@
 				showlegend: false
 			}
 
-			Plotly.newPlot("radarMissense", data, layout)
+			Plotly.newPlot("radarMissense", data1, layout)
 			Plotly.newPlot("radarConservation", data2, layout2)
 			Plotly.newPlot("radarPopulation", data3, layout3)
 
@@ -1462,8 +1468,8 @@
 				max = min - 0.13
 			}
 
-			var data = [traceMES];
-			data = data.concat(traceSpliceAI);
+			var data1 = [traceMES];
+			data1 = data1.concat(traceSpliceAI);
 			var layout = {
 			  width: apply*2,
 			  showlegend: false,
@@ -1477,7 +1483,33 @@
 			  },
 			};
 
-			Plotly.newPlot('chartSplicing', data, layout);
+			Plotly.newPlot('chartSplicing', data1, layout);
+
+		    comments = '<div class="tableFixHead">';
+			comments = comments + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			comments = comments + '<thead class="w3-flat-silver"><tr>'+
+		        '<th class="w3-flat-silver control-size-600" >Comment</th>'+
+				'<th class="w3-flat-silver control-size-250">Date</th>'+
+			'</tr></thead>';
+			comments = comments + '<tbody>';
+
+			var count = 0;
+			for (x in data["comments"]) {
+				comments = comments + '<tr>'+
+					'<td class="size-600">' + data["comments"][x]["comment"] + '</td>'+
+					'<td class="size-250">' + data["comments"][x]["date"] + '</td>'+
+				'</tr>';
+				count+=1;
+			}
+
+		    comments = comments + '</tbody>';
+		    comments = comments + '</table>';
+		    comments = comments + '</div>';
+			document.getElementById("commentsTable").innerHTML = comments;
+			var node = document.getElementsByClassName('commentsCount');
+			for (var i = 0; i < node.length; i++) {
+                node[i].innerHTML = count;
+            }
 
 		});
 		document.getElementById("variant-id").innerHTML = id;
