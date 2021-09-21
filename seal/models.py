@@ -1,6 +1,7 @@
 from seal import db, login_manager
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
+from datetime import datetime
 
 ################################################################################
 # Authentication
@@ -93,9 +94,22 @@ class Variant(db.Model):
     ref = db.Column(db.String(500), unique=False, nullable=False)
     alt = db.Column(db.String(500), unique=False, nullable=False)
     annotations = db.Column(db.JSON, nullable=True)
+    comments = relationship("Comment")
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
+
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    comment = db.Column(db.Text, nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
+
+    variantid = db.Column(db.Text, db.ForeignKey('variant.id'))
+    variant = relationship("Variant", back_populates="comments")
+
+    def __repr__(self):
+        return f"Comment('{self.comment}','{self.date}')"
 
 
 class Var2Sample(db.Model):
