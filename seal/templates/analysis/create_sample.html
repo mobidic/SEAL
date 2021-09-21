@@ -92,18 +92,15 @@
 	}
 
 	$(document).ready(function(){
-		var countries=["sample"];
-		function loadFamilies(){
-			$.getJSON('/json/families', function(data, status, xhr){
-				for (var i = 0; i < data['data'].length; i++ ) {
-					countries.push(data["data"][i]["family"]);
-				}
-			});
-		};
-		loadFamilies();
+		var families=[];
+		$.getJSON('/json/families', function(data, status, xhr){
+			for (var i = 0; i < data['data'].length; i++ ) {
+				families.push(data["data"][i]["family"]);
+			}
+		});
 
 		$('#family').autocomplete({
-			source: countries,
+			source: families,
 		});
 
 	});
