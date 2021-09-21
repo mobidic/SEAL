@@ -1,4 +1,3 @@
-import random
 import os
 import json
 import datetime
@@ -80,7 +79,7 @@ def importvcf():
                         db.session.add(variant)
 
                     # sample.variants.append(variant)
-                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0], analyse1=random.choice([True, False]), analyse2=random.choice([True, False]), reported=random.choice([True, False]))
+                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0])
                     db.session.add(v2s)
 
         except Exception as e:
