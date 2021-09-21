@@ -1,6 +1,6 @@
 import os
 from seal import db, app
-from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript, Family, Var2Sample
+from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript, Family, Var2Sample, Comment
 
 
 pathDB = os.path.join(app.root_path, 'site.db')
@@ -400,6 +400,10 @@ db.session.add(v1s1)
 db.session.add(v2s1)
 db.session.add(v3s1)
 db.session.add(v2s2)
+db.session.commit()
+
+comment1 = Comment(comment="This is a large comment about this variant. Indeed we found this way to add some personnal, or not, informations... It can be relative to the patient, the analyse, the variant, the pathology...", variantid="chr1-12-a-g")
+db.session.add(comment1)
 db.session.commit()
 
 variant = Variant.query.get("chr1-12-a-c")
