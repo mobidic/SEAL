@@ -290,7 +290,7 @@
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal</button>
+				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal (<span class="inSealCount"></span>)</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'comments')">Comments (<span class="commentsCount"></span>)</button>
 			</div>
 
@@ -340,7 +340,7 @@
 			</div>
 
 			<div id="inseal" class="w3-container detail">
-				<h1>In Seal</h1>
+				<h1>In Seal (<span class="inSealCount"></span>)</h1>
 				<div id="inSEALTable"></div>
 			</div>
 
@@ -1213,6 +1213,7 @@
 			'</tr></thead>';
 			inSeal = inSeal + '<tbody>';
 
+			var count = 0;
 			for (x in data["samples"]) {
 				if (data["samples"][x]["reported"]) {
 					reported = '<i title="Reported" class="w3-text-flat-emerald fas fa-check-circle"></i>'
@@ -1233,12 +1234,17 @@
 					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_frequency"] + '</td>'+
 					'<td class="control-size-100 w3-center">' + reported + '</td>'+
 				'</tr>'
+				count += 1;
 			}
 
 		    inSeal = inSeal + '</tbody>';
 		    inSeal = inSeal + '</table>';
 		    inSeal = inSeal + '</div>';
 			document.getElementById("inSEALTable").innerHTML = inSeal;
+			var node = document.getElementsByClassName('inSealCount');
+			for (var i = 0; i < node.length; i++) {
+                node[i].innerHTML = count;
+            }
 
 
 			tableScoresPredictions = '<div class="tableFixHead">';
