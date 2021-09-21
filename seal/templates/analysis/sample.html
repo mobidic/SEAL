@@ -935,6 +935,13 @@
 							} else {
 								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
 							}
+					    },
+						"sort" : function ( data, type, row, meta ) {
+							if (data["analyse1"]) {
+								return 1;
+							} else {
+								return 0;
+							}
 					    }
 					}
 				},
@@ -950,6 +957,13 @@
 							} else {
 								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
 							}
+					    },
+						"sort" : function ( data, type, row, meta ) {
+							if (data["analyse2"]) {
+								return 1;
+							} else {
+								return 0;
+							}
 					    }
 					}
 				},
@@ -964,6 +978,13 @@
 								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
 							} else {
 								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
+							}
+					    },
+						"sort" : function ( data, type, row, meta ) {
+							if (data["reported"]) {
+								return 1;
+							} else {
+								return 0;
 							}
 					    }
 					}
