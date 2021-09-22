@@ -4,10 +4,12 @@ import json
 import itertools
 import re
 import numpy
+import urllib
+from datetime import datetime
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm
 from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -235,11 +237,13 @@ def sample(id):
         return redirect(url_for('index'))
 
     filters = Filter.query.all()
+    commentForm = AddCommentForm()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
-        filters=filters
+        filters=filters,
+        form=commentForm
     )
 
 
@@ -590,6 +594,15 @@ def toggle_varStatus():
         return_value = v2s.reported
     db.session.commit()
     return f"{return_value}"
+
+
+@app.route("/add/comment/variant", methods=['POST'])
+@login_required
+def add_comment():
+    comment = Comment(comment=urllib.parse.unquote(request.form["comment"]), variantid=request.form["id_var"], date=datetime.now(), userid=current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+    return 'ok'
 
 
 ################################################################################

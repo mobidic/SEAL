@@ -346,6 +346,27 @@
 
 			<div id="comments" class="w3-container detail">
 				<h1>Comments (<span class="commentsCount"></span>)</h1>
+
+				{{ form.hidden_tag() }}
+				<div class="w3-row w3-section">
+					<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-comment"></i></div>
+					<div class="w3-rest">
+						{% if form.comment.errors %}
+							{{ form.comment(class="w3-input w3-border w3-border-red") }}
+							<div class="w3-small w3-text-flat-alizarin">
+								{% for error in form.comment.errors %}
+									<i class="fas fa-exclamation-circle"></i> {{ error }}
+								{% endfor %}
+							</div>
+						{% else %}
+							{{ form.comment(class="w3-input w3-border") }}
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="w3-section w3-center">
+					{{ form.submit(id="test", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="send_comment();") }}
+				</div>
 				<div id="commentsTable"></div>
 			</div>
 
@@ -643,6 +664,14 @@
 								response = '<i title="CANONICAL" class="w3-text-flat-peter-river fas fa-star"></i>';
 							} else {
 								response = '<i title="" class="w3-text-flat-peter-river far fa-star"></i>';
+							}
+							return response;
+		                },
+						"sort": function ( data, type, row ) {
+							if (data) {
+								response = true;
+							} else {
+								response = false;
 							}
 							return response;
 		                },
@@ -1573,6 +1602,56 @@
 				"id_var": id_var, "sample_id": sample_id, "type":type
 			}
 		})
+	}
+
+	function send_comment(id_var, comment) {
+		$.ajaxSetup({
+			beforeSend: function(xhr, settings) {
+				if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+				}
+			}
+		});
+		var comment = $("#comment").val();
+		var id_var = $("#variant-id").text();
+		$.ajax({
+			type: "POST",
+			url: "/add/comment/variant",
+			data: {
+				"id_var": id_var, "comment": encodeURI(comment)
+			}
+		}).done(function() {
+			$("#comment").val("");
+			$.getJSON("/json/variant/" + id_var, function(data) {
+			    comments = '<div class="tableFixHead">';
+				comments = comments + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+				comments = comments + '<thead class="w3-flat-silver"><tr>'+
+					'<th class="w3-flat-silver control-size-100" >User</th>'+
+			        '<th class="w3-flat-silver control-size-500" >Comment</th>'+
+					'<th class="w3-flat-silver control-size-225">Date</th>'+
+				'</tr></thead>';
+				comments = comments + '<tbody>';
+
+				var count = 0;
+				for (x in data["comments"]) {
+					comments = comments + '<tr>'+
+						'<td class="size-100">' + data["comments"][x]["user"] + '</td>'+
+						'<td class="size-500">' + data["comments"][x]["comment"] + '</td>'+
+						'<td class="size-225">' + data["comments"][x]["date"] + '</td>'+
+					'</tr>';
+					count+=1;
+				}
+
+			    comments = comments + '</tbody>';
+			    comments = comments + '</table>';
+			    comments = comments + '</div>';
+				document.getElementById("commentsTable").innerHTML = comments;
+				var node = document.getElementsByClassName('commentsCount');
+				for (var i = 0; i < node.length; i++) {
+	                node[i].innerHTML = count;
+	            }
+			});
+		});
 	}
 </script>
 {% endblock %}
