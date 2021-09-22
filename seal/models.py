@@ -38,6 +38,7 @@ class User(db.Model, UserMixin):
     technician = db.Column(db.Boolean(), nullable=False, default=False)
     biologist = db.Column(db.Boolean(), nullable=False, default=False)
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), default=1)
+    comments = relationship("Comment")
 
     teams = db.relationship(
         'Team', secondary=team2member, lazy='subquery',
@@ -105,8 +106,11 @@ class Comment(db.Model):
     comment = db.Column(db.Text, nullable=False)
     date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
 
-    variantid = db.Column(db.Text, db.ForeignKey('variant.id'))
+    variantid = db.Column(db.Text, db.ForeignKey('variant.id'), nullable=False)
     variant = relationship("Variant", back_populates="comments")
+
+    userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = relationship("User", back_populates="comments")
 
     def __repr__(self):
         return f"Comment('{self.comment}','{self.date}')"

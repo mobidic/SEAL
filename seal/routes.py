@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -549,7 +549,8 @@ def json_variant(id, version=-1):
     for comment in variant.comments:
         comments.append({
             "comment": comment.comment,
-            "date": comment.date.strftime("%Y/%m/%d at %H:%M:%S")
+            "date": comment.date.strftime("%Y/%m/%d at %H:%M:%S"),
+            "user": comment.user.username
         })
 
     variant_json = {

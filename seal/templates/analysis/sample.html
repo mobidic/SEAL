@@ -1494,16 +1494,18 @@
 		    comments = '<div class="tableFixHead">';
 			comments = comments + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			comments = comments + '<thead class="w3-flat-silver"><tr>'+
-		        '<th class="w3-flat-silver control-size-600" >Comment</th>'+
-				'<th class="w3-flat-silver control-size-250">Date</th>'+
+				'<th class="w3-flat-silver control-size-100" >User</th>'+
+		        '<th class="w3-flat-silver control-size-500" >Comment</th>'+
+				'<th class="w3-flat-silver control-size-225">Date</th>'+
 			'</tr></thead>';
 			comments = comments + '<tbody>';
 
 			var count = 0;
 			for (x in data["comments"]) {
 				comments = comments + '<tr>'+
-					'<td class="size-600">' + data["comments"][x]["comment"] + '</td>'+
-					'<td class="size-250">' + data["comments"][x]["date"] + '</td>'+
+					'<td class="size-100">' + data["comments"][x]["user"] + '</td>'+
+					'<td class="size-500">' + data["comments"][x]["comment"] + '</td>'+
+					'<td class="size-225">' + data["comments"][x]["date"] + '</td>'+
 				'</tr>';
 				count+=1;
 			}

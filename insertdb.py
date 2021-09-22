@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from seal import db, app
 from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript, Family, Var2Sample, Comment
 
@@ -402,7 +403,7 @@ db.session.add(v3s1)
 db.session.add(v2s2)
 db.session.commit()
 
-comment1 = Comment(comment="This is a large comment about this variant. Indeed we found this way to add some personnal, or not, informations... It can be relative to the patient, the analyse, the variant, the pathology...", variantid="chr1-12-a-g")
+comment1 = Comment(comment="This is a large comment about this variant. Indeed we found this way to add some personnal, or not, informations... It can be relative to the patient, the analyse, the variant, the pathology...", date=datetime.now(), variantid="chr1-12-a-g", userid=1)
 db.session.add(comment1)
 db.session.commit()
 
