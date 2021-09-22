@@ -1,7 +1,7 @@
 from seal import db, login_manager
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
-from datetime import datetime
+
 
 ################################################################################
 # Authentication
@@ -103,7 +103,7 @@ class Variant(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.Text, nullable=False)
-    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
 
     variantid = db.Column(db.Text, db.ForeignKey('variant.id'))
     variant = relationship("Variant", back_populates="comments")
