@@ -1520,34 +1520,45 @@
 
 			Plotly.newPlot('chartSplicing', data1, layout);
 
-		    comments = '<div class="tableFixHead">';
-			comments = comments + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			comments = comments + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver control-size-100" >User</th>'+
-		        '<th class="w3-flat-silver control-size-500" >Comment</th>'+
-				'<th class="w3-flat-silver control-size-225">Date</th>'+
+				'<th class="w3-flat-silver control-size-75 no-sort" >User</th>'+
+		        '<th class="w3-flat-silver control-size-500 no-sort" >Comment</th>'+
+				'<th class="w3-flat-silver control-size-200">Date</th>'+
 			'</tr></thead>';
 			comments = comments + '<tbody>';
 
 			var count = 0;
 			for (x in data["comments"]) {
 				comments = comments + '<tr>'+
-					'<td class="size-100">' + data["comments"][x]["user"] + '</td>'+
+					'<td class="size-75">' + data["comments"][x]["user"] + '</td>'+
 					'<td class="size-500">' + data["comments"][x]["comment"] + '</td>'+
-					'<td class="size-225">' + data["comments"][x]["date"] + '</td>'+
+					'<td class="size-200">' + data["comments"][x]["date"] + '</td>'+
 				'</tr>';
 				count+=1;
 			}
 
 		    comments = comments + '</tbody>';
 		    comments = comments + '</table>';
-		    comments = comments + '</div>';
 			document.getElementById("commentsTable").innerHTML = comments;
 			var node = document.getElementsByClassName('commentsCount');
 			for (var i = 0; i < node.length; i++) {
                 node[i].innerHTML = count;
             }
 
+			$('#tableComments').DataTable({
+				scrollX: true,
+				searching:false,
+				"lengthMenu": [ 10 ],
+				"dom": 'tip',
+				"order": [[ 2, "desc" ]],
+				columnDefs: [
+				   	{
+				   		orderable: false,
+						targets:  "no-sort"
+			   		}
+			   	],
+			});
 		});
 		document.getElementById("variant-id").innerHTML = id;
 		document.getElementById('modal-details-variant').style.display='block'
@@ -1623,33 +1634,46 @@
 		}).done(function() {
 			$("#comment").val("");
 			$.getJSON("/json/variant/" + id_var, function(data) {
-			    comments = '<div class="tableFixHead">';
-				comments = comments + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+
+				comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 				comments = comments + '<thead class="w3-flat-silver"><tr>'+
-					'<th class="w3-flat-silver control-size-100" >User</th>'+
-			        '<th class="w3-flat-silver control-size-500" >Comment</th>'+
-					'<th class="w3-flat-silver control-size-225">Date</th>'+
+					'<th class="w3-flat-silver control-size-75 no-sort" >User</th>'+
+			        '<th class="w3-flat-silver control-size-500 no-sort" >Comment</th>'+
+					'<th class="w3-flat-silver control-size-200">Date</th>'+
 				'</tr></thead>';
 				comments = comments + '<tbody>';
 
 				var count = 0;
 				for (x in data["comments"]) {
 					comments = comments + '<tr>'+
-						'<td class="size-100">' + data["comments"][x]["user"] + '</td>'+
+						'<td class="size-75">' + data["comments"][x]["user"] + '</td>'+
 						'<td class="size-500">' + data["comments"][x]["comment"] + '</td>'+
-						'<td class="size-225">' + data["comments"][x]["date"] + '</td>'+
+						'<td class="size-200">' + data["comments"][x]["date"] + '</td>'+
 					'</tr>';
 					count+=1;
 				}
 
 			    comments = comments + '</tbody>';
 			    comments = comments + '</table>';
-			    comments = comments + '</div>';
 				document.getElementById("commentsTable").innerHTML = comments;
 				var node = document.getElementsByClassName('commentsCount');
 				for (var i = 0; i < node.length; i++) {
 	                node[i].innerHTML = count;
 	            }
+
+				$('#tableComments').DataTable({
+					scrollX: true,
+					searching:false,
+					"lengthMenu": [ 10 ],
+					"dom": 'tip',
+					"order": [[ 2, "desc" ]],
+					columnDefs: [
+					   	{
+					   		orderable: false,
+							targets:  "no-sort"
+				   		}
+				   	],
+				});
 			});
 		});
 	}
