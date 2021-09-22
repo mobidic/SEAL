@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
 from seal.models import User, Sample
@@ -97,6 +97,15 @@ class UploadVariantForm(FlaskForm):
         sample = Sample.query.filter_by(samplename=samplename.data).first()
         if sample:
             raise ValidationError('This Sample Name is already in database!')
+
+
+class AddCommentForm(FlaskForm):
+    comment = TextAreaField(
+        'Comment',
+        validators=[DataRequired(), Length(min=2)]
+    )
+
+    submit = SubmitField('Add A Comment')
 
 
 ################################################################################
