@@ -1566,14 +1566,11 @@
 		});
 		$.ajax({
 			type: "POST",
-			url: "/toggle/samples/variant/status/"+id_var+"/"+sample_id+"/"+type,
+			url: "/toggle/samples/variant/status",
 			data: {
-				id_var: id_var, sample_id: sample_id
+				"id_var": id_var, "sample_id": sample_id, "type":type
 			}
 		})
-		.done(function(return_code) {
-			$('#' + id).attr("checked", return_code);
-		});
 	}
 </script>
 {% endblock %}

@@ -571,9 +571,12 @@ def json_variant(id, version=-1):
 ################################################################################
 # Toggle boolean variables in DB
 
-@app.route("/toggle/samples/variant/status/<string:id_var>/<int:sample_id>/<string:type>", methods=['GET', 'POST'])
+@app.route("/toggle/samples/variant/status", methods=['POST'])
 @login_required
-def toggle_varStatus(id_var, sample_id, type):
+def toggle_varStatus():
+    id_var = request.form["id_var"]
+    sample_id = request.form["sample_id"]
+    type = request.form["type"]
     v2s = Var2Sample.query.get((id_var, sample_id))
     if type == "analyse1":
         v2s.analyse1 = False if v2s.analyse1 else True
