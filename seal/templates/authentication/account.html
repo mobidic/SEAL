@@ -8,6 +8,7 @@
 				<div class="w3-container w3-border-bottom">
 					<h3>Update account</h3>
 				</div>
+
 				<form class="w3-container"  action="" method="post" enctype="multipart/form-data">
 					{{ update_account_form.hidden_tag() }}
 					<div class="w3-row w3-section">
@@ -25,6 +26,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-envelope"></i></div>
 						<div class="w3-rest">
@@ -40,6 +42,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-camera"></i></div>
 						<div class="w3-rest">
@@ -68,6 +71,7 @@
 				<div class="w3-container w3-border-bottom">
 					<h3>Update Password</h3>
 				</div>
+
 				<form class="w3-container"  action="" method="post" enctype="multipart/form-data">
 					{{ update_password_form.hidden_tag() }}
 					<div class="w3-row w3-section">
@@ -85,6 +89,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.new_password.label() }}</b></div>
 						<div class="w3-rest">
@@ -100,6 +105,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.confirm_password.label() }}</b></div>
 						<div class="w3-rest">
@@ -125,9 +131,8 @@
 	</div>
 {% endblock %}
 
-
 {% block script %}
-<script type="text/javascript">	
+<script type="text/javascript">
 	// Script to open and close sidebar
 	function w3_open() {
 		document.getElementById("sidebar").style.display = "block";

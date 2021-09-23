@@ -6,6 +6,7 @@
 			<div class="w3-container w3-flat-green-sea">
 				<h2>Login</h2>
 			</div>
+
 			<div class="w3-container">
 				{% include "includes/flash.j2" %}
 				<form action="" method="post">
@@ -25,6 +26,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-unlock-alt"></i></div>
 						<div class="w3-rest">
@@ -40,6 +42,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					{{ form.remember(class="w3-check") }}
 					{{ form.remember.label() }}
 

@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 	{% include 'includes/sidebar.j2' %}
 	<div class="w3-main" style="margin-left:350px">
@@ -9,6 +8,7 @@
 				<div class="w3-container w3-border-bottom">
 					<h3>Upload A New Sample</h3>
 				</div>
+
 				<form class="w3-container"  action="" method="post" enctype="multipart/form-data">
 					{{ form.hidden_tag() }}
 					<div class="w3-row w3-section">
@@ -26,6 +26,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-address-card"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
 						<div class="w3-rest">
@@ -41,6 +42,7 @@
 							{% endif %}
 						</div>
 					</div>
+
 					<div class="w3-row w3-section">
 						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
 						<div class="w3-rest">
@@ -59,6 +61,7 @@
 
 					{{ form.carrier(class="w3-check") }}
 					{{ form.carrier.label() }}
+
 					{{ form.index(class="w3-check") }}
 					{{ form.index.label() }}
 
@@ -97,7 +100,6 @@
 		$('#family').autocomplete({
 			source: families,
 		});
-
 	});
 </script>
 {% endblock %}
