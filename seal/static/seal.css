@@ -1,0 +1,187 @@
+
+.control-size-25 {
+    width: 25px;
+	max-width: 25px;
+    min-width: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-50 {
+    width: 50px;
+	max-width: 50px;
+    min-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-75 {
+    width: 75px;
+	max-width: 75px;
+    min-width: 75px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-100 {
+    width: 100px;
+	max-width: 100px;
+    min-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-125 {
+    width: 125px;
+	max-width: 125px;
+    min-width: 125px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-150 {
+    width: 150px;
+	max-width: 150px;
+    min-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-200 {
+    width: 200px;
+    max-width: 200px;
+    min-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-225 {
+    width: 225px;
+	max-width: 225px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-250 {
+    width: 250px;
+	max-width: 250px;
+    min-width: 250px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-275 {
+    width: 275px;
+	max-width: 275px;
+    min-width: 275px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-300 {
+    width: 300px;
+	max-width: 300px;
+    min-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-350 {
+    width: 350px;
+	max-width: 350px;
+    min-width: 350px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-400 {
+    width: 400px;
+	max-width: 400px;
+    min-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-500 {
+    width: 500px;
+	max-width: 500px;
+    min-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.control-size-600 {
+    width: 600px;
+	max-width: 600px;
+    min-width: 600px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.size-100 {
+    max-width: 100px;
+    min-width: 100px;
+}
+.size-125 {
+    max-width: 125px;
+    min-width: 125px;
+}
+.size-150 {
+    max-width: 150px;
+    min-width: 150px;
+}
+.size-200 {
+    max-width: 200px;
+    min-width: 200px;
+}
+.size-225 {
+    max-width: 225px;
+    min-width: 225px;
+}
+.size-250 {
+    max-width: 250px;
+    min-width: 250px;
+}
+.size-300 {
+    max-width: 250px;
+    min-width: 250px;
+}
+.size-550 {
+    max-width: 550px;
+    min-width: 550px;
+}
+
+.no-padding {
+	padding: 0px !important;
+}
+
+
+.dataTables_scrollHead table.dataTable thead th {
+	position: relative;
+	background-image: none !important;
+}
+.dataTables_scrollHead table.dataTable thead .sorting {
+	background-image: none !important;
+}
+.dataTables_scrollHead table.dataTable thead th.sorting:after,
+.dataTables_scrollHead table.dataTable thead th.sorting_asc:after,
+.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
+	position: absolute !important;
+	top: 12px !important;
+	right: 8px !important;
+	font-size: 0.8em !important;
+	font-family: 'Font Awesome\ 5 Free' !important;
+}
+.dataTables_scrollHead table.dataTable thead th.sorting:after {
+	content: "\f0dc" !important;
+	opacity:0.5;
+}
+.dataTables_scrollHead table.dataTable thead th.sorting_asc:after {
+	opacity:1;
+	content: "\f0dd" !important;
+}
+.dataTables_scrollHead table.dataTable thead th.sorting_desc:after {
+	opacity:1;
+	content: "\f0de" !important;
+}
