@@ -1522,18 +1522,18 @@
 
 			comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			comments = comments + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver control-size-75 no-sort" >User</th>'+
-		        '<th class="w3-flat-silver control-size-500 no-sort" >Comment</th>'+
-				'<th class="w3-flat-silver control-size-200">Date</th>'+
+				'<th class="w3-flat-silver no-sort">User</th>'+
+		        '<th class="w3-flat-silver no-sort" >Comment</th>'+
+				'<th class="w3-flat-silver" width="20%">Date</th>'+
 			'</tr></thead>';
 			comments = comments + '<tbody>';
 
 			var count = 0;
 			for (x in data["comments"]) {
 				comments = comments + '<tr>'+
-					'<td class="size-75">' + data["comments"][x]["user"] + '</td>'+
-					'<td class="size-500">' + data["comments"][x]["comment"] + '</td>'+
-					'<td class="size-200">' + data["comments"][x]["date"] + '</td>'+
+					'<td>' + data["comments"][x]["user"] + '</td>'+
+					'<td>' + data["comments"][x]["comment"] + '</td>'+
+					'<td>' + data["comments"][x]["date"] + '</td>'+
 				'</tr>';
 				count+=1;
 			}
@@ -1547,7 +1547,6 @@
             }
 
 			$('#tableComments').DataTable({
-				scrollX: true,
 				searching:false,
 				"lengthMenu": [ 10 ],
 				"dom": 'tip',
@@ -1637,18 +1636,18 @@
 
 				comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 				comments = comments + '<thead class="w3-flat-silver"><tr>'+
-					'<th class="w3-flat-silver control-size-75 no-sort" >User</th>'+
-			        '<th class="w3-flat-silver control-size-500 no-sort" >Comment</th>'+
-					'<th class="w3-flat-silver control-size-200">Date</th>'+
+					'<th class="w3-flat-silver no-sort" >User</th>'+
+			        '<th class="w3-flat-silver no-sort" >Comment</th>'+
+					'<th class="w3-flat-silver">Date</th>'+
 				'</tr></thead>';
 				comments = comments + '<tbody>';
 
 				var count = 0;
 				for (x in data["comments"]) {
 					comments = comments + '<tr>'+
-						'<td class="size-75">' + data["comments"][x]["user"] + '</td>'+
-						'<td class="size-500">' + data["comments"][x]["comment"] + '</td>'+
-						'<td class="size-200">' + data["comments"][x]["date"] + '</td>'+
+						'<td>' + data["comments"][x]["user"] + '</td>'+
+						'<td>' + data["comments"][x]["comment"] + '</td>'+
+						'<td>' + data["comments"][x]["date"] + '</td>'+
 					'</tr>';
 					count+=1;
 				}
@@ -1662,7 +1661,6 @@
 	            }
 
 				$('#tableComments').DataTable({
-					scrollX: true,
 					searching:false,
 					"lengthMenu": [ 10 ],
 					"dom": 'tip',
@@ -1671,7 +1669,7 @@
 					   	{
 					   		orderable: false,
 							targets:  "no-sort"
-				   		}
+				   		},
 				   	],
 				});
 			});
