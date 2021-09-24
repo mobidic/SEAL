@@ -182,7 +182,7 @@ def save_picture(form_picture):
 def logout():
     logout_user()
     flash("You have been disconnected!", "warning")
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 
 @app.route("/account", methods=['GET', 'POST'])
