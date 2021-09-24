@@ -1523,11 +1523,11 @@
 
 			Plotly.newPlot('chartSplicing', data1, layout);
 
-			comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
 			comments = comments + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver no-sort">User</th>'+
-		        '<th class="w3-flat-silver no-sort" >Comment</th>'+
-				'<th class="w3-flat-silver" width="20%">Date</th>'+
+				'<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
+		        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
+				'<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
 			'</tr></thead>';
 			comments = comments + '<tbody>';
 
@@ -1637,11 +1637,11 @@
 			$("#comment").val("");
 			$.getJSON("/json/variant/" + id_var, function(data) {
 
-				comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+				comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
 				comments = comments + '<thead class="w3-flat-silver"><tr>'+
-					'<th class="w3-flat-silver no-sort" >User</th>'+
-			        '<th class="w3-flat-silver no-sort" >Comment</th>'+
-					'<th class="w3-flat-silver">Date</th>'+
+					'<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
+			        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
+					'<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
 				'</tr></thead>';
 				comments = comments + '<tbody>';
 
@@ -1672,7 +1672,7 @@
 					   	{
 					   		orderable: false,
 							targets:  "no-sort"
-				   		},
+				   		}
 				   	],
 				});
 			});
