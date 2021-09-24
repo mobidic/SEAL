@@ -24,7 +24,7 @@
         text-align: center;
         box-shadow: -10px 10px 67px -12px rgba(0, 0, 0, 0.2);
         opacity: 0;
-        animation: apparition 0.8s 1.2s cubic-bezier(0.39, 0.575, 0.28, 0.995) forwards;
+        animation: apparition 1.8s 0.2s cubic-bezier(0.39, 0.575, 0.28, 0.995) forwards;
     }
     .content p {
         font-size: 1.3rem;
@@ -54,7 +54,7 @@
     @keyframes apparition {
         from {
             opacity: 0;
-            transform: translateY(100px);
+            transform: translateY(200%);
         }
         to {
             opacity: 1;
@@ -102,7 +102,7 @@
         {% for i in range(120) %}
             <span class='particle'>{{ e.code | string | list | random() }}</span>
         {% endfor %}
-        <div class="w3-content w3-display-middle w3-padding" style="width:100%;min-width:400px">
+        <div class="w3-content w3-display-middle w3-padding" style="width:100%;">
             <div class="w3-content w3-card-4 content" style="width:100%">
 
             <p>{{ e }}</p>
