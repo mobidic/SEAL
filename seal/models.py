@@ -1,4 +1,4 @@
-from seal import db, login_manager
+from seal import db, login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
 
@@ -32,7 +32,8 @@ class User(db.Model, UserMixin):
     image_file = db.Column(
         db.String(20), unique=False,
         nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), unique=False, nullable=False)
+    password = db.Column(db.String(120), unique=False, nullable=False)
+    logged = db.Column(db.Boolean(), nullable=False, default=False)
     admin = db.Column(db.Boolean(), nullable=False, default=False)
     bioinfo = db.Column(db.Boolean(), nullable=False, default=False)
     technician = db.Column(db.Boolean(), nullable=False, default=False)
@@ -47,6 +48,9 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User('{self.username}', '{self.image_file}')"
+
+    def verify_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
 
 
 class Team(db.Model):

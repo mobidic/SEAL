@@ -1,6 +1,6 @@
 import os
 from datetime import datetime
-from seal import db, app
+from seal import db, app, bcrypt
 from seal.models import User, Team, Sample, Variant, Filter, Gene, Transcript, Family, Var2Sample, Comment
 
 
@@ -350,8 +350,8 @@ db.session.add(filter2)
 db.session.add(filter3)
 db.session.commit()
 
-user1 = User(username="admin", password="$2b$12$a41mGjwpAWjVNEJirzsbVOBVmn6dv2Cmj/xTye13j7qZg1nNMkUIS", admin=True, technician=True, bioinfo=True, biologist=True, filter_id=2)
-user2 = User(username="user", mail="mail@mail.com", password="$2b$12$a41mGjwpAWjVNEJirzsbVOBVmn6dv2Cmj/xTye13j7qZg1nNMkUIS")
+user1 = User(username="admin", password=bcrypt.generate_password_hash("password").decode('utf-8'), admin=True, technician=True, bioinfo=True, biologist=True, filter_id=2)
+user2 = User(username="user", mail="mail@mail.com", password=bcrypt.generate_password_hash("password").decode('utf-8'))
 db.session.add(user1)
 db.session.add(user2)
 db.session.commit()

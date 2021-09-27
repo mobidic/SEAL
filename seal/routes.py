@@ -150,7 +150,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and user.verify_password(form.password.data):
             flash(f'You are logged as: {user.username}!', 'success')
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
