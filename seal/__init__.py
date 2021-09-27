@@ -33,3 +33,4 @@ app.logger.info(app.config)
 
 from seal import routes
 from seal import schedulers
+from seal import admin

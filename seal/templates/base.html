@@ -26,6 +26,9 @@
 				<a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-left" aria-label="Home" data-balloon-pos="right"><span class="icon-seal"></span> SEAL</a>
 				{% if current_user.is_authenticated %}
 				<a href="{{ url_for('logout') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-right" aria-label="Logout" data-balloon-pos="left"><i class="fas fa-sign-out-alt"></i></a>
+					{% if current_user.admin %}
+						<a href="{{ url_for('admin.index') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-right" aria-label="Transcripts" data-balloon-pos="left"><i class="fas fa-tools"></i></a>
+					{% endif %}
 				<a href="{{ url_for('transcripts') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-right" aria-label="Transcripts" data-balloon-pos="left"><i class="fas fa-dna"></i></a>
 				<a href="{{ url_for('account') }}" class="w3-bar-item w3-padding-arge w3-hover-flat-turquoise w3-right" aria-label="My Account" data-balloon-pos="left">
 					<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:35px; height:35px" style="padding:0px" class="w3-white w3-circle">

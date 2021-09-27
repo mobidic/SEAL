@@ -11,6 +11,7 @@ dependencies:
   - flask-sqlalchemy=2.5.1
   - flask-wtf=0.15.1
   - flask-bcrypt=0.7.1
+  - flask-admin=1.5.8
   - flask-login=0.5.0
   - flask-apscheduler=1.12.2
   - flask-testing=0.8.1
