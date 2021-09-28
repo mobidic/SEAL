@@ -48,9 +48,9 @@ def importvcf():
                 index = data['index']
 
             sample = Sample(samplename=samplename, familyid=familyid, carrier=carrier, index=index)
-            app.logger.info(f"---- Add sample : {sample} ----")
             db.session.add(sample)
             db.session.commit()
+            app.logger.info(f"---- Sample Added : {sample} - {sample.id} ----")
 
         current_date = datetime.datetime.now().isoformat()
 
@@ -93,5 +93,5 @@ def importvcf():
             os.remove(vcf_fn)
         finally:
             db.session.commit()
-            app.logger.info(f"---- End added sample : {sample} ----")
+            app.logger.info(f"---- Variant for Sample Added : {sample} - {sample.id} ----")
             os.remove(os.path.join(app.root_path, 'static/temp/vcf/.lock'))
