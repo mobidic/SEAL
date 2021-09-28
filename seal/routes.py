@@ -5,14 +5,15 @@ import itertools
 import re
 import numpy
 import urllib
+import functools
 from datetime import datetime
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm
 from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment
-from flask_login import login_user, current_user, logout_user, login_required
-
+from flask_login import login_user, current_user, logout_user
+from flask_login.utils import EXEMPT_METHODS
 
 ################################################################################
 # Define global variables
@@ -93,8 +94,21 @@ SPLICEAI = [
 ]
 
 
-################################################################################
-# Essentials pages
+def login_required(func):
+    @functools.wraps(func)
+    def decorated_view(*args, **kwargs):
+        if request.method in EXEMPT_METHODS:
+            return func(*args, **kwargs)
+        elif app.config.get('LOGIN_DISABLED'):
+            return func(*args, **kwargs)
+        elif not current_user.is_authenticated:
+            return app.login_manager.unauthorized()
+        elif request.url_rule.endpoint == "first_connexion":
+            pass
+        elif not current_user.logged:
+            return redirect(url_for('first_connexion', next=request.url))
+        return func(*args, **kwargs)
+    return decorated_view
 
 
 @app.route("/")
@@ -151,9 +165,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user and user.verify_password(form.password.data):
-            flash(f'You are logged as: {user.username}!', 'success')
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
+            if not user.logged:
+                return redirect(url_for('first_connexion', next=next_page))
+            flash(f'You are logged as: {user.username}!', 'success')
             return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
             flash('Login unsucessful. Please check the username and/or password!', 'error')
@@ -212,6 +228,25 @@ def account():
     return render_template(
         'authentication/account.html', title='Account',
         update_account_form=update_account_form,
+        update_password_form=update_password_form)
+
+
+@app.route("/first_connexion", methods=['GET', 'POST'])
+@login_required
+def first_connexion():
+    update_password_form = UpdatePasswordForm()
+    next_page = request.args.get('next')
+    if current_user.logged:
+        return redirect(next_page) if next_page else redirect(url_for('index'))
+    if "submit_password" in request.form and update_password_form.validate_on_submit():
+        current_user.password = bcrypt.generate_password_hash(update_password_form.new_password.data).decode('utf-8')
+        current_user.logged = True
+        db.session.commit()
+        flash('Your password has been changed!', 'success')
+        return redirect(next_page) if next_page else redirect(url_for('index'))
+
+    return render_template(
+        'authentication/first_connexion.html', title='First Connexion',
         update_password_form=update_password_form)
 
 

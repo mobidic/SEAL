@@ -63,13 +63,17 @@ class UpdatePasswordForm(FlaskForm):
     )
     confirm_password = PasswordField(
         'Confirm Password',
-        validators=[DataRequired(), EqualTo('new_password')]
+        validators=[DataRequired(), EqualTo('new_password', "Passwords must match!")]
     )
     submit_password = SubmitField('Update Password')
 
     def validate_old_password(self, old_password):
         if not bcrypt.check_password_hash(current_user.password, self.old_password.data):
             raise ValidationError('That password is incorrect!')
+
+    def validate_new_password(self, new_password):
+        if bcrypt.check_password_hash(current_user.password, self.new_password.data):
+            raise ValidationError('Your new password must be different from your previous password!')
 
 
 ################################################################################
