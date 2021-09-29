@@ -34,6 +34,7 @@ def importvcf():
         with open(current_fn, "r") as tf:
             data = json.load(tf)
             samplename = data['samplename']
+            vcf_path = data['vcf_path']
 
             # Add family in database if necessary
             familyid = None
@@ -72,9 +73,9 @@ def importvcf():
 
         current_date = datetime.datetime.now().isoformat()
 
-        vcf_fn = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.vcf')
-        vcf_vep = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.vep.vcf')
-        stats_vep = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.vep.html')
+        vcf_fn = os.path.join(vcf_path)
+        vcf_vep = os.path.join(os.path.basename(f"{os.path.splitext(vcf_path)[0]}.vep.vcf"))
+        stats_vep = os.path.join(os.path.basename(f"{os.path.splitext(vcf_path)[0]}.vep.html"))
         vep_cmd = "vep " + \
             f" --input_file {vcf_fn} " + \
             f" --output_file {vcf_vep} " + \

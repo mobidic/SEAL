@@ -291,6 +291,8 @@ def add_vcf(info, vcf_file):
     vcf_path = os.path.join(app.root_path, 'static/temp/vcf/', vcf_fn)
     vcf_file.save(vcf_path)
 
+    info["vcf_path"] = vcf_path
+
     token_fn = random_hex + ".token"
     token_path = os.path.join(app.root_path, 'static/temp/vcf/', token_fn)
     with open(token_path, "w") as tf:
