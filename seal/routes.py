@@ -11,7 +11,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 
@@ -314,6 +314,7 @@ def create_variant():
         info = {
             "samplename": uploadSampleForm.samplename.data,
             "family": uploadSampleForm.family.data,
+            "run": uploadSampleForm.run.data,
             "carrier": uploadSampleForm.carrier.data,
             "index": uploadSampleForm.index.data,
         }
@@ -347,19 +348,38 @@ def json_families():
     return jsonify(families_json)
 
 
+@app.route("/json/runs", methods=['GET', 'POST'])
+@login_required
+def json_runs():
+    runs = db.session.query(Run.id, Run.run_name, Run.run_alias).all()
+    runs_json = {"data": list()}
+    for run in runs:
+        runs_json["data"].append({
+            "id": run.id,
+            "run_name": run.run_name,
+            "run_alias": run.run_alias
+        })
+    return jsonify(runs_json)
+
+
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
 def json_samples():
-    samples = db.session.query(Sample.id, Sample.samplename, Sample.status, Sample.familyid).all()
+    samples = db.session.query(Sample.id, Sample.samplename, Sample.status, Sample.familyid, Sample.runid).all()
     samples_json = {"data": list()}
     for sample in samples:
         family = None
         if sample.familyid is not None:
             family = Family.query.get(sample.familyid)
+        run = None
+        if sample.runid is not None:
+            run = Run.query.get(sample.runid)
         samples_json["data"].append({
             "id": sample.id,
             "samplename": sample.samplename,
             "family": family.family if family else None,
+            "run": run.run_name if run else None,
+            "run_alias": run.run_alias if run else None,
             "status": sample.status
         })
     return jsonify(samples_json)

@@ -2,7 +2,7 @@ import os
 import json
 import datetime
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family, Var2Sample
+from seal.models import Sample, Variant, Family, Var2Sample, Run
 from anacore import annotVcf
 import shlex
 import subprocess
@@ -46,6 +46,18 @@ def importvcf():
                     db.session.commit()
                 familyid = family.id
 
+            # Add run in database if necessary
+            runid = None
+            if "run" in data and data["run"] != "":
+                run_name = data['run']
+                run = Run.query.filter_by(run_name=run_name).first()
+                if not run:
+                    run = Run(run_name=run_name)
+                    db.session.add(run)
+                    db.session.commit()
+                runid = run.id
+            app.logger.info(f"---- {runid} ----")
+
             carrier = False
             if "carrier" in data and data["carrier"] != "":
                 carrier = data['carrier']
@@ -53,7 +65,7 @@ def importvcf():
             if "index" in data and data["index"] != "":
                 index = data['index']
 
-            sample = Sample(samplename=samplename, familyid=familyid, carrier=carrier, index=index)
+            sample = Sample(samplename=samplename, familyid=familyid, runid=runid, carrier=carrier, index=index)
             db.session.add(sample)
             db.session.commit()
             app.logger.info(f"---- Sample Added : {sample} - {sample.id} ----")

@@ -85,8 +85,12 @@ class UploadVariantForm(FlaskForm):
         validators=[DataRequired(), Length(min=2, max=20)]
     )
     family = StringField(
-        'Family ID',
+        'Family',
         validators=[Optional(), Length(min=2, max=20)]
+    )
+    run = StringField(
+        'Run',
+        validators=[Optional(), Length(min=2, max=50)]
     )
     vcf_file = FileField(
         'Upload VCF file',

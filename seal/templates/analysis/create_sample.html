@@ -17,7 +17,7 @@
 				<form class="w3-container"  action="" method="post" enctype="multipart/form-data">
 					{{ form.hidden_tag() }}
 					<div class="w3-row w3-section">
-						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-address-card"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}</div>
 						<div class="w3-rest">
 							{% if form.samplename.errors %}
 								{{ form.samplename(class="w3-input w3-border w3-border-red") }}
@@ -33,7 +33,7 @@
 					</div>
 
 					<div class="w3-row w3-section">
-						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-address-card"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-users"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
 						<div class="w3-rest">
 							{% if form.family.errors %}
 								{{ form.family(class="w3-input w3-border w3-border-red") }}
@@ -44,6 +44,22 @@
 								</div>
 							{% else %}
 								{{ form.family(class="w3-input w3-border") }}
+							{% endif %}
+						</div>
+					</div>
+
+					<div class="w3-row w3-section">
+						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-digital-tachograph"></i> {{ form.run.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+						<div class="w3-rest">
+							{% if form.run.errors %}
+								{{ form.run(class="w3-input w3-border w3-border-red") }}
+								<div class="w3-small w3-text-flat-alizarin">
+									{% for error in form.run.errors %}
+										<i class="fas fa-exclamation-circle"></i> {{ error }}
+									{% endfor %}
+								</div>
+							{% else %}
+								{{ form.run(class="w3-input w3-border") }}
 							{% endif %}
 						</div>
 					</div>
@@ -104,6 +120,17 @@
 
 		$('#family').autocomplete({
 			source: families,
+		});
+
+		var runs=[];
+		$.getJSON('/json/runs', function(data, status, xhr){
+			for (var i = 0; i < data['data'].length; i++ ) {
+				runs.push(data["data"][i]["run_name"]);
+			}
+		});
+
+		$('#run').autocomplete({
+			source: runs,
 		});
 	});
 </script>

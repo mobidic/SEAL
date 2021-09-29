@@ -16,7 +16,8 @@
 				<thead>
 					<tr class="w3-flat-green-sea">
 						<th><div class="w3-padding">Sample Name</div></th>
-						<th><div class="w3-padding">Family ID</div></th>
+						<th><div class="w3-padding">Family</div></th>
+						<th><div class="w3-padding">Run</div></th>
 						<th><div class="w3-padding">Status</div></th>
 					</tr>
 				</thead>
@@ -24,6 +25,7 @@
 					<tr class="w3-flat-green-sea">
 						<th><div class="w3-padding">Sample Name</div></th>
 						<th><div class="w3-padding">Family ID</div></th>
+						<th><div class="w3-padding">Run ID</div></th>
 						<th><div class="w3-padding">Status</div></th>
 					</tr>
 				</tfoot>
@@ -65,6 +67,26 @@
 							response = "";
 							if (data["family"]) {
 								response = data["family"];
+							}
+							status = data["status"];
+							if ( status == 1 ) {
+								return '<div class="w3-padding" style="width:100%">' + response + '</div>';
+							}
+							return '<div class="w3-padding w3-disabled" style="width:100%">' + response + '</div>';
+		                },
+					}
+				},
+		        {
+					"className": 'showTitle no-padding',
+					"data": {
+						"_": "run",
+						"display": function ( data, type, row ) {
+							response = "";
+							if (data["run"]) {
+								response = data["run"];
+								if (data["run_alias"]) {
+									response = response + " <i>(" + data["run_alias"] + ")</i>";
+								}
 							}
 							status = data["status"];
 							if ( status == 1 ) {

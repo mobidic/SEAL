@@ -79,6 +79,9 @@ class Sample(db.Model):
     familyid = db.Column(db.Integer, db.ForeignKey('family.id'))
     family = relationship("Family", back_populates="samples")
 
+    runid = db.Column(db.Integer, db.ForeignKey('run.id'))
+    run = relationship("Run", back_populates="samples")
+
     def __repr__(self):
         return f"Sample('{self.samplename}','{self.status}')"
 
@@ -90,6 +93,16 @@ class Family(db.Model):
 
     def __repr__(self):
         return f"Family('{self.family}')"
+
+
+class Run(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    run_name = db.Column(db.String(50), unique=True, nullable=False)
+    run_alias = db.Column(db.String(50), unique=False, nullable=True)
+    samples = relationship("Sample")
+
+    def __repr__(self):
+        return f"Run('{self.run_name}')"
 
 
 class Variant(db.Model):
