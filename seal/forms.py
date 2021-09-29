@@ -3,7 +3,7 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
-from seal.models import User, Sample
+from seal.models import User, Sample, Run
 from seal import bcrypt
 
 
@@ -102,7 +102,11 @@ class UploadVariantForm(FlaskForm):
     submit = SubmitField('Create New Sample')
 
     def validate_samplename(self, samplename):
-        sample = Sample.query.filter_by(samplename=samplename.data).first()
+        run = Run.query.filter_by(run_name=self.run.data).first()
+        if run:
+            sample = Sample.query.filter_by(samplename=samplename.data, runid=run.id).first()
+        else:
+            sample = Sample.query.filter_by(samplename=samplename.data, runid=None).first()
         if sample:
             raise ValidationError('This Sample Name is already in database!')
 

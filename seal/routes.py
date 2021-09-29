@@ -306,7 +306,11 @@ def create_variant():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
     if "submit" in request.form and uploadSampleForm.validate_on_submit():
-        sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data).first()
+        run = Run.query.filter_by(run_name=uploadSampleForm.run.data).first()
+        if run:
+            sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data, runid=run.id).first()
+        else:
+            sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data, runid=None).first()
         if sample:
             flash("This Sample Name is already in database!", "error")
             return redirect(url_for('index'))
