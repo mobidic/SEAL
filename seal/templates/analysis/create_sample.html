@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block static %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
+	<script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+{% endblock %}
+
 {% block content %}
 	{% include 'includes/sidebar.j2' %}
 	<div class="w3-main" style="margin-left:350px">
