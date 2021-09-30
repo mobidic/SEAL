@@ -180,6 +180,18 @@ def login():
     )
 
 
+def crop_center(pil_img, crop_width, crop_height):
+    img_width, img_height = pil_img.size
+    return pil_img.crop(((img_width - crop_width) // 2,
+                         (img_height - crop_height) // 2,
+                         (img_width + crop_width) // 2,
+                         (img_height + crop_height) // 2))
+
+
+def crop_max_square(pil_img):
+    return crop_center(pil_img, min(pil_img.size), min(pil_img.size))
+
+
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
@@ -188,7 +200,7 @@ def save_picture(form_picture):
 
     output_size = (125, 125)
     i = Image.open(form_picture)
-    i.thumbnail(output_size)
+    i = crop_max_square(i).resize(output_size, Image.LANCZOS)
     i.save(picture_path)
 
     return picture_fn
