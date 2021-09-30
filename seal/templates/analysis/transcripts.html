@@ -44,7 +44,14 @@
 				"loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
 			},
 			scrollX: true,
-    		ajax: '/json/transcripts',
+			"proccessing": true,  "serverSide": true,
+    		ajax: {
+				url: '/json/transcripts',
+				type: 'POST',
+				headers: {
+	                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+			},
     		"columns": [
 				{ "className": 'showTitle control-size-200', "data": "hgncname"},
 		        { "className": 'showTitle control-size-100', "data": "hgncid"},

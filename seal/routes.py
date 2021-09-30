@@ -11,10 +11,10 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Gene
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
-
+from sqlalchemy import or_
 ################################################################################
 # Define global variables
 # TODO: create values in database
@@ -550,11 +550,56 @@ def json_variants(id, version=-1):
     return jsonify(variants)
 
 
-@app.route("/json/transcripts")
+@app.route("/json/transcripts", methods=['GET', 'POST'])
 @login_required
 def json_transcripts():
-    transcripts = db.session.query(Transcript).all()
-    transcripts_json = {"data": list()}
+    key_list = {
+        "asc": [
+            Gene.hgncname.asc(),
+            Gene.hgncid.asc(),
+            Transcript.canonical.asc(),
+            Transcript.refSeq.asc(),
+            Transcript.refProt.asc(),
+            Transcript.uniprot.asc(),
+            Gene.chromosome.asc(),
+            Gene.strand.asc()
+        ],
+        "desc": [
+            Gene.hgncname.desc(),
+            Gene.hgncid.desc(),
+            Transcript.canonical.desc(),
+            Transcript.refSeq.desc(),
+            Transcript.refProt.desc(),
+            Transcript.uniprot.desc(),
+            Gene.chromosome.desc(),
+            Gene.strand.desc()
+        ]
+    }
+    filters = or_(
+        Gene.hgncname.op('~')(request.form['search[value]']),
+        Gene.hgncid.op('~')(request.form['search[value]']),
+        Transcript.refSeq.op('~')(request.form['search[value]']),
+        Transcript.refProt.op('~')(request.form['search[value]']),
+        Transcript.uniprot.op('~')(request.form['search[value]']),
+        Gene.chromosome.op('~')(request.form['search[value]']),
+        Gene.strand.op('~')(request.form['search[value]'])
+    )
+
+    transcripts = db.session.query(Transcript)
+    recordsTotal = db.session.query(Transcript).count()
+    transcripts_filter = transcripts.join(Gene, Transcript.gene).filter(filters)
+    recordsFiltered = transcripts.join(Gene, Transcript.gene).filter(filters).count()
+    transcripts = transcripts_filter.\
+        order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])]).\
+        offset(request.form["start"]).\
+        limit(request.form["length"]).\
+        all()
+    transcripts_json = {
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": list()
+    }
+
     for transcript in transcripts:
         # for transcript in gene.transcripts:
         transcripts_json["data"].append({
