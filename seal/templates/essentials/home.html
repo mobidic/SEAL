@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block static %}
+	{% include 'includes/loading_bar.dt.j2' %}
 	<style>
 		tbody tr:hover {
 			cursor: pointer;
@@ -39,6 +40,9 @@
 
 	$(document).ready(function() {
 	    table = $('#samples').DataTable({
+			"language": {
+				"loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
+			},
 			scrollX: true,
     		ajax: '/json/samples',
     		"columns": [

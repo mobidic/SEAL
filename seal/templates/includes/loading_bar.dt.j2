@@ -1,0 +1,45 @@
+<style>
+	.animation-bar-1 span {
+	    position: relative;
+	    display: inline-block;
+	    vertical-align: middle;
+	    height: 20px;
+	    border-radius: 10px;
+	    overflow: hidden;
+	    background-size: 100%;
+	    background: #f56982 linear-gradient(to bottom, #3498db, #2980b9);
+	    animation: progress-anim-1 5s infinite linear;
+	}
+
+	.animation-bar-1 span:after {
+	    position: absolute;
+	    top: 0;
+	    left: 0;
+	    right: 0;
+	    bottom: 0;
+	    content: "";
+	    background-image: linear-gradient(
+			135deg,
+			#ffffff 25%,
+	        rgba(0, 0, 0, 0) 25%,
+	        rgba(0, 0, 0, 0) 50%,
+	        #ffffff 50%,
+	        #ffffff 75%,
+	        rgba(0, 0, 0, 0) 75%,
+	        rgba(0, 0, 0, 0)
+		);
+
+	    background-size: 30px 30px;
+	    opacity: 0.3;
+	    animation: progress-anim-1-after 0.5s infinite linear;
+	}
+
+	@-webkit-keyframes progress-anim-1-after {
+	    0% {
+	        background-position: 0 100%;
+	    }
+	    100% {
+	        background-position: 30px 100%;
+	    }
+	}
+</style>

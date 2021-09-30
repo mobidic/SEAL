@@ -1,109 +1,66 @@
 {% extends 'base.html' %}
 
 {% block static %}
-<script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
+	{% include 'includes/loading_bar.dt.j2' %}
 
-<style>
-	/* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
-	.DTFC_LeftBodyLiner {
-		overflow-x: hidden;
-	}
-	/* End */
-	.DTFC_LeftFootWrapper {
-		visibility: hidden;
-	}
+	<style>
+		/* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
+		.DTFC_LeftBodyLiner {
+			overflow-x: hidden;
+		}
+		/* End */
+		.DTFC_LeftFootWrapper {
+			visibility: hidden;
+		}
 
-	.v-middle {
-		vertical-align: middle!important;
-	}
+		.v-middle {
+			vertical-align: middle!important;
+		}
 
-	.tableFixHead {
-	    overflow-y: auto;
-	    height: 434.5px;
-	}
-	.tableFixHead thead th {
-	    position: sticky;
-	    top: 0;
-	}
-	/*
-	©Raj Rajhans
-	rajrajhans.com
-	Day #4 : 30 Days CSS
-	*/
+		.tableFixHead {
+		    overflow-y: auto;
+		    height: 434.5px;
+		}
+		.tableFixHead thead th {
+		    position: sticky;
+		    top: 0;
+		}
+		/*
+		©Raj Rajhans
+		rajrajhans.com
+		Day #4 : 30 Days CSS
+		*/
 
-	.animation-bar-1 span {
-	    position: relative;
-	    display: inline-block;
-	    vertical-align: middle;
-	    height: 20px;
-	    border-radius: 10px;
-	    overflow: hidden;
-	    background-size: 100%;
-	    background: #f56982 linear-gradient(to bottom, #3498db, #2980b9);
-	    animation: progress-anim-1 5s infinite linear;
-	}
-
-	.animation-bar-1 span:after {
-	    position: absolute;
-	    top: 0;
-	    left: 0;
-	    right: 0;
-	    bottom: 0;
-	    content: "";
-	    background-image: linear-gradient(
-			135deg,
-			#ffffff 25%,
-	        rgba(0, 0, 0, 0) 25%,
-	        rgba(0, 0, 0, 0) 50%,
-	        #ffffff 50%,
-	        #ffffff 75%,
-	        rgba(0, 0, 0, 0) 75%,
-	        rgba(0, 0, 0, 0)
-		);
-
-	    background-size: 30px 30px;
-	    opacity: 0.3;
-	    animation: progress-anim-1-after 0.5s infinite linear;
-	}
-
-	@-webkit-keyframes progress-anim-1-after {
-	    0% {
-	        background-position: 0 100%;
-	    }
-	    100% {
-	        background-position: 30px 100%;
-	    }
-	}
-	.w3-modal table.dataTable thead th {
-		position: relative;
-		background-image: none !important;
-	}
-	.w3-modal table.dataTable thead .sorting {
-		background-image: none !important;
-	}
-	.w3-modal table.dataTable thead th.sorting:after,
-	.w3-modal table.dataTable thead th.sorting_asc:after,
-	.w3-modal table.dataTable thead th.sorting_desc:after {
-		position: absolute !important;
-		top: 12px !important;
-		right: 8px !important;
-		font-size: 0.8em !important;
-		font-family: 'Font Awesome\ 5 Free' !important;
-	}
-	.w3-modal table.dataTable thead th.sorting:after {
-		content: "\f0dc" !important;
-		opacity:0.5;
-	}
-	.w3-modal table.dataTable thead th.sorting_asc:after {
-		opacity:1;
-		content: "\f0dd" !important;
-	}
-	.w3-modal table.dataTable thead th.sorting_desc:after {
-		opacity:1;
-		content: "\f0de" !important;
-	}
-</style>
-
+		.w3-modal table.dataTable thead th {
+			position: relative;
+			background-image: none !important;
+		}
+		.w3-modal table.dataTable thead .sorting {
+			background-image: none !important;
+		}
+		.w3-modal table.dataTable thead th.sorting:after,
+		.w3-modal table.dataTable thead th.sorting_asc:after,
+		.w3-modal table.dataTable thead th.sorting_desc:after {
+			position: absolute !important;
+			top: 12px !important;
+			right: 8px !important;
+			font-size: 0.8em !important;
+			font-family: 'Font Awesome\ 5 Free' !important;
+		}
+		.w3-modal table.dataTable thead th.sorting:after {
+			content: "\f0dc" !important;
+			opacity:0.5;
+		}
+		.w3-modal table.dataTable thead th.sorting_asc:after {
+			opacity:1;
+			content: "\f0dd" !important;
+		}
+		.w3-modal table.dataTable thead th.sorting_desc:after {
+			opacity:1;
+			content: "\f0de" !important;
+		}
+	</style>
 {% endblock %}
 
 {% block content %}

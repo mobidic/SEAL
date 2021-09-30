@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block static %}
+	{% include 'includes/loading_bar.dt.j2' %}
+{% endblock %}
+
 {% block content %}
 	{% include 'includes/sidebar.j2' %}
 	<div class="w3-main w3-padding" style="margin-left:350px">
@@ -36,6 +40,9 @@
 <script type="text/javascript">
 	$(document).ready(function() {
 	    table = $('#genes').DataTable({
+			"language": {
+				"loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
+			},
 			scrollX: true,
     		ajax: '/json/transcripts',
     		"columns": [
