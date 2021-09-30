@@ -323,6 +323,7 @@ def create_variant():
             "run": uploadSampleForm.run.data,
             "carrier": uploadSampleForm.carrier.data,
             "index": uploadSampleForm.index.data,
+            "interface": True
         }
         add_vcf(info, uploadSampleForm.vcf_file.data)
 

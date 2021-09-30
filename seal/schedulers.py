@@ -35,6 +35,9 @@ def importvcf():
             data = json.load(tf)
             samplename = data['samplename']
             vcf_path = data['vcf_path']
+            interface = False
+            if "interface" in data and data["interface"] == True:
+                interface = True
 
             # Add family in database if necessary
             familyid = None
@@ -171,7 +174,8 @@ def importvcf():
         else:
             sample.status = 1
             os.remove(current_fn)
-            os.remove(vcf_fn)
+            if interface:
+                os.remove(vcf_fn)
             os.remove(vcf_vep)
             os.remove(stats_vep)
         finally:
