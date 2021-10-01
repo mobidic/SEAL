@@ -384,21 +384,46 @@ def json_runs():
 @app.route("/json/samples", methods=['GET', 'POST'])
 @login_required
 def json_samples():
-    samples = db.session.query(Sample.id, Sample.samplename, Sample.status, Sample.familyid, Sample.runid).all()
-    samples_json = {"data": list()}
+    key_list = {
+        "asc": [
+            Sample.samplename.asc(),
+            Family.family.asc(),
+            Run.run_name.asc(),
+            Sample.status.asc()
+        ],
+        "desc": [
+            Sample.samplename.desc(),
+            Family.family.desc(),
+            Run.run_name.desc(),
+            Sample.status.desc()
+        ]
+    }
+    filters = or_(
+        Sample.samplename.op('~')(request.form['search[value]']),
+    )
+
+    samples = db.session.query(Sample)
+    recordsTotal = samples.count()
+    samples_filter = samples.outerjoin(Family, Sample.family).outerjoin(Run, Sample.run).filter(filters)
+    recordsFiltered = samples_filter.count()
+    samples = samples_filter.\
+        order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])]).\
+        offset(request.form["start"]).\
+        limit(request.form["length"]).\
+        all()
+    samples_json = {
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": list()
+    }
+
     for sample in samples:
-        family = None
-        if sample.familyid is not None:
-            family = Family.query.get(sample.familyid)
-        run = None
-        if sample.runid is not None:
-            run = Run.query.get(sample.runid)
         samples_json["data"].append({
             "id": sample.id,
             "samplename": sample.samplename,
-            "family": family.family if family else None,
-            "run": run.run_name if run else None,
-            "run_alias": run.run_alias if run else None,
+            "family": sample.family.family if sample.familyid else None,
+            "run": sample.run.run_name if sample.runid else None,
+            "run_alias": sample.run.run_alias if sample.runid else None,
             "status": sample.status
         })
     return jsonify(samples_json)

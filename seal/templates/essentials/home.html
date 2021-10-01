@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block static %}
-	{% include 'includes/loading_bar.dt.j2' %}
 	<style>
 		tbody tr:hover {
 			cursor: pointer;
@@ -16,18 +15,18 @@
 			<table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
 				<thead>
 					<tr class="w3-flat-green-sea">
-						<th><div class="w3-padding">Sample Name</div></th>
-						<th><div class="w3-padding">Family</div></th>
-						<th><div class="w3-padding">Run</div></th>
-						<th><div class="w3-padding">Status</div></th>
+						<th><div>Sample Name</div></th>
+						<th><div>Family</div></th>
+						<th><div>Run</div></th>
+						<th><div>Status</div></th>
 					</tr>
 				</thead>
 				<tfoot>
 					<tr class="w3-flat-green-sea">
-						<th><div class="w3-padding">Sample Name</div></th>
-						<th><div class="w3-padding">Family</div></th>
-						<th><div class="w3-padding">Run</div></th>
-						<th><div class="w3-padding">Status</div></th>
+						<th><div>Sample Name</div></th>
+						<th><div>Family</div></th>
+						<th><div>Run</div></th>
+						<th><div>Status</div></th>
 					</tr>
 				</tfoot>
 			</table>
@@ -40,89 +39,46 @@
 
 	$(document).ready(function() {
 	    table = $('#samples').DataTable({
-			"language": {
-				"loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
-			},
 			scrollX: true,
-    		ajax: '/json/samples',
+			"proccessing": true,  "serverSide": true,
+    		ajax: {
+				url: '/json/samples',
+				type: 'POST',
+				headers: {
+	                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+			},
     		"columns": [
+				{ "className": 'showTitle', "data": "samplename" },
+		        { "className": 'showTitle', "data": "family" },
+				{ "className": 'showTitle', "data": "run" },
 				{
-					"className": 'showTitle no-padding',
-					"data": {
-						"_": "samplename",
-						"display": function ( data, type, row ) {
-							response = "";
-							if (data["samplename"]) {
-								response = data["samplename"];
-							}
-							status = data["status"];
-							if ( status == 1 ) {
-								return '<div class="w3-padding" style="width:100%">' + response + '</div>';
-							}
-							return '<div class="w3-padding w3-disabled" style="width:100%">' + response + '</div>';
-		                },
-					}
-				},
-		        {
-					"className": 'showTitle no-padding',
-					"data": {
-						"_": "family",
-						"display": function ( data, type, row ) {
-							response = "";
-							if (data["family"]) {
-								response = data["family"];
-							}
-							status = data["status"];
-							if ( status == 1 ) {
-								return '<div class="w3-padding" style="width:100%">' + response + '</div>';
-							}
-							return '<div class="w3-padding w3-disabled" style="width:100%">' + response + '</div>';
-		                },
-					}
-				},
-		        {
-					"className": 'showTitle no-padding',
-					"data": {
-						"_": "run",
-						"display": function ( data, type, row ) {
-							response = "";
-							if (data["run"]) {
-								response = data["run"];
-								if (data["run_alias"]) {
-									response = response + " <i>(" + data["run_alias"] + ")</i>";
-								}
-							}
-							status = data["status"];
-							if ( status == 1 ) {
-								return '<div class="w3-padding" style="width:100%">' + response + '</div>';
-							}
-							return '<div class="w3-padding w3-disabled" style="width:100%">' + response + '</div>';
-		                },
-					}
-				},
-		        {
-					"className": 'showTitle no-padding w3-center control-size-100',
+					"className": 'showTitle',
 					"data": {
 						"_": "status",
 						"display": function ( data, type, row ) {
-							status = data["status"];
-							if (status == -1) {
-								response = '<i title="Error" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
-							} else if (status == '0') {
-								response = '<i title="In Proceedings" class="w3-text-flat-peter-river fa-spin fas fa-circle-notch"></i>';
-							} else if (status == 1) {
-								response = '<i title="Valid" class="w3-text-flat-emerald fas fa-check-circle"></i>';
-							} else {
-								response = '<i title="Warning" class="w3-text-flat-orange fas fa-exclamation-triangle"></i>';
+							response = "";
+							if(data) {
+								if (data.status == -1) {
+									response = '<i title="Error" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
+								} else if (data.status == 1) {
+									response = '<i title="Valid" class="w3-text-flat-emerald fas fa-check-circle"></i>';
+								} else if (data.status == 2) {
+									response = '<i title="In Proceedings" class="w3-text-flat-peter-river fa-spin fas fa-circle-notch"></i>';
+								} else {
+									response = '<i title="Warning" class="w3-text-flat-orange fas fa-exclamation-triangle"></i>';
+								}
 							}
-							if ( status == 1 ) {
-								return '<div class="w3-padding" style="width:100%">' + response + '</div>';
-							}
-							return '<div class="w3-padding w3-disabled" style="width:100%">' + response + '</div>';
+							return response;
 		                },
 					}
 				}
-			]
+			],
+			"createdRow": function( row, data, dataIndex ) {
+			    if ( data.status != 1 ) {
+					$(row).addClass( 'w3-disabled' );
+			    }
+			  }
 		});
 
 		$('#samples tbody').on( 'click', 'tr', function () {
