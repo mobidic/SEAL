@@ -598,9 +598,9 @@ def json_transcripts():
     )
 
     transcripts = db.session.query(Transcript)
-    recordsTotal = db.session.query(Transcript).count()
+    recordsTotal = transcripts.count()
     transcripts_filter = transcripts.join(Gene, Transcript.gene).filter(filters)
-    recordsFiltered = transcripts.join(Gene, Transcript.gene).filter(filters).count()
+    recordsFiltered = transcripts_filter.count()
     transcripts = transcripts_filter.\
         order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])]).\
         offset(request.form["start"]).\
