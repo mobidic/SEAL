@@ -77,7 +77,7 @@
 						<option value="{{ filter.id }}">{{filter.filtername}}</option>
 					{% endfor %}
 				</select>
-				<!-- <button class="w3-button w3-flat-green-sea w3-hover-flat-turquoise w3-ripple" onclick="save_filters()">Save filters</button> -->
+				<button class="w3-button w3-flat-green-sea w3-hover-flat-turquoise w3-ripple" onclick="save_filters()">Save filters</button>
 			</div>
 			<div class="w3-padding">
 				<table id="variants" class="w3-table-all" style="width:100%">
@@ -634,7 +634,7 @@
 							return data;
 						},
 						"display": function ( data, type, row ) {
-							response = '<i onclick="openDetailsVariantModal(\'' + data + '\')" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
+							response = '<i onclick="openDetailsVariantModal(\'' + data + '\',{% if sample.familyid %}{{ sample.familyid }}{% else %}null{% endif %})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
 							return response;
 		                },
 					},
@@ -722,7 +722,7 @@
 				{ "className": 'showTitle control-size-100', "data": "allelic_frequency"},
 				{
 					"className": 'showTitle control-size-100',
-					"data": "annotations.GnomADg_max",
+					"data": "annotations.gnomadMax",
 					"render" : {
 						"_" : function ( data, type, row, meta ) {
 							if(data != null) {
@@ -865,7 +865,7 @@
 				},
 				{
 					"className": 'showTitle size-100',
-					"data": "annotations.MESvar",
+					"data": "annotations.MES_var",
 					"render": {
 						"_": function ( data, type, row, meta ) {
 							if (data == null){
@@ -888,7 +888,7 @@
 				},
 				{
 					"className": 'showTitle size-125',
-					"data": "annotations.maxSpliceAI_DS",
+					"data": "annotations.spliceAI",
 					"render": {
 						"_": function ( data, type, row, meta ) {
 							if (data == null){
@@ -915,7 +915,7 @@
 				},
 				{
 					"className": 'showTitle size-100',
-					"data": "annotations.missenseMean",
+					"data": "annotations.missensesMean",
 					"render": {
 						"_" : function ( data, type, row, meta ) {
 							if(data != null) {
@@ -1047,13 +1047,20 @@
 		document.getElementById('help-modal').style.display='block'
 	}
 	const missenseScores = []
-	function openDetailsVariantModal(id) {
-		$.getJSON("/json/variant/" + id, function(data) {
+	function openDetailsVariantModal(id, familyid) {
+		if (familyid) {
+			request = "/json/variant/" + id +"/family/" + familyid;
+		} else {
+			request = "/json/variant/" + id;
+		}
+		$.getJSON(request, function(data) {
 		    allFeature = '<div class="tableFixHead">';
 			allFeature = allFeature + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			allFeature = allFeature + '<thead class="w3-flat-silver"><tr>'+
 		        '<th class="w3-flat-silver control-size-100" >Gene</th>'+
 				'<th class="w3-flat-silver control-size-200">Transcript</th>'+
+				'<th class="w3-flat-silver control-size-150">Biotype</th>'+
+				'<th class="w3-flat-silver control-size-100">Canonical</th>'+
 		        '<th class="w3-flat-silver control-size-150" title="Exon-Intron">Ex-In</th>'+
 		        '<th class="w3-flat-silver control-size-300" >HGVSc</th>'+
 		        '<th class="w3-flat-silver control-size-300" >HGVSp</th>'+
@@ -1161,9 +1168,16 @@
 						cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
 					}
 				}
+				if (data["annotations"]["ANN"][x]["canonical"]) {
+					response = '<i title="CANONICAL" class="w3-text-flat-peter-river fas fa-star"></i>';
+				} else {
+					response = '<i title="" class="w3-text-flat-peter-river far fa-star"></i>';
+				}
 				allFeature = allFeature + '<tr>'+
 					'<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+
 		            '<td class="w3-text-black showTitle control-size-200" >'+data["annotations"]["ANN"][x]["Feature"]+'</td>'+
+					'<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["BIOTYPE"]+'</td>'+
+					'<td class="w3-text-black showTitle control-size-100 w3-center" >'+response+'</td>'+
 		            '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["EI"]+'</td>'+
 					'<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSc"]+'</td>'+
 		            '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSp"]+'</td>'+
@@ -1223,6 +1237,7 @@
 			inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
 				'<th class="w3-flat-silver control-size-100">Sample</th>'+
 				'<th class="w3-flat-silver control-size-100">Family</th>'+
+				'<th class="w3-flat-silver control-size-100">same</th>'+
 				'<th class="w3-flat-silver control-size-75 w3-center">Carrier</th>'+
 				'<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
 				'<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
@@ -1243,9 +1258,15 @@
 				} else {
 					carrier = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-user-times"></i>'
 				}
+				if (data["samples"][x]["same_family"]) {
+					family = '<i title="True" class="w3-text-flat-emerald fas fa-check-circle"></i>';
+				} else {
+					family = '<i title="False" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
+				}
 				inSeal = inSeal + '<tr>'+
 					'<td class="control-size-100">' + data["samples"][x]["samplename"] + '</td>'+
 					'<td class="control-size-100">' + data["samples"][x]["family"] + '</td>'+
+					'<td class="control-size-100">' + family+ '</td>'+
 					'<td class="control-size-75 w3-center">' + carrier + '</td>'+
 					'<td class="control-size-75 w3-center">' + data["samples"][x]["depth"] + '</td>'+
 					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_depth"] + '</td>'+

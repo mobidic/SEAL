@@ -1,11 +1,91 @@
 import os
 import json
+import numpy
 import datetime
 from seal import app, scheduler, db
 from seal.models import Sample, Variant, Family, Var2Sample, Run
 from anacore import annotVcf
 import shlex
 import subprocess
+
+
+CONSEQUENCES_DICT = {
+    "stop_gained": 20,
+    "stop_lost": 20,
+    "splice_acceptor_variant": 10,
+    "splice_donor_variant": 10,
+    "frameshift_variant": 10,
+    "transcript_ablation": 10,
+    "start_lost": 10,
+    "transcript_amplification": 10,
+    "missense_variant": 10,
+    "protein_altering_variant": 10,
+    "splice_region_variant": 10,
+    "inframe_insertion": 10,
+    "inframe_deletion": 10,
+    "incomplete_terminal_codon_variant": 10,
+    "stop_retained_variant": 10,
+    "start_retained_variant": 10,
+    "synonymous_variant": 10,
+    "coding_sequence_variant": 10,
+    "mature_miRNA_variant": 10,
+    "intron_variant": 10,
+    "NMD_transcript_variant": 10,
+    "non_coding_transcript_exon_variant": 5,
+    "non_coding_transcript_variant": 5,
+    "3_prime_UTR_variant": 2,
+    "5_prime_UTR_variant": 2,
+    "upstream_gene_variant": 0,
+    "downstream_gene_variant": 0,
+    "TFBS_ablation": 0,
+    "TFBS_amplification": 0,
+    "TF_binding_site_variant": 0,
+    "regulatory_region_ablation": 0,
+    "regulatory_region_amplification": 0,
+    "regulatory_region_variant": 0,
+    "feature_elongation": 0,
+    "feature_truncation": 0,
+    "intergenic_variant": 0
+}
+GNOMADG = [
+    "gnomADg_AF_AFR",
+    "gnomADg_AF_AMR",
+    "gnomADg_AF_ASJ",
+    "gnomADg_AF_EAS",
+    "gnomADg_AF_FIN",
+    "gnomADg_AF_NFE",
+    "gnomADg_AF_OTH"
+]
+ANNOT_TO_SPLIT = [
+    "Existing_variation",
+    "Consequence",
+    "CLIN_SIG",
+    "SOMATIC",
+    "PHENO",
+    "PUBMED",
+    "TRANSCRIPTION_FACTORS",
+    "VAR_SYNONYMS",
+    "DOMAINS",
+    "FLAGS"
+]
+MISSENSES = [
+    "CADD_raw_rankscore_hg19",
+    "VEST4_rankscore",
+    "MetaSVM_rankscore",
+    "MetaLR_rankscore",
+    "Eigen-raw_coding_rankscore",
+    "Eigen-PC-raw_coding_rankscore",
+    "REVEL_rankscore",
+    "BayesDel_addAF_rankscore",
+    "BayesDel_noAF_rankscore",
+    "ClinPred_rankscore"
+]
+SPLICEAI = [
+    "SpliceAI_pred_DS_AG",
+    "SpliceAI_pred_DS_AL",
+    "SpliceAI_pred_DS_DG",
+    "SpliceAI_pred_DS_DL"
+]
 
 
 # cron examples
@@ -36,7 +116,7 @@ def importvcf():
             samplename = data['samplename']
             vcf_path = data['vcf_path']
             interface = False
-            if "interface" in data and data["interface"] == True:
+            if "interface" in data and data["interface"] is True:
                 interface = True
 
             # Add family in database if necessary
@@ -77,8 +157,9 @@ def importvcf():
         current_date = datetime.datetime.now().isoformat()
 
         vcf_fn = os.path.join(vcf_path)
-        vcf_vep = os.path.join(os.path.basename(f"{os.path.splitext(vcf_path)[0]}.vep.vcf"))
-        stats_vep = os.path.join(os.path.basename(f"{os.path.splitext(vcf_path)[0]}.vep.html"))
+        baseout = os.path.basename(os.path.splitext(vcf_path)[0])
+        vcf_vep = os.path.join(app.root_path, "static/temp/vcf/", f"{baseout}.vep.vcf")
+        stats_vep = os.path.join(app.root_path, "static/temp/vcf/", f"{baseout}.vep.html")
         vep_cmd = "vep " + \
             f" --input_file {vcf_fn} " + \
             f" --output_file {vcf_vep} " + \
@@ -149,15 +230,65 @@ def importvcf():
                     if not variant:
                         annotations = [{
                             "date": current_date,
-                            "ANN": dict()
+                            "ANN": list()
                         }]
 
                         for annot in v.info["ANN"]:
-                            try:
-                                wout_version = annot["Feature"].split('.')[0]
-                            except AttributeError:
-                                wout_version = "intergenic"
-                            annotations[-1]["ANN"][wout_version] = annot
+                            # Split annotations
+                            for splitAnn in ANNOT_TO_SPLIT:
+                                try:
+                                    annot[splitAnn] = annot[splitAnn].split("&")
+                                except AttributeError:
+                                    annot[splitAnn] = []
+
+                            # Get consequence score
+                            consequence_score = 0
+                            for consequence in annot["Consequence"]:
+                                consequence_score += CONSEQUENCES_DICT[consequence]
+                            annot["consequenceScore"] = consequence_score
+
+                            # Get Exon/Intron
+                            annot["EI"] = None
+                            if annot["EXON"] is not None:
+                                annot["EI"] = f"Exon {annot['EXON']}"
+                            if annot["INTRON"] is not None:
+                                annot["EI"] = f"Intron {annot['INTRON']}"
+
+                            # Get Exon/Intron
+                            annot["canonical"] = True if annot['CANONICAL'] == 'YES' else False
+
+                            # missense
+                            missenses = list()
+                            for value in MISSENSES:
+                                missenses.append(annot[value])
+                            missenses = numpy.array(missenses, dtype=numpy.float64)
+                            mean = numpy.nanmean(missenses)
+                            annot["missensesMean"] = None if numpy.isnan(mean) else mean
+
+                            # max gnomad
+                            gnomad = list()
+                            for value in GNOMADG:
+                                gno = None if annot[value] == "." else annot[value]
+                                gnomad.append(gno)
+                            gnomad = numpy.array(gnomad, dtype=numpy.float64)
+                            max = numpy.nanmax(gnomad)
+                            annot["gnomadMax"] = None if numpy.isnan(max) else max
+
+                            # max spliceAI
+                            spliceAI = list()
+                            for value in SPLICEAI:
+                                spliceAI.append(annot[value])
+                            spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
+                            max = numpy.nanmax(spliceAI)
+                            annot["spliceAI"] = None if numpy.isnan(max) else max
+
+                            # max MaxEntScan
+                            annot["MES_var"] = None
+                            if annot["MaxEntScan_alt"] is not None and annot["MaxEntScan_ref"] is not None:
+                                annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
+
+                            annotations[-1]["ANN"].append(annot)
+
                         # app.logger.debug(f"       - Create Variant : {sample}")
                         variant = Variant(id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", chr=v.chrom, pos=v.pos, ref=v.ref, alt=v.alt[0], annotations=annotations)
                         db.session.add(variant)

@@ -14,7 +14,7 @@ from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadV
 from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Gene
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 ################################################################################
 # Define global variables
 # TODO: create values in database
@@ -278,7 +278,7 @@ def transcripts():
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
-    sample = db.session.query(Sample.samplename, Sample.id).filter(Sample.id == id).first()
+    sample = db.session.query(Sample.samplename, Sample.id, Sample.familyid).filter(Sample.id == id).first()
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
@@ -400,6 +400,8 @@ def json_samples():
     }
     filters = or_(
         Sample.samplename.op('~')(request.form['search[value]']),
+        Family.family.op('~')(request.form['search[value]']),
+        Run.run_name.op('~')(request.form['search[value]'])
     )
 
     samples = db.session.query(Sample)
@@ -448,128 +450,79 @@ def json_variants(id, version=-1):
 
     ##################################################
 
-    for var2sample in sample.variants:
-        annotations = var2sample.variant.annotations[version]["ANN"]
-        features = list(annotations.keys())
-        feature = None
-        consequence_score_max = 0
-        consequence_score_max_nc = 0
+    var2samples = db.session.query(Var2Sample).filter(Var2Sample.sample_ID == int(id))
+    for var2sample in var2samples:
+        variant = db.session.query(Variant).filter(Variant.id == var2sample.variant_ID).first()
+        annotations = variant.annotations
+        main_annot = None
+        consequence_score = -999
         canonical = False
-        for value in features:
-            # Split annotations
-            for splitAnn in ANNOT_TO_SPLIT:
-                try:
-                    annotations[value][splitAnn] = annotations[value][splitAnn].split("&")
-                except AttributeError:
-                    annotations[value][splitAnn] = []
+        refseq = False
+        protein_coding = False
 
-            # Get consequence score
-            consequence_score = 0
-            for consequence in annotations[value]["Consequence"]:
-                consequence_score += CONSEQUENCES_DICT[consequence]
+        for annot in annotations[version]["ANN"]:
+            current_consequence_score = annot['consequenceScore']
+            current_canonical = annot['canonical']
+            current_refseq = True if annot['SOURCE'] == 'RefSeq' else False
+            current_protein_coding = True if annot['BIOTYPE'] == 'protein_coding' else False
 
-            # Calcul position into the gene (Exons or Intron)
-            if annotations[value]["EXON"] is not None:
-                pos = annotations[value]["EXON"]
-                annotations[value]["EI"] = f"Exon {pos}"
-            elif annotations[value]["INTRON"] is not None:
-                pos = annotations[value]["INTRON"]
-                annotations[value]["EI"] = f"Intron {pos}"
-            else:
-                annotations[value]["EI"] = None
-
-            # Calcul GnomAD AF for all population and get the max
-            gnomadg_max = None
-            gnomadg_max_pop = "ALL"
-            for gnomADg_key in GNOMADG:
-                try:
-                    annotations[value][gnomADg_key] = float(annotations[value][gnomADg_key])
-                except ValueError:
-                    annotations[value][gnomADg_key] = 0
-                except TypeError:
-                    annotations[value][gnomADg_key] = None
-
-                if annotations[value][gnomADg_key] is not None:
-                    if gnomadg_max is None or annotations[value][gnomADg_key] > gnomadg_max:
-                        gnomadg_max = annotations[value][gnomADg_key]
-                        gnomadg_max_pop = gnomADg_key
-            annotations[value]["GnomADg_max"] = gnomadg_max
-            annotations[value]["GnomADg_max_pop"] = gnomadg_max_pop
-
-            # Get the canonical transcript with max consequences or
-            # random NM or another one...
-            annotations[value]["canonical"] = False
-            if feature is None:
-                feature = value
-            elif value in transcripts:
-                if consequence_score >= consequence_score_max:
-                    feature = value
-                    consequence_score_max = consequence_score
-                    annotations[feature]["canonical"] = True
-                    canonical = True
-            elif re.search("NM_", value) and not canonical:
-                if consequence_score >= consequence_score_max_nc:
-                    feature = value
-                    consequence_score_max_nc = consequence_score
-
-            # Calcul missenses scores
-            missenseScores = list()
-            for missense in MISSENSES:
-                if annotations[feature][missense] is not None:
-                    missenseScores.append(float(annotations[feature][missense]))
-            mean = numpy.mean(missenseScores)
-            if numpy.isnan(mean):
-                annotations[feature]["missenseMean"] = None
-            else:
-                annotations[feature]["missenseMean"] = mean
-
-            # Get Max spliceAI
-            maxSpliceAI_DS = None
-            maxSpliceAI_DP = None
-            maxSpliceAI_type = None
-            for type in SPLICEAI:
-                key_DS = f"SpliceAI_pred_DS_{type}"
-                key_DP = f"SpliceAI_pred_DP_{type}"
-                score = annotations[feature][key_DS]
-                pos = annotations[feature][key_DP]
-                if score is None:
+            if refseq == current_refseq:
+                if current_protein_coding and not protein_coding:
+                    canonical = current_canonical
+                    consequence_score = current_consequence_score
+                    refseq = current_refseq
+                    main_annot = annot
                     continue
-                if maxSpliceAI_DS is None or score > maxSpliceAI_DS:
-                    maxSpliceAI_DS = score
-                    maxSpliceAI_DP = pos
-                    maxSpliceAI_type = type
-            annotations[feature]["maxSpliceAI_DS"] = maxSpliceAI_DS
-            annotations[feature]["maxSpliceAI_DP"] = maxSpliceAI_DP
-            annotations[feature]["maxSpliceAI_type"] = maxSpliceAI_type
+                if protein_coding and not current_protein_coding:
+                    continue
+                if canonical and not current_canonical:
+                    continue
+                if not canonical and current_canonical:
+                    canonical = current_canonical
+                    consequence_score = current_consequence_score
+                    refseq = current_refseq
+                    main_annot = annot
+                    continue
+                if current_consequence_score > consequence_score:
+                    canonical = current_canonical
+                    consequence_score = current_consequence_score
+                    refseq = current_refseq
+                    main_annot = annot
+                    continue
+                continue
 
-            # Calc MaxEntScan
-            annotations[value]["MESvar"] = None
-            if annotations[value]["MaxEntScan_alt"] is not None:
-                MESvar = -100 + (float(annotations[value]["MaxEntScan_alt"]) * 100) / float(annotations[value]["MaxEntScan_ref"])
-                annotations[value]["MESvar"] = MESvar
+            if current_refseq:
+                canonical = current_canonical
+                consequence_score = current_consequence_score
+                refseq = current_refseq
+                main_annot = annot
+                protein_coding = current_protein_coding
+                continue
 
-        occurrences = 0
-        for sam in var2sample.variant.samples:
-            if sam.sample.status == 1:
-                occurrences += 1
-        occurences_family = 0
+            if main_annot is None:
+                canonical = current_canonical
+                consequence_score = current_consequence_score
+                refseq = current_refseq
+                protein_coding = current_protein_coding
+                main_annot = annot
+                continue
+
+        cnt = 0
+        cnt = db.session.query(Var2Sample).filter(Var2Sample.variant_ID == var2sample.variant_ID).count()
+
+        cnt_family = 0
         members = []
-        for sam in var2sample.variant.samples:
-            if sam.sample.familyid is not None and \
-               sam.sample.familyid == sample.familyid and \
-               sam.sample.id != sample.id and \
-               sam.sample.status == 1:
-                occurences_family += 1
-                members.append(sam.sample.samplename)
+        cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status == 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
+
         variants["data"].append({
-            "annotations": annotations[feature],
-            "chr": f"{var2sample.variant.chr}",
-            "id": f"{var2sample.variant.id}",
-            "pos": f"{var2sample.variant.pos}",
-            "ref": f"{var2sample.variant.ref}",
-            "alt": f"{var2sample.variant.alt}",
+            "annotations": main_annot,
+            "chr": f"{variant.chr}",
+            "id": f"{variant.id}",
+            "pos": f"{variant.pos}",
+            "ref": f"{variant.ref}",
+            "alt": f"{variant.alt}",
             "depth": f"{var2sample.depth}",
             "analyse1": var2sample.analyse1,
             "analyse2": var2sample.analyse2,
@@ -577,9 +530,9 @@ def json_variants(id, version=-1):
             "allelic_depth": f"{var2sample.allelic_depth}",
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
-                "occurrences": occurrences,
+                "occurrences": cnt,
                 "total_samples": total_samples,
-                "occurences_family": occurences_family,
+                "occurences_family": cnt_family,
                 "members": members
             }
         })
@@ -665,27 +618,25 @@ def json_filter(id=1):
 
 @app.route("/json/variant/<string:id>")
 @app.route("/json/variant/<string:id>/version/<int:version>")
+@app.route("/json/variant/<string:id>/family/<int:family>")
+@app.route("/json/variant/<string:id>/family/<int:family>/version/<int:version>")
 @login_required
-def json_variant(id, version=-1):
+def json_variant(id, version=-1, family=None):
     variant = Variant.query.get(id)
-
-    for key in variant.annotations[version]["ANN"]:
-        variant.annotations[version]["ANN"][key]["EI"] = None
-        if variant.annotations[version]["ANN"][key]["EXON"] is not None:
-            pos = variant.annotations[version]["ANN"][key]["EXON"]
-            variant.annotations[version]["ANN"][key]["EI"] = f"Exon {pos}"
-        elif variant.annotations[version]["ANN"][key]["INTRON"] is not None:
-            pos = variant.annotations[version]["ANN"][key]["INTRON"]
-            variant.annotations[version]["ANN"][key]["EI"] = f"Intron {pos}"
 
     samples = list()
     for v2s in variant.samples:
+        same_family = False
         if v2s.sample.status == 1:
+            if family is not None and v2s.sample.family:
+                if v2s.sample.familyid == family:
+                    same_family = True
             allelic_frequency = v2s.allelic_depth / v2s.depth
             samples.append({
                 "samplename": v2s.sample.samplename,
                 "carrier": v2s.sample.carrier,
                 "family": v2s.sample.family.family if v2s.sample.family else "",
+                "same_family": same_family,
                 "depth": v2s.depth,
                 "allelic_depth": v2s.allelic_depth,
                 "allelic_frequency": f"{allelic_frequency:.4f}",
