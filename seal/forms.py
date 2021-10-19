@@ -120,4 +120,17 @@ class AddCommentForm(FlaskForm):
     submit = SubmitField('Add A Comment')
 
 
+class SaveFilterForm(FlaskForm):
+    filterName = StringField(
+        'Filter Name',
+        validators=[DataRequired(), Length(min=2, max=20)]
+    )
+    filterText = TextAreaField(
+        'Filters',
+        validators=[DataRequired()]
+    )
+
+    submit = SubmitField('Add A New Filter')
+
+
 ################################################################################
