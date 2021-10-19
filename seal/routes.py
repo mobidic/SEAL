@@ -2,15 +2,13 @@ import os
 import secrets
 import json
 import itertools
-import re
-import numpy
 import urllib
 import functools
 from datetime import datetime
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm, SaveFilterForm
 from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Gene
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
@@ -285,12 +283,14 @@ def sample(id):
 
     filters = Filter.query.all()
     commentForm = AddCommentForm()
+    saveFilterForm = SaveFilterForm()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
         filters=filters,
-        form=commentForm
+        form=commentForm,
+        saveFilterForm=saveFilterForm
     )
 
 
@@ -616,6 +616,20 @@ def json_filter(id=1):
     return jsonify(filter.filter)
 
 
+@app.route("/json/filters")
+@login_required
+def json_filters():
+    filters = Filter.query.all()
+    if not filters:
+        flash(f"Error filter not found! Please contact your administrator! (id - {id})", category="error")
+        return redirect(url_for('index'))
+
+    filter = dict()
+    for f in filters:
+        filter[f.id] = f.filtername
+    return jsonify(filter)
+
+
 @app.route("/json/variant/<string:id>")
 @app.route("/json/variant/<string:id>/version/<int:version>")
 @app.route("/json/variant/<string:id>/family/<int:family>")
@@ -696,6 +710,18 @@ def toggle_varStatus():
 def add_comment():
     comment = Comment(comment=urllib.parse.unquote(request.form["comment"]), variantid=request.form["id_var"], date=datetime.now(), userid=current_user.id)
     db.session.add(comment)
+    db.session.commit()
+    return 'ok'
+
+
+@app.route("/add/filter", methods=['POST'])
+@login_required
+def add_filter():
+    filter = Filter(
+        filtername=urllib.parse.unquote(request.form["name"]),
+        filter=json.loads(request.form["filter"])
+    )
+    db.session.add(filter)
     db.session.commit()
     return 'ok'
 
