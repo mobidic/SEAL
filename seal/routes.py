@@ -394,7 +394,7 @@ def json_samples():
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.run_name.desc(),
-            Run.run_alias.asc(),
+            Run.run_alias.desc(),
             Sample.status.desc()
         ]
     }
