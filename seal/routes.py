@@ -387,19 +387,22 @@ def json_samples():
             Sample.samplename.asc(),
             Family.family.asc(),
             Run.run_name.asc(),
+            Run.run_alias.asc(),
             Sample.status.asc()
         ],
         "desc": [
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.run_name.desc(),
+            Run.run_alias.asc(),
             Sample.status.desc()
         ]
     }
     filters = or_(
         Sample.samplename.op('~')(request.form['search[value]']),
         Family.family.op('~')(request.form['search[value]']),
-        Run.run_name.op('~')(request.form['search[value]'])
+        Run.run_name.op('~')(request.form['search[value]']),
+        Run.run_alias.op('~')(request.form['search[value]'])
     )
 
     samples = db.session.query(Sample)
