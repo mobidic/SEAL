@@ -4,10 +4,10 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#dt/jq-3.3.1/dt-1.11.0/b-2.0.0/fc-3.3.3/fh-3.1.9/sb-1.2.0
+ *   https://datatables.net/download/#dt/jq-3.6.0/dt-1.11.3/b-2.0.1/fc-4.0.0/fh-3.2.0/sb-1.2.2
  *
  * Included libraries:
- *   jQuery 3 3.3.1, DataTables 1.11.0, Buttons 2.0.0, FixedColumns 3.3.3, FixedHeader 3.1.9, SearchBuilder 1.2.0
+ *   jQuery 3 3.6.0, DataTables 1.11.3, Buttons 2.0.1, FixedColumns 4.0.0, FixedHeader 3.2.0, SearchBuilder 1.2.2
  */
 
 td.dt-control {
@@ -136,19 +136,19 @@ table.dataTable thead .sorting_desc_disabled {
   background-position: center right;
 }
 table.dataTable thead .sorting {
-  background-image: url("DataTables-1.11.0/images/sort_both.png");
+  background-image: url("DataTables-1.11.3/images/sort_both.png");
 }
 table.dataTable thead .sorting_asc {
-  background-image: url("DataTables-1.11.0/images/sort_asc.png") !important;
+  background-image: url("DataTables-1.11.3/images/sort_asc.png") !important;
 }
 table.dataTable thead .sorting_desc {
-  background-image: url("DataTables-1.11.0/images/sort_desc.png") !important;
+  background-image: url("DataTables-1.11.3/images/sort_desc.png") !important;
 }
 table.dataTable thead .sorting_asc_disabled {
-  background-image: url("DataTables-1.11.0/images/sort_asc_disabled.png");
+  background-image: url("DataTables-1.11.3/images/sort_asc_disabled.png");
 }
 table.dataTable thead .sorting_desc_disabled {
-  background-image: url("DataTables-1.11.0/images/sort_desc_disabled.png");
+  background-image: url("DataTables-1.11.3/images/sort_desc_disabled.png");
 }
 table.dataTable tbody tr {
   background-color: #ffffff;
@@ -943,32 +943,44 @@ button.dt-btn-split-drop-button:hover {
 }
 
 
-table.DTFC_Cloned thead,
-table.DTFC_Cloned tfoot {
-  background-color: white;
-}
-
-div.DTFC_Blocker {
-  background-color: white;
-}
-
-div.DTFC_LeftWrapper table.dataTable,
-div.DTFC_RightWrapper table.dataTable {
-  margin-bottom: 0;
-  z-index: 2;
-}
-div.DTFC_LeftWrapper table.dataTable.no-footer,
-div.DTFC_RightWrapper table.dataTable.no-footer {
-  border-bottom: none;
-}
-
 table.dataTable.display tbody tr.DTFC_NoData {
   background-color: transparent;
 }
 
+tr.even td {
+  background-color: #ffffff;
+}
+
+tr.odd td {
+  background-color: #f9f9f9;
+}
+
+tr.selected td {
+  background-color: #a6b4cd;
+}
+
+thead th {
+  background-color: white;
+}
+
+tfoot th {
+  background-color: white;
+}
+
+tr.dt-rowReorder-moving td.dtfc-fixed-left,
+tr.dt-rowReorder-moving td.dtfc-fixed-right {
+  border-top: 2px solid #555 !important;
+  border-bottom: 2px solid #555 !important;
+}
+tr.dt-rowReorder-moving td.dtfc-fixed-left:first-child {
+  border-left: 2px solid #555 !important;
+}
+tr.dt-rowReorder-moving td.dtfc-fixed-right:last-child {
+  border-right: 2px solid #555 !important;
+}
+
 
 table.fixedHeader-floating {
-  position: fixed !important;
   background-color: white;
 }
 
@@ -990,9 +1002,12 @@ table.fixedHeader-locked {
 
 div.dt-button-collection {
   overflow: visible !important;
+  z-index: 2002 !important;
 }
 div.dt-button-collection div.dtsb-searchBuilder {
-  width: 100% !important;
+  width: 99% !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
 }
 
 .dtsb-greyscale {

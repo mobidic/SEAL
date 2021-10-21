@@ -6,17 +6,7 @@
 
 	<style>
 		/* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
-		.DTFC_LeftBodyLiner {
-			overflow-x: hidden;
-		}
-		/* End */
-		.DTFC_LeftFootWrapper {
-			visibility: hidden;
-		}
 
-		.v-middle {
-			vertical-align: middle!important;
-		}
 
 		.tableFixHead {
 		    overflow-y: auto;
@@ -31,6 +21,7 @@
 		rajrajhans.com
 		Day #4 : 30 Days CSS
 		*/
+		.dtfc-fixed-left{z-index:1;}
 
 		.w3-modal table.dataTable thead th {
 			position: relative;
@@ -79,163 +70,163 @@
 			<div class="w3-padding">
 				<table id="variants" class="w3-table-all" style="width:100%">
 					<thead>
-						<tr class="w3-flat-green-sea">
-	                        <th class="w3-center control-size-25"></th>
-							<th class='showTitle control-size-100'>Gene</th>
-							<th class='showTitle control-size-100'>Feature</th>
-							<th class='showTitle control-size-75'>Can.</th>
-							<th class='showTitle control-size-150'>Exon/Intron</th>
-							<th class='showTitle control-size-250'>HGVSg</th>
-							<th class='showTitle control-size-250'>HGVSc</th>
-							<th class='showTitle control-size-250'>HGVSp</th>
-							<th class='showTitle control-size-100'>Depth</th>
-							<th class='showTitle control-size-100'>Allelic depth</th>
-							<th class='showTitle control-size-100'>Allelic frequencies</th>
-							<th class='showTitle control-size-100'>GnomAD</th>
-							<th class='showTitle control-size-100'>SEAL (pct)</th>
-							<th class='showTitle control-size-100'>SEAL (cnt)</th>
-							<th class='showTitle control-size-100'>In Family</th>
-							<th class='showTitle control-size-300'>ClinSig</th>
-							<th class='showTitle control-size-100'>Impact</th>
-							<th class='showTitle control-size-300'>Consequence</th>
-							<th class='showTitle control-size-100'>MES var</th>
-							<th class='showTitle control-size-125'>SpliceAI DS</th>
-							<th class='showTitle control-size-100'>Missense</th>
-							<th class='showTitle control-size-100'>Analyse 1</th>
-							<th class='showTitle control-size-100'>Analyse 2</th>
-							<th class='showTitle control-size-100'>Report</th>
+						<tr>
+	                        <th class="w3-flat-green-sea w3-center control-size-25"></th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Gene</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Feature</th>
+							<th class='w3-flat-green-sea showTitle control-size-75'>Can.</th>
+							<th class='w3-flat-green-sea showTitle control-size-150'>Exon/Intron</th>
+							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSg</th>
+							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSc</th>
+							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSp</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Depth</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Allelic depth</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Allelic frequencies</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>GnomAD</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>SEAL (pct)</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>SEAL (cnt)</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>In Family</th>
+							<th class='w3-flat-green-sea showTitle control-size-300'>ClinSig</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Impact</th>
+							<th class='w3-flat-green-sea showTitle control-size-300'>Consequence</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>MES var</th>
+							<th class='w3-flat-green-sea showTitle control-size-125'>SpliceAI DS</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Analyse 1</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Analyse 2</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Report</th>
 						</tr>
 					</thead>
 					<tfoot>
-						<tr class="w3-flat-green-sea">
-							<th class="w3-center control-size-25"></th>
-							<th class='showTitle control-size-100'>
+						<tr>
+							<th class="w3-flat-green-sea w3-center control-size-25"></th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Gene
 								<span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Feature
 								<span onclick="openHelpModal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-75'>
+							<th class='w3-flat-green-sea showTitle control-size-75'>
 								Can.
 								<span onclick="openHelpModal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript.<br />Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-150'>
+							<th class='w3-flat-green-sea showTitle control-size-150'>
 								Exon/Intron
 								<span onclick="openHelpModal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-	                        <th class='showTitle control-size-250'>
+	                        <th class='w3-flat-green-sea showTitle control-size-250'>
 								HGVSg
 								<span onclick="openHelpModal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-	                        <th class='showTitle control-size-250'>
+	                        <th class='w3-flat-green-sea showTitle control-size-250'>
 								HGVSc
 								<span onclick="openHelpModal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-250'>
+							<th class='w3-flat-green-sea showTitle control-size-250'>
 								HGVSp
 								<span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Depth
 								<span onclick="openHelpModal(title='Depth', content='Depth in DNA sequencing is the number of unique reads that include a given nucleotide in the reconstructed sequence.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Allelic depth
 								<span onclick="openHelpModal(title='Allelic depth', content='Depth of the observed allele.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Allelic frequencies
 								<span onclick="openHelpModal(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								GnomAD
 								<span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 (GRCh37/hg19) spans 125,748 exome sequences and 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								SEAL (pct)
 								<span onclick="openHelpModal(title='SEAL (pct)', content='The percentage this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								SEAL (cnt)
 								<span onclick="openHelpModal(title='SEAL (count)', content='The number of occurences this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								In Family
 								<span onclick="openHelpModal(title='In Family', content='Count variant presence in the case family and list all samples in the faimily with this variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-300'>
+							<th class='w3-flat-green-sea showTitle control-size-300'>
 								ClinSig
 								<span onclick="openHelpModal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Impact
 								<span onclick="openHelpModal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-300'>
+							<th class='w3-flat-green-sea showTitle control-size-300'>
 								Consequence
 								<span onclick="openHelpModal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								MES var
 								<span onclick="openHelpModal(title='MES alt', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li>|percent variation| &ge; 0.15</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-125'>
+							<th class='w3-flat-green-sea showTitle control-size-125'>
 								SpliceAI DS
 								<span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Missense
 								<span onclick="openHelpModal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Analyse 1
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Analyse 2
 							</th>
-							<th class='showTitle control-size-100'>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Report
 							</th>
 						</tr>
@@ -676,7 +667,8 @@
 			dom: 'Blfrtip',
 			scrollX: true,
 			"order": [[ 5, "asc" ]],
-	        fixedColumns: true,
+	        fixedColumns: {left:2},
+			colReorder: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
 		        {

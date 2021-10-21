@@ -10,10 +10,19 @@
 		<link rel="stylesheet" href="{{ url_for('static', filename='balloon.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-5.10.1-web/css/all.css') }}">
 		<link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
-		<link rel="stylesheet" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}" />
 
-		<script src="{{ url_for('static', filename='DataTables/datatables.min.js') }}"></script>
+		<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/DataTables-1.11.3/css/jquery.dataTables.min.css') }}"/>
+	    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/Buttons-2.0.1/css/buttons.dataTables.min.css') }}"/>
+	    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/FixedColumns-4.0.0/css/fixedColumns.dataTables.min.css') }}"/>
+	    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/FixedHeader-3.2.0/css/fixedHeader.dataTables.min.css') }}"/>
+	    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/SearchBuilder-1.2.2/css/searchBuilder.dataTables.min.css') }}"/>
 
+	    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/jQuery-3.6.0/jquery-3.6.0.min.js') }}"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/DataTables-1.11.3/js/jquery.dataTables.min.js') }}"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/Buttons-2.0.1/js/dataTables.buttons.min.js') }}"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/FixedColumns-4.0.0/js/dataTables.fixedColumns.min.js') }}"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/FixedHeader-3.2.0/js/dataTables.fixedHeader.min.js') }}"></script>
+	    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/SearchBuilder-1.2.2/js/dataTables.searchBuilder.min.js') }}"></script>
 		{% block static %}
 		{% endblock %}
 	</head>
