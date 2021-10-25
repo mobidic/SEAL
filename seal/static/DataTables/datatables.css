@@ -4,10 +4,10 @@
  *
  * To rebuild or modify this file with the latest versions of the included
  * software please visit:
- *   https://datatables.net/download/#dt/jq-3.6.0/dt-1.11.3/b-2.0.1/fc-4.0.0/fh-3.2.0/sb-1.2.2
+ *   https://datatables.net/download/#dt/jq-3.6.0/dt-1.11.3/b-2.0.1/cr-1.5.4/fc-4.0.0/fh-3.2.0/sb-1.2.2
  *
  * Included libraries:
- *   jQuery 3 3.6.0, DataTables 1.11.3, Buttons 2.0.1, FixedColumns 4.0.0, FixedHeader 3.2.0, SearchBuilder 1.2.2
+ *   jQuery 3 3.6.0, DataTables 1.11.3, Buttons 2.0.1, ColReorder 1.5.4, FixedColumns 4.0.0, FixedHeader 3.2.0, SearchBuilder 1.2.2
  */
 
 td.dt-control {
@@ -940,6 +940,19 @@ button.dt-btn-split-drop-button {
 }
 button.dt-btn-split-drop-button:hover {
   background-color: white;
+}
+
+
+table.DTCR_clonedTable.dataTable {
+  position: absolute !important;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 202;
+}
+
+div.DTCR_pointer {
+  width: 1px;
+  background-color: #0259C4;
+  z-index: 201;
 }
 
 
