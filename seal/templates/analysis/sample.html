@@ -671,7 +671,9 @@
 				left:1,
 				right:1
 			},
-			colReorder: true,
+			colReorder: {
+	            realtime: false
+	        },
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
 				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
