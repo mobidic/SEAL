@@ -71,7 +71,6 @@
 				<table id="variants" class="w3-table-all" style="width:100%">
 					<thead>
 						<tr>
-	                        <th class="w3-flat-green-sea w3-center control-size-25"></th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>Gene</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>Feature</th>
 							<th class='w3-flat-green-sea showTitle control-size-75'>Can.</th>
@@ -92,14 +91,14 @@
 							<th class='w3-flat-green-sea showTitle control-size-100'>MES var</th>
 							<th class='w3-flat-green-sea showTitle control-size-125'>SpliceAI DS</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Analyse 1</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Analyse 2</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Report</th>
+							<th class='w3-flat-green-sea showTitle control-size-25'>A1</th>
+							<th class='w3-flat-green-sea showTitle control-size-25'>A2</th>
+							<th class='w3-flat-green-sea showTitle control-size-25'>R</th>
+							<th class="w3-flat-green-sea w3-center control-size-25"></th>
 						</tr>
 					</thead>
 					<tfoot>
 						<tr>
-							<th class="w3-flat-green-sea w3-center control-size-25"></th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>
 								Gene
 								<span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
@@ -220,15 +219,16 @@
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Analyse 1
+							<th class='w3-flat-green-sea showTitle control-size-25'>
+								A1
 							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Analyse 2
+							<th class='w3-flat-green-sea showTitle control-size-25'>
+								A2
 							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Report
+							<th class='w3-flat-green-sea showTitle control-size-25'>
+								R
 							</th>
+							<th class="w3-flat-green-sea w3-center control-size-25"></th>
 						</tr>
 					</tfoot>
 				</table>
@@ -667,24 +667,13 @@
 			dom: 'Blfrtip',
 			scrollX: true,
 			"order": [[ 5, "asc" ]],
-	        fixedColumns: {left:2},
+	        fixedColumns: {
+				left:1,
+				right:1
+			},
 			colReorder: true,
     		ajax: '/json/variants/sample/{{ sample.id }}',
     		"columns": [
-		        {
-		            "className":      'details-control v-middle',
-		            "orderable":      false,
-		            "data":           "id",
-	                "render": {
-						"_": function ( data, type, row ) {
-							return data;
-						},
-						"display": function ( data, type, row ) {
-							response = '<i onclick="openDetailsVariantModal(\'' + data + '\',{% if sample.familyid %}{{ sample.familyid }}{% else %}null{% endif %})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
-							return response;
-		                },
-					},
-		        },
 				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
 				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
 				{
@@ -994,7 +983,7 @@
 					},
 				},
 				{
-					"className": 'showTitle size-100',
+					"className": 'showTitle size-25 w3-center',
 					"data": {
 						"_": "analyse1",
 						"display" : function ( data, type, row, meta ) {
@@ -1016,7 +1005,7 @@
 					}
 				},
 				{
-					"className": 'showTitle size-100',
+					"className": 'showTitle size-25 w3-center',
 					"data": {
 						"_": "analyse2",
 						"display" : function ( data, type, row, meta ) {
@@ -1038,7 +1027,7 @@
 					}
 				},
 				{
-					"className": 'showTitle size-100',
+					"className": 'showTitle size-25 w3-center',
 					"data": {
 						"_": "reported",
 						"display" : function ( data, type, row, meta ) {
@@ -1058,6 +1047,20 @@
 							}
 					    }
 					}
+				},
+				{
+					"className":      'details-control w3-center',
+					"orderable":      false,
+					"data":           "id",
+					"render": {
+						"_": function ( data, type, row ) {
+							return data;
+						},
+						"display": function ( data, type, row ) {
+							response = '<i onclick="openDetailsVariantModal(\'' + data + '\',{% if sample.familyid %}{{ sample.familyid }}{% else %}null{% endif %})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
+							return response;
+						},
+					},
 				},
 			]
 		});
