@@ -1,7 +1,6 @@
 import os
 import secrets
 import json
-import itertools
 import urllib
 import functools
 from datetime import datetime
@@ -9,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Gene
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from sqlalchemy import or_, and_
@@ -445,9 +444,6 @@ def json_variants(id, version=-1):
     total_samples = db.session.query(Sample).count()
 
     # Get all canonical trancripts
-    transcripts = db.session.query(Transcript.refSeq).filter_by(canonical=True).all()
-    transcripts = list(itertools.chain(*transcripts))
-    transcripts = [each.split('.')[0] for each in transcripts]
 
     ##################################################
 
@@ -460,44 +456,71 @@ def json_variants(id, version=-1):
         canonical = False
         refseq = False
         protein_coding = False
+        preferred_transcript = False
 
         for annot in annotations[version]["ANN"]:
             current_consequence_score = annot['consequenceScore']
             current_canonical = annot['canonical']
             current_refseq = True if annot['SOURCE'] == 'RefSeq' else False
             current_protein_coding = True if annot['BIOTYPE'] == 'protein_coding' else False
+            # current_transcript = Transcript.query.get(annot['Feature'])
+            # current_transcript = Transcript.query.get(annot['Feature'])
+            current_preferred_transcript = True if annot['Feature'] in current_user.transcripts else False
 
-            if refseq == current_refseq:
-                if current_protein_coding and not protein_coding:
+            if preferred_transcript == current_preferred_transcript:
+                if refseq == current_refseq:
+                    if current_protein_coding and not protein_coding:
+                        canonical = current_canonical
+                        consequence_score = current_consequence_score
+                        refseq = current_refseq
+                        protein_coding = current_protein_coding
+                        preferred_transcript = current_preferred_transcript
+                        annot["preferred"] = preferred_transcript
+                        main_annot = annot
+                        continue
+                    if protein_coding and not current_protein_coding:
+                        continue
+                    if canonical and not current_canonical:
+                        continue
+                    if not canonical and current_canonical:
+                        canonical = current_canonical
+                        consequence_score = current_consequence_score
+                        refseq = current_refseq
+                        protein_coding = current_protein_coding
+                        preferred_transcript = current_preferred_transcript
+                        annot["preferred"] = preferred_transcript
+                        main_annot = annot
+                        continue
+                    if current_consequence_score > consequence_score:
+                        canonical = current_canonical
+                        consequence_score = current_consequence_score
+                        refseq = current_refseq
+                        protein_coding = current_protein_coding
+                        preferred_transcript = current_preferred_transcript
+                        annot["preferred"] = preferred_transcript
+                        main_annot = annot
+                        continue
+                    continue
+
+                if current_refseq:
                     canonical = current_canonical
                     consequence_score = current_consequence_score
                     refseq = current_refseq
-                    main_annot = annot
-                    continue
-                if protein_coding and not current_protein_coding:
-                    continue
-                if canonical and not current_canonical:
-                    continue
-                if not canonical and current_canonical:
-                    canonical = current_canonical
-                    consequence_score = current_consequence_score
-                    refseq = current_refseq
-                    main_annot = annot
-                    continue
-                if current_consequence_score > consequence_score:
-                    canonical = current_canonical
-                    consequence_score = current_consequence_score
-                    refseq = current_refseq
+                    protein_coding = current_protein_coding
+                    preferred_transcript = current_preferred_transcript
+                    annot["preferred"] = preferred_transcript
                     main_annot = annot
                     continue
                 continue
 
-            if current_refseq:
+            if current_preferred_transcript:
                 canonical = current_canonical
                 consequence_score = current_consequence_score
                 refseq = current_refseq
-                main_annot = annot
                 protein_coding = current_protein_coding
+                preferred_transcript = current_preferred_transcript
+                annot["preferred"] = preferred_transcript
+                main_annot = annot
                 continue
 
             if main_annot is None:
@@ -505,6 +528,8 @@ def json_variants(id, version=-1):
                 consequence_score = current_consequence_score
                 refseq = current_refseq
                 protein_coding = current_protein_coding
+                preferred_transcript = current_preferred_transcript
+                annot["preferred"] = preferred_transcript
                 main_annot = annot
                 continue
 
@@ -546,39 +571,46 @@ def json_variants(id, version=-1):
 def json_transcripts():
     key_list = {
         "asc": [
-            Gene.hgncname.asc(),
-            Gene.hgncid.asc(),
+            Transcript.feature.asc(),
+            Transcript.biotype.asc(),
+            Transcript.feature_type.asc(),
+            Transcript.symbol.asc(),
+            Transcript.symbol_source.asc(),
+            Transcript.gene.asc(),
+            Transcript.source.asc(),
+            Transcript.protein.asc(),
             Transcript.canonical.asc(),
-            Transcript.refSeq.asc(),
-            Transcript.refProt.asc(),
-            Transcript.uniprot.asc(),
-            Gene.chromosome.asc(),
-            Gene.strand.asc()
+            Transcript.hgnc.asc()
         ],
         "desc": [
-            Gene.hgncname.desc(),
-            Gene.hgncid.desc(),
+            Transcript.feature.desc(),
+            Transcript.biotype.desc(),
+            Transcript.feature_type.desc(),
+            Transcript.symbol.desc(),
+            Transcript.symbol_source.desc(),
+            Transcript.gene.desc(),
+            Transcript.source.desc(),
+            Transcript.protein.desc(),
             Transcript.canonical.desc(),
-            Transcript.refSeq.desc(),
-            Transcript.refProt.desc(),
-            Transcript.uniprot.desc(),
-            Gene.chromosome.desc(),
-            Gene.strand.desc()
+            Transcript.hgnc.desc()
         ]
     }
     filters = or_(
-        Gene.hgncname.op('~')(request.form['search[value]']),
-        Gene.hgncid.op('~')(request.form['search[value]']),
-        Transcript.refSeq.op('~')(request.form['search[value]']),
-        Transcript.refProt.op('~')(request.form['search[value]']),
-        Transcript.uniprot.op('~')(request.form['search[value]']),
-        Gene.chromosome.op('~')(request.form['search[value]']),
-        Gene.strand.op('~')(request.form['search[value]'])
+        Transcript.feature.op('~')(request.form['search[value]']),
+        Transcript.biotype.op('~')(request.form['search[value]']),
+        Transcript.feature_type.op('~')(request.form['search[value]']),
+        Transcript.symbol.op('~')(request.form['search[value]']),
+        Transcript.symbol_source.op('~')(request.form['search[value]']),
+        Transcript.gene.op('~')(request.form['search[value]']),
+        Transcript.source.op('~')(request.form['search[value]']),
+        Transcript.protein.op('~')(request.form['search[value]']),
+        Transcript.canonical.op('~')(request.form['search[value]']),
+        Transcript.hgnc.op('~')(request.form['search[value]'])
     )
 
     transcripts = db.session.query(Transcript)
     recordsTotal = transcripts.count()
-    transcripts_filter = transcripts.join(Gene, Transcript.gene).filter(filters)
+    transcripts_filter = transcripts.filter(filters)
     recordsFiltered = transcripts_filter.count()
     transcripts = transcripts_filter.\
         order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])]).\
@@ -592,16 +624,21 @@ def json_transcripts():
     }
 
     for transcript in transcripts:
-        # for transcript in gene.transcripts:
+        t = False
+        if transcript.feature in current_user.transcripts:
+            t = True
         transcripts_json["data"].append({
-            "hgncname": transcript.gene.hgncname,
-            "hgncid": transcript.gene.hgncid,
-            "chromosome": transcript.gene.chromosome,
-            "strand": transcript.gene.strand,
-            "refSeq": transcript.refSeq,
+            "feature": transcript.feature,
+            "biotype": transcript.biotype,
+            "feature_type": transcript.feature_type,
+            "symbol": transcript.symbol,
+            "symbol_source": transcript.symbol_source,
+            "gene": transcript.gene,
+            "source": transcript.source,
+            "protein": transcript.protein,
             "canonical": transcript.canonical,
-            "refProt": transcript.refProt,
-            "uniprot": transcript.uniprot
+            "hgnc": transcript.hgnc,
+            "val": t
         })
     return jsonify(transcripts_json)
 
@@ -724,6 +761,24 @@ def add_filter():
     )
     db.session.add(filter)
     db.session.commit()
+    return 'ok'
+
+
+@app.route("/add/preferred", methods=['POST'])
+@login_required
+def add_preferred():
+    user = db.session.query(User).filter_by(id=current_user.get_id()).first()
+    print(user)
+    print(user.transcripts)
+    transcript = urllib.parse.unquote(request.form["transcript"])
+    # transcript = Transcript.query.get(transcript_id)
+    if transcript in user.transcripts:
+        user.transcripts.remove(transcript)
+    else:
+        user.transcripts.append(transcript)
+    print(user.transcripts)
+    db.session.commit()
+    print(user.transcripts)
     return 'ok'
 
 

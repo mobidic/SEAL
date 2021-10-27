@@ -680,21 +680,25 @@
 				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
 				{
 					"className": 'showTitle w3-center control-size-75',
-					"data": "annotations.canonical",
+					"data": "annotations",
 	                "render": {
 						"_": function ( data, type, row ) {
-							return data;
+							return data["canonical"];
 						},
 						"display": function ( data, type, row ) {
-							if (data) {
-								response = '<i title="CANONICAL" class="w3-text-flat-peter-river fas fa-star"></i>';
+                            color = "w3-text-flat-peter-river"
+                            if (data["preferred"]) {
+                                color = "w3-text-flat-alizarin"
+                            }
+							if (data["canonical"]) {
+								response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
 							} else {
-								response = '<i title="" class="w3-text-flat-peter-river far fa-star"></i>';
+								response = '<i title="" class="' + color + ' far fa-star"></i>';
 							}
 							return response;
 		                },
 						"sort": function ( data, type, row ) {
-							if (data) {
+							if (data["canonical"]) {
 								response = true;
 							} else {
 								response = false;
@@ -1213,10 +1217,14 @@
 						cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
 					}
 				}
+                color = "w3-text-flat-peter-river";
+                if ({{ current_user.transcripts | safe }}.includes(data["annotations"]["ANN"][x]["Feature"])) {
+                    color = "w3-text-flat-alizarin";
+                }
 				if (data["annotations"]["ANN"][x]["canonical"]) {
-					response = '<i title="CANONICAL" class="w3-text-flat-peter-river fas fa-star"></i>';
+					response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
 				} else {
-					response = '<i title="" class="w3-text-flat-peter-river far fa-star"></i>';
+					response = '<i title="" class="' + color + ' far fa-star"></i>';
 				}
 				allFeature = allFeature + '<tr>'+
 					'<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+

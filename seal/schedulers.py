@@ -3,7 +3,7 @@ import json
 import numpy
 import datetime
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family, Var2Sample, Run
+from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript
 from anacore import annotVcf
 import shlex
 import subprocess
@@ -240,6 +240,23 @@ def importvcf():
                                     annot[splitAnn] = annot[splitAnn].split("&")
                                 except AttributeError:
                                     annot[splitAnn] = []
+
+                            # transcript
+                            transcript = Transcript.query.get(annot["Feature"])
+                            if not transcript:
+                                transcript = Transcript(
+                                    feature=annot["Feature"],
+                                    biotype=annot["BIOTYPE"],
+                                    feature_type=annot["Feature_type"],
+                                    symbol=annot["SYMBOL"],
+                                    symbol_source=annot["SYMBOL_SOURCE"],
+                                    gene=annot["Gene"],
+                                    source=annot["SOURCE"],
+                                    protein=annot["ENSP"],
+                                    canonical=annot["CANONICAL"],
+                                    hgnc=annot["HGNC_ID"]
+                                )
+                                db.session.add(transcript)
 
                             # Get consequence score
                             consequence_score = 0

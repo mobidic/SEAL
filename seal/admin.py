@@ -4,7 +4,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from seal import app, db
-from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Gene, Transcript, Run
+from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run
 
 
 class MyAdminIndexView(AdminIndexView):
@@ -39,6 +39,6 @@ admin.add_view(AdminView(Variant, db.session, category="Analysis"))
 admin.add_view(AdminView(Comment, db.session, category="Analysis"))
 admin.add_view(AdminView(Var2Sample, db.session, category="Analysis"))
 admin.add_view(AdminView(Filter, db.session, category="Filter"))
-admin.add_view(AdminView(Gene, db.session, category="Genes"))
+# admin.add_view(AdminView(Gene, db.session, category="Genes"))
 admin.add_view(AdminView(Transcript, db.session, category="Genes"))
 admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))

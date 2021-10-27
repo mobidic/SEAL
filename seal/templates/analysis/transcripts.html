@@ -10,26 +10,32 @@
 		<table id="genes" class="w3-table-all w3-hoverable" style="width:100%">
 			<thead>
 				<tr>
-					<th class="w3-flat-green-sea">HGNC Name</th>
-					<th class="w3-flat-green-sea">HGNC ID</th>
-					<th class="w3-flat-green-sea">Canonical</th>
-					<th class="w3-flat-green-sea">Transcript</th>
-					<th class="w3-flat-green-sea">Ref Protein</th>
-					<th class="w3-flat-green-sea">UNIPROT</th>
-					<th class="w3-flat-green-sea">chr</th>
-					<th class="w3-flat-green-sea">strand</th>
+                    <th class="w3-flat-green-sea">feature</th>
+                    <th class="w3-flat-green-sea">biotype</th>
+                    <th class="w3-flat-green-sea">feature_type</th>
+                    <th class="w3-flat-green-sea">symbol</th>
+                    <th class="w3-flat-green-sea">symbol_source</th>
+                    <th class="w3-flat-green-sea">gene</th>
+                    <th class="w3-flat-green-sea">source</th>
+                    <th class="w3-flat-green-sea">protein</th>
+                    <th class="w3-flat-green-sea">canonical</th>
+                    <th class="w3-flat-green-sea">hgnc</th>
+                    <th class="w3-flat-green-sea">ref</th>
 				</tr>
 			</thead>
 			<tfoot>
 				<tr>
-					<th class="w3-flat-green-sea">HGNC Name</th>
-					<th class="w3-flat-green-sea">HGNC ID</th>
-					<th class="w3-flat-green-sea">Canonical</th>
-					<th class="w3-flat-green-sea">RefSeq</th>
-					<th class="w3-flat-green-sea">Ref Protein</th>
-					<th class="w3-flat-green-sea">UNIPROT</th>
-					<th class="w3-flat-green-sea">chr</th>
-					<th class="w3-flat-green-sea">strand</th>
+                    <th class="w3-flat-green-sea">feature</th>
+                    <th class="w3-flat-green-sea">biotype</th>
+                    <th class="w3-flat-green-sea">feature_type</th>
+                    <th class="w3-flat-green-sea">symbol</th>
+                    <th class="w3-flat-green-sea">symbol_source</th>
+                    <th class="w3-flat-green-sea">gene</th>
+                    <th class="w3-flat-green-sea">source</th>
+                    <th class="w3-flat-green-sea">protein</th>
+                    <th class="w3-flat-green-sea">canonical</th>
+                    <th class="w3-flat-green-sea">hgnc</th>
+                    <th class="w3-flat-green-sea">ref</th>
 				</tr>
 			</tfoot>
 		</table>
@@ -52,15 +58,40 @@
 	                'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
 			},
+            colReorder: true,
+	        fixedColumns: {
+				left:1,
+				right:1
+			},
     		"columns": [
-				{ "className": 'showTitle control-size-200', "data": "hgncname"},
-		        { "className": 'showTitle control-size-100', "data": "hgncid"},
-				{ "className": 'showTitle w3-center control-size-100', "data": "canonical"},
-				{ "className": 'showTitle control-size-500', "data": "refSeq"},
-				{ "className": 'showTitle control-size-500', "data": "refProt"},
-				{ "className": 'showTitle control-size-100', "data": "uniprot"},
-				{ "className": 'showTitle control-size-50', "data": "chromosome"},
-				{ "className": 'showTitle control-size-50', "data": "strand"},
+                { 'className': 'showTitle control-size-200', 'data': 'feature'},
+                { 'className': 'showTitle control-size-300', 'data': 'biotype'},
+                { 'className': 'showTitle control-size-200', 'data': 'feature_type'},
+                { 'className': 'showTitle control-size-150', 'data': 'symbol'},
+                { 'className': 'showTitle control-size-150', 'data': 'symbol_source'},
+                { 'className': 'showTitle control-size-100', 'data': 'gene'},
+                { 'className': 'showTitle control-size-100', 'data': 'source'},
+                { 'className': 'showTitle control-size-200', 'data': 'protein'},
+                { 'className': 'showTitle control-size-100', 'data': 'canonical'},
+                { 'className': 'showTitle control-size-100', 'data': 'hgnc'},
+				{
+					"className": 'showTitle size-25 w3-center',
+					"orderable":      false,
+					"data": {
+						"_": "val",
+						"display" : function ( data, type, row, meta ) {
+                            if (data) {
+    							const transcript=data["feature"];
+    							if (data["val"]) {
+    								return '<input id="'+ transcript +'" class="w3-check" type="checkbox" checked="checked" onclick="add_transcript(\''+ transcript +'\');">';
+    							} else {
+    								return '<input id="'+ transcript +'" class="w3-check" type="checkbox" onclick="add_transcript(\''+ transcript +'\');">';
+    							}
+                            }
+                            return "NA"
+					    }
+					}
+				}
 			],
 			"columnDefs": [
 	            {
@@ -77,7 +108,7 @@
 							return data;
 		                },
 					},
-	                "targets": 2
+	                "targets": 8
 	            }
 			],
 		});
@@ -93,5 +124,22 @@
 		document.getElementById("sidebar").style.display = "none";
 		document.getElementById("overlay").style.display = "none";
 	}
+
+    function add_transcript(transcript) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/add/preferred",
+            data: {
+                "transcript": transcript
+            }
+        })
+    }
 </script>
 {% endblock %}

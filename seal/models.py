@@ -1,6 +1,7 @@
 from seal import db, login_manager, bcrypt
 from flask_login import UserMixin
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.mutable import Mutable
 
 
 ################################################################################
@@ -25,6 +26,25 @@ team2member = db.Table(
 )
 
 
+class MutableList(Mutable, list):
+    def append(self, value):
+        list.append(self, value)
+        self.changed()
+
+    def remove(self, value):
+        list.remove(self, value)
+        self.changed()
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, MutableList):
+            if isinstance(value, list):
+                return MutableList(value)
+            return Mutable.coerce(key, value)
+        else:
+            return value
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
@@ -39,6 +59,7 @@ class User(db.Model, UserMixin):
     technician = db.Column(db.Boolean(), nullable=False, default=False)
     biologist = db.Column(db.Boolean(), nullable=False, default=False)
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), default=1)
+    transcripts = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     comments = relationship("Comment")
 
     teams = db.relationship(
@@ -158,30 +179,21 @@ class Filter(db.Model):
         return f"{self.filtername}"
 
 
-class Gene(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    hgncname = db.Column(db.String(20), unique=True, nullable=False)
-    hgncid = db.Column(db.String(20), unique=True, nullable=False)
-    chromosome = db.Column(db.String(5))
-    strand = db.Column(db.CHAR)
-    transcripts = relationship("Transcript")
-
-    def __repr__(self):
-        return f"Gene('{self.hgncname}','{self.hgncid}')"
-
-
 class Transcript(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    refSeq = db.Column(db.String(20), unique=True, nullable=False)
-    canonical = db.Column(db.Boolean(), nullable=False, unique=False, default=False)
-    refProt = db.Column(db.String(30))
-    uniprot = db.Column(db.String(30))
-
-    geneid = db.Column(db.Integer, db.ForeignKey('gene.id'))
-    gene = relationship("Gene", back_populates="transcripts")
+    # id = db.Column(db.Integer, primary_key=True)
+    feature = db.Column(db.String(30), unique=True, nullable=True, primary_key=True)
+    biotype = db.Column(db.String(30), unique=False, nullable=True)
+    feature_type = db.Column(db.String(30), unique=False, nullable=True)
+    symbol = db.Column(db.String(30), unique=False, nullable=True)
+    symbol_source = db.Column(db.String(30), unique=False, nullable=True)
+    gene = db.Column(db.String(30), unique=False, nullable=True)
+    source = db.Column(db.String(30), unique=False, nullable=True)
+    protein = db.Column(db.String(30), unique=False, nullable=True)
+    canonical = db.Column(db.String(30), unique=False, nullable=True)
+    hgnc = db.Column(db.String(30), unique=False, nullable=True)
 
     def __repr__(self):
-        return f"Transcript('{self.refSeq}','{self.canonical}')"
+        return f"Transcript('{self.feature}','{self.canonical}')"
 
 
 ################################################################################
