@@ -113,7 +113,7 @@
 							</th>
 							<th class='w3-flat-green-sea showTitle control-size-75'>
 								Can.
-								<span onclick="openHelpModal(title='Canonical', content='Flag if the Feature corresponding to the canonical transcript.<br />Based on MobiDetails API database.', footer='For more information see : <a  href=\'https://mobidetails.iurc.montp.inserm.fr/MDAPI/\' target=\'_blank\' style=\'text-decoration:underline\'><i>MDAPI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+    								<span onclick="openHelpModal(title='Canonical', content='This flag indicating if :<br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-alizarin fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'https://grch37.ensembl.org/info/docs/tools/vep/script/vep_options.html#opt_canonical\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
