@@ -1103,8 +1103,7 @@
 			request = "/json/variant/" + id;
 		}
 		$.getJSON(request, function(data) {
-		    allFeature = '<div class="tableFixHead">';
-			allFeature = allFeature + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			allFeature = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			allFeature = allFeature + '<thead class="w3-flat-silver"><tr>'+
 		        '<th class="w3-flat-silver control-size-100" >Gene</th>'+
 				'<th class="w3-flat-silver control-size-200">Transcript</th>'+
@@ -1281,12 +1280,10 @@
 			}
 		    allFeature = allFeature + '</tbody>';
 		    allFeature = allFeature + '</table>';
-		    allFeature = allFeature + '</div>';
 			document.getElementById("allFeaturesTable").innerHTML = allFeature;
 
 
-			inSeal = '<div class="tableFixHead">';
-			inSeal = inSeal + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			inSeal = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
 				'<th class="w3-flat-silver control-size-100">Sample</th>'+
 				'<th class="w3-flat-silver control-size-100">Family</th>'+
@@ -1331,16 +1328,18 @@
 
 		    inSeal = inSeal + '</tbody>';
 		    inSeal = inSeal + '</table>';
-		    inSeal = inSeal + '</div>';
 			document.getElementById("inSEALTable").innerHTML = inSeal;
+            $('.table-modal-large').DataTable( {
+                scrollY:        '50vh',
+                scrollX:        true,
+                paging:         false
+            });
 			var node = document.getElementsByClassName('inSealCount');
 			for (var i = 0; i < node.length; i++) {
                 node[i].innerHTML = count;
             }
 
-
-			tableScoresPredictions = '<div class="tableFixHead">';
-			tableScoresPredictions = tableScoresPredictions + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresPredictions = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
 			tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
 				'<th class="w3-flat-silver">Name</th>'+
 				'<th class="w3-flat-silver">Score</th>'+
@@ -1354,11 +1353,9 @@
 			};
 			tableScoresPredictions = tableScoresPredictions + '</tbody>';
 			tableScoresPredictions = tableScoresPredictions + '</table>';
-			tableScoresPredictions = tableScoresPredictions + '</div>';
 			document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
 
-			tableScoresConservation = '<div class="tableFixHead">';
-			tableScoresConservation = tableScoresConservation + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresConservation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			tableScoresConservation = tableScoresConservation + '<thead class="w3-flat-silver"><tr>'+
 				'<th class="w3-flat-silver">Name</th>'+
 				'<th class="w3-flat-silver">Score</th>'+
@@ -1372,11 +1369,9 @@
 			};
 			tableScoresConservation = tableScoresConservation + '</tbody>';
 			tableScoresConservation = tableScoresConservation + '</table>';
-			tableScoresConservation = tableScoresConservation + '</div>';
 			document.getElementById("tableScoresConservation").innerHTML = tableScoresConservation;
 
-			tableScoresPopulation = '<div class="tableFixHead">';
-			tableScoresPopulation = tableScoresPopulation + '<table class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			tableScoresPopulation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
 			tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
 				'<th class="w3-flat-silver">Name</th>'+
 				'<th class="w3-flat-silver">Score</th>'+
@@ -1390,8 +1385,8 @@
 			};
 			tableScoresPopulation = tableScoresPopulation + '</tbody>';
 			tableScoresPopulation = tableScoresPopulation + '</table>';
-			tableScoresPopulation = tableScoresPopulation + '</div>';
 			document.getElementById("tableScoresPopulation").innerHTML = tableScoresPopulation;
+            $('.table-modal').DataTable();
 
 			wi1 = window.screen.width;
 			var apply = 433.983;
