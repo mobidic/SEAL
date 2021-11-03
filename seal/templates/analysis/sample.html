@@ -174,13 +174,13 @@
 							</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>
 								SEAL (pct)
-								<span onclick="openHelpModal(title='SEAL (pct)', content='The percentage this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SEAL (pct)', content='The percentage of occurrence of this variant in SEAL, excluding this sample.', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>
 								SEAL (cnt)
-								<span onclick="openHelpModal(title='SEAL (count)', content='The number of occurences this variant appear in the SEAL database', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='SEAL (count)', content='The number of occurrences of this variant in SEAL, excluding this sample.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -497,147 +497,147 @@
 	const consequences_dict = {
 		"stop_gained": {
 			"color": "ff0000",
-			"score": 0,
+			"score": 50,
 		},
 		"stop_lost": {
 			"color": "ff0000",
-			"score": 0,
+			"score": 50,
 		},
+        "start_lost": {
+            "color": "ffd700",
+            "score": 30,
+        },
 		"splice_acceptor_variant": {
 			"color": "FF581A",
-			"score": 0,
+			"score": 20,
 		},
 		"splice_donor_variant": {
 			"color": "FF581A",
-			"score": 0,
+			"score": 20,
 		},
 		"frameshift_variant": {
 			"color": "9400D3",
-			"score": 0,
+			"score": 15,
 		},
 		"transcript_ablation": {
 			"color": "ff0000",
-			"score": 0,
-		},
-		"start_lost": {
-			"color": "ffd700",
-			"score": 0,
+			"score": 8,
 		},
 		"transcript_amplification": {
 			"color": "ff69b4",
-			"score": 0,
+			"score": 8,
 		},
 		"missense_variant": {
 			"color": "ffd700",
-			"score": 0,
+			"score": 6,
 		},
 		"protein_altering_variant": {
 			"color": "ff0080",
-			"score": 0,
+			"score": 5,
 		},
 		"splice_region_variant": {
 			"color": "ff7f50",
-			"score": 0,
+			"score": 5,
 		},
 		"inframe_insertion": {
 			"color": "ff69b4",
-			"score": 0,
+			"score": 2,
 		},
 		"inframe_deletion": {
 			"color": "ff69b4",
-			"score": 0,
+			"score": 2,
 		},
 		"incomplete_terminal_codon_variant": {
 			"color": "ff00ff",
-			"score": 0,
+			"score": 2,
 		},
 		"stop_retained_variant": {
 			"color": "76ee00",
-			"score": 0,
+			"score": 1,
 		},
 		"start_retained_variant": {
 			"color": "76ee00",
-			"score": 0,
+			"score": 1,
 		},
 		"synonymous_variant": {
 			"color": "76ee00",
-			"score": 0,
+			"score": 1,
 		},
 		"coding_sequence_variant": {
 			"color": "458b00",
-			"score": 0,
+			"score": 0.75,
 		},
 		"mature_miRNA_variant": {
 			"color": "458b00",
-			"score": 0,
+			"score": 0.5,
 		},
 		"intron_variant": {
 			"color": "02599c",
-			"score": 0,
+			"score": 0.25,
 		},
 		"NMD_transcript_variant": {
 			"color": "ff4500",
-			"score": 0,
+			"score": 0.1,
 		},
 		"non_coding_transcript_exon_variant": {
 			"color": "32cd32",
-			"score": 0,
+			"score": 0.05,
 		},
 		"non_coding_transcript_variant": {
 			"color": "32cd32",
-			"score": 0,
-		},
-		"3_prime_UTR_variant": {
-			"color": "7ac5cd",
-			"score": 0,
+			"score": 0.005,
 		},
 		"5_prime_UTR_variant": {
 			"color": "7ac5cd",
-			"score": 0,
+			"score": 0.5,
+		},
+		"3_prime_UTR_variant": {
+			"color": "7ac5cd",
+			"score": 0.45,
 		},
 		"upstream_gene_variant": {
 			"color": "a2b5cd",
-			"score": 0,
+			"score": 0.0005,
 		},
 		"downstream_gene_variant": {
 			"color": "a2b5cd",
-			"score": 0,
+			"score": 0.0005,
 		},
 		"TFBS_ablation": {
 			"color": "a52a2a",
-			"score": 0,
+			"score": 0.00001,
 		},
 		"TFBS_amplification": {
 			"color": "a52a2a",
-			"score": 0,
+			"score": 0.00001,
 		},
 		"TF_binding_site_variant": {
 			"color": "a52a2a",
-			"score": 0,
+			"score": 0.00001,
 		},
 		"regulatory_region_ablation": {
 			"color": "a52a2a",
-			"score": 0,
+			"score": 0.005,
 		},
 		"regulatory_region_amplification": {
 			"color": "a52a2a",
-			"score": 0,
+			"score": 0.005,
 		},
 		"regulatory_region_variant": {
 			"color": "a52a2a",
-			"score": 0,
+			"score": 0.005,
 		},
 		"feature_elongation": {
 			"color": "7f7f7f",
-			"score": 0,
+			"score": 0.00001,
 		},
 		"feature_truncation": {
 			"color": "7f7f7f",
-			"score": 0,
+			"score": 0.0000001,
 		},
 		"intergenic_variant": {
 			"color": "636363",
-			"score": 0,
+			"score": 0.0000001,
 		}
 	};
 
@@ -783,16 +783,18 @@
 							return data.toString();
 					    },
 						"sort": function ( data, type, row, meta ) {
-                            val = 0
-                            for (d in data) {
-                                if (d == "PASS") {
-                                    return 1;
+                            var val = 0;
+                            var zero = "000000000";
+                            for (idx in data) {
+                                if (data[idx] == "PASS") {
+                                    val = 2;
                                 }
                                 val += -1;
                             }
                             return val
 					    }
-					}
+					},
+                    "sType": "numeric"
 				},
 				{ "className": 'showTitle control-size-100', "data": "depth"},
 				{ "className": 'showTitle control-size-100', "data": "allelic_depth"},
@@ -832,36 +834,16 @@
 						"_" : function ( data, type, row, meta ) {
 							percent = (data["occurrences"]/data["total_samples"]).toFixed(4);
 							return percent;
-					    },
+					    }
 					},
 				},
 				{
 					"className": 'showTitle control-size-125',
-					"data": "inseal",
-					"render" : {
-						"_" : function ( data, type, row, meta ) {
-							return data["occurrences"];
-					    },
-						"sort" : function ( data, type, row, meta ) {
-							return data["occurrences"];
-					    }
-					},
+					"data": "inseal.occurrences",
 				},
 				{
 					"className": 'showTitle size-125',
-					"data": "inseal",
-					"render" : {
-						"_" : function ( data, type, row, meta ) {
-							members = null
-							if (data["members"].length > 0) {
-								members = " (" + data["members"].join(", ") + ")"
-							}
-							return data["occurences_family"] + members;
-					    },
-						"sort" : function ( data, type, row, meta ) {
-							return data["occurences_family"];
-					    }
-					},
+					"data": "inseal.occurences_family",
 				},
 				{
 					"className": 'showTitle size-300',
@@ -891,9 +873,10 @@
 							for (idx in data) {
 								score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
 							}
-							return (parseInt(score)/1000).toFixed(8);
+							return score;
 					    },
-					}
+					},
+                    "sType": "numeric"
 				},
 				{
 					"className": 'showTitle size-100',
@@ -910,8 +893,8 @@
 						"sort": function ( data, type, row, meta ) {
 							return impact_dict[data]["score"];
 					    },
-					}
-
+					},
+                    "sType": "numeric"
 				},
 				{
 					"className": 'showTitle size-300',
@@ -932,13 +915,14 @@
 							return data.toString();
 					    },
 						"sort": function ( data, type, row, meta ) {
-							sort = "A";
-							for (idx in consequences_dict) {
-								sort += data.includes(idx) ? "1" : "0";
-							}
-							return sort;
+                            var sort = 0;
+                            for (idx in data) {
+                                sort += consequences_dict[data[idx]]["score"];
+                            }
+							return Math.log10(sort);
 					    }
 					},
+                    "sType": "numeric"
 				},
 				{
 					"className": 'showTitle size-100',
