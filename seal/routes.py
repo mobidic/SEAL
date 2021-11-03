@@ -441,7 +441,6 @@ def json_variants(id, version=-1):
         return redirect(url_for('index'))
 
     variants = {"data": list()}
-    total_samples = db.session.query(Sample).count()
 
     # Get all canonical trancripts
 
@@ -533,11 +532,8 @@ def json_variants(id, version=-1):
                 main_annot = annot
                 continue
 
-        cnt = 0
-        cnt = db.session.query(Var2Sample).filter(Var2Sample.variant_ID == var2sample.variant_ID).count()
-
-        cnt_family = 0
-        members = []
+        cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status == 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
+        total_samples = db.session.query(Sample).filter(and_(Sample.status == 1, Sample.id != sample.id)).count()
         cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status == 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
@@ -559,8 +555,7 @@ def json_variants(id, version=-1):
             "inseal": {
                 "occurrences": cnt,
                 "total_samples": total_samples,
-                "occurences_family": cnt_family,
-                "members": members
+                "occurences_family": cnt_family
             }
         })
 
