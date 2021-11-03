@@ -159,6 +159,7 @@ class Var2Sample(db.Model):
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
     depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
+    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     analyse1 = db.Column(db.Boolean, nullable=False, unique=False, default=False)
     analyse2 = db.Column(db.Boolean, nullable=False, unique=False, default=False)
     reported = db.Column(db.Boolean, nullable=False, unique=False, default=False)
@@ -181,7 +182,7 @@ class Filter(db.Model):
 
 class Transcript(db.Model):
     # id = db.Column(db.Integer, primary_key=True)
-    feature = db.Column(db.String(30), unique=True, nullable=True, primary_key=True)
+    feature = db.Column(db.String(30), unique=True, nullable=False, primary_key=True)
     biotype = db.Column(db.String(50), unique=False, nullable=True)
     feature_type = db.Column(db.String(50), unique=False, nullable=True)
     symbol = db.Column(db.String(50), unique=False, nullable=True)

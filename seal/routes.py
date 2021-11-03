@@ -549,6 +549,7 @@ def json_variants(id, version=-1):
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
             "alt": f"{variant.alt}",
+            "filter": var2sample.filter,
             "depth": f"{var2sample.depth}",
             "analyse1": var2sample.analyse1,
             "analyse2": var2sample.analyse2,

@@ -78,6 +78,7 @@
 							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSg</th>
 							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSc</th>
 							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSp</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Filter</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>Depth</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>Allelic depth</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>Allelic frequencies</th>
@@ -138,6 +139,12 @@
 							<th class='w3-flat-green-sea showTitle control-size-250'>
 								HGVSp
 								<span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+									<i class="fas fa-question-circle"></i>
+								</span>
+							</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
+								Filter
+								<span onclick="openHelpModal(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -758,6 +765,35 @@
 				},
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
 				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
+				{
+					"className": 'showTitle size-200',
+					"data": "filter",
+					"render": {
+						"_": function ( data, type, row, meta ) {
+							cell = ""
+							style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+
+							for (idx in data) {
+								color = "asbestos";
+								cell += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
+							}
+							return cell;
+					    },
+						"filter": function ( data, type, row, meta ) {
+							return data.toString();
+					    },
+						"sort": function ( data, type, row, meta ) {
+                            val = 0
+                            for (d in data) {
+                                if (d == "PASS") {
+                                    return 1;
+                                }
+                                val += -1;
+                            }
+                            return val
+					    }
+					}
+				},
 				{ "className": 'showTitle control-size-100', "data": "depth"},
 				{ "className": 'showTitle control-size-100', "data": "allelic_depth"},
 				{ "className": 'showTitle control-size-100', "data": "allelic_frequency"},
@@ -855,7 +891,7 @@
 							for (idx in data) {
 								score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
 							}
-							return score;
+							return (parseInt(score)/1000).toFixed(8);
 					    },
 					}
 				},
