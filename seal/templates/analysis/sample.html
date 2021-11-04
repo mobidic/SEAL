@@ -51,6 +51,10 @@
 			opacity:1;
 			content: "\f0de" !important;
 		}
+
+        #variants_processing {
+            background: none;
+        }
 	</style>
 {% endblock %}
 
@@ -668,8 +672,10 @@
 			buttons:[{
 				extend: 'searchBuilder',
 	        }],
+            processing: true,
 			"language": {
-				"loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
+                "loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
+				"processing": '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
 			},
 			dom: 'Blfrtip',
 			scrollX: true,
@@ -1660,7 +1666,17 @@
 
 	function changeFilter(id) {
 		$.getJSON("/json/filter/" + id, function(data) {
-		    $('#variants').DataTable().searchBuilder.rebuild(data);
+            document.getElementById("variants_processing").style.visibility = "visible";
+            document.getElementById("variants_processing").style.zIndex = "10";
+            document.getElementById("variants_processing").style.display = "block";
+            document.getElementById("variants").style.opacity = "0.5";
+		    setTimeout(function () {
+                $('#variants').DataTable().searchBuilder.rebuild(data);
+                document.getElementById("variants_processing").style.visibility = "hidden";
+                document.getElementById("variants_processing").style.zIndex = "0";
+                document.getElementById("variants_processing").style.display = "none";
+                document.getElementById("variants").style.opacity = "1";
+            }, 30);
 		});
 	}
 
@@ -1783,7 +1799,6 @@
 				document.getElementById('selectBox').innerHTML = options
 			});
 		})
-
 	}
 </script>
 {% endblock %}
