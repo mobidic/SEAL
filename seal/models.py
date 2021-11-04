@@ -58,7 +58,8 @@ class User(db.Model, UserMixin):
     bioinfo = db.Column(db.Boolean(), nullable=False, default=False)
     technician = db.Column(db.Boolean(), nullable=False, default=False)
     biologist = db.Column(db.Boolean(), nullable=False, default=False)
-    filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), default=1)
+    filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=False, default=1)
+    filter = relationship("Filter", backref=db.backref("users"))
     transcripts = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     comments = relationship("Comment")
 

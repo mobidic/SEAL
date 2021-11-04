@@ -67,9 +67,8 @@
 		<div class="w3-padding">
 			<div class="w3-row w3-padding">
 				<div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
-				<select id="selectBox" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
+				<select disabled id="selectBox" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
 				</select>
-				<button class="w3-button w3-flat-green-sea w3-hover-flat-turquoise w3-ripple" onclick="save_filters()">Save filters</button>
 			</div>
 			<div class="w3-padding">
 				<table id="variants" class="w3-table-all" style="width:100%">
@@ -664,14 +663,22 @@
 		$.getJSON("/json/filters", function(data) {
 			var options = "";
 			for (x in data) {
-				options = options + '<option value="' + x + '">' + data[x] + '</option>';
+                option = '<option value="' + x + '" '
+                if (x == {{ current_user.filter_id }}) {
+                    option += 'selected>' + data[x] + ' (default)</option>';
+                } else {
+                    option += '>' + data[x] + '</option>';
+                }
+				options += option;
 			}
 			document.getElementById('selectBox').innerHTML = options
 		});
 	    table = $('#variants').DataTable({
-			buttons:[{
-				extend: 'searchBuilder',
-	        }],
+			buttons:[
+                {
+    				extend: 'searchBuilder',
+    	        }
+            ],
             processing: true,
 			"language": {
                 "loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
@@ -1094,7 +1101,17 @@
 						},
 					},
 				},
-			]
+			],
+            "initComplete": function(settings, json) {
+                changeFilter({{ current_user.filter_id }});
+                document.getElementById('selectBox').disabled = false;
+                table.button().add( 1, {
+                    text: 'Save Filter',
+                    action: function ( e, dt, node, config ) {
+                        save_filters()
+                    }
+                } );
+            }
 		});
 	} );
 
@@ -1102,7 +1119,6 @@
 		var d = table.searchBuilder.getDetails();
 		document.getElementById('filterText').innerHTML = JSON.stringify(d)
 		document.getElementById('filter-modal').style.display='block';
-		console.log(JSON.stringify(d));
 	}
 	// Script to open and close sidebar
 	function w3_open() {
@@ -1794,7 +1810,16 @@
 			$.getJSON("/json/filters", function(data) {
 				var options = "";
 				for (x in data) {
-					options = options + '<option value="' + x + '">' + data[x] + '</option>';
+                    option = '<option value="' + x + '" '
+                    if (data[x] == name) {
+                        option += "selected"
+                    }
+                    if (x == {{ current_user.filter_id }}) {
+                        option += '>' + data[x] + ' (default)</option>';
+                    } else {
+                        option += '>' + data[x] + '</option>';
+                    }
+    				options += option;
 				}
 				document.getElementById('selectBox').innerHTML = options
 			});
