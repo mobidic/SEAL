@@ -169,7 +169,7 @@ def importvcf():
             f" --plugin  MaxEntScan,{vep_config['MaxEntScan']} " + \
             f" --plugin SpliceAI,snv={vep_config['SpliceAI_snv']},indel={vep_config['SpliceAI_indel']} " + \
             f" --plugin dbscSNV,{vep_config['dbscSNV']} " + \
-            f" --custom {vep_config['gnomADg']},gnomADg,vcf,exact,0,AF_AFR,AF_AMR,AF_ASJ,AF_EAS,AF_FIN,AF_NFE,AF_OTH " + \
+            f" --custom {vep_config['gnomADg']},gnomADg,vcf,exact,0,AF_AFR,AF_AMR,AF_ASJ,AF_EAS,AF_FIN,AF_NFE,AF_OTH,AF " + \
             f" --fasta {vep_config['fasta']} " + \
             f" --fork {vep_config['fork']} " + \
             " --species homo_sapiens " + \
@@ -281,15 +281,6 @@ def importvcf():
                             missenses = numpy.array(missenses, dtype=numpy.float64)
                             mean = numpy.nanmean(missenses)
                             annot["missensesMean"] = None if numpy.isnan(mean) else mean
-
-                            # max gnomad
-                            gnomad = list()
-                            for value in GNOMADG:
-                                gno = None if annot[value] == "." else annot[value]
-                                gnomad.append(gno)
-                            gnomad = numpy.array(gnomad, dtype=numpy.float64)
-                            max = numpy.nanmax(gnomad)
-                            annot["gnomadMax"] = None if numpy.isnan(max) else max
 
                             # max spliceAI
                             spliceAI = list()

@@ -117,7 +117,7 @@
 							</th>
 							<th class='w3-flat-green-sea showTitle control-size-75'>
 								Can.
-    								<span onclick="openHelpModal(title='Canonical', content='This flag indicating if :<br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-alizarin fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'https://grch37.ensembl.org/info/docs/tools/vep/script/vep_options.html#opt_canonical\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity">
+    								<span onclick="openHelpModal(title='Canonical', content='Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-alizarin fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -171,7 +171,7 @@
 							</th>
 							<th class='w3-flat-green-sea showTitle control-size-100'>
 								GnomAD
-								<span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 (GRCh37/hg19) spans 125,748 exome sequences and 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
+								<span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
 									<i class="fas fa-question-circle"></i>
 								</span>
 							</th>
@@ -814,30 +814,15 @@
 				{ "className": 'showTitle control-size-100', "data": "allelic_frequency"},
 				{
 					"className": 'showTitle control-size-100',
-					"data": "annotations.gnomadMax",
+					"data": "annotations.gnomADg_AF",
 					"render" : {
 						"_" : function ( data, type, row, meta ) {
 							if(data != null) {
-					    		return data.toFixed(6);
+					    		return parseFloat(data).toFixed(6);
 							} else {
 								return null;
 							}
 					    },
-						"display" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(6);
-							} else {
-								return "NA";
-							}
-					    },
-	            		"sort" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(6);
-							} else {
-								num = -1
-								return num.toFixed(6);
-							}
-					    }
 					},
 				},
 				{
