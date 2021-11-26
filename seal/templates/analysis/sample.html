@@ -823,6 +823,20 @@
 								return null;
 							}
 					    },
+                        "display" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return parseFloat(data).toFixed(6);
+                            } else {
+                                return "NA";
+                            }
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return parseFloat(data).toFixed(6);
+                            } else {
+                                return -1
+                            }
+                        }
 					},
 				},
 				{
