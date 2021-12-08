@@ -322,18 +322,19 @@
 			</header>
 
 			<div class="w3-bar w3-border-bottom">
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allFeatures')">All Features</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allTranscripts')">Transcripts</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'links')">Links</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal (<span class="inSealCount"></span>)</button>
 				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'comments')">Comments (<span class="commentsCount"></span>)</button>
 			</div>
 
-			<div id="allFeatures" class="w3-container detail">
-				<h1>All features</h1>
-				<div id="allFeaturesTable"></div>
+			<div id="allTranscripts" class="w3-container detail">
+				<h1>Transcripts</h1>
+				<div id="allTranscriptsTable"></div>
 			</div>
 
 			<div id="missense" class="w3-container detail">
@@ -370,10 +371,19 @@
 				<h1>Splicing</h1>
 				<div class="w3-row">
 					<div id='chartSplicing' class="w3-col l3 m6 s6"><!-- Plotly chart will be drawn inside this DIV --></div>
-					<div class="w3-col l3 m6 s6" style="background-color:#FF00FF">
-						<div id="tableScoresPopulation"></div>
-					</div>
 				</div>
+			</div>
+
+			<div id="links" class="w3-container detail">
+				<h1>Links</h1>
+                <div id="test_link" style="column-count: 3;"></div>
+                <div class="w3-padding w3-display-bottommiddle w3-tiny">
+                    <span><i class="w3-text-flat-asbestos fas fa-flag"></i> dbSNP</span>
+                    <span><i class="w3-text-flat-amethyst fas fa-disease"></i> Cosmic</span>
+                    <span><i class="w3-text-flat-belize-hole fas fa-user-md"></i> CliVar</span>
+                    <span><i class="w3-text-flat-pomegranate fas fa-microscope"></i> UniProt</span>
+                    <span><i class="w3-text-flat-wet-asphalt fas fa-book"></i> PubMed</span>
+                </div>
 			</div>
 
 			<div id="inseal" class="w3-container detail">
@@ -1136,6 +1146,11 @@
 		document.getElementById("help-modal-footer").innerHTML = footer;
 		document.getElementById('help-modal').style.display='block'
 	}
+
+    function htmlLink(data) {
+      return `<a class="w3-hover-text-${data.color}" href="${data.link_prefix}${data.id}${data.link_suffix}" target="_blank"><i class="w3-text-${data.color} ${data.flag}"></i> ${data.id}</a>`;
+    }
+
 	const missenseScores = []
 	function openDetailsVariantModal(id, familyid) {
 		if (familyid) {
@@ -1144,8 +1159,8 @@
 			request = "/json/variant/" + id;
 		}
 		$.getJSON(request, function(data) {
-			allFeature = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
-			allFeature = allFeature + '<thead class="w3-flat-silver"><tr>'+
+			allTranscript = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+			allTranscript = allTranscript + '<thead class="w3-flat-silver"><tr>'+
 		        '<th class="w3-flat-silver control-size-100" >Gene</th>'+
 				'<th class="w3-flat-silver control-size-200">Transcript</th>'+
 				'<th class="w3-flat-silver control-size-150">Biotype</th>'+
@@ -1158,7 +1173,7 @@
 				'<th class="showTitle w3-flat-silver control-size-100">MES diff</th>'+
 				'<th class="showTitle w3-flat-silver control-size-100">MES alt</th>'+
 			'</tr></thead>';
-			allFeature = allFeature + '<tbody>';
+			allTranscript = allTranscript + '<tbody>';
 
 			var allScoresPredictions = {
 				"SIFT_converted_rankscore": null,
@@ -1247,8 +1262,74 @@
 					"name": "Donor Loss"
 				}
 			}
-
 			for (x in data["annotations"]["ANN"]) {
+
+                var links = []
+                for (idx_var in data["annotations"]["ANN"][x]["Existing_variation"]) {
+                    id_var = data["annotations"]["ANN"][x]["Existing_variation"][idx_var]
+                    if (RegExp("^rs[0-9]+").test(id_var)) {
+                        let dbsnp = {
+                            link_prefix: "https://www.ncbi.nlm.nih.gov/snp/",
+                            id: id_var,
+                            link_suffix: "",
+                            color: "flat-asbestos",
+                            flag: "fas fa-flag"
+                        }
+                        links.push(htmlLink(dbsnp))
+                    }
+                }
+                for (idx_var in data["annotations"]["ANN"][x]["VAR_SYNONYMS"]) {
+                    let var_synonyms = {
+                        link_prefix: "",
+                        id: "",
+                        link_suffix: "",
+                        color: "",
+                        flag: null
+                    }
+                    if (idx_var == "ClinVar") {
+                        var_synonyms.color = "flat-belize-hole"
+                        var_synonyms.flag = "fas fa-user-md"
+                        var_synonyms.clinvar = true
+                    } else if (idx_var == "UniProt") {
+                        var_synonyms.link_prefix = "https://web.expasy.org/variant_pages/"
+                        var_synonyms.link_suffix = ".html"
+                        var_synonyms.color = "flat-pomegranate"
+                        var_synonyms.flag = "fas fa-microscope"
+                    } else if (idx_var == "COSMIC") {
+                        var_synonyms.link_prefix = "https://cancer.sanger.ac.uk/cosmic/search?genome=37&q="
+                        var_synonyms.color = "flat-amethyst"
+                        var_synonyms.flag = "fas fa-disease"
+                    }
+                    if (var_synonyms.flag != null) {
+                        for (idx_var2 in data["annotations"]["ANN"][x]["VAR_SYNONYMS"][idx_var]) {
+                            var_synonyms.id = data["annotations"]["ANN"][x]["VAR_SYNONYMS"][idx_var][idx_var2]
+                            if (var_synonyms.clinvar) {
+                                if (RegExp("^VCV[0-9]+").test(var_synonyms.id)) {
+                                    var_synonyms.link_prefix = "https://www.ncbi.nlm.nih.gov/clinvar/variation/"
+                                } else {
+                                    var_synonyms.link_prefix = "https://www.ncbi.nlm.nih.gov/clinvar/"
+                                }
+                            }
+                            links.push(htmlLink(var_synonyms))
+                        }
+                    }
+
+                }
+
+                for (idx_var in data["annotations"]["ANN"][x]["PUBMED"]) {
+                    id_var = data["annotations"]["ANN"][x]["PUBMED"][idx_var]
+                    let pubmed = {
+                        link_prefix: "https://pubmed.ncbi.nlm.nih.gov/",
+                        id: id_var,
+                        link_suffix: "",
+                        color: "flat-wet-asphalt",
+                        flag: "fas fa-book"
+                    }
+                    links.push(htmlLink(pubmed))
+                }
+
+                document.getElementById("test_link").innerHTML = links.join("<br />");                var links = []
+
 				cell = "";
 				for (idx in consequences_dict) {
 					if (data["annotations"]["ANN"][x]["Consequence"].includes(idx)){
@@ -1266,7 +1347,7 @@
 				} else {
 					response = '<i title="" class="' + color + ' far fa-star"></i>';
 				}
-				allFeature = allFeature + '<tr>'+
+				allTranscript = allTranscript + '<tr>'+
 					'<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+
 		            '<td class="w3-text-black showTitle control-size-200" >'+data["annotations"]["ANN"][x]["Feature"]+'</td>'+
 					'<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["BIOTYPE"]+'</td>'+
@@ -1319,9 +1400,9 @@
 					}
 				}
 			}
-		    allFeature = allFeature + '</tbody>';
-		    allFeature = allFeature + '</table>';
-			document.getElementById("allFeaturesTable").innerHTML = allFeature;
+		    allTranscript = allTranscript + '</tbody>';
+		    allTranscript = allTranscript + '</table>';
+			document.getElementById("allTranscriptsTable").innerHTML = allTranscript;
 
 
 			inSeal = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
@@ -1673,10 +1754,10 @@
 		}
 		tablinks = document.getElementsByClassName("tablink");
 		for (i = 0; i < x.length; i++) {
-			tablinks[i].classList.remove("w3-light-grey");
+			tablinks[i].classList.remove("w3-flat-nephritis");
 		}
 		document.getElementById(detailName).style.display = "block";
-		evt.currentTarget.classList.add("w3-light-grey");
+		evt.currentTarget.classList.add("w3-flat-nephritis");
 	}
 
 	function changeFilter(id) {

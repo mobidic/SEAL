@@ -236,10 +236,22 @@ def importvcf():
                         for annot in v.info["ANN"]:
                             # Split annotations
                             for splitAnn in ANNOT_TO_SPLIT:
-                                try:
-                                    annot[splitAnn] = annot[splitAnn].split("&")
-                                except AttributeError:
-                                    annot[splitAnn] = []
+                                if splitAnn == 'VAR_SYNONYMS':
+                                    try:
+                                        var_synonyms = dict()
+                                        for vs in annot[splitAnn].split("--"):
+                                            key, values = vs.split("::")
+                                            values_array = values.split("&")
+                                            var_synonyms[key] = values_array
+
+                                        annot[splitAnn] = var_synonyms
+                                    except AttributeError:
+                                        annot[splitAnn] = dict()
+                                else:
+                                    try:
+                                        annot[splitAnn] = annot[splitAnn].split("&")
+                                    except AttributeError:
+                                        annot[splitAnn] = []
 
                             # transcript
                             transcript = Transcript.query.get(annot["Feature"])
