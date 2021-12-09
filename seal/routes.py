@@ -739,6 +739,17 @@ def toggle_varStatus():
     return f"{return_value}"
 
 
+@app.route("/toggle/samples/status", methods=['POST'])
+@login_required
+def toggle_sampleStatus():
+    sample_id = request.form["sample_id"]
+    sample = Sample.query.get(sample_id)
+    if sample.status == 1:
+        sample.status = 2
+        db.session.commit()
+    return f"{sample} - {sample.status}"
+
+
 @app.route("/add/comment/variant", methods=['POST'])
 @login_required
 def add_comment():
