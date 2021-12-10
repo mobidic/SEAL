@@ -76,22 +76,11 @@
 								} else if (data.status == 0) {
                                     response = '<span class="w3-text-flat-wet-asphalt"><i class="fas fa-cloud-download-alt"></i> <i><b>Upload</b> - in progress</i></span>';
 								} else if (data.status == 1) {
-									response = '<span class="w3-text-flat-peter-river">'+
-                                    '<span class="fa-layers fa-fw">'+
-                                        '<i class="fas fa-user w3-text-flat-peter-river"></i>'+
-                                        '<i class="fas fa-cog fa-spin w3-text-flat-wet-asphalt" data-fa-transform="shrink-6 down-2.5 left-7"></i>'+
-                                    '</span> <i><b>Analysis</b> - pending</i></span>';
+									response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>';
 								} else if (data.status == 2) {
-									response = '<span class="w3-text-flat-peter-river">'+
-                                    '<span class="fa-layers fa-fw">'+
-                                        '<i class="fas fa-user w3-text-flat-peter-river"></i>'+
-                                        '<i class="fas fa-pen-alt w3-text-flat-wet-asphalt" data-fa-transform="shrink-6 right-8"></i>'+
-                                    '</span> <i><b>Analysis</b> - processing</i></span>';
+									response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b> - analysing</i></span>';
 								} else if (data.status == 3) {
-									response = '<span class="w3-text-flat-emerald">'+
-                                    '<span class="fa-layers fa-fw">'+
-                                        '<i class="fas fa-user-check"></i>'+
-                                    '</span> <i><b>Validated</b> - analysed</i></span>';
+									response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b> - analysed</i></span>';
 								}  else {
                                     response = '<span class="w3-text-flat-orange"><i class="fas fa-exclamation-triangle"></i> <i><b>Warning</b> - contact admin</i></span>';
 								}
@@ -120,15 +109,19 @@
     		});
 			id = table.row( this ).data().id;
 			status = table.row( this ).data().status;
+
     		$.ajax({
     			type: "POST",
-    			url: "/toggle/samples/status",
+    			url: "/toggle/sample/status",
     			data: {
     				"sample_id": id
-    			}
-    		})
+    			},
+                success: function() {
+                    document.location.href = "/sample/" + id;
+                }
+    		});
 
-			document.location.href = "/sample/" + id;
+
 		} );
 
 		setInterval( function () {

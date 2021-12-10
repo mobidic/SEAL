@@ -61,8 +61,44 @@
 {% block content %}
 	{% include 'includes/sidebar.j2' %}
 	<div class="w3-main" style="margin-left:350px">
-		<div class="w3-bar w3-flat-silver w3-left-align w3-padding">
-			<h3><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
+		<div class="w3-container w3-flat-silver w3-padding">
+            <h3 class="w3-left"><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
+			<div class="w3-padding w3-right w3-container">
+                <div class="w3-dropdown-hover w3-right">
+                    <button class="w3-button w3-white" id="button-status">
+                    {% if sample.status == 1 %}
+                        <span class="w3-text-flat-peter-river">
+                            <i class="fas fa-user-clock"></i> <i><b>New</b></i>
+                        </span>
+                    {% elif sample.status == 2 %}
+                        <span class="w3-text-flat-peter-river">
+                            <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
+                        </span>
+                    {% elif sample.status == 3 %}
+                        <span class="w3-text-flat-emerald">
+                            <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
+                        </span>
+                    {% endif %}
+                    </button>
+                    <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+                        <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
+                            <span class="w3-text-flat-peter-river">
+                                <i class="fas fa-user-clock"></i> <i><b>New</b></i>
+                            </span>
+                        </a>
+                        <a onclick="toggle_status({{ sample.id }}, 2)" class="w3-bar-item w3-button">
+                            <span class="w3-text-flat-peter-river">
+                                <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
+                            </span>
+                        </a>
+                        <a onclick="toggle_status({{ sample.id }}, 3)" class="w3-bar-item w3-button">
+                            <span class="w3-text-flat-emerald">
+                                <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
+                            </span>
+                        </a>
+                    </div>
+                </div>
+            </div>
 		</div>
 		<div class="w3-padding">
 			<div class="w3-row w3-padding">
@@ -429,6 +465,36 @@
 
 {% block script %}
 <script type="text/javascript">
+    function toggle_status(id, status) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        console.log(id);
+        console.log(status);
+
+        $.ajax({
+            type: "POST",
+            url: "/toggle/sample/status",
+            data: {
+                "sample_id": id,
+                "status": status
+            },
+            success: function() {
+                if (status == 1) {
+                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b></i></span>';
+                } else if (status == 2) {
+                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b></i></span>';
+                } else if (status == 3) {
+                    response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b></i></span>';
+                }
+                document.getElementById("button-status").innerHTML = response;
+            }
+        });
+    }
 	const clinsig_dict = {
 		"uncertain_significance": {
 			"color": "orange",

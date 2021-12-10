@@ -275,7 +275,7 @@ def transcripts():
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
-    sample = db.session.query(Sample.samplename, Sample.id, Sample.familyid).filter(Sample.id == id).first()
+    sample = db.session.query(Sample.samplename, Sample.id, Sample.familyid, Sample.status).filter(Sample.id == id).first()
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
@@ -739,11 +739,17 @@ def toggle_varStatus():
     return f"{return_value}"
 
 
-@app.route("/toggle/samples/status", methods=['POST'])
+@app.route("/toggle/sample/status", methods=['POST'])
 @login_required
 def toggle_sampleStatus():
     sample_id = request.form["sample_id"]
     sample = Sample.query.get(sample_id)
+
+    if "status" in request.form:
+        sample.status = request.form["status"]
+        db.session.commit()
+        return f"{sample} - {sample.status}"
+
     if sample.status == 1:
         sample.status = 2
         db.session.commit()
