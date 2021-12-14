@@ -740,6 +740,18 @@ def toggle_varStatus():
     return f"{return_value}"
 
 
+@app.route("/toggle/samples/variant/class", methods=['POST'])
+@login_required
+def toggle_varClass():
+    id_var = request.form["id_var"]
+    sample_id = request.form["sample_id"]
+    class_variant = request.form["class_variant"]
+    v2s = Var2Sample.query.get((id_var, sample_id))
+    v2s.class_variant = class_variant
+    db.session.commit()
+    return f"{v2s.class_variant}"
+
+
 @app.route("/toggle/sample/status", methods=['POST'])
 @login_required
 def toggle_sampleStatus():

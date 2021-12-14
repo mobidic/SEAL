@@ -134,7 +134,7 @@
                             <th class='w3-flat-green-sea showTitle control-size-25'>A1</th>
                             <th class='w3-flat-green-sea showTitle control-size-25'>A2</th>
                             <th class='w3-flat-green-sea showTitle control-size-25'>R</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Class</th>
+                            <th class='w3-flat-green-sea showTitle control-size-200'>Class</th>
                             <th class="w3-flat-green-sea w3-center control-size-25"></th>
                         </tr>
                     </thead>
@@ -275,7 +275,7 @@
                             <th class='w3-flat-green-sea showTitle control-size-25'>
                                 R
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th class='w3-flat-green-sea showTitle control-size-200'>
                                 Class
                             </th>
                             <th class="w3-flat-green-sea w3-center control-size-25"></th>
@@ -737,6 +737,30 @@
         }
     };
 
+    const class_variant_html = [
+        '<span class="w3-text-flat-concrete"><i class="fas fa-ellipsis-h"></i></span>',
+        '<span class="w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
+            '<i class="fas fa-bookmark"></i>'+
+            '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
+        '</span> - Benign</span>',
+        '<span class="w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
+            '<i class="fas fa-bookmark"></i>'+
+            '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
+        '</span> - Likely Benign</span>',
+        '<span class="w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
+            '<i class="fas fa-bookmark"></i>'+
+            '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
+        '</span> - VUS</span>',
+        '<span class="w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
+            '<i class="fas fa-bookmark"></i>'+
+            '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
+        '</span> - Likely Pathogenic</span>',
+        '<span class="w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
+            '<i class="fas fa-bookmark"></i>'+
+            '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
+        '</span> - Pathogenic</span>',
+    ];
+
     $(document).ready(function() {
         $.getJSON("/json/filters", function(data) {
             var options = "";
@@ -1168,46 +1192,31 @@
                     }
                 },
                 {
-                    "className": 'showTitle size-25 w3-center',
-                    "data": "class_variant",
-                    "render": {
-                        "_" : function ( data, type, row, meta ) {
-                            if(data != null) {
-                                return data.toFixed(4);
-                            } else {
-                                return null;
+                    "className": 'showTitle size-200 w3-center',
+                    "data": {
+                        "_": "class_variant",
+                        "display": function ( data, type, row ) {
+                            if(data) {
+                                id_var = data.id
+                                class_variant = data.class_variant ? data.class_variant : 0;
+                                dropdown = ""
+                                for (c in class_variant_html) {
+                                    dropdown += '<a onclick="toggle_class(\'' + id_var + '\', {{ sample.id }}, ' + c +')" class="w3-bar-item w3-button">'+
+                                            class_variant_html[c]+
+                                        '</a>'
+                                }
+                                response = `<div class="w3-dropdown-hover w3-right" style="background-color:transparent">
+                                    <button class="w3-button" id="button-class-` + id_var + `">
+                                        ` + class_variant_html[class_variant] + `
+                                    </button>
+                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+                                        `+ dropdown +`
+                                    </div>
+                                </div>`
                             }
+                            return response;
                         },
-                        "display" : function ( data, type, row, meta ) {
-                            if (data == 1) {
-                                return '<span class="w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
-                                    '<i class="fas fa-map-marker"></i>'+
-                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
-                                '</span> - Benign</span>';
-                            } else if (data == 2) {
-                                return '<span class="w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
-                                    '<i class="fas fa-map-marker"></i>'+
-                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
-                                '</span> - Likely Benign</span>';
-                            } else if (data == 3) {
-                                return '<span class="w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
-                                    '<i class="fas fa-map-marker"></i>'+
-                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
-                                '</span> - VUS</span>';
-                            } else if (data == 4) {
-                                return '<span class="w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
-                                    '<i class="fas fa-map-marker"></i>'+
-                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
-                                '</span> - Likely Pathogenic</span>';
-                            } else if (data == 5) {
-                                return '<span class="w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
-                                    '<i class="fas fa-map-marker"></i>'+
-                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
-                                '</span> - Pathogenic</span>';
-                            }
-                            return "...";
-                        }
-                    },
+                    }
                 },
                 {
                     "className":      'details-control w3-center',
@@ -1901,6 +1910,29 @@
         if (event.target == document.getElementById('filter-modal')) {
           document.getElementById('filter-modal').style.display = "none";
         }
+    }
+
+    function toggle_class(id_var, sample_id, class_variant) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/toggle/samples/variant/class",
+            data: {
+                "id_var": id_var,
+                "sample_id": sample_id,
+                "class_variant": class_variant
+            },
+            success: function() {
+                id_button = 'button-class-' + id_var;
+                document.getElementById(id_button).innerHTML = class_variant_html[class_variant];
+            }
+        })
     }
 
     function toggle_var2sample_status(id, id_var, sample_id, type) {
