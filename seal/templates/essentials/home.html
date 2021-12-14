@@ -1,48 +1,48 @@
 {% extends 'base.html' %}
 
 {% block static %}
-	<style>
-		.access:hover {
-			cursor: pointer;
-		}
-		.disabled:hover {
-			cursor: not-allowed;
-		}
-		.load:hover {
-			cursor: wait;
-		}
-		.help:hover {
-			cursor: help;
-		}
-	</style>
+    <style>
+        .access:hover {
+            cursor: pointer;
+        }
+        .disabled:hover {
+            cursor: not-allowed;
+        }
+        .load:hover {
+            cursor: wait;
+        }
+        .help:hover {
+            cursor: help;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
-	{% include 'includes/sidebar.j2' %}
-	<div class="w3-main" style="margin-left:350px">
-		<div class="w3-padding">
-			<table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
-				<thead>
-					<tr>
-						<th class="w3-flat-green-sea"><div>Sample Name</div></th>
-						<th class="w3-flat-green-sea"><div>Family</div></th>
-						<th class="w3-flat-green-sea"><div>Run</div></th>
-						<th class="w3-flat-green-sea"><div>Run Alias</div></th>
-						<th class="w3-flat-green-sea"><div>Status</div></th>
-					</tr>
-				</thead>
-				<tfoot>
-					<tr>
-						<th class="w3-flat-green-sea"><div>Sample Name</div></th>
-						<th class="w3-flat-green-sea"><div>Family</div></th>
-						<th class="w3-flat-green-sea"><div>Run</div></th>
-						<th class="w3-flat-green-sea"><div>Run Alias</div></th>
-						<th class="w3-flat-green-sea"><div>Status</div></th>
-					</tr>
-				</tfoot>
-			</table>
-		</div>
-	</div>
+    {% include 'includes/sidebar.j2' %}
+    <div class="w3-main" style="margin-left:350px">
+        <div class="w3-padding">
+            <table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
+                <thead>
+                    <tr>
+                        <th class="w3-flat-green-sea"><div>Sample Name</div></th>
+                        <th class="w3-flat-green-sea"><div>Family</div></th>
+                        <th class="w3-flat-green-sea"><div>Run</div></th>
+                        <th class="w3-flat-green-sea"><div>Run Alias</div></th>
+                        <th class="w3-flat-green-sea"><div>Status</div></th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th class="w3-flat-green-sea"><div>Sample Name</div></th>
+                        <th class="w3-flat-green-sea"><div>Family</div></th>
+                        <th class="w3-flat-green-sea"><div>Run</div></th>
+                        <th class="w3-flat-green-sea"><div>Run Alias</div></th>
+                        <th class="w3-flat-green-sea"><div>Status</div></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
 {% endblock %}
 
 {% block script %}
@@ -97,19 +97,19 @@
         });
     }
 
-	$(document).ready(function() {
-	    table = $('#samples').DataTable({
-			scrollX: true,
-			"proccessing": true,  "serverSide": true,
-    		ajax: {
-				url: '/json/samples',
-				type: 'POST',
-				headers: {
-	                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+    $(document).ready(function() {
+        table = $('#samples').DataTable({
+            scrollX: true,
+            "proccessing": true,  "serverSide": true,
+            ajax: {
+                url: '/json/samples',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-			},
-    		"columns": [
-				{
+            },
+            "columns": [
+                {
                     "className": 'showTitle',
                     "data": {
                         _: "samplename",
@@ -121,16 +121,16 @@
                         }
                     }
                 },
-		        { "className": 'showTitle', "data": "family" },
-				{ "className": 'showTitle', "data": "run" },
-				{ "className": 'showTitle', "data": "run_alias" },
-				{
-					"className": 'showTitle ',
-					"data": {
-						"_": "status",
-						"display": function ( data, type, row ) {
+                { "className": 'showTitle', "data": "family" },
+                { "className": 'showTitle', "data": "run" },
+                { "className": 'showTitle', "data": "run_alias" },
+                {
+                    "className": 'showTitle ',
+                    "data": {
+                        "_": "status",
+                        "display": function ( data, type, row ) {
                             response = "";
-							if(data) {
+                            if(data) {
                                 if (data.status == -1) {
                                     response = '<span class="w3-text-flat-alizarin"><i title="Error" class="fas fa-times-circle"></i> <i><b>Error</b> - contact admin</i></span>';
                                 } else if (data.status == 0) {
@@ -161,35 +161,34 @@
                                         </a>
                                     </div>
                                 </div>`
-							}
-							return response;
-		                },
-					}
-				}
-			],
-			"createdRow": function( row, data, dataIndex ) {
-			    if ( data.status < 1 || data.status > 3) {
-					$(row).addClass( 'w3-disabled' );
-			    }
-			  }
-		});
+                            }
+                            return response;
+                        },
+                    }
+                }
+            ],
+            "createdRow": function( row, data, dataIndex ) {
+                if ( data.status < 1 || data.status > 3) {
+                    $(row).addClass( 'w3-disabled' );
+                }
+            }
+        });
 
-		setInterval( function () {
-		    table.ajax.reload();
-		}, 10000 );
+        setInterval( function () {
+            table.ajax.reload();
+        }, 10000 );
+    } );
 
-	} );
 
+    // Script to open and close sidebar
+    function w3_open() {
+        document.getElementById("sidebar").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+    }
 
-	// Script to open and close sidebar
-	function w3_open() {
-		document.getElementById("sidebar").style.display = "block";
-		document.getElementById("overlay").style.display = "block";
-	}
-
-	function w3_close() {
-		document.getElementById("sidebar").style.display = "none";
-		document.getElementById("overlay").style.display = "none";
-	}
+    function w3_close() {
+        document.getElementById("sidebar").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+    }
 </script>
 {% endblock %}

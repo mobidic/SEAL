@@ -1,137 +1,137 @@
 {% extends 'base.html' %}
 
 {% block static %}
-	<link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
-	<script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
+    <script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-	{% include 'includes/sidebar.j2' %}
-	<div class="w3-main" style="margin-left:350px">
-		<div class="w3-padding w3-mobile">
-			<div class="w3-card w3-padding w3-mobile">
-				<div class="w3-container w3-border-bottom">
-					<h3>Upload A New Sample</h3>
-				</div>
+    {% include 'includes/sidebar.j2' %}
+    <div class="w3-main" style="margin-left:350px">
+        <div class="w3-padding w3-mobile">
+            <div class="w3-card w3-padding w3-mobile">
+                <div class="w3-container w3-border-bottom">
+                    <h3>Upload A New Sample</h3>
+                </div>
 
-				<form class="w3-container"  action="" method="post" enctype="multipart/form-data">
-					{{ form.hidden_tag() }}
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-						<div class="w3-rest">
-							{% if form.samplename.errors %}
-								{{ form.samplename(class="w3-input w3-border w3-border-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in form.samplename.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ form.samplename(class="w3-input w3-border") }}
-							{% endif %}
-						</div>
-					</div>
+                <form class="w3-container"  action="" method="post" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.samplename.errors %}
+                                {{ form.samplename(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.samplename.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.samplename(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-users"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-						<div class="w3-rest">
-							{% if form.family.errors %}
-								{{ form.family(class="w3-input w3-border w3-border-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in form.family.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ form.family(class="w3-input w3-border") }}
-							{% endif %}
-						</div>
-					</div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-users"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.family.errors %}
+                                {{ form.family(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.family.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.family(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-digital-tachograph"></i> {{ form.run.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-						<div class="w3-rest">
-							{% if form.run.errors %}
-								{{ form.run(class="w3-input w3-border w3-border-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in form.run.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ form.run(class="w3-input w3-border") }}
-							{% endif %}
-						</div>
-					</div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-digital-tachograph"></i> {{ form.run.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.run.errors %}
+                                {{ form.run(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.run.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.run(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-						<div class="w3-rest">
-							{% if form.vcf_file.errors %}
-								{{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in form.vcf_file.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ form.vcf_file(class="w3-input w3-border-0") }}
-							{% endif %}
-						</div>
-					</div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.vcf_file.errors %}
+                                {{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.vcf_file.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.vcf_file(class="w3-input w3-border-0") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					{{ form.carrier(class="w3-check") }}
-					{{ form.carrier.label() }}
+                    {{ form.carrier(class="w3-check") }}
+                    {{ form.carrier.label() }}
 
-					{{ form.index(class="w3-check") }}
-					{{ form.index.label() }}
+                    {{ form.index(class="w3-check") }}
+                    {{ form.index.label() }}
 
-					<div class="w3-section w3-center">
-						{{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
-					</div>
-				</form>
-				<div id="result"></div>
-			</div>
-		</div>
-	</div>
+                    <div class="w3-section w3-center">
+                        {{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+                    </div>
+                </form>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 
 {% block script %}
 <script type="text/javascript">
-	// Script to open and close sidebar
-	function w3_open() {
-		document.getElementById("sidebar").style.display = "block";
-		document.getElementById("overlay").style.display = "block";
-	}
+    // Script to open and close sidebar
+    function w3_open() {
+        document.getElementById("sidebar").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+    }
 
-	function w3_close() {
-		document.getElementById("sidebar").style.display = "none";
-		document.getElementById("overlay").style.display = "none";
-	}
+    function w3_close() {
+        document.getElementById("sidebar").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+    }
 
-	$(document).ready(function(){
-		var families=[];
-		$.getJSON('/json/families', function(data, status, xhr){
-			for (var i = 0; i < data['data'].length; i++ ) {
-				families.push(data["data"][i]["family"]);
-			}
-		});
+    $(document).ready(function(){
+        var families=[];
+        $.getJSON('/json/families', function(data, status, xhr){
+            for (var i = 0; i < data['data'].length; i++ ) {
+                families.push(data["data"][i]["family"]);
+            }
+        });
 
-		$('#family').autocomplete({
-			source: families,
-		});
+        $('#family').autocomplete({
+            source: families,
+        });
 
-		var runs=[];
-		$.getJSON('/json/runs', function(data, status, xhr){
-			for (var i = 0; i < data['data'].length; i++ ) {
-				runs.push(data["data"][i]["run_name"]);
-			}
-		});
+        var runs=[];
+        $.getJSON('/json/runs', function(data, status, xhr){
+            for (var i = 0; i < data['data'].length; i++ ) {
+                runs.push(data["data"][i]["run_name"]);
+            }
+        });
 
-		$('#run').autocomplete({
-			source: runs,
-		});
-	});
+        $('#run').autocomplete({
+            source: runs,
+        });
+    });
 </script>
 {% endblock %}

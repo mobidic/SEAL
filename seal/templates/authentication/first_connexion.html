@@ -1,69 +1,69 @@
 {% extends 'base.html' %}
 
 {% block content %}
-	<div class="w3-content w3-display-middle w3-padding" style="width:100%;min-width:400px">
-		<div class="w3-content w3-card-4" style="width:100%">
-			<div class="w3-container w3-flat-green-sea">
-				<h2>Update Password</h2>
-			</div>
+    <div class="w3-content w3-display-middle w3-padding" style="width:100%;min-width:400px">
+        <div class="w3-content w3-card-4" style="width:100%">
+            <div class="w3-container w3-flat-green-sea">
+                <h2>Update Password</h2>
+            </div>
 
-			<div class="w3-container">
-				{% include "includes/flash.j2" %}
-				<form action="" method="post">
-					{{ update_password_form.hidden_tag() }}
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.old_password.label() }}</b></div>
-						<div class="w3-rest">
-							{% if update_password_form.old_password.errors %}
-								{{ update_password_form.old_password(class="w3-input w3-border w3-border-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in update_password_form.old_password.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ update_password_form.old_password(class="w3-input w3-border") }}
-							{% endif %}
-						</div>
-					</div>
+            <div class="w3-container">
+                {% include "includes/flash.j2" %}
+                <form action="" method="post">
+                    {{ update_password_form.hidden_tag() }}
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.old_password.label() }}</b></div>
+                        <div class="w3-rest">
+                            {% if update_password_form.old_password.errors %}
+                                {{ update_password_form.old_password(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in update_password_form.old_password.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ update_password_form.old_password(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.new_password.label() }}</b></div>
-						<div class="w3-rest">
-							{% if update_password_form.new_password.errors %}
-								{{ update_password_form.new_password(class="w3-input w3-border w3-border-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in update_password_form.new_password.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ update_password_form.new_password(class="w3-input w3-border") }}
-							{% endif %}
-						</div>
-					</div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.new_password.label() }}</b></div>
+                        <div class="w3-rest">
+                            {% if update_password_form.new_password.errors %}
+                                {{ update_password_form.new_password(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in update_password_form.new_password.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ update_password_form.new_password(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					<div class="w3-row w3-section">
-						<div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.confirm_password.label() }}</b></div>
-						<div class="w3-rest">
-							{% if update_password_form.confirm_password.errors %}
-								{{ update_password_form.confirm_password(class="w3-input w3-border w3-border-red") }}
-								<div class="w3-small w3-text-flat-alizarin">
-									{% for error in update_password_form.confirm_password.errors %}
-										<i class="fas fa-exclamation-circle"></i> {{ error }}
-									{% endfor %}
-								</div>
-							{% else %}
-								{{ update_password_form.confirm_password(class="w3-input w3-border") }}
-							{% endif %}
-						</div>
-					</div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-text-flat-green-sea w3-center" style="width:100px"><b>{{ update_password_form.confirm_password.label() }}</b></div>
+                        <div class="w3-rest">
+                            {% if update_password_form.confirm_password.errors %}
+                                {{ update_password_form.confirm_password(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in update_password_form.confirm_password.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ update_password_form.confirm_password(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
 
-					<div class="w3-section w3-center">
-						{{ update_password_form.submit_password(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+                    <div class="w3-section w3-center">
+                        {{ update_password_form.submit_password(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

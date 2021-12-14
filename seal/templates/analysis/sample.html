@@ -1,69 +1,69 @@
 {% extends 'base.html' %}
 
 {% block static %}
-	<script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
-	{% include 'includes/loading_bar.dt.j2' %}
+    <script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
+    {% include 'includes/loading_bar.dt.j2' %}
 
-	<style>
-		/* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
+    <style>
+        /* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
 
 
-		.tableFixHead {
-		    overflow-y: auto;
-		    height: 434.5px;
-		}
-		.tableFixHead thead th {
-		    position: sticky;
-		    top: 0;
-		}
-		/*
-		©Raj Rajhans
-		rajrajhans.com
-		Day #4 : 30 Days CSS
-		*/
-		.dtfc-fixed-left{z-index:1;}
+        .tableFixHead {
+            overflow-y: auto;
+            height: 434.5px;
+        }
+        .tableFixHead thead th {
+            position: sticky;
+            top: 0;
+        }
+        /*
+        ©Raj Rajhans
+        rajrajhans.com
+        Day #4 : 30 Days CSS
+        */
+        .dtfc-fixed-left{z-index:1;}
 
-		.w3-modal table.dataTable thead th {
-			position: relative;
-			background-image: none !important;
-		}
-		.w3-modal table.dataTable thead .sorting {
-			background-image: none !important;
-		}
-		.w3-modal table.dataTable thead th.sorting:after,
-		.w3-modal table.dataTable thead th.sorting_asc:after,
-		.w3-modal table.dataTable thead th.sorting_desc:after {
-			position: absolute !important;
-			top: 12px !important;
-			right: 8px !important;
-			font-size: 0.8em !important;
-			font-family: 'Font Awesome\ 5 Free' !important;
-		}
-		.w3-modal table.dataTable thead th.sorting:after {
-			content: "\f0dc" !important;
-			opacity:0.5;
-		}
-		.w3-modal table.dataTable thead th.sorting_asc:after {
-			opacity:1;
-			content: "\f0dd" !important;
-		}
-		.w3-modal table.dataTable thead th.sorting_desc:after {
-			opacity:1;
-			content: "\f0de" !important;
-		}
+        .w3-modal table.dataTable thead th {
+            position: relative;
+            background-image: none !important;
+        }
+        .w3-modal table.dataTable thead .sorting {
+            background-image: none !important;
+        }
+        .w3-modal table.dataTable thead th.sorting:after,
+        .w3-modal table.dataTable thead th.sorting_asc:after,
+        .w3-modal table.dataTable thead th.sorting_desc:after {
+            position: absolute !important;
+            top: 12px !important;
+            right: 8px !important;
+            font-size: 0.8em !important;
+            font-family: 'Font Awesome\ 5 Free' !important;
+        }
+        .w3-modal table.dataTable thead th.sorting:after {
+            content: "\f0dc" !important;
+            opacity:0.5;
+        }
+        .w3-modal table.dataTable thead th.sorting_asc:after {
+            opacity:1;
+            content: "\f0dd" !important;
+        }
+        .w3-modal table.dataTable thead th.sorting_desc:after {
+            opacity:1;
+            content: "\f0de" !important;
+        }
 
         #variants_processing {
             background: none;
         }
-	</style>
+    </style>
 {% endblock %}
 
 {% block content %}
-	{% include 'includes/sidebar.j2' %}
-	<div class="w3-main" style="margin-left:350px">
-		<div class="w3-container w3-flat-silver w3-padding">
+    {% include 'includes/sidebar.j2' %}
+    <div class="w3-main" style="margin-left:350px">
+        <div class="w3-container w3-flat-silver w3-padding">
             <h3 class="w3-left"><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
-			<div class="w3-padding w3-right w3-container">
+            <div class="w3-padding w3-right w3-container">
                 <div class="w3-dropdown-hover w3-right">
                     <button class="w3-button w3-white" id="button-status">
                     {% if sample.status == 1 %}
@@ -99,323 +99,323 @@
                     </div>
                 </div>
             </div>
-		</div>
-		<div class="w3-padding">
-			<div class="w3-row w3-padding">
-				<div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
-				<select disabled id="selectBox" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
-				</select>
-			</div>
-			<div class="w3-padding">
-				<table id="variants" class="w3-table-all" style="width:100%">
-					<thead>
-						<tr>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Gene</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Feature</th>
-							<th class='w3-flat-green-sea showTitle control-size-75'>Can.</th>
-							<th class='w3-flat-green-sea showTitle control-size-150'>Exon/Intron</th>
-							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSg</th>
-							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSc</th>
-							<th class='w3-flat-green-sea showTitle control-size-250'>HGVSp</th>
+        </div>
+        <div class="w3-padding">
+            <div class="w3-row w3-padding">
+                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
+                <select disabled id="selectBox" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
+                </select>
+            </div>
+            <div class="w3-padding">
+                <table id="variants" class="w3-table-all" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Gene</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Feature</th>
+                            <th class='w3-flat-green-sea showTitle control-size-75'>Can.</th>
+                            <th class='w3-flat-green-sea showTitle control-size-150'>Exon/Intron</th>
+                            <th class='w3-flat-green-sea showTitle control-size-250'>HGVSg</th>
+                            <th class='w3-flat-green-sea showTitle control-size-250'>HGVSc</th>
+                            <th class='w3-flat-green-sea showTitle control-size-250'>HGVSp</th>
                             <th class='w3-flat-green-sea showTitle control-size-100'>Filter</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Depth</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Allelic depth</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Allelic frequencies</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>GnomAD</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>SEAL (pct)</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>SEAL (cnt)</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>In Family</th>
-							<th class='w3-flat-green-sea showTitle control-size-300'>ClinSig</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Impact</th>
-							<th class='w3-flat-green-sea showTitle control-size-300'>Consequence</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>MES var</th>
-							<th class='w3-flat-green-sea showTitle control-size-125'>SpliceAI DS</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
-							<th class='w3-flat-green-sea showTitle control-size-25'>A1</th>
-							<th class='w3-flat-green-sea showTitle control-size-25'>A2</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Depth</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Allelic depth</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Allelic frequencies</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>GnomAD</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>SEAL (pct)</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>SEAL (cnt)</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>In Family</th>
+                            <th class='w3-flat-green-sea showTitle control-size-300'>ClinSig</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Impact</th>
+                            <th class='w3-flat-green-sea showTitle control-size-300'>Consequence</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>MES var</th>
+                            <th class='w3-flat-green-sea showTitle control-size-125'>SpliceAI DS</th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
+                            <th class='w3-flat-green-sea showTitle control-size-25'>A1</th>
+                            <th class='w3-flat-green-sea showTitle control-size-25'>A2</th>
                             <th class='w3-flat-green-sea showTitle control-size-25'>R</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>Class</th>
-							<th class="w3-flat-green-sea w3-center control-size-25"></th>
-						</tr>
-					</thead>
-					<tfoot>
-						<tr>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Gene
-								<span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Feature
-								<span onclick="openHelpModal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-75'>
-								Can.
-    								<span onclick="openHelpModal(title='Canonical', content='Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-alizarin fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-150'>
-								Exon/Intron
-								<span onclick="openHelpModal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-	                        <th class='w3-flat-green-sea showTitle control-size-250'>
-								HGVSg
-								<span onclick="openHelpModal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-	                        <th class='w3-flat-green-sea showTitle control-size-250'>
-								HGVSc
-								<span onclick="openHelpModal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-250'>
-								HGVSp
-								<span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Filter
-								<span onclick="openHelpModal(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Depth
-								<span onclick="openHelpModal(title='Depth', content='Depth in DNA sequencing is the number of unique reads that include a given nucleotide in the reconstructed sequence.', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Allelic depth
-								<span onclick="openHelpModal(title='Allelic depth', content='Depth of the observed allele.', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Allelic frequencies
-								<span onclick="openHelpModal(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								GnomAD
-								<span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								SEAL (pct)
-								<span onclick="openHelpModal(title='SEAL (pct)', content='The percentage of occurrence of this variant in SEAL, excluding this sample.', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								SEAL (cnt)
-								<span onclick="openHelpModal(title='SEAL (count)', content='The number of occurrences of this variant in SEAL, excluding this sample.', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								In Family
-								<span onclick="openHelpModal(title='In Family', content='Count variant presence in the case family and list all samples in the faimily with this variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-300'>
-								ClinSig
-								<span onclick="openHelpModal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Impact
-								<span onclick="openHelpModal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-300'>
-								Consequence
-								<span onclick="openHelpModal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								MES var
-								<span onclick="openHelpModal(title='MES alt', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li>|percent variation| &ge; 0.15</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-125'>
-								SpliceAI DS
-								<span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Missense
-								<span onclick="openHelpModal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
-									<i class="fas fa-question-circle"></i>
-								</span>
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-25'>
-								A1
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-25'>
-								A2
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-25'>
-								R
-							</th>
-							<th class='w3-flat-green-sea showTitle control-size-100'>
-								Class
-							</th>
-							<th class="w3-flat-green-sea w3-center control-size-25"></th>
-						</tr>
-					</tfoot>
-				</table>
-			</div>
-		</div>
-	</div>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>Class</th>
+                            <th class="w3-flat-green-sea w3-center control-size-25"></th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Gene
+                                <span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Feature
+                                <span onclick="openHelpModal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-75'>
+                                Can.
+                                    <span onclick="openHelpModal(title='Canonical', content='Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-alizarin fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-150'>
+                                Exon/Intron
+                                <span onclick="openHelpModal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-250'>
+                                HGVSg
+                                <span onclick="openHelpModal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-250'>
+                                HGVSc
+                                <span onclick="openHelpModal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-250'>
+                                HGVSp
+                                <span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Filter
+                                <span onclick="openHelpModal(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Depth
+                                <span onclick="openHelpModal(title='Depth', content='Depth in DNA sequencing is the number of unique reads that include a given nucleotide in the reconstructed sequence.', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Allelic depth
+                                <span onclick="openHelpModal(title='Allelic depth', content='Depth of the observed allele.', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Allelic frequencies
+                                <span onclick="openHelpModal(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                GnomAD
+                                <span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                SEAL (pct)
+                                <span onclick="openHelpModal(title='SEAL (pct)', content='The percentage of occurrence of this variant in SEAL, excluding this sample.', footer='Warning : this value include this sample')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                SEAL (cnt)
+                                <span onclick="openHelpModal(title='SEAL (count)', content='The number of occurrences of this variant in SEAL, excluding this sample.', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                In Family
+                                <span onclick="openHelpModal(title='In Family', content='Count variant presence in the case family and list all samples in the faimily with this variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-300'>
+                                ClinSig
+                                <span onclick="openHelpModal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Impact
+                                <span onclick="openHelpModal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-300'>
+                                Consequence
+                                <span onclick="openHelpModal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                MES var
+                                <span onclick="openHelpModal(title='MES alt', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li>|percent variation| &ge; 0.15</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-125'>
+                                SpliceAI DS
+                                <span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Missense
+                                <span onclick="openHelpModal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                    <i class="fas fa-question-circle"></i>
+                                </span>
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-25'>
+                                A1
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-25'>
+                                A2
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-25'>
+                                R
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                                Class
+                            </th>
+                            <th class="w3-flat-green-sea w3-center control-size-25"></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
 
-	<!-- MODALS -->
-	<div id="help-modal" class="w3-modal">
-		<div class="w3-modal-content w3-card-4">
-			<header class="w3-container w3-flat-turquoise">
-				<span onclick="document.getElementById('help-modal').style.display='none'"
-					class="w3-button w3-display-topright">&times;</span>
-				<h5 id="help-modal-title"></h5>
-			</header>
-			<div class="w3-container">
-				<p id="help-modal-content"></p>
-			</div>
-			<footer class="w3-container w3-flat-turquoise">
-				<p id="help-modal-footer"></p>
-			</footer>
-		</div>
-	</div>
+    <!-- MODALS -->
+    <div id="help-modal" class="w3-modal">
+        <div class="w3-modal-content w3-card-4">
+            <header class="w3-container w3-flat-turquoise">
+                <span onclick="document.getElementById('help-modal').style.display='none'"
+                    class="w3-button w3-display-topright">&times;</span>
+                <h5 id="help-modal-title"></h5>
+            </header>
+            <div class="w3-container">
+                <p id="help-modal-content"></p>
+            </div>
+            <footer class="w3-container w3-flat-turquoise">
+                <p id="help-modal-footer"></p>
+            </footer>
+        </div>
+    </div>
 
-	<div id="filter-modal" class="w3-modal">
-		<div class="w3-modal-content w3-card-4">
-			<header class="w3-container w3-flat-turquoise">
-				<span onclick="document.getElementById('filter-modal').style.display='none'"
-					class="w3-button w3-display-topright">&times;</span>
-				<h5 id="filter-modal-title">Save Filter</h5>
-			</header>
-			<div class="w3-container">
-				{{ saveFilterForm.hidden_tag() }}
-				<div class="w3-row w3-section">
-					<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-tag"></i></div>
-					<div class="w3-rest">
-						{% if saveFilterForm.filterName.errors %}
-							{{ saveFilterForm.filterName(class="w3-input w3-border w3-border-red") }}
-							<div class="w3-small w3-text-flat-alizarin">
-								{% for error in saveFilterForm.filterName.errors %}
-									<i class="fas fa-exclamation-circle"></i> {{ error }}
-								{% endfor %}
-							</div>
-						{% else %}
-							{{ saveFilterForm.filterName(class="w3-input w3-border") }}
-						{% endif %}
-					</div>
-				</div>
-				<div class="w3-row w3-section">
-					<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-filter"></i></div>
-					<div class="w3-rest">
-						{% if saveFilterForm.filterText.errors %}
-							{{ saveFilterForm.filterText(class="w3-input w3-border w3-border-red") }}
-							<div class="w3-small w3-text-flat-alizarin">
-								{% for error in saveFilterForm.filterText.errors %}
-									<i class="fas fa-exclamation-circle"></i> {{ error }}
-								{% endfor %}
-							</div>
-						{% else %}
-							{{ saveFilterForm.filterText(class="w3-input w3-border", disabled=True) }}
-						{% endif %}
-					</div>
-				</div>
+    <div id="filter-modal" class="w3-modal">
+        <div class="w3-modal-content w3-card-4">
+            <header class="w3-container w3-flat-turquoise">
+                <span onclick="document.getElementById('filter-modal').style.display='none'"
+                    class="w3-button w3-display-topright">&times;</span>
+                <h5 id="filter-modal-title">Save Filter</h5>
+            </header>
+            <div class="w3-container">
+                {{ saveFilterForm.hidden_tag() }}
+                <div class="w3-row w3-section">
+                    <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-tag"></i></div>
+                    <div class="w3-rest">
+                        {% if saveFilterForm.filterName.errors %}
+                            {{ saveFilterForm.filterName(class="w3-input w3-border w3-border-red") }}
+                            <div class="w3-small w3-text-flat-alizarin">
+                                {% for error in saveFilterForm.filterName.errors %}
+                                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ saveFilterForm.filterName(class="w3-input w3-border") }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="w3-row w3-section">
+                    <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-filter"></i></div>
+                    <div class="w3-rest">
+                        {% if saveFilterForm.filterText.errors %}
+                            {{ saveFilterForm.filterText(class="w3-input w3-border w3-border-red") }}
+                            <div class="w3-small w3-text-flat-alizarin">
+                                {% for error in saveFilterForm.filterText.errors %}
+                                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ saveFilterForm.filterText(class="w3-input w3-border", disabled=True) }}
+                        {% endif %}
+                    </div>
+                </div>
 
-				<div class="w3-section w3-center">
-					{{ saveFilterForm.submit(id="validateSaveFilter", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="validateFilter();") }}
-				</div>
-			</div>
-			<footer class="w3-container w3-flat-turquoise">
-				<p id="filter-modal-footer">foo</p>
-			</footer>
-		</div>
-	</div>
+                <div class="w3-section w3-center">
+                    {{ saveFilterForm.submit(id="validateSaveFilter", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="validateFilter();") }}
+                </div>
+            </div>
+            <footer class="w3-container w3-flat-turquoise">
+                <p id="filter-modal-footer">foo</p>
+            </footer>
+        </div>
+    </div>
 
-	<div id="modal-details-variant" class="w3-modal">
-		<div class="w3-modal-content w3-card-4 w3-animate-zoom">
-			<header class="w3-container w3-flat-emerald">
-				<span onclick="document.getElementById('modal-details-variant').style.display='none'"
-				class="w3-button w3-flat-emerald w3-xlarge w3-display-topright">&times;</span>
-				<h2>Variant : <span id="variant-id"><span></h2>
-			</header>
+    <div id="modal-details-variant" class="w3-modal">
+        <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+            <header class="w3-container w3-flat-emerald">
+                <span onclick="document.getElementById('modal-details-variant').style.display='none'"
+                class="w3-button w3-flat-emerald w3-xlarge w3-display-topright">&times;</span>
+                <h2>Variant : <span id="variant-id"><span></h2>
+            </header>
 
-			<div class="w3-bar w3-border-bottom">
+            <div class="w3-bar w3-border-bottom">
                 <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'allTranscripts')">Transcripts</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'missense')">Missense</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'conservation')">Conservation</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'population')">Population</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'splicing')">Splicing</button>
                 <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'links')">Links</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal (<span class="inSealCount"></span>)</button>
-				<button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'comments')">Comments (<span class="commentsCount"></span>)</button>
-			</div>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'inseal')">In Seal (<span class="inSealCount"></span>)</button>
+                <button class="tablink w3-bar-item w3-button" onclick="openDetails(event, 'comments')">Comments (<span class="commentsCount"></span>)</button>
+            </div>
 
-			<div id="allTranscripts" class="w3-container detail">
-				<h1>Transcripts</h1>
-				<div id="allTranscriptsTable"></div>
-			</div>
+            <div id="allTranscripts" class="w3-container detail">
+                <h1>Transcripts</h1>
+                <div id="allTranscriptsTable"></div>
+            </div>
 
-			<div id="missense" class="w3-container detail">
-				<h1>Missense</h1>
-				<div class="w3-row">
-					<div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
-					<div class="w3-col l6 m12 s12">
-						<div id="tableScoresPredictions"></div>
-					</div>
-				</div>
-			</div>
+            <div id="missense" class="w3-container detail">
+                <h1>Missense</h1>
+                <div class="w3-row">
+                    <div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
+                    <div class="w3-col l6 m12 s12">
+                        <div id="tableScoresPredictions"></div>
+                    </div>
+                </div>
+            </div>
 
-			<div id="conservation" class="w3-container detail">
-				<h1>Conservation</h1>
-				<div class="w3-row">
-					<div id='radarConservation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
-					<div class="w3-col l6 m12 s12">
-						<div id="tableScoresConservation"></div>
-					</div>
-				</div>
-			</div>
+            <div id="conservation" class="w3-container detail">
+                <h1>Conservation</h1>
+                <div class="w3-row">
+                    <div id='radarConservation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
+                    <div class="w3-col l6 m12 s12">
+                        <div id="tableScoresConservation"></div>
+                    </div>
+                </div>
+            </div>
 
-			<div id="population" class="w3-container detail">
-				<h1>Population</h1>
-				<div class="w3-row">
-					<div id='radarPopulation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
-					<div class="w3-col l6 m12 s12">
-						<div id="tableScoresPopulation"></div>
-					</div>
-				</div>
-			</div>
+            <div id="population" class="w3-container detail">
+                <h1>Population</h1>
+                <div class="w3-row">
+                    <div id='radarPopulation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
+                    <div class="w3-col l6 m12 s12">
+                        <div id="tableScoresPopulation"></div>
+                    </div>
+                </div>
+            </div>
 
-			<div id="splicing" class="w3-container detail">
-				<h1>Splicing</h1>
-				<div class="w3-row">
-					<div id='chartSplicing' class="w3-col l3 m6 s6"><!-- Plotly chart will be drawn inside this DIV --></div>
-				</div>
-			</div>
+            <div id="splicing" class="w3-container detail">
+                <h1>Splicing</h1>
+                <div class="w3-row">
+                    <div id='chartSplicing' class="w3-col l3 m6 s6"><!-- Plotly chart will be drawn inside this DIV --></div>
+                </div>
+            </div>
 
-			<div id="links" class="w3-container detail">
-				<h1>Links</h1>
+            <div id="links" class="w3-container detail">
+                <h1>Links</h1>
                 <div id="test_link" style="column-count: 3;"></div>
                 <div class="w3-padding w3-display-bottommiddle w3-tiny">
                     <span><i class="w3-text-flat-asbestos fas fa-flag"></i> dbSNP</span>
@@ -424,45 +424,45 @@
                     <span><i class="w3-text-flat-pomegranate fas fa-microscope"></i> UniProt</span>
                     <span><i class="w3-text-flat-wet-asphalt fas fa-book"></i> PubMed</span>
                 </div>
-			</div>
+            </div>
 
-			<div id="inseal" class="w3-container detail">
-				<h1>In Seal (<span class="inSealCount"></span>)</h1>
-				<div id="inSEALTable"></div>
-			</div>
+            <div id="inseal" class="w3-container detail">
+                <h1>In Seal (<span class="inSealCount"></span>)</h1>
+                <div id="inSEALTable"></div>
+            </div>
 
-			<div id="comments" class="w3-container detail">
-				<h1>Comments (<span class="commentsCount"></span>)</h1>
+            <div id="comments" class="w3-container detail">
+                <h1>Comments (<span class="commentsCount"></span>)</h1>
 
-				{{ form.hidden_tag() }}
-				<div class="w3-row w3-section">
-					<div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-comment"></i></div>
-					<div class="w3-rest">
-						{% if form.comment.errors %}
-							{{ form.comment(class="w3-input w3-border w3-border-red") }}
-							<div class="w3-small w3-text-flat-alizarin">
-								{% for error in form.comment.errors %}
-									<i class="fas fa-exclamation-circle"></i> {{ error }}
-								{% endfor %}
-							</div>
-						{% else %}
-							{{ form.comment(class="w3-input w3-border") }}
-						{% endif %}
-					</div>
-				</div>
+                {{ form.hidden_tag() }}
+                <div class="w3-row w3-section">
+                    <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-comment"></i></div>
+                    <div class="w3-rest">
+                        {% if form.comment.errors %}
+                            {{ form.comment(class="w3-input w3-border w3-border-red") }}
+                            <div class="w3-small w3-text-flat-alizarin">
+                                {% for error in form.comment.errors %}
+                                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            {{ form.comment(class="w3-input w3-border") }}
+                        {% endif %}
+                    </div>
+                </div>
 
-				<div class="w3-section w3-center">
-					{{ form.submit(id="submitComment", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="send_comment();") }}
-				</div>
-				<div id="commentsTable"></div>
-			</div>
+                <div class="w3-section w3-center">
+                    {{ form.submit(id="submitComment", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="send_comment();") }}
+                </div>
+                <div id="commentsTable"></div>
+            </div>
 
-			<div class="w3-container w3-light-grey w3-padding">
-				<button class="w3-button w3-right w3-white w3-border"
-				onclick="document.getElementById('modal-details-variant').style.display='none'">Close</button>
-			</div>
-		</div>
-	</div>
+            <div class="w3-container w3-light-grey w3-padding">
+                <button class="w3-button w3-right w3-white w3-border"
+                onclick="document.getElementById('modal-details-variant').style.display='none'">Close</button>
+            </div>
+        </div>
+    </div>
 
 {% endblock %}
 
@@ -497,383 +497,383 @@
             }
         });
     }
-	const clinsig_dict = {
-		"uncertain_significance": {
-			"color": "orange",
-			"score": 4
-		},
-		"conflicting_interpretations_of_pathogenicity": {
-			"color": "orange",
-			"score": 4
-		},
-		"pathogenic": {
-			"color": "alizarin",
-			"score": 10
-		},
-		"likely_pathogenic": {
-			"color": "alizarin",
-			"score": 7
-		},
-		"pathogenic/likely_pathogenic": {
-			"color": "alizarin",
-			"score": 6
-		},
-		"benign": {
-			"color": "turquoise",
-			"score": -1.5
-		},
-		"likely_benign": {
-			"color": "turquoise",
-			"score": -0.25
-		},
-		"benign/likely_benign": {
-			"color": "turquoise",
-			"score": -1
-		},
-		"not_provided": {
-			"color": "peter-river",
-			"score": -0.1
-		},
-		"_other": {
-			"color": "peter-river",
-			"score": 0
-		},
-		"protective": {
-			"color": "peter-river",
-			"score": -0.1
-		},
-		"association": {
-			"color": "peter-river",
-			"score": 0.1
-		},
-		"risk_factor": {
-			"color": "peter-river",
-			"score": 0.2
-		},
-		"affects": {
-			"color": "peter-river",
-			"score": 0.15
-		}
-	};
+    const clinsig_dict = {
+        "uncertain_significance": {
+            "color": "orange",
+            "score": 4
+        },
+        "conflicting_interpretations_of_pathogenicity": {
+            "color": "orange",
+            "score": 4
+        },
+        "pathogenic": {
+            "color": "alizarin",
+            "score": 10
+        },
+        "likely_pathogenic": {
+            "color": "alizarin",
+            "score": 7
+        },
+        "pathogenic/likely_pathogenic": {
+            "color": "alizarin",
+            "score": 6
+        },
+        "benign": {
+            "color": "turquoise",
+            "score": -1.5
+        },
+        "likely_benign": {
+            "color": "turquoise",
+            "score": -0.25
+        },
+        "benign/likely_benign": {
+            "color": "turquoise",
+            "score": -1
+        },
+        "not_provided": {
+            "color": "peter-river",
+            "score": -0.1
+        },
+        "_other": {
+            "color": "peter-river",
+            "score": 0
+        },
+        "protective": {
+            "color": "peter-river",
+            "score": -0.1
+        },
+        "association": {
+            "color": "peter-river",
+            "score": 0.1
+        },
+        "risk_factor": {
+            "color": "peter-river",
+            "score": 0.2
+        },
+        "affects": {
+            "color": "peter-river",
+            "score": 0.15
+        }
+    };
 
-	const impact_dict = {
-		"MODERATE": {
-			"color": "orange",
-			"score" : 2
-		},
-		"MODIFIER": {
-			"color": "orange",
-			"score" : 1.5
-		},
-		"HIGH": {
-			"color": "alizarin",
-			"score" : 3
-		},
-		"LOW": {
-			"color": "turquoise",
-			"score" : 1
-		}
-	};
+    const impact_dict = {
+        "MODERATE": {
+            "color": "orange",
+            "score" : 2
+        },
+        "MODIFIER": {
+            "color": "orange",
+            "score" : 1.5
+        },
+        "HIGH": {
+            "color": "alizarin",
+            "score" : 3
+        },
+        "LOW": {
+            "color": "turquoise",
+            "score" : 1
+        }
+    };
 
-	const consequences_dict = {
-		"stop_gained": {
-			"color": "ff0000",
-			"score": 50,
-		},
-		"stop_lost": {
-			"color": "ff0000",
-			"score": 50,
-		},
+    const consequences_dict = {
+        "stop_gained": {
+            "color": "ff0000",
+            "score": 50,
+        },
+        "stop_lost": {
+            "color": "ff0000",
+            "score": 50,
+        },
         "start_lost": {
             "color": "ffd700",
             "score": 30,
         },
-		"splice_acceptor_variant": {
-			"color": "FF581A",
-			"score": 20,
-		},
-		"splice_donor_variant": {
-			"color": "FF581A",
-			"score": 20,
-		},
-		"frameshift_variant": {
-			"color": "9400D3",
-			"score": 15,
-		},
-		"transcript_ablation": {
-			"color": "ff0000",
-			"score": 8,
-		},
-		"transcript_amplification": {
-			"color": "ff69b4",
-			"score": 8,
-		},
-		"missense_variant": {
-			"color": "ffd700",
-			"score": 6,
-		},
-		"protein_altering_variant": {
-			"color": "ff0080",
-			"score": 5,
-		},
-		"splice_region_variant": {
-			"color": "ff7f50",
-			"score": 5,
-		},
-		"inframe_insertion": {
-			"color": "ff69b4",
-			"score": 2,
-		},
-		"inframe_deletion": {
-			"color": "ff69b4",
-			"score": 2,
-		},
-		"incomplete_terminal_codon_variant": {
-			"color": "ff00ff",
-			"score": 2,
-		},
-		"stop_retained_variant": {
-			"color": "76ee00",
-			"score": 1,
-		},
-		"start_retained_variant": {
-			"color": "76ee00",
-			"score": 1,
-		},
-		"synonymous_variant": {
-			"color": "76ee00",
-			"score": 1,
-		},
-		"coding_sequence_variant": {
-			"color": "458b00",
-			"score": 0.75,
-		},
-		"mature_miRNA_variant": {
-			"color": "458b00",
-			"score": 0.5,
-		},
-		"intron_variant": {
-			"color": "02599c",
-			"score": 0.25,
-		},
-		"NMD_transcript_variant": {
-			"color": "ff4500",
-			"score": 0.1,
-		},
-		"non_coding_transcript_exon_variant": {
-			"color": "32cd32",
-			"score": 0.05,
-		},
-		"non_coding_transcript_variant": {
-			"color": "32cd32",
-			"score": 0.005,
-		},
-		"5_prime_UTR_variant": {
-			"color": "7ac5cd",
-			"score": 0.5,
-		},
-		"3_prime_UTR_variant": {
-			"color": "7ac5cd",
-			"score": 0.45,
-		},
-		"upstream_gene_variant": {
-			"color": "a2b5cd",
-			"score": 0.0005,
-		},
-		"downstream_gene_variant": {
-			"color": "a2b5cd",
-			"score": 0.0005,
-		},
-		"TFBS_ablation": {
-			"color": "a52a2a",
-			"score": 0.00001,
-		},
-		"TFBS_amplification": {
-			"color": "a52a2a",
-			"score": 0.00001,
-		},
-		"TF_binding_site_variant": {
-			"color": "a52a2a",
-			"score": 0.00001,
-		},
-		"regulatory_region_ablation": {
-			"color": "a52a2a",
-			"score": 0.005,
-		},
-		"regulatory_region_amplification": {
-			"color": "a52a2a",
-			"score": 0.005,
-		},
-		"regulatory_region_variant": {
-			"color": "a52a2a",
-			"score": 0.005,
-		},
-		"feature_elongation": {
-			"color": "7f7f7f",
-			"score": 0.00001,
-		},
-		"feature_truncation": {
-			"color": "7f7f7f",
-			"score": 0.0000001,
-		},
-		"intergenic_variant": {
-			"color": "636363",
-			"score": 0.0000001,
-		}
-	};
+        "splice_acceptor_variant": {
+            "color": "FF581A",
+            "score": 20,
+        },
+        "splice_donor_variant": {
+            "color": "FF581A",
+            "score": 20,
+        },
+        "frameshift_variant": {
+            "color": "9400D3",
+            "score": 15,
+        },
+        "transcript_ablation": {
+            "color": "ff0000",
+            "score": 8,
+        },
+        "transcript_amplification": {
+            "color": "ff69b4",
+            "score": 8,
+        },
+        "missense_variant": {
+            "color": "ffd700",
+            "score": 6,
+        },
+        "protein_altering_variant": {
+            "color": "ff0080",
+            "score": 5,
+        },
+        "splice_region_variant": {
+            "color": "ff7f50",
+            "score": 5,
+        },
+        "inframe_insertion": {
+            "color": "ff69b4",
+            "score": 2,
+        },
+        "inframe_deletion": {
+            "color": "ff69b4",
+            "score": 2,
+        },
+        "incomplete_terminal_codon_variant": {
+            "color": "ff00ff",
+            "score": 2,
+        },
+        "stop_retained_variant": {
+            "color": "76ee00",
+            "score": 1,
+        },
+        "start_retained_variant": {
+            "color": "76ee00",
+            "score": 1,
+        },
+        "synonymous_variant": {
+            "color": "76ee00",
+            "score": 1,
+        },
+        "coding_sequence_variant": {
+            "color": "458b00",
+            "score": 0.75,
+        },
+        "mature_miRNA_variant": {
+            "color": "458b00",
+            "score": 0.5,
+        },
+        "intron_variant": {
+            "color": "02599c",
+            "score": 0.25,
+        },
+        "NMD_transcript_variant": {
+            "color": "ff4500",
+            "score": 0.1,
+        },
+        "non_coding_transcript_exon_variant": {
+            "color": "32cd32",
+            "score": 0.05,
+        },
+        "non_coding_transcript_variant": {
+            "color": "32cd32",
+            "score": 0.005,
+        },
+        "5_prime_UTR_variant": {
+            "color": "7ac5cd",
+            "score": 0.5,
+        },
+        "3_prime_UTR_variant": {
+            "color": "7ac5cd",
+            "score": 0.45,
+        },
+        "upstream_gene_variant": {
+            "color": "a2b5cd",
+            "score": 0.0005,
+        },
+        "downstream_gene_variant": {
+            "color": "a2b5cd",
+            "score": 0.0005,
+        },
+        "TFBS_ablation": {
+            "color": "a52a2a",
+            "score": 0.00001,
+        },
+        "TFBS_amplification": {
+            "color": "a52a2a",
+            "score": 0.00001,
+        },
+        "TF_binding_site_variant": {
+            "color": "a52a2a",
+            "score": 0.00001,
+        },
+        "regulatory_region_ablation": {
+            "color": "a52a2a",
+            "score": 0.005,
+        },
+        "regulatory_region_amplification": {
+            "color": "a52a2a",
+            "score": 0.005,
+        },
+        "regulatory_region_variant": {
+            "color": "a52a2a",
+            "score": 0.005,
+        },
+        "feature_elongation": {
+            "color": "7f7f7f",
+            "score": 0.00001,
+        },
+        "feature_truncation": {
+            "color": "7f7f7f",
+            "score": 0.0000001,
+        },
+        "intergenic_variant": {
+            "color": "636363",
+            "score": 0.0000001,
+        }
+    };
 
-	const spliceAI_Type_dict = {
-		"AG": {
-			"color": "w3-flat-amethyst"
-		},
-		"AL": {
-			"color": "w3-flat-wisteria"
-		},
-		"DG": {
-			"color": "w3-flat-carrot"
-		},
-		"DL": {
-			"color": "w3-flat-pumpkin"
-		}
-	};
+    const spliceAI_Type_dict = {
+        "AG": {
+            "color": "w3-flat-amethyst"
+        },
+        "AL": {
+            "color": "w3-flat-wisteria"
+        },
+        "DG": {
+            "color": "w3-flat-carrot"
+        },
+        "DL": {
+            "color": "w3-flat-pumpkin"
+        }
+    };
 
-	$(document).ready(function() {
-		$.getJSON("/json/filters", function(data) {
-			var options = "";
-			for (x in data) {
+    $(document).ready(function() {
+        $.getJSON("/json/filters", function(data) {
+            var options = "";
+            for (x in data) {
                 option = '<option value="' + x + '" '
                 if (x == {{ current_user.filter_id }}) {
                     option += 'selected>' + data[x] + ' (default)</option>';
                 } else {
                     option += '>' + data[x] + '</option>';
                 }
-				options += option;
-			}
-			document.getElementById('selectBox').innerHTML = options
-		});
-	    table = $('#variants').DataTable({
-			buttons:[
+                options += option;
+            }
+            document.getElementById('selectBox').innerHTML = options
+        });
+        table = $('#variants').DataTable({
+            buttons:[
                 {
-    				extend: 'searchBuilder',
-    	        }
+                    extend: 'searchBuilder',
+                }
             ],
             processing: true,
-			"language": {
+            "language": {
                 "loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
-				"processing": '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
-			},
-			dom: 'Blfrtip',
-			scrollX: true,
-			"order": [[ 5, "asc" ]],
-	        fixedColumns: {
-				left:1,
-				right:1
-			},
-			colReorder: {
-	            realtime: false
-	        },
-    		ajax: '/json/variants/sample/{{ sample.id }}',
-    		"columns": [
-				{ "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
-				{ "className": 'showTitle control-size-100', "data": "annotations.Feature"},
-				{
-					"className": 'showTitle w3-center control-size-75',
-					"data": "annotations",
-	                "render": {
-						"_": function ( data, type, row ) {
-							return data["canonical"];
-						},
-						"display": function ( data, type, row ) {
+                "processing": '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
+            },
+            dom: 'Blfrtip',
+            scrollX: true,
+            "order": [[ 5, "asc" ]],
+            fixedColumns: {
+                left:1,
+                right:1
+            },
+            colReorder: {
+                realtime: false
+            },
+            ajax: '/json/variants/sample/{{ sample.id }}',
+            "columns": [
+                { "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
+                { "className": 'showTitle control-size-100', "data": "annotations.Feature"},
+                {
+                    "className": 'showTitle w3-center control-size-75',
+                    "data": "annotations",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            return data["canonical"];
+                        },
+                        "display": function ( data, type, row ) {
                             color = "w3-text-flat-peter-river"
                             if (data["preferred"]) {
                                 color = "w3-text-flat-alizarin"
                             }
-							if (data["canonical"]) {
-								response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
-							} else {
-								response = '<i title="" class="' + color + ' far fa-star"></i>';
-							}
-							return response;
-		                },
-						"sort": function ( data, type, row ) {
-							if (data["canonical"]) {
-								response = true;
-							} else {
-								response = false;
-							}
-							return response;
-		                },
-					},
-				},
-				{
-					"className": 'showTitle control-size-150',
-					"data": "annotations.EI",
-					"render": {
-						"_": function ( data, type, row ) {
-							return data;
-						},
-						"sort": function ( data, type, row ) {
-							if (data == null) {
-								return "NA";
-							}
-							pos_split = data.split(/\s|\//);
-							if(pos_split[0] == "Exon") {
-								myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_0";
-							} else if (pos_split[0] == "Intron") {
-								myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_1";
-							} else {
-								myvar = "NA"
-							}
-							return myvar
-						},
-					}
-				},
-				{
-					"className": 'showTitle control-size-250',
-					"data": "annotations.HGVSg",
-					"render" : {
-						"_" : function ( data, type, row, meta ) {
-							return data;
-					    },
-						"sort" : function ( data, type, row, meta ) {
-							if(data != null) {
-								var regExp = /(chr)?([0-9XYM]+):g\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|[ACGT]+)?/;
-								var matches = regExp.exec(data);
-								var zero = "000000000"
-								var chr;
-								if (Number.isInteger(parseInt(matches[2]))) {
-									chr = (zero + matches[2]).slice(-2);
-								} else {
-									chr = (matches[2])
-								}
-					    		return chr + "_" + (zero + matches[3]).slice(-9) + "_" + matches[6];
-							} else {
-								num = -1
-								return num.toFixed(6);
-							}
-					    },
-					},
-				},
-				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
-				{ "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
-				{
-					"className": 'showTitle size-200',
-					"data": "filter",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							cell = ""
-							style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+                            if (data["canonical"]) {
+                                response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
+                            } else {
+                                response = '<i title="" class="' + color + ' far fa-star"></i>';
+                            }
+                            return response;
+                        },
+                        "sort": function ( data, type, row ) {
+                            if (data["canonical"]) {
+                                response = true;
+                            } else {
+                                response = false;
+                            }
+                            return response;
+                        },
+                    },
+                },
+                {
+                    "className": 'showTitle control-size-150',
+                    "data": "annotations.EI",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            return data;
+                        },
+                        "sort": function ( data, type, row ) {
+                            if (data == null) {
+                                return "NA";
+                            }
+                            pos_split = data.split(/\s|\//);
+                            if(pos_split[0] == "Exon") {
+                                myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_0";
+                            } else if (pos_split[0] == "Intron") {
+                                myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_1";
+                            } else {
+                                myvar = "NA"
+                            }
+                            return myvar
+                        },
+                    }
+                },
+                {
+                    "className": 'showTitle control-size-250',
+                    "data": "annotations.HGVSg",
+                    "render" : {
+                        "_" : function ( data, type, row, meta ) {
+                            return data;
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                var regExp = /(chr)?([0-9XYM]+):g\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|[ACGT]+)?/;
+                                var matches = regExp.exec(data);
+                                var zero = "000000000"
+                                var chr;
+                                if (Number.isInteger(parseInt(matches[2]))) {
+                                    chr = (zero + matches[2]).slice(-2);
+                                } else {
+                                    chr = (matches[2])
+                                }
+                                return chr + "_" + (zero + matches[3]).slice(-9) + "_" + matches[6];
+                            } else {
+                                num = -1
+                                return num.toFixed(6);
+                            }
+                        },
+                    },
+                },
+                { "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
+                { "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
+                {
+                    "className": 'showTitle size-200',
+                    "data": "filter",
+                    "render": {
+                        "_": function ( data, type, row, meta ) {
+                            cell = ""
+                            style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
 
-							for (idx in data) {
-								color = "asbestos";
-								cell += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
-							}
-							return cell;
-					    },
-						"filter": function ( data, type, row, meta ) {
-							return data.toString();
-					    },
-						"sort": function ( data, type, row, meta ) {
+                            for (idx in data) {
+                                color = "asbestos";
+                                cell += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
+                            }
+                            return cell;
+                        },
+                        "filter": function ( data, type, row, meta ) {
+                            return data.toString();
+                        },
+                        "sort": function ( data, type, row, meta ) {
                             var val = 0;
                             var zero = "000000000";
                             for (idx in data) {
@@ -883,24 +883,24 @@
                                 val += -1;
                             }
                             return val
-					    }
-					},
+                        }
+                    },
                     "sType": "numeric"
-				},
-				{ "className": 'showTitle control-size-100', "data": "depth"},
-				{ "className": 'showTitle control-size-100', "data": "allelic_depth"},
-				{ "className": 'showTitle control-size-100', "data": "allelic_frequency"},
-				{
-					"className": 'showTitle control-size-100',
-					"data": "annotations.gnomADg_AF",
-					"render" : {
-						"_" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return parseFloat(data).toFixed(6);
-							} else {
-								return null;
-							}
-					    },
+                },
+                { "className": 'showTitle control-size-100', "data": "depth"},
+                { "className": 'showTitle control-size-100', "data": "allelic_depth"},
+                { "className": 'showTitle control-size-100', "data": "allelic_frequency"},
+                {
+                    "className": 'showTitle control-size-100',
+                    "data": "annotations.gnomADg_AF",
+                    "render" : {
+                        "_" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return parseFloat(data).toFixed(6);
+                            } else {
+                                return null;
+                            }
+                        },
                         "display" : function ( data, type, row, meta ) {
                             if(data != null) {
                                 return parseFloat(data).toFixed(6);
@@ -915,270 +915,270 @@
                                 return -1
                             }
                         }
-					},
-				},
-				{
-					"className": 'showTitle control-size-125',
-					"data": "inseal",
-					"render" : {
-						"_" : function ( data, type, row, meta ) {
+                    },
+                },
+                {
+                    "className": 'showTitle control-size-125',
+                    "data": "inseal",
+                    "render" : {
+                        "_" : function ( data, type, row, meta ) {
                             if (data["total_samples"] > 0) {
                                  return (data["occurrences"]/data["total_samples"]).toFixed(4);
                             } else {
                                 return 0
                             }
-					    }
-					},
-				},
-				{
-					"className": 'showTitle control-size-125',
-					"data": "inseal.occurrences",
-				},
-				{
-					"className": 'showTitle size-125',
-					"data": "inseal.occurences_family",
-				},
-				{
-					"className": 'showTitle size-300',
-					"data": "annotations.CLIN_SIG",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							cell = {
-								"orange": "",
-								"alizarin": "",
-								"turquoise": "",
-								"peter-river": "",
-								"asbestos": ""
-							}
-							style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+                        }
+                    },
+                },
+                {
+                    "className": 'showTitle control-size-125',
+                    "data": "inseal.occurrences",
+                },
+                {
+                    "className": 'showTitle size-125',
+                    "data": "inseal.occurences_family",
+                },
+                {
+                    "className": 'showTitle size-300',
+                    "data": "annotations.CLIN_SIG",
+                    "render": {
+                        "_": function ( data, type, row, meta ) {
+                            cell = {
+                                "orange": "",
+                                "alizarin": "",
+                                "turquoise": "",
+                                "peter-river": "",
+                                "asbestos": ""
+                            }
+                            style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
 
-							for (idx in data) {
-								color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
-								cell[color] += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
-							}
-							return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
-					    },
-						"filter": function ( data, type, row, meta ) {
-							return data.toString();
-					    },
-						"sort": function ( data, type, row, meta ) {
-							score = 0;
-							for (idx in data) {
-								score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
-							}
-							return score;
-					    },
-					},
+                            for (idx in data) {
+                                color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
+                                cell[color] += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
+                            }
+                            return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
+                        },
+                        "filter": function ( data, type, row, meta ) {
+                            return data.toString();
+                        },
+                        "sort": function ( data, type, row, meta ) {
+                            score = 0;
+                            for (idx in data) {
+                                score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
+                            }
+                            return score;
+                        },
+                    },
                     "sType": "numeric"
-				},
-				{
-					"className": 'showTitle size-100',
-					"data": "annotations.IMPACT",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-							cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
-							return cell;
-					    },
-						"filter": function ( data, type, row, meta ) {
-							return data.toString();
-					    },
-						"sort": function ( data, type, row, meta ) {
-							return impact_dict[data]["score"];
-					    },
-					},
+                },
+                {
+                    "className": 'showTitle size-100',
+                    "data": "annotations.IMPACT",
+                    "render": {
+                        "_": function ( data, type, row, meta ) {
+                            style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+                            cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
+                            return cell;
+                        },
+                        "filter": function ( data, type, row, meta ) {
+                            return data.toString();
+                        },
+                        "sort": function ( data, type, row, meta ) {
+                            return impact_dict[data]["score"];
+                        },
+                    },
                     "sType": "numeric"
-				},
-				{
-					"className": 'showTitle size-300',
-					"data": "annotations.Consequence",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							cell = "";
-							for (idx in consequences_dict) {
-								if (data.includes(idx)){
-									color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
-									style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
-									cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
-								}
-							}
-							return cell;
-					    },
-						"filter": function ( data, type, row, meta ) {
-							return data.toString();
-					    },
-						"sort": function ( data, type, row, meta ) {
+                },
+                {
+                    "className": 'showTitle size-300',
+                    "data": "annotations.Consequence",
+                    "render": {
+                        "_": function ( data, type, row, meta ) {
+                            cell = "";
+                            for (idx in consequences_dict) {
+                                if (data.includes(idx)){
+                                    color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
+                                    style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
+                                    cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
+                                }
+                            }
+                            return cell;
+                        },
+                        "filter": function ( data, type, row, meta ) {
+                            return data.toString();
+                        },
+                        "sort": function ( data, type, row, meta ) {
                             var sort = 0;
                             for (idx in data) {
                                 sort += consequences_dict[data[idx]]["score"];
                             }
-							return Math.log10(sort);
-					    }
-					},
+                            return Math.log10(sort);
+                        }
+                    },
                     "sType": "numeric"
-				},
-				{
-					"className": 'showTitle size-100',
-					"data": "annotations.MES_var",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							if (data == null){
-								return -999;
-							}
-							return Math.abs(parseFloat(data).toFixed(3));
-					    },
-						"display": function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							value = parseFloat(data).toFixed(3)
-							classw3css = "w3-text-black";
-							if (Math.abs(value) >= 15) {
-								classw3css = "w3-text-flat-alizarin";
-							}
-							return "<span class='" + classw3css + "'>" + value + "</span>";
-					    },
-					},
-				},
-				{
-					"className": 'showTitle size-125',
-					"data": "annotations.spliceAI",
-					"render": {
-						"_": function ( data, type, row, meta ) {
-							if (data == null){
-								return null;
-							}
-							return parseFloat(data).toFixed(3);
-					    },
-						"display": function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							value = parseFloat(data).toFixed(3)
-							classw3css = "w3-text-black";
-							if (value >= 0.8) {
-								classw3css = "w3-text-flat-alizarin";
-							} else if (value >= 0.5) {
-								classw3css = "w3-text-flat-carrot";
-							} else if (value >= 0.2) {
-								classw3css = "w3-text-flat-sun-flower";
-							}
-							return "<span class='" + classw3css + "'>" + value + "</span>";
-					    },
-					},
-				},
-				{
-					"className": 'showTitle size-100',
-					"data": "annotations.missensesMean",
-					"render": {
-						"_" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(4);
-							} else {
-								return null;
-							}
-					    },
-						"display" : function ( data, type, row, meta ) {
-							if (data == null){
-								return "NA";
-							}
-							value = parseFloat(data).toFixed(3)
-							classw3css = "w3-text-black";
-							if (value >= 0.65) {
-								classw3css = "w3-text-flat-alizarin";
-							} else if (value >= 0.45) {
-								classw3css = "w3-text-flat-carrot";
-							}
-							return "<span class='" + classw3css + "'>" + value + "</span>";
-					    },
-	            		"sort" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(4);
-							} else {
-								num = -1
-								return num.toFixed(4);
-							}
-					    }
-					},
-				},
-				{
-					"className": 'showTitle size-25 w3-center',
-					"data": {
-						"_": "analyse1",
-						"display" : function ( data, type, row, meta ) {
-							const id_var=data["id"];
-							const id=data["id"] + "_analyse1";
-							if (data["analyse1"]) {
-								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
-							} else {
-								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
-							}
-					    },
-						"sort" : function ( data, type, row, meta ) {
-							if (data["analyse1"]) {
-								return 1;
-							} else {
-								return 0;
-							}
-					    }
-					}
-				},
-				{
-					"className": 'showTitle size-25 w3-center',
-					"data": {
-						"_": "analyse2",
-						"display" : function ( data, type, row, meta ) {
-							const id_var=data["id"];
-							const id=data["id"] + "_analyse2";
-							if (data["analyse2"]) {
-								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
-							} else {
-								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
-							}
-					    },
-						"sort" : function ( data, type, row, meta ) {
-							if (data["analyse2"]) {
-								return 1;
-							} else {
-								return 0;
-							}
-					    }
-					}
-				},
-				{
-					"className": 'showTitle size-25 w3-center',
-					"data": {
-						"_": "reported",
-						"display" : function ( data, type, row, meta ) {
-							const id_var=data["id"];
-							const id=data["id"] + "reported";
-							if (data["reported"]) {
-								return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
-							} else {
-								return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
-							}
-					    },
-						"sort" : function ( data, type, row, meta ) {
-							if (data["reported"]) {
-								return 1;
-							} else {
-								return 0;
-							}
-					    }
-					}
-				},
-				{
-					"className": 'showTitle size-25 w3-center',
-					"data": "class_variant",
-					"render": {
-						"_" : function ( data, type, row, meta ) {
-							if(data != null) {
-					    		return data.toFixed(4);
-							} else {
-								return null;
-							}
-					    },
-						"display" : function ( data, type, row, meta ) {
+                },
+                {
+                    "className": 'showTitle size-100',
+                    "data": "annotations.MES_var",
+                    "render": {
+                        "_": function ( data, type, row, meta ) {
+                            if (data == null){
+                                return -999;
+                            }
+                            return Math.abs(parseFloat(data).toFixed(3));
+                        },
+                        "display": function ( data, type, row, meta ) {
+                            if (data == null){
+                                return "NA";
+                            }
+                            value = parseFloat(data).toFixed(3)
+                            classw3css = "w3-text-black";
+                            if (Math.abs(value) >= 15) {
+                                classw3css = "w3-text-flat-alizarin";
+                            }
+                            return "<span class='" + classw3css + "'>" + value + "</span>";
+                        },
+                    },
+                },
+                {
+                    "className": 'showTitle size-125',
+                    "data": "annotations.spliceAI",
+                    "render": {
+                        "_": function ( data, type, row, meta ) {
+                            if (data == null){
+                                return null;
+                            }
+                            return parseFloat(data).toFixed(3);
+                        },
+                        "display": function ( data, type, row, meta ) {
+                            if (data == null){
+                                return "NA";
+                            }
+                            value = parseFloat(data).toFixed(3)
+                            classw3css = "w3-text-black";
+                            if (value >= 0.8) {
+                                classw3css = "w3-text-flat-alizarin";
+                            } else if (value >= 0.5) {
+                                classw3css = "w3-text-flat-carrot";
+                            } else if (value >= 0.2) {
+                                classw3css = "w3-text-flat-sun-flower";
+                            }
+                            return "<span class='" + classw3css + "'>" + value + "</span>";
+                        },
+                    },
+                },
+                {
+                    "className": 'showTitle size-100',
+                    "data": "annotations.missensesMean",
+                    "render": {
+                        "_" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return data.toFixed(4);
+                            } else {
+                                return null;
+                            }
+                        },
+                        "display" : function ( data, type, row, meta ) {
+                            if (data == null){
+                                return "NA";
+                            }
+                            value = parseFloat(data).toFixed(3)
+                            classw3css = "w3-text-black";
+                            if (value >= 0.65) {
+                                classw3css = "w3-text-flat-alizarin";
+                            } else if (value >= 0.45) {
+                                classw3css = "w3-text-flat-carrot";
+                            }
+                            return "<span class='" + classw3css + "'>" + value + "</span>";
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return data.toFixed(4);
+                            } else {
+                                num = -1
+                                return num.toFixed(4);
+                            }
+                        }
+                    },
+                },
+                {
+                    "className": 'showTitle size-25 w3-center',
+                    "data": {
+                        "_": "analyse1",
+                        "display" : function ( data, type, row, meta ) {
+                            const id_var=data["id"];
+                            const id=data["id"] + "_analyse1";
+                            if (data["analyse1"]) {
+                                return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
+                            } else {
+                                return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse1\');">';
+                            }
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if (data["analyse1"]) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                },
+                {
+                    "className": 'showTitle size-25 w3-center',
+                    "data": {
+                        "_": "analyse2",
+                        "display" : function ( data, type, row, meta ) {
+                            const id_var=data["id"];
+                            const id=data["id"] + "_analyse2";
+                            if (data["analyse2"]) {
+                                return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
+                            } else {
+                                return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'analyse2\');">';
+                            }
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if (data["analyse2"]) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                },
+                {
+                    "className": 'showTitle size-25 w3-center',
+                    "data": {
+                        "_": "reported",
+                        "display" : function ( data, type, row, meta ) {
+                            const id_var=data["id"];
+                            const id=data["id"] + "reported";
+                            if (data["reported"]) {
+                                return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
+                            } else {
+                                return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
+                            }
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if (data["reported"]) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                },
+                {
+                    "className": 'showTitle size-25 w3-center',
+                    "data": "class_variant",
+                    "render": {
+                        "_" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return data.toFixed(4);
+                            } else {
+                                return null;
+                            }
+                        },
+                        "display" : function ( data, type, row, meta ) {
                             if (data == 1) {
                                 return '<span class="w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
                                     '<i class="fas fa-map-marker"></i>'+
@@ -1205,25 +1205,25 @@
                                     '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
                                 '</span> - Pathogenic</span>';
                             }
-							return "...";
-					    }
-					},
-				},
-				{
-					"className":      'details-control w3-center',
-					"orderable":      false,
-					"data":           "id",
-					"render": {
-						"_": function ( data, type, row ) {
-							return data;
-						},
-						"display": function ( data, type, row ) {
-							response = '<i onclick="openDetailsVariantModal(\'' + data + '\',{% if sample.familyid %}{{ sample.familyid }}{% else %}null{% endif %})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
-							return response;
-						},
-					},
-				},
-			],
+                            return "...";
+                        }
+                    },
+                },
+                {
+                    "className":      'details-control w3-center',
+                    "orderable":      false,
+                    "data":           "id",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            return data;
+                        },
+                        "display": function ( data, type, row ) {
+                            response = '<i onclick="openDetailsVariantModal(\'' + data + '\',{% if sample.familyid %}{{ sample.familyid }}{% else %}null{% endif %})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
+                            return response;
+                        },
+                    },
+                },
+            ],
             "initComplete": function(settings, json) {
                 changeFilter({{ current_user.filter_id }});
                 document.getElementById('selectBox').disabled = false;
@@ -1234,148 +1234,148 @@
                     }
                 } );
             }
-		});
-	} );
+        });
+    } );
 
-	function save_filters() {
-		var d = table.searchBuilder.getDetails();
-		document.getElementById('filterText').innerHTML = JSON.stringify(d)
-		document.getElementById('filter-modal').style.display='block';
-	}
-	// Script to open and close sidebar
-	function w3_open() {
-		document.getElementById("sidebar").style.display = "block";
-		document.getElementById("overlay").style.display = "block";
-	}
+    function save_filters() {
+        var d = table.searchBuilder.getDetails();
+        document.getElementById('filterText').innerHTML = JSON.stringify(d)
+        document.getElementById('filter-modal').style.display='block';
+    }
+    // Script to open and close sidebar
+    function w3_open() {
+        document.getElementById("sidebar").style.display = "block";
+        document.getElementById("overlay").style.display = "block";
+    }
 
-	function w3_close() {
-		document.getElementById("sidebar").style.display = "none";
-		document.getElementById("overlay").style.display = "none";
-	}
+    function w3_close() {
+        document.getElementById("sidebar").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+    }
 
-	function openHelpModal(title="Some help", content='Some Content', footer='footer') {
-		document.getElementById("help-modal-title").innerHTML = title;
-		document.getElementById("help-modal-content").innerHTML = content;
-		document.getElementById("help-modal-footer").innerHTML = footer;
-		document.getElementById('help-modal').style.display='block'
-	}
+    function openHelpModal(title="Some help", content='Some Content', footer='footer') {
+        document.getElementById("help-modal-title").innerHTML = title;
+        document.getElementById("help-modal-content").innerHTML = content;
+        document.getElementById("help-modal-footer").innerHTML = footer;
+        document.getElementById('help-modal').style.display='block'
+    }
 
     function htmlLink(data) {
       return `<a class="w3-hover-text-${data.color}" href="${data.link_prefix}${data.id}${data.link_suffix}" target="_blank"><i class="w3-text-${data.color} ${data.flag}"></i> ${data.id}</a>`;
     }
 
-	const missenseScores = []
-	function openDetailsVariantModal(id, familyid) {
-		if (familyid) {
-			request = "/json/variant/" + id +"/family/" + familyid;
-		} else {
-			request = "/json/variant/" + id;
-		}
-		$.getJSON(request, function(data) {
-			allTranscript = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
-			allTranscript = allTranscript + '<thead class="w3-flat-silver"><tr>'+
-		        '<th class="w3-flat-silver control-size-100" >Gene</th>'+
-				'<th class="w3-flat-silver control-size-200">Transcript</th>'+
-				'<th class="w3-flat-silver control-size-150">Biotype</th>'+
-				'<th class="w3-flat-silver control-size-100">Canonical</th>'+
-		        '<th class="w3-flat-silver control-size-150" title="Exon-Intron">Ex-In</th>'+
-		        '<th class="w3-flat-silver control-size-300" >HGVSc</th>'+
-		        '<th class="w3-flat-silver control-size-300" >HGVSp</th>'+
-		        '<th class="w3-flat-silver size-250">Consequences</th>'+
-				'<th class="showTitle w3-flat-silver control-size-100">MES ref</th>'+
-				'<th class="showTitle w3-flat-silver control-size-100">MES diff</th>'+
-				'<th class="showTitle w3-flat-silver control-size-100">MES alt</th>'+
-			'</tr></thead>';
-			allTranscript = allTranscript + '<tbody>';
+    const missenseScores = []
+    function openDetailsVariantModal(id, familyid) {
+        if (familyid) {
+            request = "/json/variant/" + id +"/family/" + familyid;
+        } else {
+            request = "/json/variant/" + id;
+        }
+        $.getJSON(request, function(data) {
+            allTranscript = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            allTranscript = allTranscript + '<thead class="w3-flat-silver"><tr>'+
+                '<th class="w3-flat-silver control-size-100" >Gene</th>'+
+                '<th class="w3-flat-silver control-size-200">Transcript</th>'+
+                '<th class="w3-flat-silver control-size-150">Biotype</th>'+
+                '<th class="w3-flat-silver control-size-100">Canonical</th>'+
+                '<th class="w3-flat-silver control-size-150" title="Exon-Intron">Ex-In</th>'+
+                '<th class="w3-flat-silver control-size-300" >HGVSc</th>'+
+                '<th class="w3-flat-silver control-size-300" >HGVSp</th>'+
+                '<th class="w3-flat-silver size-250">Consequences</th>'+
+                '<th class="showTitle w3-flat-silver control-size-100">MES ref</th>'+
+                '<th class="showTitle w3-flat-silver control-size-100">MES diff</th>'+
+                '<th class="showTitle w3-flat-silver control-size-100">MES alt</th>'+
+            '</tr></thead>';
+            allTranscript = allTranscript + '<tbody>';
 
-			var allScoresPredictions = {
-				"SIFT_converted_rankscore": null,
-				"SIFT4G_converted_rankscore": null,
-				"Polyphen2_HDIV_rankscore": null,
-				"Polyphen2_HVAR_rankscore": null,
-				"PROVEAN_converted_rankscore": null,
-				"LRT_converted_rankscore": null,
-				"MutationTaster_converted_rankscore": null,
-				"MutationAssessor_rankscore": null,
-				"FATHMM_converted_rankscore": null,
-				"fathmm-MKL_coding_rankscore": null,
-				"fathmm-XF_coding_rankscore": null,
-				"CADD_raw_rankscore": null,
-				"CADD_raw_rankscore_hg19": null,
-				"VEST4_rankscore": null,
-				"integrated_fitCons_rankscore": null,
-				"GM12878_fitCons_rankscore": null,
-				"H1-hESC_fitCons_rankscore": null,
-				"HUVEC_fitCons_rankscore": null,
-				"LINSIGHT_rankscore": null,
-				"DANN_rankscore": null,
-				"MetaSVM_rankscore": null,
-				"MetaLR_rankscore": null,
-				"GenoCanyon_rankscore": null,
-				"Eigen-raw_coding_rankscore": null,
-				"Eigen-PC-raw_coding_rankscore": null,
-				"M-CAP_rankscore": null,
-				"REVEL_rankscore": null,
-				"MutPred_rankscore": null,
-				"MVP_rankscore": null,
-				"MPC_rankscore": null,
-				"PrimateAI_rankscore": null,
-				"DEOGEN2_rankscore": null,
-				"BayesDel_addAF_rankscore": null,
-				"BayesDel_noAF_rankscore": null,
-				"ClinPred_rankscore": null,
-				"LIST-S2_rankscore": null
-			}
+            var allScoresPredictions = {
+                "SIFT_converted_rankscore": null,
+                "SIFT4G_converted_rankscore": null,
+                "Polyphen2_HDIV_rankscore": null,
+                "Polyphen2_HVAR_rankscore": null,
+                "PROVEAN_converted_rankscore": null,
+                "LRT_converted_rankscore": null,
+                "MutationTaster_converted_rankscore": null,
+                "MutationAssessor_rankscore": null,
+                "FATHMM_converted_rankscore": null,
+                "fathmm-MKL_coding_rankscore": null,
+                "fathmm-XF_coding_rankscore": null,
+                "CADD_raw_rankscore": null,
+                "CADD_raw_rankscore_hg19": null,
+                "VEST4_rankscore": null,
+                "integrated_fitCons_rankscore": null,
+                "GM12878_fitCons_rankscore": null,
+                "H1-hESC_fitCons_rankscore": null,
+                "HUVEC_fitCons_rankscore": null,
+                "LINSIGHT_rankscore": null,
+                "DANN_rankscore": null,
+                "MetaSVM_rankscore": null,
+                "MetaLR_rankscore": null,
+                "GenoCanyon_rankscore": null,
+                "Eigen-raw_coding_rankscore": null,
+                "Eigen-PC-raw_coding_rankscore": null,
+                "M-CAP_rankscore": null,
+                "REVEL_rankscore": null,
+                "MutPred_rankscore": null,
+                "MVP_rankscore": null,
+                "MPC_rankscore": null,
+                "PrimateAI_rankscore": null,
+                "DEOGEN2_rankscore": null,
+                "BayesDel_addAF_rankscore": null,
+                "BayesDel_noAF_rankscore": null,
+                "ClinPred_rankscore": null,
+                "LIST-S2_rankscore": null
+            }
 
-			var allScoresConservation = {
-				"bStatistic_converted_rankscore": null,
-				"phyloP100way_vertebrate_rankscore": null,
-				"phyloP30way_mammalian_rankscore": null,
-				"phyloP17way_primate_rankscore": null,
-				"phastCons100way_vertebrate_rankscore": null,
-				"phastCons30way_mammalian_rankscore": null,
-				"phastCons17way_primate_rankscore": null,
-				"GERP++_RS_rankscore": null,
-				"SiPhy_29way_logOdds_rankscore": null
-			}
+            var allScoresConservation = {
+                "bStatistic_converted_rankscore": null,
+                "phyloP100way_vertebrate_rankscore": null,
+                "phyloP30way_mammalian_rankscore": null,
+                "phyloP17way_primate_rankscore": null,
+                "phastCons100way_vertebrate_rankscore": null,
+                "phastCons30way_mammalian_rankscore": null,
+                "phastCons17way_primate_rankscore": null,
+                "GERP++_RS_rankscore": null,
+                "SiPhy_29way_logOdds_rankscore": null
+            }
 
-			var allScoresPopulation = {
-				"gnomADg_AF_AFR": null,
-				"gnomADg_AF_AMR": null,
-				"gnomADg_AF_ASJ": null,
-				"gnomADg_AF_EAS": null,
-				"gnomADg_AF_FIN": null,
-				"gnomADg_AF_NFE": null,
-				"gnomADg_AF_OTH": null
-			}
+            var allScoresPopulation = {
+                "gnomADg_AF_AFR": null,
+                "gnomADg_AF_AMR": null,
+                "gnomADg_AF_ASJ": null,
+                "gnomADg_AF_EAS": null,
+                "gnomADg_AF_FIN": null,
+                "gnomADg_AF_NFE": null,
+                "gnomADg_AF_OTH": null
+            }
 
-			var MaxEntScan_alt = null;
-			var MaxEntScan_ref = null;
-			var MaxEntScan_ratio = null;
+            var MaxEntScan_alt = null;
+            var MaxEntScan_ref = null;
+            var MaxEntScan_ratio = null;
 
-			var spliceAI = {
-				"AG": {
-					"score": null,
-					"pos": null,
-					"name": "Acceptor Gain"
-				},
-				"DG": {
-					"score": null,
-					"pos": null,
-					"name": "Donor Gain"
-				},
-				"AL": {
-					"score": null,
-					"pos": null,
-					"name": "Acceptor Loss"
-				},
-				"DL": {
-					"score": null,
-					"pos": null,
-					"name": "Donor Loss"
-				}
-			}
-			for (x in data["annotations"]["ANN"]) {
+            var spliceAI = {
+                "AG": {
+                    "score": null,
+                    "pos": null,
+                    "name": "Acceptor Gain"
+                },
+                "DG": {
+                    "score": null,
+                    "pos": null,
+                    "name": "Donor Gain"
+                },
+                "AL": {
+                    "score": null,
+                    "pos": null,
+                    "name": "Acceptor Loss"
+                },
+                "DL": {
+                    "score": null,
+                    "pos": null,
+                    "name": "Donor Loss"
+                }
+            }
+            for (x in data["annotations"]["ANN"]) {
 
                 var links = []
                 for (idx_var in data["annotations"]["ANN"][x]["Existing_variation"]) {
@@ -1443,566 +1443,566 @@
 
                 document.getElementById("test_link").innerHTML = links.join("<br />");                var links = []
 
-				cell = "";
-				for (idx in consequences_dict) {
-					if (data["annotations"]["ANN"][x]["Consequence"].includes(idx)){
-						color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
-						style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
-						cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
-					}
-				}
+                cell = "";
+                for (idx in consequences_dict) {
+                    if (data["annotations"]["ANN"][x]["Consequence"].includes(idx)){
+                        color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
+                        style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
+                        cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
+                    }
+                }
                 color = "w3-text-flat-peter-river";
                 if ({{ current_user.transcripts | safe }}.includes(data["annotations"]["ANN"][x]["Feature"])) {
                     color = "w3-text-flat-alizarin";
                 }
-				if (data["annotations"]["ANN"][x]["canonical"]) {
-					response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
-				} else {
-					response = '<i title="" class="' + color + ' far fa-star"></i>';
-				}
-				allTranscript = allTranscript + '<tr>'+
-					'<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+
-		            '<td class="w3-text-black showTitle control-size-200" >'+data["annotations"]["ANN"][x]["Feature"]+'</td>'+
-					'<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["BIOTYPE"]+'</td>'+
-					'<td class="w3-text-black showTitle control-size-100 w3-center" >'+response+'</td>'+
-		            '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["EI"]+'</td>'+
-					'<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSc"]+'</td>'+
-		            '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSp"]+'</td>'+
-		            '<td class="w3-text-black showTitle size-250">'+cell+'</td>'+
-					'<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_ref"]+'</td>'+
-					'<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_diff"]+'</td>'+
-		            '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_alt"]+'</td>'+
-		        '</tr>';
+                if (data["annotations"]["ANN"][x]["canonical"]) {
+                    response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
+                } else {
+                    response = '<i title="" class="' + color + ' far fa-star"></i>';
+                }
+                allTranscript = allTranscript + '<tr>'+
+                    '<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-200" >'+data["annotations"]["ANN"][x]["Feature"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["BIOTYPE"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-100 w3-center" >'+response+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["EI"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSc"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSp"]+'</td>'+
+                    '<td class="w3-text-black showTitle size-250">'+cell+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_ref"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_diff"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_alt"]+'</td>'+
+                '</tr>';
 
-				for (nameScore in allScoresPredictions) {
-					if (data["annotations"]["ANN"][x][nameScore] != null) {
-						allScoresPredictions[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPredictions[nameScore]);
-					}
-				};
+                for (nameScore in allScoresPredictions) {
+                    if (data["annotations"]["ANN"][x][nameScore] != null) {
+                        allScoresPredictions[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPredictions[nameScore]);
+                    }
+                };
 
-				for (nameScore in allScoresConservation) {
-					if (data["annotations"]["ANN"][x][nameScore] != null) {
-						allScoresConservation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresConservation[nameScore]);
-					}
-				};
+                for (nameScore in allScoresConservation) {
+                    if (data["annotations"]["ANN"][x][nameScore] != null) {
+                        allScoresConservation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresConservation[nameScore]);
+                    }
+                };
 
-				for (nameScore in allScoresPopulation) {
-					if (data["annotations"]["ANN"][x][nameScore] != null) {
-						allScoresPopulation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPopulation[nameScore]);
-					}
-				};
-				if (data["annotations"]["ANN"][x]["MaxEntScan_ref"] != null && data["annotations"]["ANN"][x]["MaxEntScan_alt"] != null) {
-					MES_ref = Math.abs(data["annotations"]["ANN"][x]["MaxEntScan_ref"]);
-					MES_alt = Math.abs(data["annotations"]["ANN"][x]["MaxEntScan_alt"]);
-					MES_ratio = -100 + (MES_alt*100) / MES_ref;
-					if (Math.abs(MES_ratio) > Math.abs(MaxEntScan_ratio)) {
-						MaxEntScan_ratio = MES_ratio;
-						MaxEntScan_ref = data["annotations"]["ANN"][x]["MaxEntScan_ref"];
-						MaxEntScan_alt = data["annotations"]["ANN"][x]["MaxEntScan_alt"];
-					}
-				};
+                for (nameScore in allScoresPopulation) {
+                    if (data["annotations"]["ANN"][x][nameScore] != null) {
+                        allScoresPopulation[nameScore] = Math.max(data["annotations"]["ANN"][x][nameScore], allScoresPopulation[nameScore]);
+                    }
+                };
+                if (data["annotations"]["ANN"][x]["MaxEntScan_ref"] != null && data["annotations"]["ANN"][x]["MaxEntScan_alt"] != null) {
+                    MES_ref = Math.abs(data["annotations"]["ANN"][x]["MaxEntScan_ref"]);
+                    MES_alt = Math.abs(data["annotations"]["ANN"][x]["MaxEntScan_alt"]);
+                    MES_ratio = -100 + (MES_alt*100) / MES_ref;
+                    if (Math.abs(MES_ratio) > Math.abs(MaxEntScan_ratio)) {
+                        MaxEntScan_ratio = MES_ratio;
+                        MaxEntScan_ref = data["annotations"]["ANN"][x]["MaxEntScan_ref"];
+                        MaxEntScan_alt = data["annotations"]["ANN"][x]["MaxEntScan_alt"];
+                    }
+                };
 
-				for (site in spliceAI) {
-					var keyScore = "SpliceAI_pred_DS_" + site;
-					var keyPos = "SpliceAI_pred_DP_" + site;
-					var score = data["annotations"]["ANN"][x][keyScore];
-					var pos = data["annotations"]["ANN"][x][keyPos];
-					if (score != null && score >= spliceAI[site]["score"]) {
-						spliceAI[site]["score"] = score;
-						spliceAI[site]["position"] = pos;
-					}
-				}
-			}
-		    allTranscript = allTranscript + '</tbody>';
-		    allTranscript = allTranscript + '</table>';
-			document.getElementById("allTranscriptsTable").innerHTML = allTranscript;
+                for (site in spliceAI) {
+                    var keyScore = "SpliceAI_pred_DS_" + site;
+                    var keyPos = "SpliceAI_pred_DP_" + site;
+                    var score = data["annotations"]["ANN"][x][keyScore];
+                    var pos = data["annotations"]["ANN"][x][keyPos];
+                    if (score != null && score >= spliceAI[site]["score"]) {
+                        spliceAI[site]["score"] = score;
+                        spliceAI[site]["position"] = pos;
+                    }
+                }
+            }
+            allTranscript = allTranscript + '</tbody>';
+            allTranscript = allTranscript + '</table>';
+            document.getElementById("allTranscriptsTable").innerHTML = allTranscript;
 
 
-			inSeal = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
-			inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver control-size-100">Sample</th>'+
-				'<th class="w3-flat-silver control-size-100">Family</th>'+
-				'<th class="w3-flat-silver control-size-100">same</th>'+
-				'<th class="w3-flat-silver control-size-75 w3-center">Carrier</th>'+
-				'<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
-				'<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
-				'<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
-				'<th class="w3-flat-silver control-size-100 w3-center">Reported</th>'+
-			'</tr></thead>';
-			inSeal = inSeal + '<tbody>';
+            inSeal = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
+                '<th class="w3-flat-silver control-size-100">Sample</th>'+
+                '<th class="w3-flat-silver control-size-100">Family</th>'+
+                '<th class="w3-flat-silver control-size-100">same</th>'+
+                '<th class="w3-flat-silver control-size-75 w3-center">Carrier</th>'+
+                '<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
+                '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
+                '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
+                '<th class="w3-flat-silver control-size-100 w3-center">Reported</th>'+
+            '</tr></thead>';
+            inSeal = inSeal + '<tbody>';
 
-			var count = 0;
-			for (x in data["samples"]) {
-				if (data["samples"][x]["reported"]) {
-					reported = '<i title="Reported" class="w3-text-flat-emerald fas fa-check-circle"></i>'
-				} else {
-					reported = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-times-circle"></i>'
-				}
-				if (data["samples"][x]["carrier"]) {
-					carrier = '<i title="Reported" class="w3-text-flat-emerald fas fa-user-check"></i>'
-				} else {
-					carrier = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-user-times"></i>'
-				}
-				if (data["samples"][x]["same_family"]) {
-					family = '<i title="True" class="w3-text-flat-emerald fas fa-check-circle"></i>';
-				} else {
-					family = '<i title="False" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
-				}
-				inSeal = inSeal + '<tr>'+
-					'<td class="control-size-100">' + data["samples"][x]["samplename"] + '</td>'+
-					'<td class="control-size-100">' + data["samples"][x]["family"] + '</td>'+
-					'<td class="control-size-100">' + family+ '</td>'+
-					'<td class="control-size-75 w3-center">' + carrier + '</td>'+
-					'<td class="control-size-75 w3-center">' + data["samples"][x]["depth"] + '</td>'+
-					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_depth"] + '</td>'+
-					'<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_frequency"] + '</td>'+
-					'<td class="control-size-100 w3-center">' + reported + '</td>'+
-				'</tr>'
-				count += 1;
-			}
+            var count = 0;
+            for (x in data["samples"]) {
+                if (data["samples"][x]["reported"]) {
+                    reported = '<i title="Reported" class="w3-text-flat-emerald fas fa-check-circle"></i>'
+                } else {
+                    reported = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-times-circle"></i>'
+                }
+                if (data["samples"][x]["carrier"]) {
+                    carrier = '<i title="Reported" class="w3-text-flat-emerald fas fa-user-check"></i>'
+                } else {
+                    carrier = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-user-times"></i>'
+                }
+                if (data["samples"][x]["same_family"]) {
+                    family = '<i title="True" class="w3-text-flat-emerald fas fa-check-circle"></i>';
+                } else {
+                    family = '<i title="False" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
+                }
+                inSeal = inSeal + '<tr>'+
+                    '<td class="control-size-100">' + data["samples"][x]["samplename"] + '</td>'+
+                    '<td class="control-size-100">' + data["samples"][x]["family"] + '</td>'+
+                    '<td class="control-size-100">' + family+ '</td>'+
+                    '<td class="control-size-75 w3-center">' + carrier + '</td>'+
+                    '<td class="control-size-75 w3-center">' + data["samples"][x]["depth"] + '</td>'+
+                    '<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_depth"] + '</td>'+
+                    '<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_frequency"] + '</td>'+
+                    '<td class="control-size-100 w3-center">' + reported + '</td>'+
+                '</tr>'
+                count += 1;
+            }
 
-		    inSeal = inSeal + '</tbody>';
-		    inSeal = inSeal + '</table>';
-			document.getElementById("inSEALTable").innerHTML = inSeal;
+            inSeal = inSeal + '</tbody>';
+            inSeal = inSeal + '</table>';
+            document.getElementById("inSEALTable").innerHTML = inSeal;
             $('.table-modal-large').DataTable( {
                 scrollY:        '50vh',
                 scrollX:        true,
                 paging:         false
             });
-			var node = document.getElementsByClassName('inSealCount');
-			for (var i = 0; i < node.length; i++) {
+            var node = document.getElementsByClassName('inSealCount');
+            for (var i = 0; i < node.length; i++) {
                 node[i].innerHTML = count;
             }
 
-			tableScoresPredictions = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
-			tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver">Name</th>'+
-				'<th class="w3-flat-silver">Score</th>'+
-			'</tr></thead>';
-			tableScoresPredictions = tableScoresPredictions + '<tbody>';
-			for (nameScore in allScoresPredictions) {
-				tableScoresPredictions = tableScoresPredictions + '<tr>'+
-					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
-					'<td class="w3-text-black showTitle">'+allScoresPredictions[nameScore]+'</td>'+
-				'</tr>';
-			};
-			tableScoresPredictions = tableScoresPredictions + '</tbody>';
-			tableScoresPredictions = tableScoresPredictions + '</table>';
-			document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
+            tableScoresPredictions = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+            tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
+                '<th class="w3-flat-silver">Name</th>'+
+                '<th class="w3-flat-silver">Score</th>'+
+            '</tr></thead>';
+            tableScoresPredictions = tableScoresPredictions + '<tbody>';
+            for (nameScore in allScoresPredictions) {
+                tableScoresPredictions = tableScoresPredictions + '<tr>'+
+                    '<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+                    '<td class="w3-text-black showTitle">'+allScoresPredictions[nameScore]+'</td>'+
+                '</tr>';
+            };
+            tableScoresPredictions = tableScoresPredictions + '</tbody>';
+            tableScoresPredictions = tableScoresPredictions + '</table>';
+            document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
 
-			tableScoresConservation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
-			tableScoresConservation = tableScoresConservation + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver">Name</th>'+
-				'<th class="w3-flat-silver">Score</th>'+
-			'</tr></thead>';
-			tableScoresConservation = tableScoresConservation + '<tbody>';
-			for (nameScore in allScoresConservation) {
-				tableScoresConservation = tableScoresConservation + '<tr>'+
-					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
-					'<td class="w3-text-black showTitle">'+allScoresConservation[nameScore]+'</td>'+
-				'</tr>';
-			};
-			tableScoresConservation = tableScoresConservation + '</tbody>';
-			tableScoresConservation = tableScoresConservation + '</table>';
-			document.getElementById("tableScoresConservation").innerHTML = tableScoresConservation;
+            tableScoresConservation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            tableScoresConservation = tableScoresConservation + '<thead class="w3-flat-silver"><tr>'+
+                '<th class="w3-flat-silver">Name</th>'+
+                '<th class="w3-flat-silver">Score</th>'+
+            '</tr></thead>';
+            tableScoresConservation = tableScoresConservation + '<tbody>';
+            for (nameScore in allScoresConservation) {
+                tableScoresConservation = tableScoresConservation + '<tr>'+
+                    '<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+                    '<td class="w3-text-black showTitle">'+allScoresConservation[nameScore]+'</td>'+
+                '</tr>';
+            };
+            tableScoresConservation = tableScoresConservation + '</tbody>';
+            tableScoresConservation = tableScoresConservation + '</table>';
+            document.getElementById("tableScoresConservation").innerHTML = tableScoresConservation;
 
-			tableScoresPopulation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
-			tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver">Name</th>'+
-				'<th class="w3-flat-silver">Score</th>'+
-			'</tr></thead>';
-			tableScoresPopulation = tableScoresPopulation + '<tbody>';
-			for (nameScore in allScoresPopulation) {
-				tableScoresPopulation = tableScoresPopulation + '<tr>'+
-					'<td class="w3-text-black showTitle">'+nameScore+'</td>'+
-					'<td class="w3-text-black showTitle">'+allScoresPopulation[nameScore]+'</td>'+
-				'</tr>';
-			};
-			tableScoresPopulation = tableScoresPopulation + '</tbody>';
-			tableScoresPopulation = tableScoresPopulation + '</table>';
-			document.getElementById("tableScoresPopulation").innerHTML = tableScoresPopulation;
+            tableScoresPopulation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
+                '<th class="w3-flat-silver">Name</th>'+
+                '<th class="w3-flat-silver">Score</th>'+
+            '</tr></thead>';
+            tableScoresPopulation = tableScoresPopulation + '<tbody>';
+            for (nameScore in allScoresPopulation) {
+                tableScoresPopulation = tableScoresPopulation + '<tr>'+
+                    '<td class="w3-text-black showTitle">'+nameScore+'</td>'+
+                    '<td class="w3-text-black showTitle">'+allScoresPopulation[nameScore]+'</td>'+
+                '</tr>';
+            };
+            tableScoresPopulation = tableScoresPopulation + '</tbody>';
+            tableScoresPopulation = tableScoresPopulation + '</table>';
+            document.getElementById("tableScoresPopulation").innerHTML = tableScoresPopulation;
             $('.table-modal').DataTable();
 
-			wi1 = window.screen.width;
-			var apply = 433.983;
-			if (wi1 <= 768) {
-				apply = 467.983;
-			} else if (wi1 <= 992) {
-				apply = 567.983;
-			}
+            wi1 = window.screen.width;
+            var apply = 433.983;
+            if (wi1 <= 768) {
+                apply = 467.983;
+            } else if (wi1 <= 992) {
+                apply = 567.983;
+            }
 
 
-			radarData = [];
-			radarLabels = [];
-			for (nameScore in allScoresPredictions) {
-				if (allScoresPredictions[nameScore] != null) {
-					radarData.push(allScoresPredictions[nameScore]);
-					radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
-				}
-			};
-			radarData.push(radarData[0]);
-			radarLabels.push(radarLabels[0]);
-			data1 = [{
-				type: 'scatterpolar',
-				r: [
-					Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
-					Math.max(allScoresPredictions["VEST4_rankscore"], 0),
-					Math.max(allScoresPredictions["MetaSVM_rankscore"], 0),
-					Math.max(allScoresPredictions["MetaLR_rankscore"], 0),
-					Math.max(allScoresPredictions["Eigen-raw_coding_rankscore"], 0),
-					Math.max(allScoresPredictions["Eigen-PC-raw_coding_rankscore"], 0),
-					Math.max(allScoresPredictions["REVEL_rankscore"], 0),
-					Math.max(allScoresPredictions["BayesDel_addAF_rankscore"], 0),
-					Math.max(allScoresPredictions["BayesDel_noAF_rankscore"], 0),
-					Math.max(allScoresPredictions["ClinPred_rankscore"], 0),
-					Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
-				],
-				theta: [
-					"CADD",
-					"VEST4",
-					"MetaSVM",
-					"MetaLR",
-					"Eigen",
-					"Eigen_PC",
-					"REVEL",
-					"BayesDel_addAF",
-					"BayesDel_noAF",
-					"ClinPred",
-					"CADD"
-				],
-				fill: 'toself'
-			}]
+            radarData = [];
+            radarLabels = [];
+            for (nameScore in allScoresPredictions) {
+                if (allScoresPredictions[nameScore] != null) {
+                    radarData.push(allScoresPredictions[nameScore]);
+                    radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+                }
+            };
+            radarData.push(radarData[0]);
+            radarLabels.push(radarLabels[0]);
+            data1 = [{
+                type: 'scatterpolar',
+                r: [
+                    Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
+                    Math.max(allScoresPredictions["VEST4_rankscore"], 0),
+                    Math.max(allScoresPredictions["MetaSVM_rankscore"], 0),
+                    Math.max(allScoresPredictions["MetaLR_rankscore"], 0),
+                    Math.max(allScoresPredictions["Eigen-raw_coding_rankscore"], 0),
+                    Math.max(allScoresPredictions["Eigen-PC-raw_coding_rankscore"], 0),
+                    Math.max(allScoresPredictions["REVEL_rankscore"], 0),
+                    Math.max(allScoresPredictions["BayesDel_addAF_rankscore"], 0),
+                    Math.max(allScoresPredictions["BayesDel_noAF_rankscore"], 0),
+                    Math.max(allScoresPredictions["ClinPred_rankscore"], 0),
+                    Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
+                ],
+                theta: [
+                    "CADD",
+                    "VEST4",
+                    "MetaSVM",
+                    "MetaLR",
+                    "Eigen",
+                    "Eigen_PC",
+                    "REVEL",
+                    "BayesDel_addAF",
+                    "BayesDel_noAF",
+                    "ClinPred",
+                    "CADD"
+                ],
+                fill: 'toself'
+            }]
 
-			layout = {
-				width: apply,
-				polar: {
-					radialaxis: {
-						visible: true,
-						range: [0, 1]
-					}
-				},
-				showlegend: false
-			}
+            layout = {
+                width: apply,
+                polar: {
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 1]
+                    }
+                },
+                showlegend: false
+            }
 
-			radarData = [];
-			radarLabels = [];
-			for (nameScore in allScoresConservation) {
-				radarData.push(Math.max(allScoresConservation[nameScore], 0));
-				radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
-			};
-			radarData.push(radarData[0]);
-			radarLabels.push(radarLabels[0]);
+            radarData = [];
+            radarLabels = [];
+            for (nameScore in allScoresConservation) {
+                radarData.push(Math.max(allScoresConservation[nameScore], 0));
+                radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+            };
+            radarData.push(radarData[0]);
+            radarLabels.push(radarLabels[0]);
 
-			data2 = [{
-				type: 'scatterpolar',
-				r: radarData,
-				theta: radarLabels,
-				fill: 'toself'
-			}]
+            data2 = [{
+                type: 'scatterpolar',
+                r: radarData,
+                theta: radarLabels,
+                fill: 'toself'
+            }]
 
-			layout2 = {
-				width: apply,
-				polar: {
-					radialaxis: {
-						visible: true,
-						range: [0, 1]
-					}
-				},
-				showlegend: false
-			}
+            layout2 = {
+                width: apply,
+                polar: {
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 1]
+                    }
+                },
+                showlegend: false
+            }
 
-			radarData = [];
-			radarLabels = [];
-			for (nameScore in allScoresPopulation) {
-				radarData.push(Math.max(allScoresPopulation[nameScore], 0));
-				radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
-			};
-			radarData.push(radarData[0]);
-			radarLabels.push(radarLabels[0]);
+            radarData = [];
+            radarLabels = [];
+            for (nameScore in allScoresPopulation) {
+                radarData.push(Math.max(allScoresPopulation[nameScore], 0));
+                radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+            };
+            radarData.push(radarData[0]);
+            radarLabels.push(radarLabels[0]);
 
-			data3 = [{
-				type: 'scatterpolar',
-				r: radarData,
-				theta: radarLabels,
-				fill: 'toself'
-			}]
+            data3 = [{
+                type: 'scatterpolar',
+                r: radarData,
+                theta: radarLabels,
+                fill: 'toself'
+            }]
 
-			layout3 = {
-				width: apply,
-				polar: {
-					radialaxis: {
-						visible: true,
-						range: [0, 1]
-					}
-				},
-				showlegend: false
-			}
+            layout3 = {
+                width: apply,
+                polar: {
+                    radialaxis: {
+                        visible: true,
+                        range: [0, 1]
+                    }
+                },
+                showlegend: false
+            }
 
-			Plotly.newPlot("radarMissense", data1, layout)
-			Plotly.newPlot("radarConservation", data2, layout2)
-			Plotly.newPlot("radarPopulation", data3, layout3)
+            Plotly.newPlot("radarMissense", data1, layout)
+            Plotly.newPlot("radarConservation", data2, layout2)
+            Plotly.newPlot("radarPopulation", data3, layout3)
 
-			var traceMES = {
-				x: ['Ref', 'Alt'],
-				y: [MaxEntScan_ref, MaxEntScan_alt],
-				text: [MaxEntScan_ref, MaxEntScan_alt],
-				name: "",
-				marker:{
-					color: ['#3498db', '#34495e']
-				},
-				type: 'bar',
-				hovertemplate: "<b>MES %{x} : %{y:.0f}</b>"
-			};
+            var traceMES = {
+                x: ['Ref', 'Alt'],
+                y: [MaxEntScan_ref, MaxEntScan_alt],
+                text: [MaxEntScan_ref, MaxEntScan_alt],
+                name: "",
+                marker:{
+                    color: ['#3498db', '#34495e']
+                },
+                type: 'bar',
+                hovertemplate: "<b>MES %{x} : %{y:.0f}</b>"
+            };
 
-			var traceSpliceAI = []
-			var max=1;
-			for (site in spliceAI) {
-				var min = max - 0.15;
-				var color = "#7f8c8d";
-				if (spliceAI[site]["score"] >= 0.8) {
-					color = "#e74c3c";
-				} else if (spliceAI[site]["score"] >= 0.5) {
-					color = "#e67e22";
-				} else if (spliceAI[site]["score"] >= 0.2) {
-					color = "#f1c40f";
-				}
-				var trace = {
-					domain: { x: [0.35, 1], y: [min, max] },
-				    type: "indicator",
-				    mode: "number+gauge",
-				    gauge: {
-						shape: "bullet",
-						text:"t",
-						axis: { range: [null, 1] },
-						threshold: {
-							line: { color: "#e74c3c", width: 1 },
-							thickness: 0.75,
-							value: 0.8
-						},
-						steps: [
-							{ range: [0, 0.5], color: "#ecf0f1" },
-							{ range: [0, 0.2], color: "#bdc3c7" },
-						],
-						bar: {thickness:0.5, color: color },
-					},
-				    value: spliceAI[site]["score"],
-				    title: {
-				      text:
-				        "<b>" + spliceAI[site]["name"] + "</b><br><span style='color: gray; font-size:0.8em'>" + spliceAI[site]["position"] + "</span>",
-				      font: { size: 14 }
-				    },
-				};
-				traceSpliceAI.push(trace);
-				max = min - 0.13
-			}
+            var traceSpliceAI = []
+            var max=1;
+            for (site in spliceAI) {
+                var min = max - 0.15;
+                var color = "#7f8c8d";
+                if (spliceAI[site]["score"] >= 0.8) {
+                    color = "#e74c3c";
+                } else if (spliceAI[site]["score"] >= 0.5) {
+                    color = "#e67e22";
+                } else if (spliceAI[site]["score"] >= 0.2) {
+                    color = "#f1c40f";
+                }
+                var trace = {
+                    domain: { x: [0.35, 1], y: [min, max] },
+                    type: "indicator",
+                    mode: "number+gauge",
+                    gauge: {
+                        shape: "bullet",
+                        text:"t",
+                        axis: { range: [null, 1] },
+                        threshold: {
+                            line: { color: "#e74c3c", width: 1 },
+                            thickness: 0.75,
+                            value: 0.8
+                        },
+                        steps: [
+                            { range: [0, 0.5], color: "#ecf0f1" },
+                            { range: [0, 0.2], color: "#bdc3c7" },
+                        ],
+                        bar: {thickness:0.5, color: color },
+                    },
+                    value: spliceAI[site]["score"],
+                    title: {
+                      text:
+                        "<b>" + spliceAI[site]["name"] + "</b><br><span style='color: gray; font-size:0.8em'>" + spliceAI[site]["position"] + "</span>",
+                      font: { size: 14 }
+                    },
+                };
+                traceSpliceAI.push(trace);
+                max = min - 0.13
+            }
 
-			var data1 = [traceMES];
-			data1 = data1.concat(traceSpliceAI);
-			var layout = {
-			  width: apply*2,
-			  showlegend: false,
-			  xaxis: {
-			    domain: [0, 0.15],
-			    anchor: 'y1'
-			},title: "Splicing prediction scores (MaxEntScan & spliceAI)",
-			  yaxis: {
-			    domain: [0, 1],
-			    anchor: 'x1'
-			  },
-			};
+            var data1 = [traceMES];
+            data1 = data1.concat(traceSpliceAI);
+            var layout = {
+              width: apply*2,
+              showlegend: false,
+              xaxis: {
+                domain: [0, 0.15],
+                anchor: 'y1'
+            },title: "Splicing prediction scores (MaxEntScan & spliceAI)",
+              yaxis: {
+                domain: [0, 1],
+                anchor: 'x1'
+              },
+            };
 
-			Plotly.newPlot('chartSplicing', data1, layout);
+            Plotly.newPlot('chartSplicing', data1, layout);
 
-			comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
-			comments = comments + '<thead class="w3-flat-silver"><tr>'+
-				'<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
-		        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
-				'<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
-			'</tr></thead>';
-			comments = comments + '<tbody>';
+            comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+            comments = comments + '<thead class="w3-flat-silver"><tr>'+
+                '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
+                '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
+                '<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
+            '</tr></thead>';
+            comments = comments + '<tbody>';
 
-			var count = 0;
-			for (x in data["comments"]) {
-				comments = comments + '<tr>'+
-					'<td>' + data["comments"][x]["user"] + '</td>'+
-					'<td>' + data["comments"][x]["comment"] + '</td>'+
-					'<td>' + data["comments"][x]["date"] + '</td>'+
-				'</tr>';
-				count+=1;
-			}
+            var count = 0;
+            for (x in data["comments"]) {
+                comments = comments + '<tr>'+
+                    '<td>' + data["comments"][x]["user"] + '</td>'+
+                    '<td>' + data["comments"][x]["comment"] + '</td>'+
+                    '<td>' + data["comments"][x]["date"] + '</td>'+
+                '</tr>';
+                count+=1;
+            }
 
-		    comments = comments + '</tbody>';
-		    comments = comments + '</table>';
-			document.getElementById("commentsTable").innerHTML = comments;
-			var node = document.getElementsByClassName('commentsCount');
-			for (var i = 0; i < node.length; i++) {
+            comments = comments + '</tbody>';
+            comments = comments + '</table>';
+            document.getElementById("commentsTable").innerHTML = comments;
+            var node = document.getElementsByClassName('commentsCount');
+            for (var i = 0; i < node.length; i++) {
                 node[i].innerHTML = count;
             }
 
-			$('#tableComments').DataTable({
-				searching:false,
-				"lengthMenu": [ 10 ],
-				"dom": 'tip',
-				"order": [[ 2, "desc" ]],
-				columnDefs: [
-				   	{
-				   		orderable: false,
-						targets:  "no-sort"
-			   		}
-			   	],
-			});
-		});
-		document.getElementById("variant-id").innerHTML = id;
-		document.getElementById('modal-details-variant').style.display='block'
-	}
+            $('#tableComments').DataTable({
+                searching:false,
+                "lengthMenu": [ 10 ],
+                "dom": 'tip',
+                "order": [[ 2, "desc" ]],
+                columnDefs: [
+                       {
+                           orderable: false,
+                        targets:  "no-sort"
+                       }
+                   ],
+            });
+        });
+        document.getElementById("variant-id").innerHTML = id;
+        document.getElementById('modal-details-variant').style.display='block'
+    }
 
 
-	document.getElementsByClassName("tablink")[0].click();
+    document.getElementsByClassName("tablink")[0].click();
 
-	function openDetails(evt, detailName) {
-		var i, x, tablinks;
-		x = document.getElementsByClassName("detail");
-		for (i = 0; i < x.length; i++) {
-			x[i].style.display = "none";
-		}
-		tablinks = document.getElementsByClassName("tablink");
-		for (i = 0; i < x.length; i++) {
-			tablinks[i].classList.remove("w3-flat-nephritis");
-		}
-		document.getElementById(detailName).style.display = "block";
-		evt.currentTarget.classList.add("w3-flat-nephritis");
-	}
+    function openDetails(evt, detailName) {
+        var i, x, tablinks;
+        x = document.getElementsByClassName("detail");
+        for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < x.length; i++) {
+            tablinks[i].classList.remove("w3-flat-nephritis");
+        }
+        document.getElementById(detailName).style.display = "block";
+        evt.currentTarget.classList.add("w3-flat-nephritis");
+    }
 
-	function changeFilter(id) {
-		$.getJSON("/json/filter/" + id, function(data) {
+    function changeFilter(id) {
+        $.getJSON("/json/filter/" + id, function(data) {
             document.getElementById("variants_processing").style.visibility = "visible";
             document.getElementById("variants_processing").style.zIndex = "10";
             document.getElementById("variants_processing").style.display = "block";
             document.getElementById("variants").style.opacity = "0.5";
-		    setTimeout(function () {
+            setTimeout(function () {
                 $('#variants').DataTable().searchBuilder.rebuild(data);
                 document.getElementById("variants_processing").style.visibility = "hidden";
                 document.getElementById("variants_processing").style.zIndex = "0";
                 document.getElementById("variants_processing").style.display = "none";
                 document.getElementById("variants").style.opacity = "1";
             }, 30);
-		});
-	}
+        });
+    }
 
 
-	// When the user clicks anywhere outside of the modal, close it
-	window.onclick = function(event) {
-	  if (event.target == document.getElementById('modal-details-variant')) {
-	    document.getElementById('modal-details-variant').style.display = "none";
-	  }
-  	  if (event.target == document.getElementById('help-modal')) {
-  	    document.getElementById('help-modal').style.display = "none";
-  	  }
-  	  if (event.target == document.getElementById('filter-modal')) {
-  	    document.getElementById('filter-modal').style.display = "none";
-  	  }
-	}
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == document.getElementById('modal-details-variant')) {
+        document.getElementById('modal-details-variant').style.display = "none";
+      }
+        if (event.target == document.getElementById('help-modal')) {
+          document.getElementById('help-modal').style.display = "none";
+        }
+        if (event.target == document.getElementById('filter-modal')) {
+          document.getElementById('filter-modal').style.display = "none";
+        }
+    }
 
-	function toggle_var2sample_status(id, id_var, sample_id, type) {
-		$.ajaxSetup({
-			beforeSend: function(xhr, settings) {
-				if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
-				}
-			}
-		});
-		$.ajax({
-			type: "POST",
-			url: "/toggle/samples/variant/status",
-			data: {
-				"id_var": id_var, "sample_id": sample_id, "type":type
-			}
-		})
-	}
+    function toggle_var2sample_status(id, id_var, sample_id, type) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/toggle/samples/variant/status",
+            data: {
+                "id_var": id_var, "sample_id": sample_id, "type":type
+            }
+        })
+    }
 
-	function send_comment(id_var, comment) {
-		$.ajaxSetup({
-			beforeSend: function(xhr, settings) {
-				if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
-				}
-			}
-		});
-		var comment = $("#comment").val();
-		var id_var = $("#variant-id").text();
-		$.ajax({
-			type: "POST",
-			url: "/add/comment/variant",
-			data: {
-				"id_var": id_var, "comment": encodeURI(comment)
-			}
-		}).done(function() {
-			$("#comment").val("");
-			$.getJSON("/json/variant/" + id_var, function(data) {
+    function send_comment(id_var, comment) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        var comment = $("#comment").val();
+        var id_var = $("#variant-id").text();
+        $.ajax({
+            type: "POST",
+            url: "/add/comment/variant",
+            data: {
+                "id_var": id_var, "comment": encodeURI(comment)
+            }
+        }).done(function() {
+            $("#comment").val("");
+            $.getJSON("/json/variant/" + id_var, function(data) {
 
-				comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
-				comments = comments + '<thead class="w3-flat-silver"><tr>'+
-					'<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
-			        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
-					'<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
-				'</tr></thead>';
-				comments = comments + '<tbody>';
+                comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+                comments = comments + '<thead class="w3-flat-silver"><tr>'+
+                    '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
+                    '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
+                    '<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
+                '</tr></thead>';
+                comments = comments + '<tbody>';
 
-				var count = 0;
-				for (x in data["comments"]) {
-					comments = comments + '<tr>'+
-						'<td>' + data["comments"][x]["user"] + '</td>'+
-						'<td>' + data["comments"][x]["comment"] + '</td>'+
-						'<td>' + data["comments"][x]["date"] + '</td>'+
-					'</tr>';
-					count+=1;
-				}
+                var count = 0;
+                for (x in data["comments"]) {
+                    comments = comments + '<tr>'+
+                        '<td>' + data["comments"][x]["user"] + '</td>'+
+                        '<td>' + data["comments"][x]["comment"] + '</td>'+
+                        '<td>' + data["comments"][x]["date"] + '</td>'+
+                    '</tr>';
+                    count+=1;
+                }
 
-			    comments = comments + '</tbody>';
-			    comments = comments + '</table>';
-				document.getElementById("commentsTable").innerHTML = comments;
-				var node = document.getElementsByClassName('commentsCount');
-				for (var i = 0; i < node.length; i++) {
-	                node[i].innerHTML = count;
-	            }
+                comments = comments + '</tbody>';
+                comments = comments + '</table>';
+                document.getElementById("commentsTable").innerHTML = comments;
+                var node = document.getElementsByClassName('commentsCount');
+                for (var i = 0; i < node.length; i++) {
+                    node[i].innerHTML = count;
+                }
 
-				$('#tableComments').DataTable({
-					searching:false,
-					"lengthMenu": [ 10 ],
-					"dom": 'tip',
-					"order": [[ 2, "desc" ]],
-					columnDefs: [
-					   	{
-					   		orderable: false,
-							targets:  "no-sort"
-				   		}
-				   	],
-				});
-			});
-		});
-	}
+                $('#tableComments').DataTable({
+                    searching:false,
+                    "lengthMenu": [ 10 ],
+                    "dom": 'tip',
+                    "order": [[ 2, "desc" ]],
+                    columnDefs: [
+                           {
+                               orderable: false,
+                            targets:  "no-sort"
+                           }
+                       ],
+                });
+            });
+        });
+    }
 
-	function validateFilter() {
-		$.ajaxSetup({
-			beforeSend: function(xhr, settings) {
-				if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
-				}
-			}
-		});
-		var name = $("#filterName").val();
-		var filter = JSON.parse($("#filterText").text());
-		$.ajax({
-			type: "POST",
-			url: "/add/filter",
-			data: {
-				"name": name, "filter": JSON.stringify(filter)
-			}
-		}).done(function() {
-			document.getElementById('filter-modal').style.display = "none";
-			$.getJSON("/json/filters", function(data) {
-				var options = "";
-				for (x in data) {
+    function validateFilter() {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        var name = $("#filterName").val();
+        var filter = JSON.parse($("#filterText").text());
+        $.ajax({
+            type: "POST",
+            url: "/add/filter",
+            data: {
+                "name": name, "filter": JSON.stringify(filter)
+            }
+        }).done(function() {
+            document.getElementById('filter-modal').style.display = "none";
+            $.getJSON("/json/filters", function(data) {
+                var options = "";
+                for (x in data) {
                     option = '<option value="' + x + '" '
                     if (data[x] == name) {
                         option += "selected"
@@ -2012,11 +2012,11 @@
                     } else {
                         option += '>' + data[x] + '</option>';
                     }
-    				options += option;
-				}
-				document.getElementById('selectBox').innerHTML = options
-			});
-		})
-	}
+                    options += option;
+                }
+                document.getElementById('selectBox').innerHTML = options
+            });
+        })
+    }
 </script>
 {% endblock %}
