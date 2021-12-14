@@ -550,6 +550,7 @@ def json_variants(id, version=-1):
             "analyse1": var2sample.analyse1,
             "analyse2": var2sample.analyse2,
             "reported": var2sample.reported,
+            "class_variant": var2sample.class_variant,
             "allelic_depth": f"{var2sample.allelic_depth}",
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {

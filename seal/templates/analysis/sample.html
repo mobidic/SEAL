@@ -133,7 +133,8 @@
 							<th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
 							<th class='w3-flat-green-sea showTitle control-size-25'>A1</th>
 							<th class='w3-flat-green-sea showTitle control-size-25'>A2</th>
-							<th class='w3-flat-green-sea showTitle control-size-25'>R</th>
+                            <th class='w3-flat-green-sea showTitle control-size-25'>R</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>Class</th>
 							<th class="w3-flat-green-sea w3-center control-size-25"></th>
 						</tr>
 					</thead>
@@ -273,6 +274,9 @@
 							</th>
 							<th class='w3-flat-green-sea showTitle control-size-25'>
 								R
+							</th>
+							<th class='w3-flat-green-sea showTitle control-size-100'>
+								Class
 							</th>
 							<th class="w3-flat-green-sea w3-center control-size-25"></th>
 						</tr>
@@ -473,8 +477,6 @@
                 }
             }
         });
-        console.log(id);
-        console.log(status);
 
         $.ajax({
             type: "POST",
@@ -1164,6 +1166,48 @@
 							}
 					    }
 					}
+				},
+				{
+					"className": 'showTitle size-25 w3-center',
+					"data": "class_variant",
+					"render": {
+						"_" : function ( data, type, row, meta ) {
+							if(data != null) {
+					    		return data.toFixed(4);
+							} else {
+								return null;
+							}
+					    },
+						"display" : function ( data, type, row, meta ) {
+                            if (data == 1) {
+                                return '<span class="w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
+                                    '<i class="fas fa-map-marker"></i>'+
+                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
+                                '</span> - Benign</span>';
+                            } else if (data == 2) {
+                                return '<span class="w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
+                                    '<i class="fas fa-map-marker"></i>'+
+                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
+                                '</span> - Likely Benign</span>';
+                            } else if (data == 3) {
+                                return '<span class="w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
+                                    '<i class="fas fa-map-marker"></i>'+
+                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
+                                '</span> - VUS</span>';
+                            } else if (data == 4) {
+                                return '<span class="w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
+                                    '<i class="fas fa-map-marker"></i>'+
+                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
+                                '</span> - Likely Pathogenic</span>';
+                            } else if (data == 5) {
+                                return '<span class="w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
+                                    '<i class="fas fa-map-marker"></i>'+
+                                    '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
+                                '</span> - Pathogenic</span>';
+                            }
+							return "...";
+					    }
+					},
 				},
 				{
 					"className":      'details-control w3-center',
