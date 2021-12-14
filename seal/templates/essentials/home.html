@@ -47,6 +47,55 @@
 
 {% block script %}
 <script type="text/javascript">
+    function view_sample(id) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/toggle/sample/status",
+            data: {
+                "sample_id": id
+            },
+            success: function() {
+                document.location.href = "/sample/" + id;
+            }
+        });
+    }
+
+    function toggle_status(id, status) {
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/toggle/sample/status",
+            data: {
+                "sample_id": id,
+                "status": status
+            },
+            success: function() {
+                if (status == 1) {
+                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>';
+                } else if (status == 2) {
+                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b> - analysing</i></span>';
+                } else if (status == 3) {
+                    response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b> - analysed</i></span>';
+                }
+                document.getElementById("button-status-" + id).innerHTML = response;
+            }
+        });
+    }
 
 	$(document).ready(function() {
 	    table = $('#samples').DataTable({
@@ -60,7 +109,18 @@
                 },
 			},
     		"columns": [
-				{ "className": 'showTitle', "data": "samplename" },
+				{
+                    "className": 'showTitle',
+                    "data": {
+                        _: "samplename",
+                        display: function ( data, type, row ) {
+                            if(data) {
+                                return '<button onclick="view_sample(' + data.id + ')" class="w3-button w3-hover-flat-green-sea">' + data.samplename + '</button>';
+                            }
+                            return data
+                        }
+                    }
+                },
 		        { "className": 'showTitle', "data": "family" },
 				{ "className": 'showTitle', "data": "run" },
 				{ "className": 'showTitle', "data": "run_alias" },
@@ -69,21 +129,38 @@
 					"data": {
 						"_": "status",
 						"display": function ( data, type, row ) {
-							response = "";
+                            response = "";
 							if(data) {
-								if (data.status == -1) {
-									response = '<span class="w3-text-flat-alizarin"><i title="Error" class="fas fa-times-circle"></i> <i><b>Error</b> - contact admin</i></span>';
-								} else if (data.status == 0) {
+                                if (data.status == -1) {
+                                    response = '<span class="w3-text-flat-alizarin"><i title="Error" class="fas fa-times-circle"></i> <i><b>Error</b> - contact admin</i></span>';
+                                } else if (data.status == 0) {
                                     response = '<span class="w3-text-flat-wet-asphalt"><i class="fas fa-cloud-download-alt"></i> <i><b>Upload</b> - in progress</i></span>';
-								} else if (data.status == 1) {
-									response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>';
-								} else if (data.status == 2) {
-									response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b> - analysing</i></span>';
-								} else if (data.status == 3) {
-									response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b> - analysed</i></span>';
-								}  else {
+                                } else if (data.status == 1) {
+                                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>';
+                                } else if (data.status == 2) {
+                                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b> - analysing</i></span>';
+                                } else if (data.status == 3) {
+                                    response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b> - analysed</i></span>';
+                                }  else {
                                     response = '<span class="w3-text-flat-orange"><i class="fas fa-exclamation-triangle"></i> <i><b>Warning</b> - contact admin</i></span>';
-								}
+                                }
+                                sample_id = data.id
+                                response = `<div class="w3-dropdown-hover w3-right" style="background-color:transparent">
+                                    <button class="w3-button" id="button-status-` + sample_id + `">
+                                        ` + response + `
+                                    </button>
+                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+                                        <a onclick="toggle_status(` + sample_id + `, 1)" class="w3-bar-item w3-button">
+                                            <span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>
+                                        </a>
+                                        <a onclick="toggle_status(` + sample_id + `, 2)" class="w3-bar-item w3-button">
+                                            <span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b> - analysing</i></span>
+                                        </a>
+                                        <a onclick="toggle_status(` + sample_id + `, 3)" class="w3-bar-item w3-button">
+                                            <span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b> - analysed</i></span>
+                                        </a>
+                                    </div>
+                                </div>`
 							}
 							return response;
 		                },
@@ -91,38 +168,11 @@
 				}
 			],
 			"createdRow": function( row, data, dataIndex ) {
-			    if ( data.status >= 1 && data.status <= 3) {
-					$(row).addClass( 'access' );
-			    } else {
+			    if ( data.status < 1 || data.status > 3) {
 					$(row).addClass( 'w3-disabled' );
 			    }
 			  }
 		});
-
-		$('#samples tbody').on( 'click', 'tr', function () {
-    		$.ajaxSetup({
-    			beforeSend: function(xhr, settings) {
-    				if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-    					xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
-    				}
-    			}
-    		});
-			id = table.row( this ).data().id;
-			status = table.row( this ).data().status;
-
-    		$.ajax({
-    			type: "POST",
-    			url: "/toggle/sample/status",
-    			data: {
-    				"sample_id": id
-    			},
-                success: function() {
-                    document.location.href = "/sample/" + id;
-                }
-    		});
-
-
-		} );
 
 		setInterval( function () {
 		    table.ajax.reload();
