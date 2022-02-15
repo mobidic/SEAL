@@ -55,15 +55,96 @@ class CustomView(ModelView):
 
 
 admin = Admin(app, index_view=MyAdminIndexView())
-admin.add_view(AdminView(User, db.session, category="Authentication"))
-admin.add_view(AdminView(Team, db.session, category="Authentication"))
-admin.add_view(AdminView(Sample, db.session, category="Analysis"))
-admin.add_view(AdminView(Family, db.session, category="Analysis"))
-admin.add_view(AdminView(Run, db.session, category="Analysis"))
-admin.add_view(AdminView(Variant, db.session, category="Analysis"))
-admin.add_view(AdminView(Comment, db.session, category="Analysis"))
-admin.add_view(AdminView(Var2Sample, db.session, category="Analysis"))
-admin.add_view(AdminView(Filter, db.session, category="Filter"))
+admin.add_view(
+    CustomView(
+        User,
+        db.session,
+        category="Authentication",
+        column_exclude_list=['password', 'transcripts'],
+        column_searchable_list=['username', 'mail'],
+        column_editable_list=['username', 'mail', 'filter']
+    )
+)
+admin.add_view(
+    CustomView(
+        Team,
+        db.session,
+        category="Authentication",
+        column_searchable_list=['teamname'],
+        column_editable_list=['teamname', 'color']
+    )
+)
+admin.add_view(
+    CustomView(
+        Sample,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["samplename"],
+        column_editable_list=['samplename', 'status']
+    )
+)
+admin.add_view(
+    CustomView(
+        Family,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["family"],
+        column_editable_list=['family']
+    )
+)
+admin.add_view(
+    CustomView(
+        Run,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["run_name", "run_alias"],
+        column_editable_list=["run_name", "run_alias"]
+    )
+)
+admin.add_view(
+    CustomView(
+        Variant,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["chr", "pos", "ref", "alt", "annotations"],
+        column_editable_list=["chr", "pos", "ref", "alt"]
+    )
+)
+admin.add_view(
+    CustomView(
+        Comment,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["comment"],
+        column_editable_list=["comment"]
+    )
+)
+admin.add_view(
+    CustomView(
+        Var2Sample,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["filter"],
+        column_editable_list=["depth", "allelic_depth", "class_variant"]
+    )
+)
+admin.add_view(
+    CustomView(
+        Filter,
+        db.session,
+        category="Filter",
+        column_searchable_list=["filtername", "filter"],
+        column_editable_list=["filtername"]
+    )
+)
 # admin.add_view(AdminView(Gene, db.session, category="Genes"))
-admin.add_view(AdminView(Transcript, db.session, category="Genes"))
+admin.add_view(
+    CustomView(
+        Transcript,
+        db.session,
+        category="Genes",
+        column_searchable_list=["feature", "biotype", "feature_type", "symbol", "symbol_source", "gene", "source", "protein", "canonical", "hgnc"],
+        column_editable_list=["feature", "biotype", "feature_type", "symbol", "symbol_source", "gene", "source", "protein", "canonical", "hgnc"]
+    )
+)
 admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))
