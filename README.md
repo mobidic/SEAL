@@ -6,12 +6,14 @@ First of all clone the repo :
 https://github.com/mobidic/seal.git
 
 ### Install dependencies
+
 #### Conda
+
 Please install conda (see : https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 
 `conda env create -f environment.yml`
 
-#### Launch the app
+## Launch the app
 
 ```bash
 conda activate seal
