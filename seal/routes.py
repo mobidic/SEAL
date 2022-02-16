@@ -532,8 +532,8 @@ def json_variants(id, version=-1):
                 main_annot = annot
                 continue
 
-        cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status == 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
-        total_samples = db.session.query(Sample).filter(and_(Sample.status == 1, Sample.id != sample.id)).count()
+        cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
+        total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id)).count()
         cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status == 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
@@ -560,6 +560,7 @@ def json_variants(id, version=-1):
             }
         })
 
+    print(variants)
     return jsonify(variants)
 
 
