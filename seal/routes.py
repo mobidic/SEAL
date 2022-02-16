@@ -534,7 +534,10 @@ def json_variants(id, version=-1):
 
         cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
         total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id)).count()
-        cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
+        if sample.familyid is None:
+            cnt_family = None
+        else:
+            cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
 
@@ -675,7 +678,7 @@ def json_variant(id, version=-1, family=None):
     samples = list()
     for v2s in variant.samples:
         same_family = False
-        if v2s.sample.status == 1:
+        if v2s.sample.status >= 1:
             if family is not None and v2s.sample.family:
                 if v2s.sample.familyid == family:
                     same_family = True

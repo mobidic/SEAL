@@ -1033,6 +1033,25 @@
                 {
                     "className": 'showTitle size-125',
                     "data": "inseal.occurences_family",
+                    "render" : {
+                        "_" : function ( data, type, row, meta ) {
+                            return data;
+                        },
+                        "display" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return data;
+                            } else {
+                                return "<i>NA</i>";
+                            }
+                        },
+                        "sort" : function ( data, type, row, meta ) {
+                            if(data != null) {
+                                return data;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    },
                 },
                 {
                     "className": 'showTitle size-300',
