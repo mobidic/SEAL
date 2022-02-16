@@ -834,6 +834,9 @@
                     "data": "annotations.EI",
                     "render": {
                         "_": function ( data, type, row ) {
+                            if (data == null) {
+                                return "<i>NA</i>";
+                            }
                             return data;
                         },
                         "sort": function ( data, type, row ) {
@@ -929,7 +932,7 @@
                             if(data != null) {
                                 return parseFloat(data).toFixed(6);
                             } else {
-                                return "NA";
+                                return "<i>NA</i>";
                             }
                         },
                         "sort" : function ( data, type, row, meta ) {
@@ -1053,7 +1056,7 @@
                         },
                         "display": function ( data, type, row, meta ) {
                             if (data == null){
-                                return "NA";
+                                return "<i>NA</i>";
                             }
                             value = parseFloat(data).toFixed(3)
                             classw3css = "w3-text-black";
@@ -1076,7 +1079,7 @@
                         },
                         "display": function ( data, type, row, meta ) {
                             if (data == null){
-                                return "NA";
+                                return "<i>NA</i>";
                             }
                             value = parseFloat(data).toFixed(3)
                             classw3css = "w3-text-black";
@@ -1104,7 +1107,7 @@
                         },
                         "display" : function ( data, type, row, meta ) {
                             if (data == null){
-                                return "NA";
+                                return "<i>NA</i>";
                             }
                             value = parseFloat(data).toFixed(3)
                             classw3css = "w3-text-black";
