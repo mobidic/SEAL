@@ -185,3 +185,10 @@
     opacity:1;
     content: "\f0de" !important;
 }
+
+.dtfc-fixed-left {
+ border-right: 1px solid #063027; !important;
+}
+.dtfc-fixed-right {
+ border-left: 1px solid #063027; !important;  
+}
