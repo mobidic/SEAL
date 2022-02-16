@@ -255,7 +255,7 @@ def importvcf():
 
                             # transcript
                             transcript = Transcript.query.get(annot["Feature"])
-                            if not transcript:
+                            if not transcript and annot["Feature"] is not None:
                                 transcript = Transcript(
                                     feature=annot["Feature"],
                                     biotype=annot["BIOTYPE"],
