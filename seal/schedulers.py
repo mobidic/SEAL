@@ -192,7 +192,7 @@ def importvcf():
             " --numbers " + \
             " --vcf_info_field ANN " + \
             " --terms SO " + \
-            " --shift_3prime 1 " + \
+            " --shift_3prime 0 " + \
             " --shift_genomic 1 " + \
             " --hgvs " + \
             " --hgvsg " + \
