@@ -798,8 +798,42 @@
             },
             ajax: '/json/variants/sample/{{ sample.id }}',
             "columns": [
-                { "className": 'showTitle control-size-100', "data": "annotations.SYMBOL"},
-                { "className": 'showTitle control-size-100', "data": "annotations.Feature"},
+                {
+                    "className": 'showTitle control-size-100',
+                    "data": "annotations.SYMBOL",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            if (data == null) {
+                                return "<i>NA</i>";
+                            }
+                            return data;
+                        },
+                        "sort": function ( data, type, row ) {
+                            if (data == null) {
+                                return -1;
+                            }
+                            return data;
+                        }
+                    }
+                },
+                {
+                    "className": 'showTitle control-size-100',
+                    "data": "annotations.Feature",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            if (data == null) {
+                                return "<i>NA</i>";
+                            }
+                            return data;
+                        },
+                        "sort": function ( data, type, row ) {
+                            if (data == null) {
+                                return -1;
+                            }
+                            return data;
+                        }
+                    }
+                },
                 {
                     "className": 'showTitle w3-center control-size-75',
                     "data": "annotations",
@@ -881,8 +915,42 @@
                         },
                     },
                 },
-                { "className": 'showTitle control-size-250', "data": "annotations.HGVSc"},
-                { "className": 'showTitle control-size-250', "data": "annotations.HGVSp"},
+                {
+                    "className": 'showTitle control-size-250',
+                    "data": "annotations.HGVSc",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            if (data == null) {
+                                return "<i>NA</i>";
+                            }
+                            return data;
+                        },
+                        "sort": function ( data, type, row ) {
+                            if (data == null) {
+                                return -1;
+                            }
+                            return data;
+                        }
+                    }
+                },
+                {
+                    "className": 'showTitle control-size-250',
+                    "data": "annotations.HGVSp",
+                    "render": {
+                        "_": function ( data, type, row ) {
+                            if (data == null) {
+                                return "<i>NA</i>";
+                            }
+                            return data;
+                        },
+                        "sort": function ( data, type, row ) {
+                            if (data == null) {
+                                return -1;
+                            }
+                            return data;
+                        }
+                    }
+                },
                 {
                     "className": 'showTitle size-200',
                     "data": "filter",
