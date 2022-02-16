@@ -162,8 +162,6 @@ class Var2Sample(db.Model):
     depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
     filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
-    analyse1 = db.Column(db.Boolean, nullable=False, unique=False, default=False)
-    analyse2 = db.Column(db.Boolean, nullable=False, unique=False, default=False)
     reported = db.Column(db.Boolean, nullable=False, unique=False, default=False)
 
     sample = db.relationship(Sample, backref="variants")

@@ -547,8 +547,6 @@ def json_variants(id, version=-1):
             "alt": f"{variant.alt}",
             "filter": var2sample.filter,
             "depth": f"{var2sample.depth}",
-            "analyse1": var2sample.analyse1,
-            "analyse2": var2sample.analyse2,
             "reported": var2sample.reported,
             "class_variant": variant.class_variant,
             "allelic_depth": f"{var2sample.allelic_depth}",
