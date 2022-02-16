@@ -991,6 +991,9 @@
                     "render" : {
                         "_" : function ( data, type, row, meta ) {
                             if(data != null) {
+                                if (isNaN(parseFloat(data).toFixed(6))) {
+                                    return null
+                                }
                                 return parseFloat(data).toFixed(6);
                             } else {
                                 return null;
@@ -998,6 +1001,9 @@
                         },
                         "display" : function ( data, type, row, meta ) {
                             if(data != null) {
+                                if (isNaN(parseFloat(data).toFixed(6))) {
+                                    return "<i>NA</i>"
+                                }
                                 return parseFloat(data).toFixed(6);
                             } else {
                                 return "<i>NA</i>";
@@ -1005,6 +1011,9 @@
                         },
                         "sort" : function ( data, type, row, meta ) {
                             if(data != null) {
+                                if (isNaN(parseFloat(data).toFixed(6))) {
+                                    return -0.5
+                                }
                                 return parseFloat(data).toFixed(6);
                             } else {
                                 return -1
