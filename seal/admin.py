@@ -107,7 +107,7 @@ admin.add_view(
         db.session,
         category="Analysis",
         column_searchable_list=["chr", "pos", "ref", "alt", "annotations"],
-        column_editable_list=["chr", "pos", "ref", "alt"]
+        column_editable_list=["chr", "pos", "ref", "alt", "class_variant"]
     )
 )
 admin.add_view(
@@ -125,7 +125,7 @@ admin.add_view(
         db.session,
         category="Analysis",
         column_searchable_list=["filter"],
-        column_editable_list=["depth", "allelic_depth", "class_variant"]
+        column_editable_list=["depth", "allelic_depth"]
     )
 )
 admin.add_view(

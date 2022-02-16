@@ -534,7 +534,7 @@ def json_variants(id, version=-1):
 
         cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
         total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id)).count()
-        cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status == 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
+        cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
 
@@ -550,7 +550,7 @@ def json_variants(id, version=-1):
             "analyse1": var2sample.analyse1,
             "analyse2": var2sample.analyse2,
             "reported": var2sample.reported,
-            "class_variant": var2sample.class_variant,
+            "class_variant": variant.class_variant,
             "allelic_depth": f"{var2sample.allelic_depth}",
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
@@ -745,12 +745,11 @@ def toggle_varStatus():
 @login_required
 def toggle_varClass():
     id_var = request.form["id_var"]
-    sample_id = request.form["sample_id"]
     class_variant = request.form["class_variant"]
-    v2s = Var2Sample.query.get((id_var, sample_id))
-    v2s.class_variant = class_variant
+    variant = Variant.query.get(id_var)
+    variant.class_variant = class_variant
     db.session.commit()
-    return f"{v2s.class_variant}"
+    return f"{variant.class_variant}"
 
 
 @app.route("/toggle/sample/status", methods=['POST'])
