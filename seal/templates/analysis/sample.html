@@ -1032,21 +1032,26 @@
                 },
                 {
                     "className": 'showTitle size-125',
-                    "data": "inseal.occurences_family",
+                    "data": "inseal",
                     "render" : {
                         "_" : function ( data, type, row, meta ) {
-                            return data;
+                            return data["occurences_family"];
                         },
                         "display" : function ( data, type, row, meta ) {
-                            if(data != null) {
-                                return data;
+                            if(data["occurences_family"] != null) {
+                                val = data["occurences_family"];
+                                members = ""
+                                if (data["occurences_family"] >= 1) {
+                                    members = " (" + data["family_members"] +")"
+                                }
+                                return val + members;
                             } else {
                                 return "<i>NA</i>";
                             }
                         },
                         "sort" : function ( data, type, row, meta ) {
-                            if(data != null) {
-                                return data;
+                            if(data["occurences_family"] != null) {
+                                return data["occurences_family"];
                             } else {
                                 return 0;
                             }

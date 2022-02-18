@@ -534,10 +534,16 @@ def json_variants(id, version=-1):
 
         cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
         total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id)).count()
+
+        members = []
         if sample.familyid is None:
             cnt_family = None
         else:
-            cnt_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
+            request_family = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.familyid == sample.familyid, Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID))
+            cnt_family = request_family.count()
+            if cnt_family >= 0:
+                for member in request_family:
+                    members.append(member.samplename)
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
 
@@ -557,7 +563,8 @@ def json_variants(id, version=-1):
             "inseal": {
                 "occurrences": cnt,
                 "total_samples": total_samples,
-                "occurences_family": cnt_family
+                "occurences_family": cnt_family,
+                "family_members" : members
             }
         })
 
