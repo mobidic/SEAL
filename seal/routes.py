@@ -568,7 +568,6 @@ def json_variants(id, version=-1):
             }
         })
 
-    print(variants)
     return jsonify(variants)
 
 
@@ -806,17 +805,14 @@ def add_filter():
 @login_required
 def add_preferred():
     user = db.session.query(User).filter_by(id=current_user.get_id()).first()
-    print(user)
-    print(user.transcripts)
+
     transcript = urllib.parse.unquote(request.form["transcript"])
     # transcript = Transcript.query.get(transcript_id)
     if transcript in user.transcripts:
         user.transcripts.remove(transcript)
     else:
         user.transcripts.append(transcript)
-    print(user.transcripts)
     db.session.commit()
-    print(user.transcripts)
     return 'ok'
 
 
