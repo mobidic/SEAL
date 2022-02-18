@@ -915,7 +915,8 @@
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
-                            return data;
+                            mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span>'
+                            return mobidetails + data;
                         },
                         "sort": function ( data, type, row ) {
                             if (data == null) {
@@ -1279,8 +1280,8 @@
                             return data;
                         },
                         "display": function ( data, type, row ) {
-                            response = '<i onclick="openDetailsVariantModal(\'' + data + '\', {{ sample.id }})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
-                            return response;
+                            details = '<i onclick="openDetailsVariantModal(\'' + data + '\', {{ sample.id }})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i>'
+                            return details;
                         },
                     },
                 },
@@ -1322,10 +1323,25 @@
     }
 
     function htmlLink(data) {
-      return `<a class="w3-hover-text-${data.color}" href="${data.link_prefix}${data.id}${data.link_suffix}" target="_blank"><i class="w3-text-${data.color} ${data.flag}"></i> ${data.id}</a>`;
+        return `<a class="w3-hover-text-${data.color}" href="${data.link_prefix}${data.id}${data.link_suffix}" target="_blank"><i class="w3-text-${data.color} ${data.flag}"></i> ${data.id}</a>`;
     }
 
     const missenseScores = []
+    function openMD(id) {
+        $.ajax({
+        type: "POST",
+        url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
+        data: {
+            variant_chgvs: encodeURIComponent(id),
+            caller: 'cli',
+            api_key: ""
+        }
+        })
+        .done(function(data) {
+            window.open(data.url)
+        });
+    }
+
     function openDetailsVariantModal(id, sample_id) {
         request = "/json/variant/" + id + "/sample/" + sample_id;
         $.getJSON(request, function(data) {
