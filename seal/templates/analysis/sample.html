@@ -1279,7 +1279,7 @@
                             return data;
                         },
                         "display": function ( data, type, row ) {
-                            response = '<i onclick="openDetailsVariantModal(\'' + data + '\',{% if sample.familyid %}{{ sample.familyid }}{% else %}null{% endif %})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
+                            response = '<i onclick="openDetailsVariantModal(\'' + data + '\', {{ sample.id }})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i></button>'
                             return response;
                         },
                     },
@@ -1326,12 +1326,8 @@
     }
 
     const missenseScores = []
-    function openDetailsVariantModal(id, familyid) {
-        if (familyid) {
-            request = "/json/variant/" + id +"/family/" + familyid;
-        } else {
-            request = "/json/variant/" + id;
-        }
+    function openDetailsVariantModal(id, sample_id) {
+        request = "/json/variant/" + id + "/sample/" + sample_id;
         $.getJSON(request, function(data) {
             allTranscript = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
             allTranscript = allTranscript + '<thead class="w3-flat-silver"><tr>'+
@@ -1583,7 +1579,6 @@
             inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver control-size-100">Sample</th>'+
                 '<th class="w3-flat-silver control-size-100">Family</th>'+
-                '<th class="w3-flat-silver control-size-100">same</th>'+
                 '<th class="w3-flat-silver control-size-75 w3-center">Carrier</th>'+
                 '<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
                 '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
@@ -1604,20 +1599,26 @@
                 } else {
                     carrier = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-user-times"></i>'
                 }
-                if (data["samples"][x]["same_family"]) {
-                    family = '<i title="True" class="w3-text-flat-emerald fas fa-check-circle"></i>';
+                if (data["samples"][x]["current_family"]) {
+                    family = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["family"] + '</span></b>';
+                    sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
                 } else {
-                    family = '<i title="False" class="w3-text-flat-alizarin fas fa-times-circle"></i>';
+                    family = data["samples"][x]["family"];
+                    sample = data["samples"][x]["samplename"];
+                }
+                style=""
+                if (data["samples"][x]["current"]) {
+                    sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
+                    style =  "style='background-color:#85b3d5'"
                 }
                 inSeal = inSeal + '<tr>'+
-                    '<td class="control-size-100">' + data["samples"][x]["samplename"] + '</td>'+
-                    '<td class="control-size-100">' + data["samples"][x]["family"] + '</td>'+
-                    '<td class="control-size-100">' + family+ '</td>'+
-                    '<td class="control-size-75 w3-center">' + carrier + '</td>'+
-                    '<td class="control-size-75 w3-center">' + data["samples"][x]["depth"] + '</td>'+
-                    '<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_depth"] + '</td>'+
-                    '<td class="control-size-100 w3-center">' + data["samples"][x]["allelic_frequency"] + '</td>'+
-                    '<td class="control-size-100 w3-center">' + reported + '</td>'+
+                    '<td class="control-size-100" ' + style + '>' + sample + '</td>'+
+                    '<td class="control-size-100" ' + style + '>' + family+ '</td>'+
+                    '<td class="control-size-75 w3-center" ' + style + '>' + carrier + '</td>'+
+                    '<td class="control-size-75 w3-center" ' + style + '>' + data["samples"][x]["depth"] + '</td>'+
+                    '<td class="control-size-100 w3-center" ' + style + '>' + data["samples"][x]["allelic_depth"] + '</td>'+
+                    '<td class="control-size-100 w3-center" ' + style + '>' + data["samples"][x]["allelic_frequency"] + '</td>'+
+                    '<td class="control-size-100 w3-center" ' + style + '>' + reported + '</td>'+
                 '</tr>'
                 count += 1;
             }

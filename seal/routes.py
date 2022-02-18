@@ -675,26 +675,30 @@ def json_filters():
 
 
 @app.route("/json/variant/<string:id>")
+@app.route("/json/variant/<string:id>/sample/<int:sample>")
 @app.route("/json/variant/<string:id>/version/<int:version>")
-@app.route("/json/variant/<string:id>/family/<int:family>")
-@app.route("/json/variant/<string:id>/family/<int:family>/version/<int:version>")
+@app.route("/json/variant/<string:id>/sample/<int:sample>/version/<int:version>")
 @login_required
-def json_variant(id, version=-1, family=None):
+def json_variant(id, version=-1, sample=None):
     variant = Variant.query.get(id)
+    sample = Sample.query.get(sample)
 
     samples = list()
     for v2s in variant.samples:
-        same_family = False
+        current_family = False
+        current = False
         if v2s.sample.status >= 1:
-            if family is not None and v2s.sample.family:
-                if v2s.sample.familyid == family:
-                    same_family = True
+            if v2s.sample.familyid == sample.familyid and sample.familyid != None:
+                current_family = True
+            if v2s.sample.id == sample.id:
+                current = True
             allelic_frequency = v2s.allelic_depth / v2s.depth
             samples.append({
                 "samplename": v2s.sample.samplename,
                 "carrier": v2s.sample.carrier,
                 "family": v2s.sample.family.family if v2s.sample.family else "",
-                "same_family": same_family,
+                "current_family": current_family,
+                "current": current,
                 "depth": v2s.depth,
                 "allelic_depth": v2s.allelic_depth,
                 "allelic_frequency": f"{allelic_frequency:.4f}",
