@@ -915,7 +915,10 @@
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
-                            mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span>'
+                            mobidetails=""
+                            {%  if 'API_KEY_MD' in config %}
+                                mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
+                            {% endif %}
                             return mobidetails + data;
                         },
                         "sort": function ( data, type, row ) {
@@ -1533,13 +1536,20 @@
                 } else {
                     response = '<i title="" class="' + color + ' far fa-star"></i>';
                 }
+                mobidetails=""
+                if (data["annotations"]["ANN"][x]["HGVSc"] != null && data["annotations"]["ANN"][x]["HGVSc"].substr(0,3) == 'NM_') {
+                    {%  if 'API_KEY_MD' in config %}
+                        mobidetails = '<span onclick="openMD(\'' + data["annotations"]["ANN"][x]["HGVSc"] + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
+                    {% endif %}
+                }
+                hgvsc = mobidetails + data["annotations"]["ANN"][x]["HGVSc"];
                 allTranscript = allTranscript + '<tr>'+
                     '<td class="w3-text-black showTitle control-size-100" >'+data["annotations"]["ANN"][x]["SYMBOL"]+'</td>'+
                     '<td class="w3-text-black showTitle control-size-200" >'+data["annotations"]["ANN"][x]["Feature"]+'</td>'+
                     '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["BIOTYPE"]+'</td>'+
                     '<td class="w3-text-black showTitle control-size-100 w3-center" >'+response+'</td>'+
                     '<td class="w3-text-black showTitle control-size-150" >'+data["annotations"]["ANN"][x]["EI"]+'</td>'+
-                    '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSc"]+'</td>'+
+                    '<td class="w3-text-black showTitle control-size-300" >'+hgvsc+'</td>'+
                     '<td class="w3-text-black showTitle control-size-300" >'+data["annotations"]["ANN"][x]["HGVSp"]+'</td>'+
                     '<td class="w3-text-black showTitle size-250">'+cell+'</td>'+
                     '<td class="w3-text-black showTitle control-size-100">'+data["annotations"]["ANN"][x]["MaxEntScan_ref"]+'</td>'+
