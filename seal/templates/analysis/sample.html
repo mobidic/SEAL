@@ -1334,7 +1334,7 @@
         data: {
             variant_chgvs: encodeURIComponent(id),
             caller: 'cli',
-            api_key: ""
+            api_key: "{{ config['API_KEY_MD'] }}"
         }
         })
         .done(function(data) {
