@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_apscheduler import APScheduler
 from flask_wtf import CSRFProtect
+from flask_migrate import Migrate
 import os
 
 
@@ -29,6 +30,7 @@ login_manager.login_message_category = 'info'
 scheduler.init_app(app)
 scheduler.start()
 csrf.init_app(app)
+migrate = Migrate(app, db)
 
 app.logger.info(app.config)
 

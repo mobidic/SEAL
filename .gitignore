@@ -143,6 +143,7 @@ media
 
 # Flask relative
 *.db
+migrations
 
 # MacOS relative
 .DS_Store

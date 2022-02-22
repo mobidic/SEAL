@@ -40,14 +40,32 @@ export PYTHONPATH=${PWD}
 ```bash
 export API_KEY_MD="YOUR_MOBIDETAILS_API_KEY"
 ```
-- Initialise the database
+- Start database server
 ```bash
 initdb -D ${PWD}/seal/seal.db
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 ```
+  - __[Optional]__ Initialize database
+  ```bash
+  python insertdb.py
+  flask db init
+  flask db migrate -m "Init DataBase"
+  ```
 - Launch the flask app
 ```bash
 flask run
+```
+
+### Miscellaneous
+
+- Update database
+```bash
+flask db migrate -m "message"
+flask db upgrade
+```
+- Stop the server
+```bash
+pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```
 
 #### All commands
@@ -57,8 +75,14 @@ conda activate seal
 export FLASK_APP=seal
 export FLASK_ENV=development
 export PYTHONPATH=${PWD}
-export API_KEY_MD="YOUR_MOBIDETAILS_API_KEY"
+# export API_KEY_MD="YOUR_MOBIDETAILS_API_KEY"
 initdb -D ${PWD}/seal/seal.db
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
+# python insertdb.py
+# flask db init
+# flask db migrate -m "Init DataBase"
 flask run
+# flask db migrate -m "message"
+# flask db upgrade
+# pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```
