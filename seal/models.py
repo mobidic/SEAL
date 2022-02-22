@@ -25,6 +25,18 @@ team2member = db.Table(
     )
 )
 
+sample2team = db.Table(
+    'sample2team',
+    db.Column(
+        'team_ID', db.Integer,
+        db.ForeignKey('team.id'), primary_key=True
+    ),
+    db.Column(
+        'sample_ID', db.Integer,
+        db.ForeignKey('sample.id'), primary_key=True
+    )
+)
+
 
 class MutableList(Mutable, list):
     def append(self, value):
@@ -103,6 +115,11 @@ class Sample(db.Model):
 
     runid = db.Column(db.Integer, db.ForeignKey('run.id'))
     run = relationship("Run", back_populates="samples")
+
+    teams = db.relationship(
+        'Team', secondary=sample2team, lazy='subquery',
+        backref=db.backref('samples', lazy=True)
+    )
 
     def __repr__(self):
         return f"Sample('{self.samplename}','{self.status}')"
