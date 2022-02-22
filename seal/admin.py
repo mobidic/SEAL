@@ -18,22 +18,15 @@ class MyAdminIndexView(AdminIndexView):
         return redirect(url_for('login', next=request.url))
 
 
-class AdminView(ModelView):
-    def is_accessible(self):
-        if current_user.is_authenticated:
-            return current_user.admin
-        return False
-
-    def inaccessible_callback(self, name, **kwargs):
-        # redirect to login page if user doesn't have access
-        return redirect(url_for('login', next=request.url))
-
-
 class CustomView(ModelView):
 
     column_exclude_list = []
     column_searchable_list = []
     column_editable_list = []
+    column_display_pk = True # optional, but I like to see the IDs in the list
+    column_hide_backrefs = False
+    form_excluded_columns = []
+
 
     def __init__(self, *args, **kwargs):
         if 'column_exclude_list' in kwargs:
@@ -42,6 +35,8 @@ class CustomView(ModelView):
             self.column_searchable_list = kwargs.pop('column_searchable_list')
         if 'column_editable_list' in kwargs:
             self.column_editable_list = kwargs.pop('column_editable_list')
+        if 'form_excluded_columns' in kwargs:
+            self.form_excluded_columns = kwargs.pop('form_excluded_columns')
         super(CustomView, self).__init__(*args, **kwargs)
 
     def is_accessible(self):
@@ -62,7 +57,8 @@ admin.add_view(
         category="Authentication",
         column_exclude_list=['password', 'transcripts'],
         column_searchable_list=['username', 'mail'],
-        column_editable_list=['username', 'mail', 'filter']
+        column_editable_list=['username', 'mail', 'filter'],
+        form_excluded_columns=['comments', 'transcripts']
     )
 )
 admin.add_view(
@@ -71,7 +67,8 @@ admin.add_view(
         db.session,
         category="Authentication",
         column_searchable_list=['teamname'],
-        column_editable_list=['teamname', 'color']
+        column_editable_list=['teamname', 'color'],
+        form_excluded_columns=['members', 'samples']
     )
 )
 admin.add_view(
@@ -80,7 +77,8 @@ admin.add_view(
         db.session,
         category="Analysis",
         column_searchable_list=["samplename"],
-        column_editable_list=['samplename', 'status']
+        column_editable_list=['samplename', 'status'],
+        form_excluded_columns=['variants']
     )
 )
 admin.add_view(
@@ -107,7 +105,8 @@ admin.add_view(
         db.session,
         category="Analysis",
         column_searchable_list=["chr", "pos", "ref", "alt", "annotations"],
-        column_editable_list=["chr", "pos", "ref", "alt", "class_variant"]
+        column_editable_list=["chr", "pos", "ref", "alt", "class_variant"],
+        form_excluded_columns=['samples']
     )
 )
 admin.add_view(
@@ -134,17 +133,18 @@ admin.add_view(
         db.session,
         category="Filter",
         column_searchable_list=["filtername", "filter"],
-        column_editable_list=["filtername"]
+        column_editable_list=["filtername"],
+        form_excluded_columns=['users']
     )
 )
-# admin.add_view(AdminView(Gene, db.session, category="Genes"))
+
 admin.add_view(
     CustomView(
         Transcript,
         db.session,
         category="Genes",
         column_searchable_list=["feature", "biotype", "feature_type", "symbol", "symbol_source", "gene", "source", "protein", "canonical", "hgnc"],
-        column_editable_list=["feature", "biotype", "feature_type", "symbol", "symbol_source", "gene", "source", "protein", "canonical", "hgnc"]
+        column_editable_list=["biotype", "feature_type", "symbol", "symbol_source", "gene", "source", "protein", "canonical", "hgnc"]
     )
 )
 admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))
