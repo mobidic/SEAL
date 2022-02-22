@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from sqlalchemy import or_, and_
@@ -404,7 +404,13 @@ def json_samples():
         Run.run_alias.op('~')(request.form['search[value]'])
     )
 
-    samples = db.session.query(Sample)
+    if current_user.admin:
+        samples = db.session.query(Sample)
+    else:
+        filter_samples_teams = or_(
+            Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])), Sample.teams == None
+        )
+        samples = db.session.query(Sample).filter(filter_samples_teams)
     recordsTotal = samples.count()
     samples_filter = samples.outerjoin(Family, Sample.family).outerjoin(Run, Sample.run).filter(filters)
     recordsFiltered = samples_filter.count()
