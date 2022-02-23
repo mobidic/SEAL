@@ -275,7 +275,7 @@ def transcripts():
 @app.route("/sample/<int:id>", methods=['GET', 'POST'])
 @login_required
 def sample(id):
-    sample = db.session.query(Sample.samplename, Sample.id, Sample.familyid, Sample.status).filter(Sample.id == id).first()
+    sample = Sample.query.get(id)
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
