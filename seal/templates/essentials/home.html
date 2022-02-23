@@ -151,14 +151,14 @@
                                     <button class="w3-button" id="button-status-` + sample_id + `">
                                         ` + response + `
                                     </button>
-                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
-                                        <a onclick="toggle_status(` + sample_id + `, 1)" class="w3-bar-item w3-button">
+                                    <div class="w3-dropdown-content w3-bar-block" style="right:0">
+                                        <a onclick="toggle_status(` + sample_id + `, 1)" class="w3-border-top w3-border-right w3-border-left w3-bar-item w3-button">
                                             <span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>
                                         </a>
-                                        <a onclick="toggle_status(` + sample_id + `, 2)" class="w3-bar-item w3-button">
+                                        <a onclick="toggle_status(` + sample_id + `, 2)" class="w3-border-right w3-border-left w3-bar-item w3-button">
                                             <span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b> - analysing</i></span>
                                         </a>
-                                        <a onclick="toggle_status(` + sample_id + `, 3)" class="w3-bar-item w3-button">
+                                        <a onclick="toggle_status(` + sample_id + `, 3)" class="w3-border-right w3-border-left w3-border-bottom w3-bar-item w3-button">
                                             <span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b> - analysed</i></span>
                                         </a>
                                     </div>
