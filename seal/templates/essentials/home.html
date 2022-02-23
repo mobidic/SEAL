@@ -24,6 +24,7 @@
             <table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
                 <thead>
                     <tr>
+                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
                         <th class="w3-flat-green-sea"><div>Sample Name</div></th>
                         <th class="w3-flat-green-sea"><div>Family</div></th>
                         <th class="w3-flat-green-sea"><div>Run</div></th>
@@ -33,6 +34,7 @@
                 </thead>
                 <tfoot>
                     <tr>
+                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
                         <th class="w3-flat-green-sea"><div>Sample Name</div></th>
                         <th class="w3-flat-green-sea"><div>Family</div></th>
                         <th class="w3-flat-green-sea"><div>Run</div></th>
@@ -111,6 +113,22 @@
             "columns": [
                 {
                     "className": 'showTitle',
+                    "data": "teams",
+                    "render" : {
+                        "_": function ( data, type, row ) {
+                            if (data.length >= 1) {
+                                teams = ""
+                                for (i in data) {
+                                    teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data[i]["color"] + '">' + data[i]["teamname"] + '</span>'
+                                };
+                                return teams
+                            }
+                            return "NA"
+                        }
+                    }
+                },
+                {
+                    "className": 'showTitle',
                     "data": {
                         _: "samplename",
                         display: function ( data, type, row ) {
@@ -173,10 +191,6 @@
                 }
             }
         });
-
-        setInterval( function () {
-            table.ajax.reload();
-        }, 10000 );
     } );
 
 

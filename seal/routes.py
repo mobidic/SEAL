@@ -426,13 +426,17 @@ def json_samples():
     }
 
     for sample in samples:
+        teams = []
+        for team in sample.teams:
+            teams.append({"teamname": team.teamname, "color": team.color})
         samples_json["data"].append({
             "id": sample.id,
             "samplename": sample.samplename,
             "family": sample.family.family if sample.familyid else None,
             "run": sample.run.run_name if sample.runid else None,
             "run_alias": sample.run.run_alias if sample.runid else None,
-            "status": sample.status
+            "status": sample.status,
+            "teams": teams
         })
     return jsonify(samples_json)
 
