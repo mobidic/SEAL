@@ -24,22 +24,22 @@
             <table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
                 <thead>
                     <tr>
-                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
                         <th class="w3-flat-green-sea"><div>Sample Name</div></th>
                         <th class="w3-flat-green-sea"><div>Family</div></th>
                         <th class="w3-flat-green-sea"><div>Run</div></th>
                         <th class="w3-flat-green-sea"><div>Run Alias</div></th>
                         <th class="w3-flat-green-sea"><div>Status</div></th>
+                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
                         <th class="w3-flat-green-sea"><div>Sample Name</div></th>
                         <th class="w3-flat-green-sea"><div>Family</div></th>
                         <th class="w3-flat-green-sea"><div>Run</div></th>
                         <th class="w3-flat-green-sea"><div>Run Alias</div></th>
                         <th class="w3-flat-green-sea"><div>Status</div></th>
+                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
                     </tr>
                 </tfoot>
             </table>
@@ -113,22 +113,6 @@
             "columns": [
                 {
                     "className": 'showTitle',
-                    "data": "teams",
-                    "render" : {
-                        "_": function ( data, type, row ) {
-                            if (data.length >= 1) {
-                                teams = ""
-                                for (i in data) {
-                                    teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data[i]["color"] + '">' + data[i]["teamname"] + '</span>'
-                                };
-                                return teams
-                            }
-                            return "NA"
-                        }
-                    }
-                },
-                {
-                    "className": 'showTitle',
                     "data": {
                         _: "samplename",
                         display: function ( data, type, row ) {
@@ -182,6 +166,23 @@
                             }
                             return response;
                         },
+                    }
+                },
+                {
+                    "className": 'showTitle',
+                    "orderable": false,
+                    "data": "teams",
+                    "render" : {
+                        "_": function ( data, type, row ) {
+                            if (data.length >= 1) {
+                                teams = ""
+                                for (i in data) {
+                                    teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data[i]["color"] + '">' + data[i]["teamname"] + '</span>'
+                                };
+                                return teams
+                            }
+                            return "NA"
+                        }
                     }
                 }
             ],
