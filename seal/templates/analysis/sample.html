@@ -62,9 +62,20 @@
     {% include 'includes/sidebar.j2' %}
     <div class="w3-main" style="margin-left:350px">
         <div class="w3-container w3-flat-silver w3-padding">
-            <h3 class="w3-left"><i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i></h3>
-            <div class="w3-padding w3-right w3-container">
-                <div class="w3-dropdown-hover w3-right">
+            <h3 class="w3-left">
+                <i class="fas fa-user-tag"></i> <i>{{ sample.samplename }}</i><br>
+                {% if sample.family %}<i class="fas fa-users"></i> <i>{{ sample.family.family }}</i><br>{% endif %}
+                {% if sample.run %}<i class="fas fa-digital-tachograph"></i> <i>{{ sample.run.run_name }}</i>{% endif %}
+            </h3>
+            <div class="w3-right w3-container">
+                {% if sample.teams %}
+                    <div class="w3-padding" style='max-width:200px;'>
+                        {% for team in sample.teams %}
+                            <span class='w3-tag' style='max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background-color:{{ team.color}}'>{{ team.teamname }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="w3-dropdown-hover w3-right w3-padding" style="background-color:transparent !important">
                     <button class="w3-button w3-white" id="button-status">
                     {% if sample.status == 1 %}
                         <span class="w3-text-flat-peter-river">
@@ -80,7 +91,7 @@
                         </span>
                     {% endif %}
                     </button>
-                    <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+                    <div class="w3-dropdown-content w3-bar-block w3-border w3-margin-right" style="right:0">
                         <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
                             <span class="w3-text-flat-peter-river">
                                 <i class="fas fa-user-clock"></i> <i><b>New</b></i>
