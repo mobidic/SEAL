@@ -59,89 +59,45 @@
 {% endblock %}
 
 {% block content %}
-    {% include 'includes/sidebar.j2' %}
+    {% include 'includes/sidebar-sample.j2' %}
     <div class="w3-main" style="margin-left:350px">
-        <div class="w3-container w3-flat-silver w3-padding">
-            <div class="w3-left">
-                <h3>
-                    <div class="w3-cell-row">
-                        <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
-                            <i class="fas fa-user-tag"></i>
-                        </div>
-                        <div class="w3-container w3-cell">
-                            <i>{{ sample.samplename }}</i>
-                        </div>
-                    </div>
-                </h3>
-                {% if sample.family %}
-                <h6>
-                    <div class="w3-cell-row">
-                        <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="w3-container w3-cell">
-                            <i>{{ sample.family.family }}</i>
-                        </div>
-                    </div>
-                </h6>
+        <div class="w3-container w3-center">
+            <h1>{{ sample.samplename}}</h1>
+            <div class="w3-dropdown-hover" style="background-color:transparent !important;">
+                <button class="w3-button w3-white button-status w3-border" style=" width:222px">
+                {% if sample.status == 1 %}
+                    <span class="w3-text-flat-peter-river">
+                        <i class="fas fa-user-clock"></i> <i><b>New</b></i>
+                    </span>
+                {% elif sample.status == 2 %}
+                    <span class="w3-text-flat-peter-river">
+                        <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
+                    </span>
+                {% elif sample.status == 3 %}
+                    <span class="w3-text-flat-emerald">
+                        <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
+                    </span>
                 {% endif %}
-                {% if sample.run %}
-                <h6>
-                    <div class="w3-cell-row">
-                        <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
-                            <i class="fas fa-digital-tachograph"></i>
-                        </div>
-                        <div class="w3-container w3-cell">
-                            <i>{{ sample.run.run_name }}</i>
-                            {% if sample.run.run_alias %}<br><i>{{ sample.run.run_alias }}</i>{% endif %}
-                        </div>
-                    </div>
-                </h6>
-                {% endif %}
-            </div>
-            <div class="w3-right w3-container">
-                {% if sample.teams %}
-                    <div class="w3-padding" style='max-width:200px;'>
-                        {% for team in sample.teams %}
-                            <span class='w3-tag' style='max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background-color:{{ team.color}}'>{{ team.teamname }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
-                <div class="w3-dropdown-hover w3-right w3-padding" style="background-color:transparent !important">
-                    <button class="w3-button w3-white" id="button-status">
-                    {% if sample.status == 1 %}
+                </button>
+                <div class="w3-dropdown-content w3-bar-block w3-border" style=" width:222px">
+                    <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
                         <span class="w3-text-flat-peter-river">
                             <i class="fas fa-user-clock"></i> <i><b>New</b></i>
                         </span>
-                    {% elif sample.status == 2 %}
+                    </a>
+                    <a onclick="toggle_status({{ sample.id }}, 2)" class="w3-bar-item w3-button">
                         <span class="w3-text-flat-peter-river">
                             <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
                         </span>
-                    {% elif sample.status == 3 %}
+                    </a>
+                    <a onclick="toggle_status({{ sample.id }}, 3)" class="w3-bar-item w3-button">
                         <span class="w3-text-flat-emerald">
                             <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
                         </span>
-                    {% endif %}
-                    </button>
-                    <div class="w3-dropdown-content w3-bar-block w3-border w3-margin-right" style="right:0">
-                        <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
-                            <span class="w3-text-flat-peter-river">
-                                <i class="fas fa-user-clock"></i> <i><b>New</b></i>
-                            </span>
-                        </a>
-                        <a onclick="toggle_status({{ sample.id }}, 2)" class="w3-bar-item w3-button">
-                            <span class="w3-text-flat-peter-river">
-                                <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
-                            </span>
-                        </a>
-                        <a onclick="toggle_status({{ sample.id }}, 3)" class="w3-bar-item w3-button">
-                            <span class="w3-text-flat-emerald">
-                                <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
-                            </span>
-                        </a>
-                    </div>
+                    </a>
                 </div>
             </div>
+            <hr>
         </div>
         <div class="w3-padding">
             <div class="w3-row w3-padding">
@@ -528,7 +484,9 @@
                 } else if (status == 3) {
                     response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b></i></span>';
                 }
-                document.getElementById("button-status").innerHTML = response;
+                for (e in document.getElementsByClassName("button-status")) {
+                    document.getElementsByClassName("button-status")[e].innerHTML = response;
+                }
             }
         });
     }

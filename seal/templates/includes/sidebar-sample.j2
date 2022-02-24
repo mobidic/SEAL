@@ -1,0 +1,110 @@
+
+
+<!-- Sidebar/menu -->
+
+<nav class="w3-sidebar w3-bar-block w3-collapse w3-flat-clouds" style="z-index:3;width:350px" id="sidebar">
+	<a href="#" onclick="w3_close()" class="w3-hide-large w3-right w3-small w3-padding w3-opacity-max w3-hover-opacity" title="close menu"><i class="far fa-times-circle"></i></a>
+	<div class="w3-container" style="margin-bottom:85px">
+		{% include "includes/flash.j2" %}
+		<div class="w3-row w3-display-container w3-margin" style="overflow-wrap: anywhere;">
+            <h3>
+                <div class="w3-cell-row">
+                    <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
+                        <i class="fas fa-user-tag"></i>
+                    </div>
+                    <div class="w3-container w3-cell">
+                        <i>{{ sample.samplename }}</i>
+                    </div>
+                </div>
+            </h3>
+            <hr style="display: block; height: 1px;
+    border: 0; border-top: 1px solid #ccc;
+    margin: 1em 0; padding: 0; ">
+            {% if sample.family %}
+            <h6>
+                <div class="w3-cell-row">
+                    <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="w3-container w3-cell">
+                        <i>{{ sample.family.family }}</i>
+                    </div>
+                </div>
+            </h6>
+            <hr style="display: block; height: 1px;
+    border: 0; border-top: 1px solid #ccc;
+    margin: 1em 0; padding: 0; ">
+            {% endif %}
+            {% if sample.run %}
+            <h6>
+                <div class="w3-cell-row">
+                    <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
+                        <i class="fas fa-digital-tachograph"></i>
+                    </div>
+                    <div class="w3-container w3-cell">
+                        <i>{{ sample.run.run_name }}</i>
+                        {% if sample.run.run_alias %}<br><b>{{ sample.run.run_alias }}</b>{% endif %}
+                    </div>
+                </div>
+            </h6>
+            <hr style="display: block; height: 1px;
+    border: 0; border-top: 1px solid #ccc;
+    margin: 1em 0; padding: 0; ">
+            {% endif %}
+            {% if sample.teams %}
+                <div class="w3-cell-row w3-margin-bottom">
+                    <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <div class="w3-container w3-cell">
+                        Team(s) associated :
+                    </div>
+                </div>
+                {% for team in sample.teams %}
+                    <span class='w3-tag' style='max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; background-color:{{ team.color}}'>{{ team.teamname }}</span>
+                {% endfor %}
+                <hr style="display: block; height: 1px;
+            border: 0; border-top: 1px solid #ccc;
+            margin: 1em 0; padding: 0; ">
+            {% endif %}
+            <div class="w3-dropdown-hover w3-right w3-padding" style="background-color:transparent !important">
+                <button class="w3-button w3-white button-status">
+                {% if sample.status == 1 %}
+                    <span class="w3-text-flat-peter-river">
+                        <i class="fas fa-user-clock"></i> <i><b>New</b></i>
+                    </span>
+                {% elif sample.status == 2 %}
+                    <span class="w3-text-flat-peter-river">
+                        <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
+                    </span>
+                {% elif sample.status == 3 %}
+                    <span class="w3-text-flat-emerald">
+                        <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
+                    </span>
+                {% endif %}
+                </button>
+                <div class="w3-dropdown-content w3-bar-block w3-border">
+                    <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
+                        <span class="w3-text-flat-peter-river">
+                            <i class="fas fa-user-clock"></i> <i><b>New</b></i>
+                        </span>
+                    </a>
+                    <a onclick="toggle_status({{ sample.id }}, 2)" class="w3-bar-item w3-button">
+                        <span class="w3-text-flat-peter-river">
+                            <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
+                        </span>
+                    </a>
+                    <a onclick="toggle_status({{ sample.id }}, 3)" class="w3-bar-item w3-button">
+                        <span class="w3-text-flat-emerald">
+                            <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
+                        </span>
+                    </a>
+                </div>
+            </div>
+		</div>
+    </div>
+</nav>
+
+<div class="w3-overlay  w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="overlay"></div>
+
+<!-- End Sidebar/menu -->
