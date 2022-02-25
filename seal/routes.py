@@ -8,7 +8,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from sqlalchemy import or_, and_
@@ -442,13 +442,17 @@ def json_samples():
 
 
 @app.route("/json/variants/sample/<int:id>", methods=['GET', 'POST'])
+@app.route("/json/variants/sample/<int:id>/bed/<int:idbed>", methods=['GET', 'POST'])
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
-def json_variants(id, version=-1):
+def json_variants(id, idbed=False, version=-1):
     sample = Sample.query.get(int(id))
     if not sample:
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
+
+    if idbed:
+        bed = Bed.query.get(int(idbed))
 
     variants = {"data": list()}
 
@@ -457,8 +461,12 @@ def json_variants(id, version=-1):
     ##################################################
 
     var2samples = db.session.query(Var2Sample).filter(Var2Sample.sample_ID == int(id))
+    cnt = 0
     for var2sample in var2samples:
         variant = db.session.query(Variant).filter(Variant.id == var2sample.variant_ID).first()
+        cnt += 1
+        if not bed.varInBed(variant):
+            continue
         annotations = variant.annotations
         main_annot = None
         consequence_score = -999
@@ -574,7 +582,7 @@ def json_variants(id, version=-1):
                 "occurrences": cnt,
                 "total_samples": total_samples,
                 "occurences_family": cnt_family,
-                "family_members" : members
+                "family_members": members
             }
         })
 

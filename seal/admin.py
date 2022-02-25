@@ -4,7 +4,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from seal import app, db
-from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run
+from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run, Region, Bed
 
 
 class MyAdminIndexView(AdminIndexView):
@@ -147,4 +147,21 @@ admin.add_view(
         column_editable_list=["biotype", "feature_type", "symbol", "symbol_source", "gene", "source", "protein", "canonical", "hgnc"]
     )
 )
+
+admin.add_view(
+    CustomView(
+        Region,
+        db.session,
+        category="Bed"
+    )
+)
+
+admin.add_view(
+    CustomView(
+        Bed,
+        db.session,
+        category="Bed"
+    )
+)
+
 admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))

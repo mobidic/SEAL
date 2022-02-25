@@ -214,4 +214,53 @@ class Transcript(db.Model):
         return f"Transcript('{self.feature}','{self.canonical}')"
 
 
+region2bed = db.Table(
+    'region2bed',
+    db.Column(
+        'region_ID', db.Integer,
+        db.ForeignKey('region.id'), primary_key=True
+    ),
+    db.Column(
+        'bed_ID', db.Integer,
+        db.ForeignKey('bed.id'), primary_key=True
+    )
+)
+
+
+class Region(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), unique=False, nullable=False)
+    chr = db.Column(db.String(50), unique=False, nullable=False)
+    start = db.Column(db.Integer, unique=False, nullable=False)
+    stop = db.Column(db.Integer, unique=False, nullable=False)
+
+    def __repr__(self):
+        return f"Region('{self.name}')"
+
+    def varInRegion(self, variant):
+        same_chr = (variant.chr == self.chr)
+        pos = (variant.pos >= self.start and variant.pos <= self.stop)
+
+        return (same_chr and pos)
+
+
+class Bed(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(30), unique=True, nullable=False)
+
+    regions = db.relationship(
+        'Region', secondary=region2bed, lazy='subquery',
+        backref=db.backref('beds', lazy=True)
+    )
+
+    def __repr__(self):
+        return f"BED('{self.name}')"
+
+    def varInBed(self, variant):
+        for region in self.regions:
+            if region.varInRegion(variant):
+                return True
+        return False
+
+
 ################################################################################
