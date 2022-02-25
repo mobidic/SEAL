@@ -23,10 +23,9 @@ class CustomView(ModelView):
     column_exclude_list = []
     column_searchable_list = []
     column_editable_list = []
-    column_display_pk = True # optional, but I like to see the IDs in the list
+    column_display_pk = True
     column_hide_backrefs = False
     form_excluded_columns = []
-
 
     def __init__(self, *args, **kwargs):
         if 'column_exclude_list' in kwargs:
