@@ -461,12 +461,8 @@ def json_variants(id, idbed=False, version=-1):
     ##################################################
 
     var2samples = db.session.query(Var2Sample).filter(Var2Sample.sample_ID == int(id))
-    cnt = 0
     for var2sample in var2samples:
         variant = db.session.query(Variant).filter(Variant.id == var2sample.variant_ID).first()
-        cnt += 1
-        if not bed.varInBed(variant):
-            continue
         annotations = variant.annotations
         main_annot = None
         consequence_score = -999
