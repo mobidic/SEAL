@@ -280,8 +280,8 @@
     <!-- MODALS -->
     <div id="help-modal" class="w3-modal">
         <div class="w3-modal-content w3-card-4">
-            <header class="w3-container w3-flat-turquoise">
-                <span onclick="document.getElementById('help-modal').style.display='none'"
+            <header class="w3-container w3-flat-green-sea">
+                <span onclick="$('#help-modal').toggle()"
                     class="w3-button w3-display-topright">&times;</span>
                 <h5 id="help-modal-title"></h5>
             </header>
@@ -296,8 +296,8 @@
 
     <div id="filter-modal" class="w3-modal">
         <div class="w3-modal-content w3-card-4">
-            <header class="w3-container w3-flat-turquoise">
-                <span onclick="document.getElementById('filter-modal').style.display='none'"
+            <header class="w3-container w3-flat-green-sea">
+                <span onclick="$('#filter-modal').toggle()"
                     class="w3-button w3-display-topright">&times;</span>
                 <h5 id="filter-modal-title">Save Filter</h5>
             </header>
@@ -338,17 +338,18 @@
                     {{ saveFilterForm.submit(id="validateSaveFilter", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="validateFilter();") }}
                 </div>
             </div>
-            <footer class="w3-container w3-flat-turquoise">
-                <p id="filter-modal-footer">foo</p>
+            <footer class="w3-container w3-light-grey w3-padding">
+                <button class="w3-button w3-right w3-white w3-border"
+                onclick="$('#filter-modal').toggle()">Close</button>
             </footer>
         </div>
     </div>
 
     <div id="modal-details-variant" class="w3-modal">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-            <header class="w3-container w3-flat-emerald">
-                <span onclick="document.getElementById('modal-details-variant').style.display='none'"
-                class="w3-button w3-flat-emerald w3-xlarge w3-display-topright">&times;</span>
+            <header class="w3-container w3-flat-green-sea">
+                <span onclick="$('#modal-details-variant').toggle()"
+                class="w3-button w3-xlarge w3-display-topright">&times;</span>
                 <h2>Variant : <span id="variant-id"><span></h2>
             </header>
 
@@ -407,7 +408,7 @@
 
             <div id="links" class="w3-container detail">
                 <h1>Links</h1>
-                <div id="test_link" style="column-count: 3;"></div>
+                <div id="links_exterior" style="column-count: 3;"></div>
                 <div class="w3-padding w3-display-bottommiddle w3-tiny">
                     <span><i class="w3-text-flat-asbestos fas fa-flag"></i> dbSNP</span>
                     <span><i class="w3-text-flat-amethyst fas fa-disease"></i> Cosmic</span>
@@ -450,16 +451,16 @@
 
             <div class="w3-container w3-light-grey w3-padding">
                 <button class="w3-button w3-right w3-white w3-border"
-                onclick="document.getElementById('modal-details-variant').style.display='none'">Close</button>
+                onclick="$('#modal-details-variant').toggle()">Close</button>
             </div>
         </div>
     </div>
 
     <div id="MD-message-modal" class="w3-modal">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
-            <header id="MD-modal-header" class="MD-modal-header w3-container w3-flat-emerald">
+            <header id="MD-modal-header" class="w3-container w3-flat-green-sea">
                 <span onclick="$('#MD-message-modal').toggle()"
-                class="MD-modal-header w3-button w3-flat-emerald w3-xlarge w3-display-topright">&times;</span>
+                class="w3-button w3-xlarge w3-display-topright">&times;</span>
                 <h2>MobiDetails</h2>
             </header>
 
@@ -503,9 +504,7 @@
                 } else if (status == 3) {
                     response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b></i></span>';
                 }
-                for (e in document.getElementsByClassName("button-status")) {
-                    document.getElementsByClassName("button-status")[e].innerHTML = response;
-                }
+                $('.button-status').html(response);
             }
         });
     }
@@ -785,7 +784,7 @@
                 }
                 options += option;
             }
-            document.getElementById('selectBox').innerHTML = options
+            $('#selectBox').html(options);
         });
         table = $('#variants').DataTable({
             buttons:[
@@ -1324,25 +1323,25 @@
 
     function save_filters() {
         var d = table.searchBuilder.getDetails();
-        document.getElementById('filterText').innerHTML = JSON.stringify(d)
-        document.getElementById('filter-modal').style.display='block';
+        $('#filterText').html(JSON.stringify(d));
+        $('#filter-modal').toggle();
     }
     // Script to open and close sidebar
     function w3_open() {
-        document.getElementById("sidebar").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
+        $('#sidebar').toggle();
+        $('#overlay').toggle();
     }
 
     function w3_close() {
-        document.getElementById("sidebar").style.display = "none";
-        document.getElementById("overlay").style.display = "none";
+        $('#sidebar').toggle();
+        $('#overlay').toggle();
     }
 
     function openHelpModal(title="Some help", content='Some Content', footer='footer') {
-        document.getElementById("help-modal-title").innerHTML = title;
-        document.getElementById("help-modal-content").innerHTML = content;
-        document.getElementById("help-modal-footer").innerHTML = footer;
-        document.getElementById('help-modal').style.display='block'
+        $('#help-modal-title').html(title);
+        $('#help-modal-content').html(content);
+        $('#help-modal-footer').html(footer);
+        $('#help-modal').toggle();
     }
 
     function htmlLink(data) {
@@ -1351,22 +1350,22 @@
 
     function openMD(id) {
         $('#message-mobidetails').html('<span><i class="fas fa-cog fa-spin"></i> Checking availability in MobiDetails...</span>');
-        $('.MD-modal-header').addClass('w3-flat-emerald');
-        $('.MD-modal-header').removeClass('w3-flat-alizarin');
+        $('#MD-modal-header').addClass('w3-flat-turquoise');
+        $('#MD-modal-header').removeClass('w3-flat-alizarin');
         $('#MD-message-modal').toggle();
         $.ajax({
-        type: 'POST',
-        url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
-        data: {
-            variant_chgvs: encodeURIComponent(id),
-            caller: 'cli',
-            api_key: '{{ config["API_KEY_MD"] }}'
-        }
+            type: 'POST',
+            url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
+            data: {
+                variant_chgvs: encodeURIComponent(id),
+                caller: 'cli',
+                api_key: '{{ config["API_KEY_MD"] }}'
+            }
         })
         .done(function(data) {
             if (! data.url) {
                 $('#message-mobidetails').html('<i class="fas fa-times-circle w3-text-flat-alizarin"></i> ' + data.mobidetails_error);
-                $('.MD-modal-header').addClass('w3-flat-alizarin');
+                $('#MD-modal-header').addClass('w3-flat-alizarin');
             } else {
                 $('#message-mobidetails').html('Redirection to <a href="' + data.url + '" target="_blank" style="text-decoration:underline">' + data.url + '</a>');
                 window.open(data.url);
@@ -1546,7 +1545,7 @@
                     links.push(htmlLink(pubmed))
                 }
 
-                document.getElementById("test_link").innerHTML = links.join("<br />");                var links = []
+                $("#links_exterior").html(links.join("<br />"));
 
                 cell = "";
                 for (idx in consequences_dict) {
@@ -1627,7 +1626,7 @@
             }
             allTranscript = allTranscript + '</tbody>';
             allTranscript = allTranscript + '</table>';
-            document.getElementById("allTranscriptsTable").innerHTML = allTranscript;
+            $("#allTranscriptsTable").html(allTranscript);
 
 
             inSeal = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
@@ -1680,16 +1679,13 @@
 
             inSeal = inSeal + '</tbody>';
             inSeal = inSeal + '</table>';
-            document.getElementById("inSEALTable").innerHTML = inSeal;
+            $("#inSEALTable").html(inSeal);
             $('.table-modal-large').DataTable( {
                 scrollY:        '50vh',
                 scrollX:        true,
                 paging:         false
             });
-            var node = document.getElementsByClassName('inSealCount');
-            for (var i = 0; i < node.length; i++) {
-                node[i].innerHTML = count;
-            }
+            $('.inSealCount').html(count);
 
             tableScoresPredictions = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
             tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
@@ -1705,7 +1701,7 @@
             };
             tableScoresPredictions = tableScoresPredictions + '</tbody>';
             tableScoresPredictions = tableScoresPredictions + '</table>';
-            document.getElementById("tableScoresPredictions").innerHTML = tableScoresPredictions;
+            $("#tableScoresPredictions").html(tableScoresPredictions);
 
             tableScoresConservation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
             tableScoresConservation = tableScoresConservation + '<thead class="w3-flat-silver"><tr>'+
@@ -1721,7 +1717,7 @@
             };
             tableScoresConservation = tableScoresConservation + '</tbody>';
             tableScoresConservation = tableScoresConservation + '</table>';
-            document.getElementById("tableScoresConservation").innerHTML = tableScoresConservation;
+            $("#tableScoresConservation").html(tableScoresConservation);
 
             tableScoresPopulation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
             tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
@@ -1737,7 +1733,7 @@
             };
             tableScoresPopulation = tableScoresPopulation + '</tbody>';
             tableScoresPopulation = tableScoresPopulation + '</table>';
-            document.getElementById("tableScoresPopulation").innerHTML = tableScoresPopulation;
+            $("#tableScoresPopulation").html(tableScoresPopulation);
             $('.table-modal').DataTable();
 
             wi1 = window.screen.width;
@@ -1950,11 +1946,8 @@
 
             comments = comments + '</tbody>';
             comments = comments + '</table>';
-            document.getElementById("commentsTable").innerHTML = comments;
-            var node = document.getElementsByClassName('commentsCount');
-            for (var i = 0; i < node.length; i++) {
-                node[i].innerHTML = count;
-            }
+            $("#commentsTable").html(comments);
+            $('.commentsCount').html(count);
 
             $('#tableComments').DataTable({
                 searching:false,
@@ -1969,8 +1962,8 @@
                    ],
             });
         });
-        document.getElementById("variant-id").innerHTML = id;
-        document.getElementById('modal-details-variant').style.display='block'
+        $("#variant-id").html(id);
+        $('#modal-details-variant').toggle()
     }
 
 
@@ -1978,29 +1971,23 @@
 
     function openDetails(evt, detailName) {
         var i, x, tablinks;
-        x = document.getElementsByClassName("detail");
-        for (i = 0; i < x.length; i++) {
-            x[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablink");
-        for (i = 0; i < x.length; i++) {
-            tablinks[i].classList.remove("w3-flat-nephritis");
-        }
-        document.getElementById(detailName).style.display = "block";
-        evt.currentTarget.classList.add("w3-flat-nephritis");
+        $('.detail').hide();
+        $('.tablink').removeClass('w3-flat-turquoise');
+        $('#' + detailName).show();
+        evt.currentTarget.classList.add("w3-flat-turquoise");
     }
 
     function changeFilter(id) {
         $.getJSON("/json/filter/" + id, function(data) {
             document.getElementById("variants_processing").style.visibility = "visible";
             document.getElementById("variants_processing").style.zIndex = "10";
-            document.getElementById("variants_processing").style.display = "block";
+            $("#variants_processing").toggle();
             document.getElementById("variants").style.opacity = "0.5";
             setTimeout(function () {
                 $('#variants').DataTable().searchBuilder.rebuild(data);
                 document.getElementById("variants_processing").style.visibility = "hidden";
                 document.getElementById("variants_processing").style.zIndex = "0";
-                document.getElementById("variants_processing").style.display = "none";
+                $("#variants_processing").toggle();
                 document.getElementById("variants").style.opacity = "1";
             }, 30);
         });
@@ -2010,16 +1997,16 @@
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
         if (event.target == document.getElementById('modal-details-variant')) {
-            document.getElementById('modal-details-variant').style.display = "none";
+            $('#modal-details-variant').toggle();
         }
         if (event.target == document.getElementById('help-modal')) {
-            document.getElementById('help-modal').style.display = "none";
+            $('#help-modal').toggle();
         }
         if (event.target == document.getElementById('filter-modal')) {
-            document.getElementById('filter-modal').style.display = "none";
+            $('#filter-modal').toggle();
         }
         if (event.target == document.getElementById('MD-message-modal')) {
-            document.getElementById('MD-message-modal').style.display = "none";
+            $('#MD-message-modal').toggle();
         }
     }
 
@@ -2041,7 +2028,7 @@
             },
             success: function() {
                 id_button = 'button-class-' + id_var;
-                document.getElementById(id_button).innerHTML = class_variant_html[class_variant];
+                $("#"+id_button).html(class_variant_html[class_variant]);
             }
         })
     }
@@ -2103,11 +2090,8 @@
 
                 comments = comments + '</tbody>';
                 comments = comments + '</table>';
-                document.getElementById("commentsTable").innerHTML = comments;
-                var node = document.getElementsByClassName('commentsCount');
-                for (var i = 0; i < node.length; i++) {
-                    node[i].innerHTML = count;
-                }
+                $("#commentsTable").html(comments);
+                $('.commentsCount').html(count);
 
                 $('#tableComments').DataTable({
                     searching:false,
@@ -2142,7 +2126,7 @@
                 "name": name, "filter": JSON.stringify(filter)
             }
         }).done(function() {
-            document.getElementById('filter-modal').style.display = "none";
+            $('#filter-modal').toggle();
             $.getJSON("/json/filters", function(data) {
                 var options = "";
                 for (x in data) {
@@ -2157,7 +2141,7 @@
                     }
                     options += option;
                 }
-                document.getElementById('selectBox').innerHTML = options
+                $('#selectBox').html(options)
             });
         })
     }
