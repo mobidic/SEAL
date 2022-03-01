@@ -138,7 +138,9 @@ class Run(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     run_name = db.Column(db.String(50), unique=True, nullable=False)
     run_alias = db.Column(db.String(50), unique=False, nullable=True)
+
     samples = relationship("Sample")
+    reads = relationship("Read")
 
     def __repr__(self):
         return f"Run('{self.run_name}')"
@@ -261,6 +263,81 @@ class Bed(db.Model):
             if region.varInRegion(variant):
                 return True
         return False
+
+
+class Lane(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    lane = db.Column(db.Integer)
+    tiles = db.Column(db.Integer)
+    density = db.Column(db.Integer)
+    density_stddev = db.Column(db.Integer)
+    cluster = db.Column(db.Float)
+    cluster_stddev = db.Column(db.Float)
+
+    phasing = db.Column(db.Float)
+    phasing_stddev = db.Column(db.Float)
+    phasingslope = db.Column(db.Float)
+    phasingslope_stddev = db.Column(db.Float)
+    phasingoffset = db.Column(db.Float)
+    phasingoffset_stddev = db.Column(db.Float)
+
+    prephasing = db.Column(db.Float)
+    prephasing_stddev = db.Column(db.Float)
+    prephasingslope = db.Column(db.Float)
+    prephasingslope_stddev = db.Column(db.Float)
+    prephasingoffset = db.Column(db.Float)
+    prephasingoffset_stddev = db.Column(db.Float)
+
+    cluster = db.Column(db.Float)
+    cluster_pf = db.Column(db.Float)
+
+    q30 = db.Column(db.Float)
+
+    yield_g = db.Column(db.Float)
+    projected_yield_g = db.Column(db.Float)
+
+    cycles = db.Column(db.Integer)
+
+    align = db.Column(db.Float)
+    align_pf = db.Column(db.Float)
+
+    error_rate = db.Column(db.Float)
+    error_rate_stddev = db.Column(db.Float)
+    error_rate_35 = db.Column(db.Float)
+    error_rate_35_stddev = db.Column(db.Float)
+    error_rate_75 = db.Column(db.Float)
+    error_rate_75_stddev = db.Column(db.Float)
+    error_rate_100 = db.Column(db.Float)
+    error_rate_100_stddev = db.Column(db.Float)
+
+    intensity = db.Column(db.Integer)
+    intensity_stddev = db.Column(db.Integer)
+
+    readid = db.Column(db.Integer, db.ForeignKey('read.id'))
+    read = relationship("Read", back_populates="lanes")
+
+    def __repr__(self):
+        return f"Lane('{self.lane}')"
+
+
+class Read(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    read = db.Column(db.Integer)
+    is_index = db.Column(db.Boolean(), default=True)
+    yield_g = db.Column(db.Float)
+    projected_yield_g = db.Column(db.Float)
+    aligned = db.Column(db.Float)
+    error_rate = db.Column(db.Float)
+    intensity = db.Column(db.Integer)
+    percent_gt_q30 = db.Column(db.Float)
+
+    runid = db.Column(db.Integer, db.ForeignKey('run.id'))
+    run = relationship("Run", back_populates="reads")
+
+    lanes = relationship("Lane")
+
+    def __repr__(self):
+        return f"Read('{self.read}')"
 
 
 ################################################################################
