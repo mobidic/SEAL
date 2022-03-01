@@ -455,6 +455,25 @@
         </div>
     </div>
 
+    <div id="MD-message-modal" class="w3-modal">
+        <div class="w3-modal-content w3-card-4 w3-animate-zoom">
+            <header id="MD-modal-header" class="MD-modal-header w3-container w3-flat-emerald">
+                <span onclick="$('#MD-message-modal').toggle()"
+                class="MD-modal-header w3-button w3-flat-emerald w3-xlarge w3-display-topright">&times;</span>
+                <h2>MobiDetails</h2>
+            </header>
+
+            <div class="w3-container">
+                <p id="message-mobidetails"></p>
+            </div>
+
+            <div class="w3-container w3-light-grey w3-padding">
+                <button class="w3-button w3-right w3-white w3-border"
+                onclick="$('#MD-message-modal').toggle()">Close</button>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
 
 
@@ -1330,19 +1349,28 @@
         return `<a class="w3-hover-text-${data.color}" href="${data.link_prefix}${data.id}${data.link_suffix}" target="_blank"><i class="w3-text-${data.color} ${data.flag}"></i> ${data.id}</a>`;
     }
 
-    const missenseScores = []
     function openMD(id) {
+        $('#message-mobidetails').html('<span><i class="fas fa-cog fa-spin"></i> Checking availability in MobiDetails...</span>');
+        $('.MD-modal-header').addClass('w3-flat-emerald');
+        $('.MD-modal-header').removeClass('w3-flat-alizarin');
+        $('#MD-message-modal').toggle();
         $.ajax({
-        type: "POST",
+        type: 'POST',
         url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
         data: {
             variant_chgvs: encodeURIComponent(id),
             caller: 'cli',
-            api_key: "{{ config['API_KEY_MD'] }}"
+            api_key: '{{ config["API_KEY_MD"] }}'
         }
         })
         .done(function(data) {
-            window.open(data.url)
+            if (! data.url) {
+                $('#message-mobidetails').html('<i class="fas fa-times-circle w3-text-flat-alizarin"></i> ' + data.mobidetails_error);
+                $('.MD-modal-header').addClass('w3-flat-alizarin');
+            } else {
+                $('#message-mobidetails').html('Redirection to <a href="' + data.url + '" target="_blank" style="text-decoration:underline">' + data.url + '</a>');
+                window.open(data.url);
+            }
         });
     }
 
@@ -1981,14 +2009,17 @@
 
     // When the user clicks anywhere outside of the modal, close it
     window.onclick = function(event) {
-      if (event.target == document.getElementById('modal-details-variant')) {
-        document.getElementById('modal-details-variant').style.display = "none";
-      }
+        if (event.target == document.getElementById('modal-details-variant')) {
+            document.getElementById('modal-details-variant').style.display = "none";
+        }
         if (event.target == document.getElementById('help-modal')) {
-          document.getElementById('help-modal').style.display = "none";
+            document.getElementById('help-modal').style.display = "none";
         }
         if (event.target == document.getElementById('filter-modal')) {
-          document.getElementById('filter-modal').style.display = "none";
+            document.getElementById('filter-modal').style.display = "none";
+        }
+        if (event.target == document.getElementById('MD-message-modal')) {
+            document.getElementById('MD-message-modal').style.display = "none";
         }
     }
 
