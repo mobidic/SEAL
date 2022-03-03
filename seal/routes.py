@@ -349,8 +349,7 @@ def create_variant():
     choices = [(team.id, team.teamname) for team in Team.query.all()]
     uploadSampleForm.teams.choices = choices
     uploadSampleForm.teams.data = [team.id for team in current_user.teams]
-    # uploadSampleForm.teams.process(request.form)
-    print(uploadSampleForm.teams.iter_choices())
+
     return render_template(
         'analysis/create_sample.html', title="Add Sample",
         form=uploadSampleForm,
