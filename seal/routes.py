@@ -316,7 +316,7 @@ def create_variant():
     uploadSampleForm = UploadVariantForm()
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-    if "submit" in request.form and uploadSampleForm.validate_on_submit():
+    if "submit" in request.form and uploadSampleForm.is_submitted():
         run = Run.query.filter_by(run_name=uploadSampleForm.run.data).first()
         if run:
             sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data, runid=run.id).first()
@@ -327,11 +327,18 @@ def create_variant():
             return redirect(url_for('index'))
 
         info = {
-            "samplename": uploadSampleForm.samplename.data,
-            "family": uploadSampleForm.family.data,
-            "run": uploadSampleForm.run.data,
-            "carrier": uploadSampleForm.carrier.data,
-            "index": uploadSampleForm.index.data,
+            "sample": {
+                "name": uploadSampleForm.samplename.data,
+                "carrier": uploadSampleForm.carrier.data,
+                "index": uploadSampleForm.index.data,
+            },
+            "family": {
+                "name": uploadSampleForm.family.data
+            },
+            "run": {
+                "name": uploadSampleForm.run.data,
+            },
+            "teams": [{"name": Team.query.get(id).teamname} for id in uploadSampleForm.teams.data],
             "interface": True
         }
         add_vcf(info, uploadSampleForm.vcf_file.data)
@@ -339,9 +346,15 @@ def create_variant():
         flash(f'The sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
         return redirect(url_for('index'))
 
+    choices = [(team.id, team.teamname) for team in Team.query.all()]
+    uploadSampleForm.teams.choices = choices
+    uploadSampleForm.teams.data = [team.id for team in current_user.teams]
+    # uploadSampleForm.teams.process(request.form)
+    print(uploadSampleForm.teams.iter_choices())
     return render_template(
         'analysis/create_sample.html', title="Add Sample",
-        form=uploadSampleForm
+        form=uploadSampleForm,
+        user_teams=[team.teamname for team in current_user.teams]
     )
 
 

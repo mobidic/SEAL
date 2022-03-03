@@ -3,6 +3,8 @@
 {% block static %}
     <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
     <script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.css') }}">
+    <script src="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -17,7 +19,9 @@
                 <form class="w3-container"  action="" method="post" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
                     <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px">
+                            <i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}
+                        </div>
                         <div class="w3-rest">
                             {% if form.samplename.errors %}
                                 {{ form.samplename(class="w3-input w3-border w3-border-red") }}
@@ -31,9 +35,17 @@
                             {% endif %}
                         </div>
                     </div>
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:87px">
+                            {{ form.index(class="w3-check") }} {{ form.index.label(class="w3-display-right", style="font-weight: bold;") }}
+                        </div>
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:87px">
+                            {{ form.carrier(class="w3-check") }} {{ form.carrier.label(class="w3-display-right", style="font-weight: bold;") }}
+                        </div>
+                    </div>
 
                     <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-users"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
                             {% if form.family.errors %}
                                 {{ form.family(class="w3-input w3-border w3-border-red") }}
@@ -49,7 +61,7 @@
                     </div>
 
                     <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-digital-tachograph"></i> {{ form.run.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-digital-tachograph"></i> {{ form.run.label(class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
                             {% if form.run.errors %}
                                 {{ form.run(class="w3-input w3-border w3-border-red") }}
@@ -64,8 +76,15 @@
                         </div>
                     </div>
 
+                    <div class="w3-row w3-section w3-display-container">
+                        <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.teams.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {{ form.teams(id="example3") }}
+                        </div>
+                    </div>
+
                     <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:175px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
                             {% if form.vcf_file.errors %}
                                 {{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}
@@ -79,12 +98,6 @@
                             {% endif %}
                         </div>
                     </div>
-
-                    {{ form.carrier(class="w3-check") }}
-                    {{ form.carrier.label() }}
-
-                    {{ form.index(class="w3-check") }}
-                    {{ form.index.label() }}
 
                     <div class="w3-section w3-center">
                         {{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
@@ -133,5 +146,12 @@
             source: runs,
         });
     });
+
+    let mySelect3 = new vanillaSelectBox("#example3",{
+        search: true,
+        stayOpen:true,
+        maxHeight:150
+    });
+
 </script>
 {% endblock %}

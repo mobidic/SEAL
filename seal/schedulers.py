@@ -3,10 +3,12 @@ import json
 import numpy
 import datetime
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript
+from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team
 from anacore import annotVcf
 import shlex
 import subprocess
+from sqlalchemy.orm.exc import NoResultFound
+import random
 
 
 CONSEQUENCES_DICT = {
@@ -88,80 +90,181 @@ SPLICEAI = [
 ]
 
 
+def get_token(path_tokens):
+    for file in os.listdir(path_tokens):
+        if file.endswith('.token'):
+            return os.path.join(path_tokens, file)
+
+    return False
+
+
+def random_color(format="HEX"):
+    red = random.randint(0, 255)
+    green = random.randint(0, 255)
+    blue = random.randint(0, 255)
+    if format == "HEX":
+        return f'#{red:02X}{green:02X}{blue:02X}'
+    if format == "RGB":
+        return f'({red},{green},{blue})'
+
+
 # cron examples
 @scheduler.task('cron', id='import vcf', second="*/20")
 def importvcf():
-    files = os.listdir(os.path.join(app.root_path, 'static/temp/vcf/'))
+    # Load config file
     vep_config_file = os.path.join(app.root_path, 'static/vep.config.json')
     with open(vep_config_file, "r") as tf:
         vep_config = json.load(tf)
 
-    curr_token = False
-    for f in files:
-        if f.endswith(".token"):
-            curr_token = f
-            continue
+    # Check launchable
+    path_inout = os.path.join(app.root_path, 'static/temp/vcf/')
+    current_token = get_token(path_inout)
+    path_locker = os.path.join(app.root_path, 'static/temp/vcf/.lock')
 
-    if curr_token and not os.path.exists(os.path.join(app.root_path, 'static/temp/vcf/.lock')):
+    if current_token and not os.path.exists(path_locker):
+        app.logger.info("---------------- Create A New Sample ----------------")
+
         # Create lock file
-        lockFile = open(os.path.join(app.root_path, 'static/temp/vcf/.lock'), 'x')
+        lockFile = open(path_locker, 'x')
         lockFile.close()
 
-        f_base, f_ext = os.path.splitext(curr_token)
-        old_fn = os.path.join(app.root_path, 'static/temp/vcf/', curr_token)
-        current_fn = os.path.join(app.root_path, 'static/temp/vcf/', f'{f_base}.treat')
-        os.rename(old_fn, current_fn)
-        with open(current_fn, "r") as tf:
-            data = json.load(tf)
-            samplename = data['samplename']
-            vcf_path = data['vcf_path']
+        # Change token to treat file
+        (f_base, f_ext) = os.path.splitext(current_token)
+        current_file = f'{f_base}.treat'
+        os.rename(current_token, current_file)
+
+        # Load data
+        with open(current_file, "r") as json_sample:
+            data = json.load(json_sample)
+
+        # Come from interface
+        try:
+            interface = data["interface"]
+        except KeyError:
             interface = False
-            if "interface" in data and data["interface"] is True:
-                interface = True
 
-            # Add family in database if necessary
-            familyid = None
-            if "family" in data and data["family"] != "":
-                familyname = data['family']
-                family = Family.query.filter_by(family=familyname).first()
-                if not family:
-                    family = Family(family=familyname)
-                    db.session.add(family)
-                    db.session.commit()
-                familyid = family.id
+        # Sample Creation
+        try:
+            sample = data["sample"]
+            sample_name = sample["name"]
+            vcf_path = data["vcf_path"]
+            if not os.path.exists(vcf_path):
+                app.logger.error(f'Path does not exist for : {vcf_path}')
+                return
+        except KeyError as e:
+            os.rename(current_file, f'{f_base}.error')
+            app.logger.error(e)
+            return
 
-            # Add run in database if necessary
-            runid = None
-            if "run" in data and data["run"] != "":
-                run_name = data['run']
-                run = Run.query.filter_by(run_name=run_name).first()
-                if not run:
-                    run = Run(run_name=run_name)
-                    db.session.add(run)
-                    db.session.commit()
-                runid = run.id
-            app.logger.info(f"---- {runid} ----")
-
+        try:
+            carrier = sample["carrier"]
+            if not isinstance(sample["carrier"], (int, bool)):
+                raise TypeError
+        except (KeyError, TypeError):
+            app.logger.debug('Carrier status is unclear.')
             carrier = False
-            if "carrier" in data and data["carrier"] != "":
-                carrier = data['carrier']
-            index = False
-            if "index" in data and data["index"] != "":
-                index = data['index']
 
-            sample = Sample(samplename=samplename, familyid=familyid, runid=runid, carrier=carrier, index=index)
-            db.session.add(sample)
-            db.session.commit()
-            app.logger.info(f"---- Sample Added : {sample} - {sample.id} ----")
+        try:
+            index = sample["index"]
+            if not isinstance(sample["index"], (int, bool)):
+                raise TypeError
+        except (KeyError, TypeError):
+            app.logger.debug('Index case status is unclear.')
+            index = False
+
+        sample = Sample(samplename=sample_name, carrier=carrier, index=index)
+        db.session.add(sample)
+        db.session.commit()
+        app.logger.info(f'Sample {sample} added to SEAL !')
+
+        # Family processing
+        try:
+            family_name = data["family"]["name"]
+            family = Family.query.filter_by(family=family_name).one()
+        except KeyError:
+            family = False
+            app.logger.debug(f'No family associated with : {sample}.')
+        except NoResultFound:
+            if family_name:
+                app.logger.debug(f'Family {family_name} not found !')
+                family = Family(family=family_name)
+                db.session.add(family)
+                db.session.commit()
+                app.logger.info(f'{family} added to SEAL !')
+        finally:
+            if family:
+                sample.familyid = family.id
+                db.session.commit()
+                app.logger.info(f'Family {family} asssociated to {sample} !')
+
+        # Run processing
+        try:
+            run_name = data["run"]["name"]
+            run = Run.query.filter_by(run_name=run_name).one()
+        except KeyError:
+            run = False
+            app.logger.debug(f'No run associated with : {sample}.')
+        except NoResultFound:
+            if run_name:
+                app.logger.debug(f'Run "{run_name}" not found !')
+                try:
+                    run_alias = data["run"]["alias"]
+                except KeyError:
+                    run_alias = None
+                run = Run(run_name=run_name, run_alias=run_alias)
+                db.session.add(run)
+                db.session.commit()
+                app.logger.debug(f'{run} added to SEAL !')
+        finally:
+            if run:
+                sample.runid = run.id
+                db.session.commit()
+                app.logger.info(f'{run} asssociated to {sample} !')
+
+        # Team(s) processing
+        try:
+            if not isinstance(data["teams"], list):
+                raise TypeError
+            teams = data["teams"]
+        except (KeyError, TypeError):
+            app.logger.debug(f'No teams associated with : {sample}.')
+            teams = list()
+
+        for team in teams:
+            try:
+                team_name = team["name"]
+                team_db = Team.query.filter_by(teamname=team_name).one()
+                sample.teams.append(team_db)
+                db.session.commit()
+            except KeyError:
+                team_db = False
+                app.logger.warn(f'Keyword "name" missing in {team} (team). Skipping...')
+            except NoResultFound:
+                if team_name:
+                    app.logger.debug(f'Team "{team_name}" not found !')
+                    try:
+                        team_color = team["color"]
+                        if not team_color:
+                            raise ValueError
+                    except (ValueError, KeyError):
+                        team_color = random_color()
+                    team_db = Team(teamname=team_name, color=team_color)
+                    db.session.add(team)
+                    db.session.commit()
+                    app.logger.debug(f'{team} added to SEAL !')
+            finally:
+                if team:
+                    sample.teams.append(team_db)
+                    db.session.commit()
+                    app.logger.info(f'{team_db} asssociated to {sample} !')
 
         current_date = datetime.datetime.now().isoformat()
 
-        vcf_fn = os.path.join(vcf_path)
         baseout = os.path.basename(os.path.splitext(vcf_path)[0])
-        vcf_vep = os.path.join(app.root_path, "static/temp/vcf/", f"{baseout}.vep.vcf")
-        stats_vep = os.path.join(app.root_path, "static/temp/vcf/", f"{baseout}.vep.html")
+        vcf_vep = os.path.join(path_inout, f'{baseout}.vep.vcf')
+        stats_vep = os.path.join(path_inout, f'{baseout}.vep.html')
         vep_cmd = "vep " + \
-            f" --input_file {vcf_fn} " + \
+            f" --input_file {vcf_path} " + \
             f" --output_file {vcf_vep} " + \
             f" --stats_file {stats_vep} " + \
             f" --dir {vep_config['dir']} " + \
@@ -324,9 +427,9 @@ def importvcf():
             sample.status = -1
         else:
             sample.status = 1
-            os.remove(current_fn)
+            os.remove(current_file)
             if interface:
-                os.remove(vcf_fn)
+                os.remove(vcf_path)
             os.remove(vcf_vep)
             os.remove(stats_vep)
         finally:

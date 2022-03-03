@@ -1,9 +1,9 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
-from seal.models import User, Sample, Run
+from seal.models import User, Sample, Run, Team
 from seal import bcrypt
 
 
@@ -98,6 +98,8 @@ class UploadVariantForm(FlaskForm):
     )
     carrier = BooleanField('Carrier')
     index = BooleanField('Index')
+
+    teams = SelectMultipleField('Teams', coerce=int)
 
     submit = SubmitField('Create New Sample')
 
