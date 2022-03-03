@@ -94,8 +94,8 @@ admin.add_view(
         Run,
         db.session,
         category="Analysis",
-        column_searchable_list=["run_name", "run_alias"],
-        column_editable_list=["run_name", "run_alias"]
+        column_searchable_list=["name", "alias"],
+        column_editable_list=["name", "alias"]
     )
 )
 admin.add_view(

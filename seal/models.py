@@ -136,14 +136,14 @@ class Family(db.Model):
 
 class Run(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    run_name = db.Column(db.String(50), unique=True, nullable=False)
-    run_alias = db.Column(db.String(50), unique=False, nullable=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    alias = db.Column(db.String(50), unique=False, nullable=True)
 
     samples = relationship("Sample")
     reads = relationship("Read")
 
     def __repr__(self):
-        return f"Run('{self.run_name}')"
+        return f"Run('{self.name}')"
 
 
 class Variant(db.Model):

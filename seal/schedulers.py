@@ -200,7 +200,7 @@ def importvcf():
         # Run processing
         try:
             run_name = data["run"]["name"]
-            run = Run.query.filter_by(run_name=run_name).one()
+            run = Run.query.filter_by(name=run_name).one()
         except KeyError:
             run = False
             app.logger.debug(f'No run associated with : {sample}.')
@@ -211,7 +211,7 @@ def importvcf():
                     run_alias = data["run"]["alias"]
                 except KeyError:
                     run_alias = None
-                run = Run(run_name=run_name, run_alias=run_alias)
+                run = Run(name=run_name, run_alias=run_alias)
                 db.session.add(run)
                 db.session.commit()
                 app.logger.debug(f'{run} added to SEAL !')

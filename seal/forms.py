@@ -104,7 +104,7 @@ class UploadVariantForm(FlaskForm):
     submit = SubmitField('Create New Sample')
 
     def validate_samplename(self, samplename):
-        run = Run.query.filter_by(run_name=self.run.data).first()
+        run = Run.query.filter_by(name=self.run.data).first()
         if run:
             sample = Sample.query.filter_by(samplename=samplename.data, runid=run.id).first()
         else:

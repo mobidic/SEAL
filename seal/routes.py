@@ -317,7 +317,7 @@ def create_variant():
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
     if "submit" in request.form and uploadSampleForm.is_submitted():
-        run = Run.query.filter_by(run_name=uploadSampleForm.run.data).first()
+        run = Run.query.filter_by(name=uploadSampleForm.run.data).first()
         if run:
             sample = Sample.query.filter_by(samplename=uploadSampleForm.samplename.data, runid=run.id).first()
         else:
@@ -379,13 +379,13 @@ def json_families():
 @app.route("/json/runs", methods=['GET', 'POST'])
 @login_required
 def json_runs():
-    runs = db.session.query(Run.id, Run.run_name, Run.run_alias).all()
+    runs = db.session.query(Run.id, Run.name, Run.alias).all()
     runs_json = {"data": list()}
     for run in runs:
         runs_json["data"].append({
             "id": run.id,
-            "run_name": run.run_name,
-            "run_alias": run.run_alias
+            "name": run.name,
+            "alias": run.alias
         })
     return jsonify(runs_json)
 
@@ -397,23 +397,23 @@ def json_samples():
         "asc": [
             Sample.samplename.asc(),
             Family.family.asc(),
-            Run.run_name.asc(),
-            Run.run_alias.asc(),
+            Run.name.asc(),
+            Run.alias.asc(),
             Sample.status.asc()
         ],
         "desc": [
             Sample.samplename.desc(),
             Family.family.desc(),
-            Run.run_name.desc(),
-            Run.run_alias.desc(),
+            Run.name.desc(),
+            Run.alias.desc(),
             Sample.status.desc()
         ]
     }
     filters = or_(
         Sample.samplename.op('~')(request.form['search[value]']),
         Family.family.op('~')(request.form['search[value]']),
-        Run.run_name.op('~')(request.form['search[value]']),
-        Run.run_alias.op('~')(request.form['search[value]'])
+        Run.name.op('~')(request.form['search[value]']),
+        Run.alias.op('~')(request.form['search[value]'])
     )
 
     if current_user.admin:
@@ -445,8 +445,10 @@ def json_samples():
             "id": sample.id,
             "samplename": sample.samplename,
             "family": sample.family.family if sample.familyid else None,
-            "run": sample.run.run_name if sample.runid else None,
-            "run_alias": sample.run.run_alias if sample.runid else None,
+            "run": {
+                "name": sample.run.name if sample.runid else None,
+                "alias": sample.run.alias if sample.runid else None
+            },
             "status": sample.status,
             "teams": teams
         })

@@ -138,7 +138,7 @@
         var runs=[];
         $.getJSON('/json/runs', function(data, status, xhr){
             for (var i = 0; i < data['data'].length; i++ ) {
-                runs.push(data["data"][i]["run_name"]);
+                runs.push(data["data"][i]["name"]);
             }
         });
 
