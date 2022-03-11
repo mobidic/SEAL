@@ -1,11 +1,16 @@
 import os
+
+from pathlib import Path
+
 from seal import db, app, bcrypt
 from seal.models import User, Filter
 
 
-pathDB = os.path.join(app.root_path, 'site.db')
-if os.path.exists(pathDB):
-    os.remove(pathDB)
+pathDB = Path(app.root_path).joinpath('site.db')
+try:
+    pathDB.unlink()
+except FileNotFoundError:
+    pass
 
 os.system('psql postgres -c "DROP DATABASE seal;"')
 os.system('psql postgres -c "CREATE DATABASE seal;"')

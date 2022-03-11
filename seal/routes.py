@@ -1,4 +1,3 @@
-import os
 import secrets
 import json
 import urllib
@@ -12,6 +11,8 @@ from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2S
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from sqlalchemy import or_, and_
+from pathlib import Path
+
 ################################################################################
 # Define global variables
 # TODO: create values in database
@@ -191,9 +192,10 @@ def crop_max_square(pil_img):
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
-    _, f_ext = os.path.splitext(form_picture.filename)
+    f_ext = Path(form_picture.filename).suffix
     picture_fn = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/images/profile', picture_fn)
+    picture_path = Path(app.root_path).joinpath('static/images/profile')
+    picture_path = picture_path.joinpath(picture_fn)
 
     output_size = (125, 125)
     i = Image.open(form_picture)
@@ -294,16 +296,17 @@ def sample(id):
 def add_vcf(info, vcf_file):
     random_hex = secrets.token_hex(8)
 
-    _, f_ext = os.path.splitext(vcf_file.filename)
+    f_ext = Path(vcf_file.filename).suffix
 
     vcf_fn = random_hex + f_ext
-    vcf_path = os.path.join(app.root_path, 'static/temp/vcf/', vcf_fn)
+    vcf_path_base = Path(app.root_path).joinpath('static/temp/vcf/')
+    vcf_path = vcf_path_base.joinpath(vcf_fn)
     vcf_file.save(vcf_path)
 
-    info["vcf_path"] = vcf_path
+    info["vcf_path"] = str(vcf_path)
 
     token_fn = random_hex + ".token"
-    token_path = os.path.join(app.root_path, 'static/temp/vcf/', token_fn)
+    token_path = vcf_path_base.joinpath(token_fn)
     with open(token_path, "w") as tf:
         tf.write(json.dumps(info))
 

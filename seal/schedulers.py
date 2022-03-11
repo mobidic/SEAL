@@ -1,14 +1,17 @@
-import os
 import json
 import numpy
+import shlex
+import random
 import datetime
+import subprocess
+
+from pathlib import Path
+from sqlalchemy.orm.exc import NoResultFound
+
+from anacore import annotVcf
+
 from seal import app, scheduler, db
 from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team
-from anacore import annotVcf
-import shlex
-import subprocess
-from sqlalchemy.orm.exc import NoResultFound
-import random
 
 
 CONSEQUENCES_DICT = {
@@ -91,10 +94,9 @@ SPLICEAI = [
 
 
 def get_token(path_tokens):
-    for file in os.listdir(path_tokens):
-        if file.endswith('.token'):
-            return os.path.join(path_tokens, file)
-
+    for file in path_tokens.iterdir():
+        if file.suffix == '.token':
+            return file
     return False
 
 
@@ -112,16 +114,17 @@ def random_color(format="HEX"):
 @scheduler.task('cron', id='import vcf', second="*/20")
 def importvcf():
     # Load config file
-    vep_config_file = os.path.join(app.root_path, 'static/vep.config.json')
+
+    vep_config_file = Path(app.root_path).joinpath('static/vep.config.json')
     with open(vep_config_file, "r") as tf:
         vep_config = json.load(tf)
 
     # Check launchable
-    path_inout = os.path.join(app.root_path, 'static/temp/vcf/')
+    path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     current_token = get_token(path_inout)
-    path_locker = os.path.join(app.root_path, 'static/temp/vcf/.lock')
+    path_locker = path_inout.joinpath('.lock')
 
-    if current_token and not os.path.exists(path_locker):
+    if current_token and not path_locker.exists():
         app.logger.info("---------------- Create A New Sample ----------------")
 
         # Create lock file
@@ -129,12 +132,11 @@ def importvcf():
         lockFile.close()
 
         # Change token to treat file
-        (f_base, f_ext) = os.path.splitext(current_token)
-        current_file = f'{f_base}.treat'
-        os.rename(current_token, current_file)
+        current_file = current_token.with_suffix('.treat')
+        current_token.rename(current_file)
 
         # Load data
-        with open(current_file, "r") as json_sample:
+        with current_file.open('r') as json_sample:
             data = json.load(json_sample)
 
         # Come from interface
@@ -147,12 +149,13 @@ def importvcf():
         try:
             sample = data["sample"]
             sample_name = sample["name"]
-            vcf_path = data["vcf_path"]
-            if not os.path.exists(vcf_path):
+            vcf_path = Path(data["vcf_path"])
+            if not vcf_path.exists():
                 app.logger.error(f'Path does not exist for : {vcf_path}')
                 return
         except KeyError as e:
-            os.rename(current_file, f'{f_base}.error')
+            error_file = current_file.with_suffix('.error')
+            current_file.rename(error_file)
             app.logger.error(e)
             return
 
@@ -264,9 +267,8 @@ def importvcf():
 
         current_date = datetime.datetime.now().isoformat()
 
-        baseout = os.path.basename(os.path.splitext(vcf_path)[0])
-        vcf_vep = os.path.join(path_inout, f'{baseout}.vep.vcf')
-        stats_vep = os.path.join(path_inout, f'{baseout}.vep.html')
+        vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
+        stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
         vep_cmd = "vep " + \
             f" --input_file {vcf_path} " + \
             f" --output_file {vcf_vep} " + \
@@ -431,12 +433,12 @@ def importvcf():
             sample.status = -1
         else:
             sample.status = 1
-            os.remove(current_file)
+            current_file.unlink()
             if interface:
-                os.remove(vcf_path)
-            os.remove(vcf_vep)
-            os.remove(stats_vep)
+                vcf_path.unlink()
+            vcf_vep.unlink()
+            stats_vep.unlink()
         finally:
             db.session.commit()
             app.logger.info(f"---- Variant for Sample Added : {sample} - {sample.id} ----")
-            os.remove(os.path.join(app.root_path, 'static/temp/vcf/.lock'))
+            path_locker.unlink()
