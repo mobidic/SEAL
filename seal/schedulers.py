@@ -211,7 +211,7 @@ def importvcf():
                     run_alias = data["run"]["alias"]
                 except KeyError:
                     run_alias = None
-                run = Run(name=run_name, run_alias=run_alias)
+                run = Run(name=run_name, alias=run_alias)
                 db.session.add(run)
                 db.session.commit()
                 app.logger.debug(f'{run} added to SEAL !')
