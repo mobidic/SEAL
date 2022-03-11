@@ -191,6 +191,8 @@ def importvcf():
                 db.session.add(family)
                 db.session.commit()
                 app.logger.info(f'{family} added to SEAL !')
+            else:
+                family = False
         finally:
             if family:
                 sample.familyid = family.id
@@ -215,6 +217,8 @@ def importvcf():
                 db.session.add(run)
                 db.session.commit()
                 app.logger.debug(f'{run} added to SEAL !')
+            else:
+                run = False
         finally:
             if run:
                 sample.runid = run.id
