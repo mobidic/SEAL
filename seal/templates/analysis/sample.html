@@ -1633,7 +1633,7 @@
             inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver control-size-100">Sample</th>'+
                 '<th class="w3-flat-silver control-size-100">Family</th>'+
-                '<th class="w3-flat-silver control-size-75 w3-center">Carrier</th>'+
+                '<th class="w3-flat-silver control-size-75 w3-center">Affected</th>'+
                 '<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
                 '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
                 '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
@@ -1644,14 +1644,14 @@
             var count = 0;
             for (x in data["samples"]) {
                 if (data["samples"][x]["reported"]) {
-                    reported = '<i title="Reported" class="w3-text-flat-emerald fas fa-check-circle"></i>'
+                    reported = '<span class="w3-tag w3-round w3-flat-nephritis"><i title="Reported" class="fas fa-check-circle"></i></span>'
                 } else {
-                    reported = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-times-circle"></i>'
+                    reported = '<span class="w3-tag w3-round w3-dark-gray"><i title="Not Reported" class="fas fa-times-circle"></i></span>'
                 }
-                if (data["samples"][x]["carrier"]) {
-                    carrier = '<i title="Reported" class="w3-text-flat-emerald fas fa-user-check"></i>'
+                if (data["samples"][x]["affected"]) {
+                    affected = '<span class="w3-tag w3-round w3-flat-pomegranate"><i title="Affected" class="fas fa-user-check"></i></span>'
                 } else {
-                    carrier = '<i title="Not Reported" class="w3-text-flat-alizarin fas fa-user-times"></i>'
+                    affected = '<span class="w3-tag w3-round w3-dark-grey"><i title="Not Affected" class="fas fa-user-times"></i></span>'
                 }
                 if (data["samples"][x]["current_family"]) {
                     family = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["family"] + '</span></b>';
@@ -1668,7 +1668,7 @@
                 inSeal = inSeal + '<tr>'+
                     '<td class="control-size-100" ' + style + '>' + sample + '</td>'+
                     '<td class="control-size-100" ' + style + '>' + family+ '</td>'+
-                    '<td class="control-size-75 w3-center" ' + style + '>' + carrier + '</td>'+
+                    '<td class="control-size-75 w3-center" ' + style + '>' + affected + '</td>'+
                     '<td class="control-size-75 w3-center" ' + style + '>' + data["samples"][x]["depth"] + '</td>'+
                     '<td class="control-size-100 w3-center" ' + style + '>' + data["samples"][x]["allelic_depth"] + '</td>'+
                     '<td class="control-size-100 w3-center" ' + style + '>' + data["samples"][x]["allelic_frequency"] + '</td>'+

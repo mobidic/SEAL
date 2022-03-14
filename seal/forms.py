@@ -96,7 +96,7 @@ class UploadVariantForm(FlaskForm):
         'Upload VCF file',
         validators=[DataRequired(), FileAllowed(['vcf', 'vcf.gz'])]
     )
-    carrier = BooleanField('Carrier')
+    affected = BooleanField('Affected')
     index = BooleanField('Index')
 
     teams = SelectMultipleField('Teams', coerce=int)

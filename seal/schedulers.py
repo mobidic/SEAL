@@ -160,12 +160,12 @@ def importvcf():
             return
 
         try:
-            carrier = sample["carrier"]
-            if not isinstance(sample["carrier"], (int, bool)):
+            affected = sample["affected"]
+            if not isinstance(sample["affected"], (int, bool)):
                 raise TypeError
         except (KeyError, TypeError):
-            app.logger.debug('Carrier status is unclear.')
-            carrier = False
+            app.logger.debug('Affected status is unclear.')
+            affected = False
 
         try:
             index = sample["index"]
@@ -175,7 +175,7 @@ def importvcf():
             app.logger.debug('Index case status is unclear.')
             index = False
 
-        sample = Sample(samplename=sample_name, carrier=carrier, index=index)
+        sample = Sample(samplename=sample_name, affected=affected, index=index)
         db.session.add(sample)
         db.session.commit()
         app.logger.info(f'Sample {sample} added to SEAL !')

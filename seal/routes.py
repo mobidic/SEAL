@@ -332,7 +332,7 @@ def create_variant():
         info = {
             "sample": {
                 "name": uploadSampleForm.samplename.data,
-                "carrier": uploadSampleForm.carrier.data,
+                "affected": uploadSampleForm.affected.data,
                 "index": uploadSampleForm.index.data,
             },
             "family": {
@@ -725,7 +725,7 @@ def json_variant(id, version=-1, sample=None):
             allelic_frequency = v2s.allelic_depth / v2s.depth
             samples.append({
                 "samplename": v2s.sample.samplename,
-                "carrier": v2s.sample.carrier,
+                "affected": v2s.sample.affected,
                 "family": v2s.sample.family.family if v2s.sample.family else "",
                 "current_family": current_family,
                 "current": current,
