@@ -102,7 +102,7 @@
         <div class="w3-padding">
             <div class="w3-row w3-padding">
                 <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
-                <select disabled id="selectBox" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
+                <select disabled id="selectFilter" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
                 </select>
             </div>
             <div class="w3-padding">
@@ -787,7 +787,7 @@
                 }
                 options += option;
             }
-            $('#selectBox').html(options);
+            $('#selectFilter').html(options);
         });
         table = $('#variants').DataTable({
             buttons:[
@@ -1317,7 +1317,7 @@
             ],
             "initComplete": function(settings, json) {
                 changeFilter({{ current_user.filter_id }});
-                document.getElementById('selectBox').disabled = false;
+                $('#selectFilter').prop('disabled', true);;
                 table.button().add( 1, {
                     text: 'Save Filter',
                     action: function ( e, dt, node, config ) {
@@ -2148,7 +2148,7 @@
                     }
                     options += option;
                 }
-                $('#selectBox').html(options)
+                $('#selectFilter').html(options)
             });
         })
     }
