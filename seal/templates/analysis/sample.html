@@ -246,19 +246,19 @@
                                 Consequence
                             </th>
                             <th class='w3-flat-green-sea showTitle control-size-100'>
-                                <span onclick="openHelpModal(title='MES alt', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li>|percent variation| &ge; 15\%</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                <span onclick="openHelpModal(title='MES alt', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li class=\'w3-text-flat-pomegranate\'>|percent variation| &ge; 15\%</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 MES var
                             </th>
                             <th class='w3-flat-green-sea showTitle control-size-125'>
-                                <span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li>0.2 (high recall)</li><li>0.5 (recommended)</li><li>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                <span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li class=\'w3-text-flat-sun-flower\'>0.2 (high recall)</li><li class=\'w3-text-flat-orange\'>0.5 (recommended)</li><li class=\'w3-text-flat-pomegranate\'>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 SpliceAI DS
                             </th>
                             <th class='w3-flat-green-sea showTitle control-size-100'>
-                                <span onclick="openHelpModal(title='Missense', content='Here we calculated the mean from 10 prediction scores. The scores have been selected as the top 10 prediction tools from the dbNSFP v4 publication.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
+                                <span onclick="openHelpModal(title='Missense', content='This score represents the mean rank scores of the top 10 missense predictions tools from dbNSFP v4.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul><br />The threshold are : <ul><li><span class=\'w3-tag w3-flat-pomegranate\'>0.95</span> <i>top 5% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-pomegranate\'>0.9</span> <i>top 10% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-orange\'>0.75</span> <i>top 25% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-sun-flower\'>0.5</span> <i>top 50% deleteriousness of all missense variant</i></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Missense
@@ -1180,7 +1180,7 @@
                             value = parseFloat(data).toFixed(3)
                             classw3css = "w3-text-black";
                             if (Math.abs(value) >= 15) {
-                                classw3css = "w3-text-flat-alizarin";
+                                classw3css = "w3-text-flat-pomegranate";
                             }
                             return "<span class='" + classw3css + "'>" + value + "</span>";
                         },
@@ -1203,9 +1203,9 @@
                             value = parseFloat(data).toFixed(3)
                             classw3css = "w3-text-black";
                             if (value >= 0.8) {
-                                classw3css = "w3-text-flat-alizarin";
+                                classw3css = "w3-text-flat-pomegranate";
                             } else if (value >= 0.5) {
-                                classw3css = "w3-text-flat-carrot";
+                                classw3css = "w3-text-flat-orange";
                             } else if (value >= 0.2) {
                                 classw3css = "w3-text-flat-sun-flower";
                             }
@@ -1230,10 +1230,14 @@
                             }
                             value = parseFloat(data).toFixed(3)
                             classw3css = "w3-text-black";
-                            if (value >= 0.65) {
-                                classw3css = "w3-text-flat-alizarin";
-                            } else if (value >= 0.45) {
-                                classw3css = "w3-text-flat-carrot";
+                            if (value >= 0.95) {
+                                classw3css = "w3-tag w3-flat-pomegranate";
+                            } else if (value >= 0.9) {
+                                classw3css = "w3-text-flat-pomegranate";
+                            } else if (value >= 0.75) {
+                                classw3css = "w3-text-flat-orange";
+                            } else if (value >= 0.5) {
+                                classw3css = "w3-text-flat-sun-flower";
                             }
                             return "<span class='" + classw3css + "'>" + value + "</span>";
                         },
