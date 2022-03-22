@@ -718,7 +718,7 @@ def json_variant(id, version=-1, sample=None):
         current_family = False
         current = False
         if v2s.sample.status >= 1:
-            if sample and v2s.sample.familyid == sample.familyid and sample.familyid != None:
+            if sample and v2s.sample.familyid == sample.familyid and sample.familyid is not None:
                 current_family = True
             if sample and v2s.sample.id == sample.id:
                 current = True
