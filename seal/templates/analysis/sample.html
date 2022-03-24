@@ -1317,7 +1317,7 @@
             ],
             "initComplete": function(settings, json) {
                 changeFilter({{ current_user.filter_id }});
-                $('#selectFilter').prop('disabled', true);;
+                $('#selectFilter').prop('disabled', false);
                 table.button().add( 1, {
                     text: 'Save Filter',
                     action: function ( e, dt, node, config ) {
