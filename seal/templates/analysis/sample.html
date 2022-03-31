@@ -791,9 +791,6 @@
         });
         table = $('#variants').DataTable({
             buttons:[
-                {
-                    extend: 'searchBuilder',
-                }
             ],
             processing: true,
             "language": {
@@ -810,6 +807,7 @@
             colReorder: {
                 realtime: false
             },
+            select: true,
             ajax: '/json/variants/sample/{{ sample.id }}',
             "columns": [
                 {
@@ -1318,12 +1316,79 @@
             "initComplete": function(settings, json) {
                 changeFilter({{ current_user.filter_id }});
                 $('#selectFilter').prop('disabled', false);
+                table.button().add( 0, {
+                    extend: 'searchBuilder',
+                    text: 'Create Filter'
+                } );
                 table.button().add( 1, {
                     text: 'Save Filter',
                     action: function ( e, dt, node, config ) {
                         save_filters()
                     }
                 } );
+                table.button().add(3, {
+                    extend: 'collection',
+                    text: 'Export',
+                    className: 'custom-html-collection',
+                    buttons: [
+                        '<h3>All</h3>',
+                        {
+                            extend: 'copy',
+                            text: 'Copy',
+                            exportOptions: {
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        },
+                        {
+                            extend: 'excel',
+                            text: 'Excel',
+                            exportOptions: {
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        },
+                        {
+                            extend: 'csv',
+                            text: 'CSV',
+                            exportOptions: {
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        },
+                        '<h3>Selected</h3>',
+                        {
+                            extend: 'copy',
+                            text: 'Copy',
+                            exportOptions: {
+                                modifier: {
+                                    selected: true
+                                }
+                            }
+                        },
+                        {
+                            extend: 'excel',
+                            text: 'Excel',
+                            exportOptions: {
+                                modifier: {
+                                    selected: true
+                                }
+                            }
+                        },
+                        {
+                            extend: 'csv',
+                            text: 'CSV',
+                            exportOptions: {
+                                modifier: {
+                                    selected: true
+                                }
+                            }
+                        },
+                    ]
+                });
             }
         });
     } );
