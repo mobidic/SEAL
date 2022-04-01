@@ -789,9 +789,9 @@
             }
             $('#selectFilter').html(options);
         });
+
         table = $('#variants').DataTable({
-            buttons:[
-            ],
+            buttons:[],
             processing: true,
             "language": {
                 "loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
@@ -807,7 +807,10 @@
             colReorder: {
                 realtime: false
             },
-            select: true,
+            select: {
+                style:    'os',
+                selector: 'td:not(:nth-last-child(-n+3))'
+            },
             ajax: '/json/variants/sample/{{ sample.id }}',
             "columns": [
                 {
@@ -853,10 +856,15 @@
                         "_": function ( data, type, row ) {
                             return data["canonical"];
                         },
+                        "export":function ( data, type, row ) {
+                            select = data["preferred"]? " (selected)": "";
+                            canonical = data["canonical"]? "Yes": "No";
+                            return canonical + select;
+                        },
                         "display": function ( data, type, row ) {
-                            color = "w3-text-flat-peter-river"
+                            color = "w3-text-flat-peter-river";
                             if (data["preferred"]) {
-                                color = "w3-text-flat-alizarin"
+                                color = "w3-text-flat-alizarin";
                             }
                             if (data["canonical"]) {
                                 response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
@@ -1339,6 +1347,22 @@
                                 modifier: {
                                     selected: null
                                 }
+                            },
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        // Strip $ from salary column to make it numeric
+                                        if (column === 21) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 22) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                }
                             }
                         },
                         {
@@ -1348,6 +1372,22 @@
                                 modifier: {
                                     selected: null
                                 }
+                            },
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        // Strip $ from salary column to make it numeric
+                                        if (column === 21) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 22) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                }
                             }
                         },
                         {
@@ -1356,6 +1396,22 @@
                             exportOptions: {
                                 modifier: {
                                     selected: null
+                                }
+                            },
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        // Strip $ from salary column to make it numeric
+                                        if (column === 21) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 22) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
                                 }
                             }
                         },
@@ -1367,6 +1423,22 @@
                                 modifier: {
                                     selected: true
                                 }
+                            },
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        // Strip $ from salary column to make it numeric
+                                        if (column === 21) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 22) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                }
                             }
                         },
                         {
@@ -1376,6 +1448,22 @@
                                 modifier: {
                                     selected: true
                                 }
+                            },
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        // Strip $ from salary column to make it numeric
+                                        if (column === 21) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 22) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                }
                             }
                         },
                         {
@@ -1384,6 +1472,22 @@
                             exportOptions: {
                                 modifier: {
                                     selected: true
+                                }
+                            },
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        // Strip $ from salary column to make it numeric
+                                        if (column === 21) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 22) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
                                 }
                             }
                         },
