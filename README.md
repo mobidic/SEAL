@@ -1,4 +1,4 @@
-# SEAL - System of Experiments & Analysis for the Lab
+# SEAL db - Simple, Efficient And Lite database for NGS
 
 ## Installation
 
