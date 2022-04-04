@@ -198,7 +198,7 @@
                                 Allelic depth
                             </th>
                             <th class='w3-flat-green-sea showTitle control-size-100'>
-                                <span onclick="openHelpModal(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)', footer='')" class="w3-opacity-max w3-hover-opacity">
+                                <span onclick="openHelpModal(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Allelic frequencies
@@ -1011,7 +1011,25 @@
                 },
                 { "className": 'showTitle control-size-100', "data": "depth"},
                 { "className": 'showTitle control-size-100', "data": "allelic_depth"},
-                { "className": 'showTitle control-size-100', "data": "allelic_frequency"},
+                {
+                    "className": 'showTitle control-size-100',
+                    "data": "allelic_frequency",
+                    "render": {
+                        "_" : function ( data, type, row, meta ) {
+                            return data
+                        },
+                        "display" : function ( data, type, row, meta ) {
+                            if (data >=0 && data < 0.25) {
+                                return '<i class="far fa-dot-circle"></i> ' + data;
+                            } else if (data < 0.75) {
+                                return '<i class="fas fa-adjust"></i> ' + data;
+                            } else if (data <= 1)  {
+                                return '<i class="fas fa-circle"></i> ' + data;
+                            }
+                            return '<i class="far fa-question-circle"></i> ' + data;
+                        },
+                    }
+                },
                 {
                     "className": 'showTitle control-size-100',
                     "data": "annotations.gnomADg_AF",
