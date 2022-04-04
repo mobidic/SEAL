@@ -10,7 +10,7 @@
 
 {% block content %}
     {% include 'includes/sidebar.j2' %}
-    <div class="w3-main w3-padding" style="margin-left:350px">
+    <div class="w3-main w3-padding">
         <table id="genes" class="w3-table-all w3-hoverable" style="width:100%">
             <thead>
                 <tr>
@@ -117,17 +117,6 @@
             ],
         });
     });
-
-    // Script to open and close sidebar
-    function w3_open() {
-        document.getElementById("sidebar").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
-    }
-
-    function w3_close() {
-        document.getElementById("sidebar").style.display = "none";
-        document.getElementById("overlay").style.display = "none";
-    }
 
     function add_transcript(transcript) {
         $.ajaxSetup({

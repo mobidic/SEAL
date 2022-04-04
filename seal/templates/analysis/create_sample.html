@@ -9,7 +9,7 @@
 
 {% block content %}
     {% include 'includes/sidebar.j2' %}
-    <div class="w3-main" style="margin-left:350px">
+    <div class="w3-main">
         <div class="w3-padding w3-mobile">
             <div class="w3-card w3-padding w3-mobile">
                 <div class="w3-container w3-border-bottom">
@@ -112,17 +112,6 @@
 
 {% block script %}
 <script type="text/javascript">
-    // Script to open and close sidebar
-    function w3_open() {
-        document.getElementById("sidebar").style.display = "block";
-        document.getElementById("overlay").style.display = "block";
-    }
-
-    function w3_close() {
-        document.getElementById("sidebar").style.display = "none";
-        document.getElementById("overlay").style.display = "none";
-    }
-
     $(document).ready(function(){
         var families=[];
         $.getJSON('/json/families', function(data, status, xhr){

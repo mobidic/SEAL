@@ -22,9 +22,11 @@
 
     <body>
 
-        <header class="w3-bar w3-top w3-flat-green-sea w3-left-align w3-large" style="z-index:10" id="navHead">
+        <header class="w3-bar w3-top w3-flat-green-sea w3-left-align w3-large" style="z-index:3" id="navHead">
             <div class="w3-bar w3-flat-green-sea w3-left-align w3-large">
-                <span class="w3-button w3-hide-large w3-padding-large w3-hover-flat-turquoise w3-left" onclick="w3_open()"><i class="fa fa-bars"></i></span>
+                {% if current_user.is_authenticated %}
+                    <span class="w3-button w3-hide-arge w3-padding-large w3-hover-flat-turquoise w3-left" onclick="w3_toggle_menu()"><i class="fa fa-bars"></i></span>
+                {% endif %}
                 <a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-left" aria-label="Home" data-balloon-pos="right"><span class="icon-seal"></span> SEAL</a>
                 {% if current_user.is_authenticated %}
                     {% if not current_user.logged %}
@@ -65,6 +67,30 @@
             $(document).on("mouseenter", ".showTitle", function() {
                 $(this).attr('title', this.innerText);
             });
+        </script>
+        <script type="text/javascript">
+            function updateSideBar(){
+                if ($(window).width() <= 992) {
+                    if ($('#sidebar').is(":visible") != $('#overlay').is(":visible")) {
+                        $('#overlay').toggle();
+                    }
+                } else {
+                    if ($('#sidebar').is(":visible")) {
+                        $('.w3-main').css("margin-left","350px");
+                    } else {
+                        $('.w3-main').css("margin-left","0px");
+                    }
+                    if ($('#overlay').is(":visible")) {
+                        $('#overlay').toggle();
+                    }
+                }
+            };
+            $(window).resize(updateSideBar);     // When the browser changes size
+            // Script to open and close sidebar
+            function w3_toggle_menu() {
+                $('#sidebar').toggle();
+                updateSideBar();
+            }
         </script>
 
         {% block script %}{% endblock %}

@@ -60,7 +60,7 @@
 
 {% block content %}
     {% include 'includes/sidebar-sample.j2' %}
-    <div class="w3-main" style="margin-left:350px">
+    <div class="w3-main">
         <div class="w3-container w3-center">
             <h1>{{ sample.samplename}}</h1>
             <div class="w3-dropdown-hover" style="background-color:transparent !important;">
@@ -1522,16 +1522,6 @@
         var d = table.searchBuilder.getDetails();
         $('#filterText').html(JSON.stringify(d));
         $('#filter-modal').toggle();
-    }
-    // Script to open and close sidebar
-    function w3_open() {
-        $('#sidebar').toggle();
-        $('#overlay').toggle();
-    }
-
-    function w3_close() {
-        $('#sidebar').toggle();
-        $('#overlay').toggle();
     }
 
     function openHelpModal(title="Some help", content='Some Content', footer='footer') {
