@@ -811,6 +811,9 @@
                 style:    'os',
                 selector: 'td:not(:nth-last-child(-n+3))'
             },
+            fixedHeader: {
+                headerOffset: $('#navHead').outerHeight(),
+            },
             ajax: '/json/variants/sample/{{ sample.id }}',
             "columns": [
                 {

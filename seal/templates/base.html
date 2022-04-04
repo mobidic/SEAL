@@ -22,7 +22,7 @@
 
     <body>
 
-        <header class="w3-bar w3-top w3-flat-green-sea w3-left-align w3-large" style="z-index:10">
+        <header class="w3-bar w3-top w3-flat-green-sea w3-left-align w3-large" style="z-index:10" id="navHead">
             <div class="w3-bar w3-flat-green-sea w3-left-align w3-large">
                 <span class="w3-button w3-hide-large w3-padding-large w3-hover-flat-turquoise w3-left" onclick="w3_open()"><i class="fa fa-bars"></i></span>
                 <a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-left" aria-label="Home" data-balloon-pos="right"><span class="icon-seal"></span> SEAL</a>
@@ -51,7 +51,7 @@
         </section>
 
         <!-- Footer -->
-        <footer class="w3-bottom w3-container w3-padding w3-center w3-flat-clouds w3-border-top" style="z-index:10">
+        <footer class="w3-bottom w3-container w3-padding w3-center w3-flat-clouds w3-border-top" style="z-index:10" id="navFoot">
             <p class="w3-small w3-text-grey" style="margin:0px">
                 <a href="{{ url_for('index') }}" class="w3-hover-text-black"><span class="icon-seal"></span>
                 <span class="w3-hide-small w3-hide-medium">System of Experiments & Analysis for the Lab</span>
