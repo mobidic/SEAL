@@ -86,7 +86,7 @@
                 }
             };
             // Script to open and close sidebar
-            function w3_toggle_menu() {
+            async function w3_toggle_menu() {
                 if ($(window).width() > 992) {
                     $.ajaxSetup({
                         beforeSend: function(xhr, settings) {
@@ -102,6 +102,8 @@
                 };
                 $('#sidebar').toggle();
                 updateSideBar();
+                await new Promise(r => setTimeout(r, 450));
+                $('.w3-table-all').DataTable().columns.adjust();
             }
             $(window).resize(updateSideBar);
             $(document).ready(function(){
