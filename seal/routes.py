@@ -847,4 +847,11 @@ def add_preferred():
     return 'ok'
 
 
+@app.route("/toggle/user/sidebar", methods=['POST'])
+@login_required
+def toggle_user_sidebar():
+    current_user.sidebar = (not current_user.sidebar)
+    db.session.commit()
+    return "OK"
+
 ################################################################################
