@@ -23,6 +23,10 @@
         */
         .dtfc-fixed-left{z-index:1;}
 
+        .w3-modal {
+            z-index: 6;
+        }
+
         .w3-modal table.dataTable thead th {
             position: relative;
             background-image: none !important;
@@ -60,7 +64,7 @@
 
 {% block content %}
     {% include 'includes/sidebar-sample.j2' %}
-    <div class="w3-main">
+    <div class="w3-main" {% if current_user.sidebar %}style="margin-left:350px"{% endif %}>
         <div class="w3-container w3-center">
             <h1>{{ sample.samplename}}</h1>
             <div class="w3-dropdown-hover" style="background-color:transparent !important;">
@@ -793,13 +797,13 @@
         table = $('#variants').DataTable({
             buttons:[],
             processing: true,
-            "language": {
-                "loadingRecords": '<div class="animation-bar-1"><span style="width:100%"></span></div>',
-                "processing": '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
+            language: {
+                loadingRecords: '<div class="animation-bar-1"><span style="width:100%"></span></div>',
+                processing: '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
             },
             dom: 'Blfrtip',
             scrollX: true,
-            "order": [[ 5, "asc" ]],
+            order: [[ 5, "asc" ]],
             fixedColumns: {
                 left:1,
                 right:1
@@ -815,18 +819,18 @@
                 headerOffset: $('#navHead').outerHeight(),
             },
             ajax: '/json/variants/sample/{{ sample.id }}',
-            "columns": [
+            columns: [
                 {
-                    "className": 'showTitle control-size-100',
-                    "data": "annotations.SYMBOL",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle control-size-100',
+                    data: "annotations.SYMBOL",
+                    render: {
+                        _: function ( data, type, row ) {
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
                             return data;
                         },
-                        "sort": function ( data, type, row ) {
+                        sort: function ( data, type, row ) {
                             if (data == null) {
                                 return -1;
                             }
@@ -835,16 +839,16 @@
                     }
                 },
                 {
-                    "className": 'showTitle control-size-100',
-                    "data": "annotations.Feature",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle control-size-100',
+                    data: "annotations.Feature",
+                    render: {
+                        _: function ( data, type, row ) {
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
                             return data;
                         },
-                        "sort": function ( data, type, row ) {
+                        sort: function ( data, type, row ) {
                             if (data == null) {
                                 return -1;
                             }
@@ -853,18 +857,18 @@
                     }
                 },
                 {
-                    "className": 'showTitle w3-center control-size-75',
-                    "data": "annotations",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle w3-center control-size-75',
+                    data: "annotations",
+                    render: {
+                        _: function ( data, type, row ) {
                             return data["canonical"];
                         },
-                        "export":function ( data, type, row ) {
+                        export:function ( data, type, row ) {
                             select = data["preferred"]? " (selected)": "";
                             canonical = data["canonical"]? "Yes": "No";
                             return canonical + select;
                         },
-                        "display": function ( data, type, row ) {
+                        display: function ( data, type, row ) {
                             color = "w3-text-flat-peter-river";
                             if (data["preferred"]) {
                                 color = "w3-text-flat-alizarin";
@@ -876,7 +880,7 @@
                             }
                             return response;
                         },
-                        "sort": function ( data, type, row ) {
+                        sort: function ( data, type, row ) {
                             if (data["canonical"]) {
                                 response = true;
                             } else {
@@ -887,16 +891,16 @@
                     },
                 },
                 {
-                    "className": 'showTitle control-size-150',
-                    "data": "annotations.EI",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle control-size-150',
+                    data: "annotations.EI",
+                    render: {
+                        _: function ( data, type, row ) {
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
                             return data;
                         },
-                        "sort": function ( data, type, row ) {
+                        sort: function ( data, type, row ) {
                             if (data == null) {
                                 return "NA";
                             }
@@ -913,13 +917,13 @@
                     }
                 },
                 {
-                    "className": 'showTitle control-size-250',
-                    "data": "annotations.HGVSg",
-                    "render" : {
-                        "_" : function ( data, type, row, meta ) {
+                    className: 'showTitle control-size-250',
+                    data: "annotations.HGVSg",
+                    render : {
+                        _: function ( data, type, row, meta ) {
                             return data;
                         },
-                        "sort" : function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             if(data != null) {
                                 var regExp = /(chr)?([0-9XYM]+):g\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|[ACGT]+)?/;
                                 var matches = regExp.exec(data);
@@ -939,10 +943,10 @@
                     },
                 },
                 {
-                    "className": 'showTitle control-size-250',
-                    "data": "annotations.HGVSc",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle control-size-250',
+                    data: "annotations.HGVSc",
+                    render: {
+                        _: function ( data, type, row ) {
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
@@ -952,7 +956,7 @@
                             {% endif %}
                             return mobidetails + data;
                         },
-                        "sort": function ( data, type, row ) {
+                        sort: function ( data, type, row ) {
                             if (data == null) {
                                 return -1;
                             }
@@ -961,16 +965,16 @@
                     }
                 },
                 {
-                    "className": 'showTitle control-size-250',
-                    "data": "annotations.HGVSp",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle control-size-250',
+                    data: "annotations.HGVSp",
+                    render: {
+                        _: function ( data, type, row ) {
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
                             return data;
                         },
-                        "sort": function ( data, type, row ) {
+                        sort: function ( data, type, row ) {
                             if (data == null) {
                                 return -1;
                             }
@@ -979,10 +983,10 @@
                     }
                 },
                 {
-                    "className": 'showTitle size-200',
-                    "data": "filter",
-                    "render": {
-                        "_": function ( data, type, row, meta ) {
+                    className: 'showTitle size-200',
+                    data: "filter",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             cell = ""
                             style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
 
@@ -992,10 +996,10 @@
                             }
                             return cell;
                         },
-                        "filter": function ( data, type, row, meta ) {
+                        filter: function ( data, type, row, meta ) {
                             return data.toString();
                         },
-                        "sort": function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             var val = 0;
                             var zero = "000000000";
                             for (idx in data) {
@@ -1007,18 +1011,18 @@
                             return val
                         }
                     },
-                    "sType": "numeric"
+                    sType: "numeric"
                 },
-                { "className": 'showTitle control-size-100', "data": "depth"},
-                { "className": 'showTitle control-size-100', "data": "allelic_depth"},
+                { className: 'showTitle control-size-100', data: "depth"},
+                { className: 'showTitle control-size-100', data: "allelic_depth"},
                 {
-                    "className": 'showTitle control-size-100',
-                    "data": "allelic_frequency",
-                    "render": {
-                        "_" : function ( data, type, row, meta ) {
+                    className: 'showTitle control-size-100',
+                    data: "allelic_frequency",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             return data
                         },
-                        "display" : function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             if (data >=0 && data < 0.25) {
                                 return '<i class="far fa-dot-circle"></i> ' + data;
                             } else if (data < 0.75) {
@@ -1031,10 +1035,10 @@
                     }
                 },
                 {
-                    "className": 'showTitle control-size-100',
-                    "data": "annotations.gnomADg_AF",
-                    "render" : {
-                        "_" : function ( data, type, row, meta ) {
+                    className: 'showTitle control-size-100',
+                    data: "annotations.gnomADg_AF",
+                    render : {
+                        _: function ( data, type, row, meta ) {
                             if(data != null) {
                                 if (isNaN(parseFloat(data).toFixed(6))) {
                                     return null
@@ -1044,7 +1048,7 @@
                                 return null;
                             }
                         },
-                        "display" : function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             if(data != null) {
                                 if (isNaN(parseFloat(data).toFixed(6))) {
                                     return "<i>NA</i>"
@@ -1054,7 +1058,7 @@
                                 return "<i>NA</i>";
                             }
                         },
-                        "sort" : function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             if(data != null) {
                                 if (isNaN(parseFloat(data).toFixed(6))) {
                                     return -0.5
@@ -1067,10 +1071,10 @@
                     },
                 },
                 {
-                    "className": 'showTitle control-size-125',
-                    "data": "inseal",
-                    "render" : {
-                        "_" : function ( data, type, row, meta ) {
+                    className: 'showTitle control-size-125',
+                    data: "inseal",
+                    render : {
+                        _: function ( data, type, row, meta ) {
                             if (data["total_samples"] > 0) {
                                  return (data["occurrences"]/data["total_samples"]).toFixed(4);
                             } else {
@@ -1080,17 +1084,17 @@
                     },
                 },
                 {
-                    "className": 'showTitle control-size-125',
-                    "data": "inseal.occurrences",
+                    className: 'showTitle control-size-125',
+                    data: "inseal.occurrences",
                 },
                 {
-                    "className": 'showTitle size-125',
-                    "data": "inseal",
-                    "render" : {
-                        "_" : function ( data, type, row, meta ) {
+                    className: 'showTitle size-125',
+                    data: "inseal",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             return data["occurences_family"];
                         },
-                        "display" : function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             if(data["occurences_family"] != null) {
                                 val = data["occurences_family"];
                                 members = ""
@@ -1102,7 +1106,7 @@
                                 return "<i>NA</i>";
                             }
                         },
-                        "sort" : function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             if(data["occurences_family"] != null) {
                                 return data["occurences_family"];
                             } else {
@@ -1112,10 +1116,10 @@
                     },
                 },
                 {
-                    "className": 'showTitle size-300',
-                    "data": "annotations.CLIN_SIG",
-                    "render": {
-                        "_": function ( data, type, row, meta ) {
+                    className: 'showTitle size-300',
+                    data: "annotations.CLIN_SIG",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             cell = {
                                 "orange": "",
                                 "alizarin": "",
@@ -1131,10 +1135,10 @@
                             }
                             return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
                         },
-                        "filter": function ( data, type, row, meta ) {
+                        filter: function ( data, type, row, meta ) {
                             return data.toString();
                         },
-                        "sort": function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             score = 0;
                             for (idx in data) {
                                 score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
@@ -1142,31 +1146,31 @@
                             return score;
                         },
                     },
-                    "sType": "numeric"
+                    sType: "numeric"
                 },
                 {
-                    "className": 'showTitle size-100',
-                    "data": "annotations.IMPACT",
-                    "render": {
-                        "_": function ( data, type, row, meta ) {
+                    className: 'showTitle size-100',
+                    data: "annotations.IMPACT",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
                             cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
                             return cell;
                         },
-                        "filter": function ( data, type, row, meta ) {
+                        filter: function ( data, type, row, meta ) {
                             return data.toString();
                         },
-                        "sort": function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             return impact_dict[data]["score"];
                         },
                     },
-                    "sType": "numeric"
+                    sType: "numeric"
                 },
                 {
-                    "className": 'showTitle size-300',
-                    "data": "annotations.Consequence",
-                    "render": {
-                        "_": function ( data, type, row, meta ) {
+                    className: 'showTitle size-300',
+                    data: "annotations.Consequence",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             cell = "";
                             for (idx in consequences_dict) {
                                 if (data.includes(idx)){
@@ -1177,10 +1181,10 @@
                             }
                             return cell;
                         },
-                        "filter": function ( data, type, row, meta ) {
+                        filter: function ( data, type, row, meta ) {
                             return data.toString();
                         },
-                        "sort": function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             var sort = 0;
                             for (idx in data) {
                                 sort += consequences_dict[data[idx]]["score"];
@@ -1188,19 +1192,19 @@
                             return Math.log10(sort);
                         }
                     },
-                    "sType": "numeric"
+                    sType: "numeric"
                 },
                 {
-                    "className": 'showTitle size-100',
-                    "data": "annotations.MES_var",
-                    "render": {
-                        "_": function ( data, type, row, meta ) {
+                    className: 'showTitle size-100',
+                    data: "annotations.MES_var",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             if (data == null){
                                 return -999;
                             }
                             return Math.abs(parseFloat(data).toFixed(3));
                         },
-                        "display": function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             if (data == null){
                                 return "<i>NA</i>";
                             }
@@ -1214,16 +1218,16 @@
                     },
                 },
                 {
-                    "className": 'showTitle size-125',
-                    "data": "annotations.spliceAI",
-                    "render": {
-                        "_": function ( data, type, row, meta ) {
+                    className: 'showTitle size-125',
+                    data: "annotations.spliceAI",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             if (data == null){
                                 return null;
                             }
                             return parseFloat(data).toFixed(3);
                         },
-                        "display": function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             if (data == null){
                                 return "<i>NA</i>";
                             }
@@ -1241,17 +1245,17 @@
                     },
                 },
                 {
-                    "className": 'showTitle size-100',
-                    "data": "annotations.missensesMean",
-                    "render": {
-                        "_" : function ( data, type, row, meta ) {
+                    className: 'showTitle size-100',
+                    data: "annotations.missensesMean",
+                    render: {
+                        _: function ( data, type, row, meta ) {
                             if(data != null) {
                                 return data.toFixed(4);
                             } else {
                                 return null;
                             }
                         },
-                        "display" : function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             if (data == null){
                                 return "<i>NA</i>";
                             }
@@ -1268,7 +1272,7 @@
                             }
                             return "<span class='" + classw3css + "'>" + value + "</span>";
                         },
-                        "sort" : function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             if(data != null) {
                                 return data.toFixed(4);
                             } else {
@@ -1279,10 +1283,10 @@
                     },
                 },
                 {
-                    "className": 'showTitle size-25 w3-center',
-                    "data": {
-                        "_": "reported",
-                        "display" : function ( data, type, row, meta ) {
+                    className: 'showTitle size-25 w3-center',
+                    data: {
+                        _: "reported",
+                        display: function ( data, type, row, meta ) {
                             const id_var=data["id"];
                             const id=data["id"] + "reported";
                             if (data["reported"]) {
@@ -1291,7 +1295,7 @@
                                 return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',{{ sample.id }}, \'reported\');">';
                             }
                         },
-                        "sort" : function ( data, type, row, meta ) {
+                        sort: function ( data, type, row, meta ) {
                             if (data["reported"]) {
                                 return 1;
                             } else {
@@ -1301,10 +1305,10 @@
                     }
                 },
                 {
-                    "className": 'showTitle size-200 w3-center',
-                    "data": {
-                        "_": "class_variant",
-                        "display": function ( data, type, row ) {
+                    className: 'showTitle size-200 w3-center',
+                    data: {
+                        _: "class_variant",
+                        display: function ( data, type, row ) {
                             if(data) {
                                 id_var = data.id
                                 class_variant = data.class_variant ? data.class_variant : 0;
@@ -1328,21 +1332,21 @@
                     }
                 },
                 {
-                    "className":      'details-control w3-center',
-                    "orderable":      false,
-                    "data":           "id",
-                    "render": {
-                        "_": function ( data, type, row ) {
+                    className: 'details-control w3-center',
+                    orderable: false,
+                    data: "id",
+                    render: {
+                        _: function ( data, type, row ) {
                             return data;
                         },
-                        "display": function ( data, type, row ) {
+                        display: function ( data, type, row ) {
                             details = '<i onclick="openDetailsVariantModal(\'' + data + '\', {{ sample.id }})" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i>'
                             return details;
                         },
                     },
                 },
             ],
-            "initComplete": function(settings, json) {
+            initComplete: function(settings, json) {
                 changeFilter({{ current_user.filter_id }});
                 $('#selectFilter').prop('disabled', false);
                 table.button().add( 0, {
@@ -2138,9 +2142,9 @@
 
             $('#tableComments').DataTable({
                 searching:false,
-                "lengthMenu": [ 10 ],
-                "dom": 'tip',
-                "order": [[ 2, "desc" ]],
+                lengthMenu: [ 10 ],
+                dom: 'tip',
+                order: [[ 2, "desc" ]],
                 columnDefs: [
                        {
                            orderable: false,
@@ -2282,15 +2286,13 @@
 
                 $('#tableComments').DataTable({
                     searching:false,
-                    "lengthMenu": [ 10 ],
-                    "dom": 'tip',
-                    "order": [[ 2, "desc" ]],
-                    columnDefs: [
-                           {
-                               orderable: false,
-                            targets:  "no-sort"
-                           }
-                       ],
+                    lengthMenu: [ 10 ],
+                    dom: 'tip',
+                    order: [[ 2, "desc" ]],
+                    columnDefs: [{
+                        orderable: false,
+                        targets:  "no-sort"
+                    }],
                 });
             });
         });
@@ -2310,7 +2312,8 @@
             type: "POST",
             url: "/add/filter",
             data: {
-                "name": name, "filter": JSON.stringify(filter)
+                name: name,
+                filter: JSON.stringify(filter)
             }
         }).done(function() {
             $('#filter-modal').toggle();

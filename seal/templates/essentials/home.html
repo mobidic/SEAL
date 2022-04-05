@@ -19,9 +19,9 @@
 
 {% block content %}
     {% include 'includes/sidebar.j2' %}
-    <div class="w3-main">
+    <div class="w3-main" {% if current_user.sidebar %}style="margin-left:350px"{% endif %}>
         <div class="w3-padding">
-            <table id="samples" class="w3-table-all w3-hoverable" style="width:100%">
+            <table id="samples" class="w3-table-all" style="width:100%">
                 <thead>
                     <tr>
                         <th class="w3-flat-green-sea"><div>Sample Name</div></th>
@@ -101,8 +101,9 @@
 
     $(document).ready(function() {
         table = $('#samples').DataTable({
-            scrollX: true,
-            "proccessing": true,  "serverSide": true,
+            scrollX: false,
+            proccessing: true,
+            serverSide: true,
             ajax: {
                 url: '/json/samples',
                 type: 'POST',
@@ -110,10 +111,10 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
             },
-            "columns": [
+            columns: [
                 {
-                    "className": 'showTitle',
-                    "data": {
+                    className: 'showTitle',
+                    data: {
                         _: "samplename",
                         display: function ( data, type, row ) {
                             if(data) {
@@ -123,14 +124,14 @@
                         }
                     }
                 },
-                { "className": 'showTitle', "data": "family" },
-                { "className": 'showTitle', "data": "run.name" },
-                { "className": 'showTitle', "data": "run.alias" },
+                { className: 'showTitle', data: "family" },
+                { className: 'showTitle', data: "run.name" },
+                { className: 'showTitle', data: "run.alias" },
                 {
-                    "className": 'showTitle ',
-                    "data": {
-                        "_": "status",
-                        "display": function ( data, type, row ) {
+                    className: 'showTitle ',
+                    data: {
+                        _: "status",
+                        display: function ( data, type, row ) {
                             response = "";
                             if(data) {
                                 if (data.status == -1) {
@@ -169,11 +170,11 @@
                     }
                 },
                 {
-                    "className": 'showTitle',
-                    "orderable": false,
-                    "data": "teams",
-                    "render" : {
-                        "_": function ( data, type, row ) {
+                    className: 'showTitle',
+                    orderable: false,
+                    data: "teams",
+                    render : {
+                        _: function ( data, type, row ) {
                             if (data.length >= 1) {
                                 teams = ""
                                 for (i in data) {
@@ -186,7 +187,7 @@
                     }
                 }
             ],
-            "createdRow": function( row, data, dataIndex ) {
+            createdRow: function( row, data, dataIndex ) {
                 if ( data.status < 1 || data.status > 3) {
                     $(row).addClass( 'w3-disabled' );
                 }
