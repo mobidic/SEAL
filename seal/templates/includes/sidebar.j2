@@ -2,7 +2,7 @@
 
 <!-- Sidebar/menu -->
 
-<nav class="w3-sidebar w3-bar-block w3-flat-clouds" style="z-index:5;width:350px;display:none;" id="sidebar">
+<nav class="w3-sidebar w3-bar-block w3-flat-clouds" style="z-index:5;width:350px;display:{% if current_user.sidebar %}block{% else %}none{% endif %}";" id="sidebar">
 	<div class="w3-container">
 		{% include "includes/flash.j2" %}
 		<div class="w3-row w3-display-container w3-margin">

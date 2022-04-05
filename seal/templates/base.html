@@ -104,14 +104,11 @@
                 updateSideBar();
             }
             $(window).resize(updateSideBar);
-            {% if current_user.sidebar %}
             $(document).ready(function(){
-                if ($(window).width() > 992 && $('#sidebar').not(":visible")) {
+                if ($(window).width() <= 992 && $('#sidebar').is(":visible")) {
                     $('#sidebar').toggle();
-                    $('.w3-main').css("margin-left","350px");
                 }
             });
-            {% endif %}
         </script>
 
         {% block script %}{% endblock %}
