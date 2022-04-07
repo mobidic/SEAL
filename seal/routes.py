@@ -699,13 +699,10 @@ def json_filter(id=1):
 @login_required
 def json_filters():
     filters = Filter.query.all()
-    if not filters:
-        flash(f"Error filter not found! Please contact your administrator! (id - {id})", category="error")
-        return redirect(url_for('index'))
-
     filter = dict()
-    for f in filters:
-        filter[f.id] = f.filtername
+    if filters:
+        for f in filters:
+            filter[f.id] = f.filtername
     return jsonify(filter)
 
 
@@ -713,13 +710,10 @@ def json_filters():
 @login_required
 def json_beds():
     beds = Bed.query.all()
-    if not beds:
-        flash(f"Error filter not found! Please contact your administrator! (id - {id})", category="error")
-        return redirect(url_for('index'))
-
     bed = dict()
-    for b in beds:
-        bed[b.id] = b.name
+    if not beds:
+        for b in beds:
+            bed[b.id] = b.name
     return jsonify(bed)
 
 
