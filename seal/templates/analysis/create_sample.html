@@ -5,6 +5,12 @@
     <script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.css') }}">
     <script src="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.js') }}"></script>
+
+    <style>
+        .vsb-menu {
+            z-index:1 !important;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
