@@ -27,35 +27,6 @@
             z-index: 6;
         }
 
-        .w3-modal table.dataTable thead th {
-            position: relative;
-            background-image: none !important;
-        }
-        .w3-modal table.dataTable thead .sorting {
-            background-image: none !important;
-        }
-        .w3-modal table.dataTable thead th.sorting:after,
-        .w3-modal table.dataTable thead th.sorting_asc:after,
-        .w3-modal table.dataTable thead th.sorting_desc:after {
-            position: absolute !important;
-            top: 12px !important;
-            right: 8px !important;
-            font-size: 0.8em !important;
-            font-family: 'Font Awesome\ 5 Free' !important;
-        }
-        .w3-modal table.dataTable thead th.sorting:after {
-            content: "\f0dc" !important;
-            opacity:0.5;
-        }
-        .w3-modal table.dataTable thead th.sorting_asc:after {
-            opacity:1;
-            content: "\f0dd" !important;
-        }
-        .w3-modal table.dataTable thead th.sorting_desc:after {
-            opacity:1;
-            content: "\f0de" !important;
-        }
-
         #variants_processing {
             background: none;
         }
@@ -107,6 +78,10 @@
             <div class="w3-row w3-padding">
                 <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
                 <select disabled id="selectFilter" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
+                </select>
+                
+                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fas fa-th-list"></i> <b>Choose a panel</b></div>
+                <select disabled id="selectBed" class="w3-select w3-border w3-col m3 l2 s6" onchange="applied_panel(value);">
                 </select>
             </div>
             <div class="w3-padding">
@@ -794,6 +769,15 @@
             $('#selectFilter').html(options);
         });
 
+        $.getJSON("/json/beds", function(data) {
+            var options = '<option value="0" selected>No panel</option>';
+            for (x in data) {
+                option = '<option value="' + x + '">' + data[x] + '</option>';
+                options += option;
+            }
+            $('#selectBed').html(options);
+        });
+
         table = $('#variants').DataTable({
             buttons:[],
             processing: true,
@@ -1349,6 +1333,7 @@
             initComplete: function(settings, json) {
                 changeFilter({{ current_user.filter_id }});
                 $('#selectFilter').prop('disabled', false);
+                $('#selectBed').prop('disabled', false);
                 table.button().add( 0, {
                     extend: 'searchBuilder',
                     text: 'Create Filter'
@@ -2334,6 +2319,14 @@
                 $('#selectFilter').html(options)
             });
         })
+    }
+    function applied_panel(id) {
+        $("#variants_processing").css("visibility","show");
+        $("#variants_processing").attr('style', 'display: block; z-index: 10000 !important');
+        $("#variants").css('opacity', '0.6');
+        table = $('#variants').DataTable();
+        table.ajax.url( '/json/variants/sample/{{ sample.id }}/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
+
     }
 </script>
 {% endblock %}

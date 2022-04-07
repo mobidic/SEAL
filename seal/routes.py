@@ -468,7 +468,7 @@ def json_variants(id, idbed=False, version=-1):
         flash(f"Error sample not found! Please contact your administrator! (id - {id})", category="error")
         return redirect(url_for('index'))
 
-    if idbed:
+    if idbed >= 1:
         bed = Bed.query.get(int(idbed))
 
     variants = {"data": list()}
@@ -480,6 +480,11 @@ def json_variants(id, idbed=False, version=-1):
     var2samples = db.session.query(Var2Sample).filter(Var2Sample.sample_ID == int(id))
     for var2sample in var2samples:
         variant = db.session.query(Variant).filter(Variant.id == var2sample.variant_ID).first()
+        try:
+            if bed and not bed.varInBed(variant):
+                continue
+        except NameError:
+            pass
         annotations = variant.annotations
         main_annot = None
         consequence_score = -999
@@ -702,6 +707,20 @@ def json_filters():
     for f in filters:
         filter[f.id] = f.filtername
     return jsonify(filter)
+
+
+@app.route("/json/beds")
+@login_required
+def json_beds():
+    beds = Bed.query.all()
+    if not beds:
+        flash(f"Error filter not found! Please contact your administrator! (id - {id})", category="error")
+        return redirect(url_for('index'))
+
+    bed = dict()
+    for b in beds:
+        bed[b.id] = b.name
+    return jsonify(bed)
 
 
 @app.route("/json/variant/<string:id>")
