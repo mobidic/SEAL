@@ -16,6 +16,9 @@
 
 
         <script defer src="{{ url_for('static', filename='fontawesome-free-5/js/all.js') }}"></script>
+
+        {% if current_user.sidebar %}<style>.w3-main {margin-left:350px}</style>{% endif %}
+
         {% block static %}
         {% endblock %}
     </head>
