@@ -85,7 +85,7 @@
                     <div class="w3-row w3-section w3-display-container">
                         <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.teams.label(class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
-                            {{ form.teams(id="example3") }}
+                            {{ form.teams(id="multiSelectTeams") }}
                         </div>
                     </div>
 
@@ -142,7 +142,7 @@
         });
     });
 
-    let mySelect3 = new vanillaSelectBox("#example3",{
+    let multiSelectTeams = new vanillaSelectBox("#multiSelectTeams",{
         search: true,
         stayOpen:true,
         maxHeight:150

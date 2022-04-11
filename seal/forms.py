@@ -127,6 +127,9 @@ class SaveFilterForm(FlaskForm):
         'Filter Name',
         validators=[DataRequired(), Length(min=2, max=20)]
     )
+
+    teams = SelectMultipleField('Teams', coerce=int)
+
     filterText = TextAreaField(
         'Filters',
         validators=[DataRequired()]

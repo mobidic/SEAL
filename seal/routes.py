@@ -285,6 +285,11 @@ def sample(id):
     commentForm = AddCommentForm()
     saveFilterForm = SaveFilterForm()
 
+    choices = [(team.id, team.teamname) for team in Team.query.all()]
+    saveFilterForm.teams.choices = choices
+    saveFilterForm.teams.data = [team.id for team in current_user.teams]
+
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
@@ -838,9 +843,14 @@ def add_comment():
 @app.route("/add/filter", methods=['POST'])
 @login_required
 def add_filter():
+    teams = list()
+    for id in json.loads(request.form['teams']):
+        if id > 0:
+            teams.append(Team.query.get(id))
     filter = Filter(
         filtername=urllib.parse.unquote(request.form["name"]),
-        filter=json.loads(request.form["filter"])
+        filter=json.loads(request.form["filter"]),
+        teams=teams
     )
     db.session.add(filter)
     db.session.commit()

@@ -2,6 +2,9 @@
 
 {% block static %}
     <script src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.css') }}">
+    <script src="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.js') }}"></script>
+
     {% include 'includes/loading_bar.dt.j2' %}
 
     <style>
@@ -298,6 +301,13 @@
                         {% else %}
                             {{ saveFilterForm.filterName(class="w3-input w3-border") }}
                         {% endif %}
+                    </div>
+                </div>
+
+                <div class="w3-row w3-section w3-display-container">
+                    <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-users"></i></div>
+                    <div class="w3-rest">
+                        {{ saveFilterForm.teams(id="multiSelectTeams") }}
                     </div>
                 </div>
                 <div class="w3-row w3-section">
@@ -2293,12 +2303,19 @@
         });
         var name = $("#filterName").val();
         var filter = JSON.parse($("#filterText").text());
+        var teams = [];
+        var elt = $("#btn-group-multiSelectTeams").find('.vsb-menu').find('.multi').find('.active');
+        for (i in [...Array(elt.length).keys()]) {
+            teams.push(elt[i].value);
+            console.log(teams);
+        }
         $.ajax({
             type: "POST",
             url: "/add/filter",
             data: {
                 name: name,
-                filter: JSON.stringify(filter)
+                filter: JSON.stringify(filter),
+                teams: JSON.stringify(teams)
             }
         }).done(function() {
             $('#filter-modal').toggle();
@@ -2326,7 +2343,12 @@
         $("#variants").css('opacity', '0.6');
         table = $('#variants').DataTable();
         table.ajax.url( '/json/variants/sample/{{ sample.id }}/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
-
     }
+
+    let multiSelectTeams = new vanillaSelectBox("#multiSelectTeams",{
+        search: true,
+        stayOpen:true,
+        maxHeight:150
+    });
 </script>
 {% endblock %}
