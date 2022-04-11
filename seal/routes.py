@@ -711,9 +711,8 @@ def json_filters():
 def json_beds():
     beds = Bed.query.all()
     bed = dict()
-    if not beds:
-        for b in beds:
-            bed[b.id] = b.name
+    for b in beds:
+        bed[b.id] = b.name
     return jsonify(bed)
 
 

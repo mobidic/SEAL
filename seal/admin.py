@@ -151,7 +151,9 @@ admin.add_view(
     CustomView(
         Region,
         db.session,
-        category="Bed"
+        category="Bed",
+        column_searchable_list=["name", "chr", "start", "stop"],
+        column_editable_list=["name", "chr", "start", "stop"]
     )
 )
 
@@ -159,7 +161,10 @@ admin.add_view(
     CustomView(
         Bed,
         db.session,
-        category="Bed"
+        category="Bed",
+        column_searchable_list=["name"],
+        column_editable_list=["name"],
+        form_excluded_columns=['regions']
     )
 )
 

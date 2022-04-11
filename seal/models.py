@@ -234,7 +234,7 @@ region2bed = db.Table(
 
 class Region(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), unique=False, nullable=False)
+    name = db.Column(db.String(75), unique=False, nullable=False)
     chr = db.Column(db.String(50), unique=False, nullable=False)
     start = db.Column(db.Integer, unique=False, nullable=False)
     stop = db.Column(db.Integer, unique=False, nullable=False)
@@ -251,7 +251,7 @@ class Region(db.Model):
 
 class Bed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30), unique=True, nullable=False)
+    name = db.Column(db.String(75), unique=True, nullable=False)
 
     regions = db.relationship(
         'Region', secondary=region2bed, lazy='subquery',
