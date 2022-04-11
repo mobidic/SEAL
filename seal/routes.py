@@ -702,7 +702,8 @@ def json_filters():
     filter = dict()
     if filters:
         for f in filters:
-            filter[f.id] = f.filtername
+            if bool(set(current_user.teams) & set(f.teams)) or not f.teams:
+                filter[f.id] = f.filtername
     return jsonify(filter)
 
 
@@ -711,8 +712,10 @@ def json_filters():
 def json_beds():
     beds = Bed.query.all()
     bed = dict()
-    for b in beds:
-        bed[b.id] = b.name
+    if beds:
+        for b in beds:
+            if bool(set(current_user.teams) & set(b.teams)) or not b.teams:
+                bed[b.id] = b.name
     return jsonify(bed)
 
 

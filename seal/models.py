@@ -193,10 +193,28 @@ class Var2Sample(db.Model):
         return f"Var2Sample('{self.sample}','{self.variant}')"
 
 
+team2filter = db.Table(
+    'team2filter',
+    db.Column(
+        'team_ID', db.Integer,
+        db.ForeignKey('team.id'), primary_key=True
+    ),
+    db.Column(
+        'filter_ID', db.Integer,
+        db.ForeignKey('filter.id'), primary_key=True
+    )
+)
+
+
 class Filter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filtername = db.Column(db.String(20), unique=True, nullable=False)
     filter = db.Column(db.JSON, nullable=True)
+
+    teams = db.relationship(
+        'Team', secondary=team2filter, lazy='subquery',
+        backref=db.backref('filters', lazy=True)
+    )
 
     def __repr__(self):
         return f"{self.filtername}"
@@ -231,6 +249,18 @@ region2bed = db.Table(
     )
 )
 
+team2bed = db.Table(
+    'team2bed',
+    db.Column(
+        'team_ID', db.Integer,
+        db.ForeignKey('team.id'), primary_key=True
+    ),
+    db.Column(
+        'bed_ID', db.Integer,
+        db.ForeignKey('bed.id'), primary_key=True
+    )
+)
+
 
 class Region(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -255,6 +285,11 @@ class Bed(db.Model):
 
     regions = db.relationship(
         'Region', secondary=region2bed, lazy='subquery',
+        backref=db.backref('beds', lazy=True)
+    )
+
+    teams = db.relationship(
+        'Team', secondary=team2bed, lazy='subquery',
         backref=db.backref('beds', lazy=True)
     )
 
