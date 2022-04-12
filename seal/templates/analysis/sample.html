@@ -794,6 +794,12 @@
             language: {
                 loadingRecords: '<div class="animation-bar-1"><span style="width:100%"></span></div>',
                 processing: '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
+                searchBuilder: {
+                    button: {
+                        0: 'Create filter',
+                        _: 'Filter(s) (%d)'
+                    },
+                }
             },
             dom: 'Blfrtip',
             scrollX: true,
@@ -1346,7 +1352,6 @@
                 $('#selectBed').prop('disabled', false);
                 table.button().add( 0, {
                     extend: 'searchBuilder',
-                    text: 'Create Filter'
                 } );
                 table.button().add( 1, {
                     text: 'Save Filter',
