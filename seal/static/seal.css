@@ -196,3 +196,8 @@ table.dataTable thead th.sorting_desc:after {
 .dtfc-fixed-right {
     border-left: 1px solid #063027; !important;
 }
+
+.w3-dropdown-hover-turquoise:hover > .w3-button:first-child {
+    color:#fff!important;
+    background-color:#1abc9c!important
+}
