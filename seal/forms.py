@@ -3,8 +3,9 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectMultipleField
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
-from seal.models import User, Sample, Run, Team
+from seal.models import User, Sample, Run, Team, Bed, Region
 from seal import bcrypt
+import pandas as pd
 
 
 ################################################################################
@@ -111,6 +112,36 @@ class UploadVariantForm(FlaskForm):
             sample = Sample.query.filter_by(samplename=samplename.data, runid=None).first()
         if sample:
             raise ValidationError('This Sample Name is already in database!')
+
+
+class UploadPanelForm(FlaskForm):
+    name = StringField(
+        'Panel Name',
+        validators=[DataRequired(), Length(min=2, max=20)]
+    )
+    bed = FileField(
+        'Upload file',
+        validators=[DataRequired(), FileAllowed(['bed', 'txt', 'csv', 'tsv'])]
+    )
+    teams_choices = [(team.id, team.teamname) for team in Team.query.all()]
+    teams = SelectMultipleField('Teams', choices=teams_choices, coerce=int)
+
+    submit = SubmitField('Create New Panel')
+
+    def validate_name(self, name):
+        bed_name = Bed.query.filter_by(name=name.data).first()
+        if bed_name:
+            raise ValidationError('This Panel Name is already in database! Please choose another one.')
+
+    def validate_bed(self, bed):
+        self.df = pd.read_csv(bed.data, sep='\t', header=None)
+        if len(self.df.columns) == 2 or len(self.df.columns) > 12:
+            raise ValidationError('Error when parsing file : BED or list of Region name.')
+        for index, row in self.df.iterrows():
+            if len(self.df.columns) == 1:
+                region = Region.query.filter_by(name=row[0]).first()
+                if not region:
+                    raise ValidationError(f'Region: "{row[0]}" not found in SEAL.')
 
 
 class AddCommentForm(FlaskForm):

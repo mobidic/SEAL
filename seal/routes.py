@@ -6,8 +6,8 @@ from datetime import datetime
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from sqlalchemy import or_, and_
@@ -289,7 +289,6 @@ def sample(id):
     saveFilterForm.teams.choices = choices
     saveFilterForm.teams.data = [team.id for team in current_user.teams]
 
-
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
@@ -362,6 +361,35 @@ def create_variant():
         'analysis/create_sample.html', title="Add Sample",
         form=uploadSampleForm,
         user_teams=[team.teamname for team in current_user.teams]
+    )
+
+
+@app.route("/create/panel", methods=['GET', 'POST'])
+@login_required
+def create_panel():
+    uploadPanelForm = UploadPanelForm()
+    if "submit" in request.form and uploadPanelForm.validate_on_submit():
+        panel = Bed(name=uploadPanelForm.name.data)
+        panel.teams = [Team.query.get(team_id) for team_id in uploadPanelForm.teams.data]
+        db.session.add(panel)
+        for index, row in uploadPanelForm.df.iterrows():
+            if len(uploadPanelForm.df.columns) == 1:
+                region = Region.query.filter_by(name=row[0]).first()
+                panel.regions.append(region)
+            if (len(uploadPanelForm.df.columns) >= 3) and (len(uploadPanelForm.df.columns) <= 12):
+                random_hex = secrets.token_hex(8)
+                name = f"{random_hex}-{row[3]}" if 3 in row else random_hex
+                region = Region(name=name, chr=row[0], start=row[1], stop=row[2])
+                db.session.add(region)
+                panel.regions.append(region)
+        db.session.commit()
+        flash('Your account has been updated!', 'success')
+
+    uploadPanelForm.teams.data = [team.id for team in current_user.teams]
+
+    return render_template(
+        'analysis/create_panel.html', title="Add Panel",
+        form=uploadPanelForm
     )
 
 

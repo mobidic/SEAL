@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block static %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
+    <script src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.css') }}">
+    <script src="{{ url_for('static', filename='vanillaSelectBox/vanillaSelectBox.js') }}"></script>
+
+    <style>
+        .vsb-menu {
+            z-index:1 !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% include 'includes/sidebar.j2' %}
+    <div class="w3-main">
+        <div class="w3-padding w3-mobile">
+            <div class="w3-card w3-padding w3-mobile">
+                <div class="w3-container w3-border-bottom">
+                    <h3>Upload A New Panel</h3>
+                </div>
+
+                <form class="w3-container"  action="" method="post" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px">
+                            <i class="w3-xxlarge fas fa-tag"></i> {{ form.name.label(class="w3-display-right", style="font-weight: bold;")}}
+                        </div>
+                        <div class="w3-rest">
+                            {% if form.name.errors %}
+                                {{ form.name(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.name.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.name(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="w3-row w3-section w3-display-container">
+                        <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.teams.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.teams.errors %}
+                                {{ form.teams(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.teams.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.teams(id="multiSelectTeams") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.bed.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.bed.errors %}
+                                {{ form.bed(class="w3-input w3-border-0 w3-text-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.bed.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.bed(class="w3-input w3-border-0") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="w3-section w3-center">
+                        {{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+                    </div>
+                </form>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+<script type="text/javascript">
+    let multiSelectTeams = new vanillaSelectBox("#multiSelectTeams",{
+        search: true,
+        stayOpen:true,
+        maxHeight:150
+    });
+</script>
+{% endblock %}
