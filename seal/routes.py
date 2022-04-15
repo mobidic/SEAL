@@ -170,7 +170,7 @@ def login():
             flash(f'You are logged as: {user.username}!', 'success')
             return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
-            flash('Login unsucessful. Please check the username and/or password!', 'error')
+            flash('Login unsucessful. Please check username and/or password!', 'error')
     return render_template(
         "authentication/login.html",
         title="Login",
@@ -350,7 +350,7 @@ def create_variant():
         }
         add_vcf(info, uploadSampleForm.vcf_file.data)
 
-        flash(f'The sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
+        flash(f'Sample {uploadSampleForm.samplename.data} will be added soon!', 'info')
         return redirect(url_for('index'))
 
     choices = [(team.id, team.teamname) for team in Team.query.all()]
