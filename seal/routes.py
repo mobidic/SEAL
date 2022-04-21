@@ -374,8 +374,9 @@ def create_panel():
         db.session.add(panel)
         for index, row in uploadPanelForm.df.iterrows():
             if len(uploadPanelForm.df.columns) == 1:
-                region = Region.query.filter_by(name=row[0]).first()
-                panel.regions.append(region)
+                region = Region.query.filter_by(name=row[0]).all()
+                for r in region:
+                    panel.regions.append(r)
             if (len(uploadPanelForm.df.columns) >= 3) and (len(uploadPanelForm.df.columns) <= 12):
                 random_hex = secrets.token_hex(8)
                 name = f"{random_hex}-{row[3]}" if 3 in row else random_hex
@@ -383,7 +384,8 @@ def create_panel():
                 db.session.add(region)
                 panel.regions.append(region)
         db.session.commit()
-        flash('Your account has been updated!', 'success')
+        flash(f'New Panel Uploaded : {uploadPanelForm.name.data}', 'success')
+        return redirect(url_for('index'))
 
     uploadPanelForm.teams.data = [team.id for team in current_user.teams]
 
