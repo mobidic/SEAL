@@ -996,6 +996,13 @@
                     render: {
                         _: function ( data, type, row, meta ) {
                             cell = ""
+                            for (idx in data) {
+                                cell += data[idx] + " | ";
+                            }
+                            return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                        },
+                        dispaly: function ( data, type, row, meta ) {
+                            cell = ""
                             style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
 
                             for (idx in data) {
@@ -1128,6 +1135,13 @@
                     data: "annotations.CLIN_SIG",
                     render: {
                         _: function ( data, type, row, meta ) {
+                            cell = "";
+                            for (idx in data) {
+                                cell += data[idx] + " | "
+                            }
+                            return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                        },
+                        display: function ( data, type, row, meta ) {
                             cell = {
                                 "orange": "",
                                 "alizarin": "",
@@ -1161,6 +1175,9 @@
                     data: "annotations.IMPACT",
                     render: {
                         _: function ( data, type, row, meta ) {
+                            return data;
+                        },
+                        display: function ( data, type, row, meta ) {
                             style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
                             cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
                             return cell;
@@ -1179,6 +1196,15 @@
                     data: "annotations.Consequence",
                     render: {
                         _: function ( data, type, row, meta ) {
+                            cell = "";
+                            for (idx in consequences_dict) {
+                                if (data.includes(idx)){
+                                    cell += idx + " | "
+                                }
+                            }
+                            return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                        },
+                        display: function ( data, type, row, meta ) {
                             cell = "";
                             for (idx in consequences_dict) {
                                 if (data.includes(idx)){
@@ -1208,7 +1234,7 @@
                     render: {
                         _: function ( data, type, row, meta ) {
                             if (data == null){
-                                return -999;
+                                return null;
                             }
                             return Math.abs(parseFloat(data).toFixed(3));
                         },
@@ -1297,6 +1323,13 @@
                         _: function ( data, type, row, meta ) {
                             inheritances = ""
                             for (d in data) {
+                                inheritances = inheritances + data[d]["inheritances"] + ' | ';
+                            }
+                            return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                        },
+                        display: function ( data, type, row, meta ) {
+                            inheritances = ""
+                            for (d in data) {
                                 if (data[d]["inheritance"] != "[]") {
                                     link = "https://www.omim.org/entry/" + data[d]["phenotypeMimNumber"];
                                     title=data[d]["phenotype"];
@@ -1304,7 +1337,7 @@
                                 }
                             }
                             return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                        },
+                        }
                     },
                 },
                 {
@@ -1403,10 +1436,10 @@
                                 format: {
                                     body: function(data, row, column, node) {
                                         // Strip $ from salary column to make it numeric
-                                        if (column === 21) {
+                                        if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
-                                        if (column === 22) {
+                                        if (column === 23) {
                                             value = $(node).children('div').children('button').text();
                                             data = $.trim(value);
                                         }
@@ -1428,10 +1461,10 @@
                                 format: {
                                     body: function(data, row, column, node) {
                                         // Strip $ from salary column to make it numeric
-                                        if (column === 21) {
+                                        if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
-                                        if (column === 22) {
+                                        if (column === 23) {
                                             value = $(node).children('div').children('button').text();
                                             data = $.trim(value);
                                         }
@@ -1453,10 +1486,10 @@
                                 format: {
                                     body: function(data, row, column, node) {
                                         // Strip $ from salary column to make it numeric
-                                        if (column === 21) {
+                                        if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
-                                        if (column === 22) {
+                                        if (column === 23) {
                                             value = $(node).children('div').children('button').text();
                                             data = $.trim(value);
                                         }
@@ -1479,10 +1512,10 @@
                                 format: {
                                     body: function(data, row, column, node) {
                                         // Strip $ from salary column to make it numeric
-                                        if (column === 21) {
+                                        if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
-                                        if (column === 22) {
+                                        if (column === 23) {
                                             value = $(node).children('div').children('button').text();
                                             data = $.trim(value);
                                         }
@@ -1504,10 +1537,10 @@
                                 format: {
                                     body: function(data, row, column, node) {
                                         // Strip $ from salary column to make it numeric
-                                        if (column === 21) {
+                                        if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
-                                        if (column === 22) {
+                                        if (column === 23) {
                                             value = $(node).children('div').children('button').text();
                                             data = $.trim(value);
                                         }
@@ -1529,10 +1562,10 @@
                                 format: {
                                     body: function(data, row, column, node) {
                                         // Strip $ from salary column to make it numeric
-                                        if (column === 21) {
+                                        if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
-                                        if (column === 22) {
+                                        if (column === 23) {
                                             value = $(node).children('div').children('button').text();
                                             data = $.trim(value);
                                         }
