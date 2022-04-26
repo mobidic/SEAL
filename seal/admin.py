@@ -4,7 +4,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from seal import app, db
-from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run, Region, Bed
+from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run, Region, Bed, Phenotype, Omim
 
 
 class MyAdminIndexView(AdminIndexView):
@@ -165,6 +165,26 @@ admin.add_view(
         column_searchable_list=["name"],
         column_editable_list=["name"],
         form_excluded_columns=['regions']
+    )
+)
+
+
+admin.add_view(
+    CustomView(
+        Phenotype,
+        db.session,
+        category="Phenotypes",
+        column_searchable_list=["phenotypeMimNumber", "phenotype", "inheritances", "phenotypeMappingKey"],
+    )
+)
+
+
+admin.add_view(
+    CustomView(
+        Omim,
+        db.session,
+        category="Phenotypes",
+        column_searchable_list=["mimNumber", "approvedGeneSymbol", "comments", "computedCytoLocation", "cytoLocation", "ensemblGeneID", "entrezGeneID", "geneSymbols"],
     )
 )
 

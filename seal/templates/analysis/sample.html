@@ -113,6 +113,7 @@
                             <th class='w3-flat-green-sea showTitle control-size-100'>MES var</th>
                             <th class='w3-flat-green-sea showTitle control-size-125'>SpliceAI DS</th>
                             <th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
+                            <th class='w3-flat-green-sea showTitle control-size-200'>Transmission</th>
                             <th class='w3-flat-green-sea showTitle control-size-25'>R</th>
                             <th class='w3-flat-green-sea showTitle control-size-200'>Class</th>
                             <th class="w3-flat-green-sea w3-center control-size-25"></th>
@@ -245,6 +246,12 @@
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Missense
+                            </th>
+                            <th class='w3-flat-green-sea showTitle control-size-200'>
+                                <span onclick="openHelpModal(title='Transmission', content='This column represent the transmission mode following OMIM data.<br /><ul><li><b>AD</b>: Autosomal dominant</li><li><b>AR</b>: Autosomal recessive</li><li><b>DD</b>: Digenic dominant</li><li><b>DR</b>: Digenic recessive</li><li><b>IC</b>: Isolated cases</li><li><b>Mito</b>: Mitochondrial</li><li><b>MF</b>: Multifactorial</li><li><b>PAD</b>: Pseudoautosomal dominant</li><li><b>PAR</b>: Pseudoautosomal recessive</li><li><b>SMos</b>: Somatic mosaicism</li><li><b>SMut</b>: Somatic mutation</li><li><b>XL</b>: X-linked</li><li><b>XLD</b>: X-linked dominant</li><li><b>XLR</b>: X-linked recessive</li><li><b>YL</b>: Y-linked</li></ul><br /><i class=\'fas fa-question-circle\'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional', footer='For more information see : <a  href=\'https://www.omim.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>OMIM</i></a>' )" class="w3-opacity-max w3-hover-opacity">
+                                <i class="fas fa-question-circle"></i>
+                                </span>
+                                Transmission
                             </th>
                             <th class='w3-flat-green-sea showTitle control-size-25'>
                                 R
@@ -814,7 +821,7 @@
             },
             select: {
                 style:    'os',
-                selector: 'td:not(:nth-last-child(-n+3))'
+                selector: 'td:not(:nth-last-child(-n+4))'
             },
             fixedHeader: {
                 headerOffset: $('#navHead').outerHeight(),
@@ -1281,6 +1288,23 @@
                                 return num.toFixed(4);
                             }
                         }
+                    },
+                },
+                {
+                    className: 'size-200',
+                    data: "phenotypes",
+                    render: {
+                        _: function ( data, type, row, meta ) {
+                            inheritances = ""
+                            for (d in data) {
+                                if (data[d]["inheritance"] != "[]") {
+                                    link = "https://www.omim.org/entry/" + data[d]["phenotypeMimNumber"];
+                                    title=data[d]["phenotype"];
+                                    inheritances = inheritances + '<a class="w3-text-flat-peter-river  w3-hover-flat-belize-hole" href="'+link+'" target="_blank" title="' + title + '">' + data[d]["inheritances"] + '</a> | ';
+                                }
+                            }
+                            return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                        },
                     },
                 },
                 {

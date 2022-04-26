@@ -379,3 +379,44 @@ class Read(db.Model):
 
 
 ################################################################################
+class Phenotype(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    phenotypeMimNumber = db.Column(db.Integer)
+    phenotype = db.Column(db.Text)
+    inheritances = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
+    phenotypeMappingKey = db.Column(db.Integer)
+
+    def __repr__(self):
+        return f"PhenotypeOMIM('{self.phenotypeMimNumber}')"
+
+
+phenotype2OMIM = db.Table(
+    'phenotype2OMIM',
+    db.Column(
+        'phenotype_ID', db.Integer,
+        db.ForeignKey('phenotype.id'), primary_key=True
+    ),
+    db.Column(
+        'omim_ID', db.Integer,
+        db.ForeignKey('omim.mimNumber'), primary_key=True
+    )
+)
+
+
+class Omim(db.Model):
+    mimNumber = db.Column(db.Integer, primary_key=True)
+    approvedGeneSymbol = db.Column(db.String(50))
+    comments = db.Column(db.Text)
+    computedCytoLocation = db.Column(db.String(50))
+    cytoLocation = db.Column(db.String(50))
+    ensemblGeneID = db.Column(db.String(50))
+    entrezGeneID = db.Column(db.String(50))
+    geneSymbols = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
+
+    phenotypes = db.relationship(
+        'Phenotype', secondary=phenotype2OMIM, lazy='subquery',
+        backref=db.backref('omims', lazy=True)
+    )
+
+    def __repr__(self):
+        return f"Omim('{self.mimNumber}')"

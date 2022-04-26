@@ -56,6 +56,11 @@ pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
   wget -qO- http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/ncbiRefSeq.txt.gz   | gunzip -c - | awk -v OFS="\t" '{ if (!match($13, /.*-[0-9]+/)) { print $3, $5-2000, $6+2000, $13; } }' -  | sort -u > ncbiRefSeq.hg19.sorted.bed
   python insert_genes.py
   ```
+  - __[Optional]__ Add OMIM (for transmission and relative diseases) __/!\ YOU NEED AN OMIM ACCESS TO DOWNLOAD FILE__
+  ```bash
+  wget -qO- https://data.omim.org/downloads/{{YOUR API KEY}}/genemap2.txt
+  python insert_OMIM.py
+  ```
 - Launch the flask app
 ```bash
 flask run

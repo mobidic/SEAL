@@ -7,7 +7,7 @@ from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal import app, db, bcrypt
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region, Omim, Phenotype
 from flask_login import login_user, current_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from sqlalchemy import or_, and_
@@ -603,6 +603,18 @@ def json_variants(id, idbed=False, version=-1):
                 main_annot = annot
                 continue
 
+        omims = Omim.query.filter_by(approvedGeneSymbol=main_annot["SYMBOL"])
+        phenotypes = list()
+        if omims.count():
+            for omim in omims.all():
+                for pheno in omim.phenotypes:
+                    phenotypes.append({
+                        "id": pheno.id,
+                        "phenotypeMimNumber": pheno.phenotypeMimNumber,
+                        "phenotype": pheno.phenotype,
+                        "inheritances": str(pheno.inheritances),
+                        "phenotypeMappingKey": pheno.phenotypeMappingKey
+                    })
         cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
         total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id)).count()
 
@@ -636,7 +648,8 @@ def json_variants(id, idbed=False, version=-1):
                 "total_samples": total_samples,
                 "occurences_family": cnt_family,
                 "family_members": members
-            }
+            },
+            "phenotypes": phenotypes
         })
 
     return jsonify(variants)
