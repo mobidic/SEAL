@@ -956,9 +956,15 @@
                     render: {
                         _: function ( data, type, row ) {
                             if (data == null) {
+                                return "NA";
+                            }
+                            return data;
+                        },
+                        display: function ( data, type, row ) {
+                            if (data == null) {
                                 return "<i>NA</i>";
                             }
-                            mobidetails=""
+                            mobidetails=" t "
                             {%  if 'API_KEY_MD' in config %}
                                 mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
                             {% endif %}
@@ -1001,7 +1007,7 @@
                             }
                             return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
                         },
-                        dispaly: function ( data, type, row, meta ) {
+                        display: function ( data, type, row, meta ) {
                             cell = ""
                             style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
 
