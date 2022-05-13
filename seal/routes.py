@@ -222,7 +222,7 @@ def account():
             picture_file = save_picture(update_account_form.image_file.data)
             current_user.image_file = picture_file
 
-        current_user.mail = update_account_form.mail.data
+        current_user.mail = update_account_form.mail.data if update_account_form.mail.data != '' else None
         current_user.username = update_account_form.username.data
         db.session.commit()
 
