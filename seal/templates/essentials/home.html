@@ -148,11 +148,11 @@
                                     response = '<span class="w3-text-flat-orange"><i class="fas fa-exclamation-triangle"></i> <i><b>Warning</b> - contact admin</i></span>';
                                 }
                                 sample_id = data.id
-                                response = `<div class="w3-dropdown-hover w3-right" style="background-color:transparent">
-                                    <button class="w3-button" id="button-status-` + sample_id + `">
+                                response = `<div class="w3-dropdown-click w3-right" style="background-color:transparent">
+                                    <button class="w3-button button-status" onclick="toggle_dd_status('button-status-` + sample_id + `')" id="button-status-` + sample_id + `">
                                         ` + response + `
                                     </button>
-                                    <div class="w3-dropdown-content w3-bar-block" style="right:0">
+                                    <div class="w3-dropdown-content w3-bar-block" style="position: fixed !important;right:0" id="button-status-` + sample_id + `-content">
                                         <a onclick="toggle_status(` + sample_id + `, 1)" class="w3-border-top w3-border-right w3-border-left w3-bar-item w3-button">
                                             <span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b> - new sample</i></span>
                                         </a>
@@ -194,5 +194,23 @@
             }
         });
     } );
+
+    $(document).on("click", function(event){
+        if($(event.target).parents('.button-status').length || $(event.target).hasClass('button-status')) {
+            return;
+        }
+        $('.StatusVisible').toggle();
+        $('.StatusVisible').removeClass("StatusVisible");
+    });
+    function toggle_dd_status(id) {
+        if (! $('#' + id + "-content").hasClass("StatusVisible")) {
+            $('.StatusVisible').hide();
+            $('.StatusVisible').removeClass("StatusVisible");
+        }
+        right = $(window).width() - $('#' + id).offset().left - $('#' + id).width();
+        $('#' + id + "-content").css('margin-right', right);
+        $('#' + id + "-content").toggle();
+        $('#' + id + "-content").toggleClass("StatusVisible");
+    }
 </script>
 {% endblock %}

@@ -10,8 +10,6 @@
 
     <style>
         /* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
-
-
         .tableFixHead {
             overflow-y: auto;
             height: 434.5px;
@@ -1378,15 +1376,15 @@
                                 class_variant = data.class_variant ? data.class_variant : 0;
                                 dropdown = ""
                                 for (c in class_variant_html) {
-                                    dropdown += '<a onclick="toggle_class(\'' + id_var + '\', {{ sample.id }}, ' + c +')" class="w3-bar-item w3-button">'+
+                                    dropdown += '<a onclick="toggle_class(\'' + id_var + '\', {{ sample.id }}, ' + c +')" class="w3-bar-item w3-button" style="width:inherit">'+
                                             class_variant_html[c]+
                                         '</a>'
                                 }
-                                response = `<div class="w3-dropdown-hover w3-right" style="background-color:transparent">
-                                    <button class="w3-button" id="button-class-` + id_var + `">
+                                response = `<div class="w3-dropdown-click w3-right" style="background-color:transparent">
+                                    <button class="w3-button button-class" onclick="toggle_dd_class('button-class-` + id_var + `')" id="button-class-` + id_var + `">
                                         ` + class_variant_html[class_variant] + `
                                     </button>
-                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="right:0">
+                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="position: fixed !important;right:0;min-width:200px" data-container="body" id="button-class-` + id_var + `-content">
                                         `+ dropdown +`
                                     </div>
                                 </div>`
@@ -2417,5 +2415,24 @@
         selectableHeader: "<div class='w3-container w3-teal'>Selectable Teams</div>",
         selectionHeader: "<div class='w3-container w3-teal'>Selected Teams</div>",
     });
+
+
+    $(document).on("click", function(event){
+        if($(event.target).parents('.button-class').length || $(event.target).hasClass('button-class')) {
+            return;
+        }
+        $('.ClassVisible').toggle();
+        $('.ClassVisible').removeClass("ClassVisible");
+    });
+    function toggle_dd_class(id) {
+        if (! $('#' + id +'-content').hasClass("ClassVisible")) {
+            $('.ClassVisible').hide();
+            $('.ClassVisible').removeClass("ClassVisible");
+        }
+        right = $(window).width() - $('#' + id).offset().left - $('#' + id).outerWidth();
+        $('#' + id +'-content').css('margin-right', right);
+        $('#' + id +'-content').toggle();
+        $('#' + id +'-content').toggleClass("ClassVisible");
+    }
 </script>
 {% endblock %}
