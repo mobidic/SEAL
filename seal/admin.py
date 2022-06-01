@@ -48,6 +48,34 @@ class CustomView(ModelView):
         return redirect(url_for('login', next=request.url))
 
 
+class SampleView(CustomView):
+    def delete_model(self, model):
+        """
+        Delete model.
+        :param model:
+            Model to delete
+        """
+        try:
+            self.session.flush()
+            var2samples = db.session.query(Var2Sample).filter(Var2Sample.sample_ID == int(model.id))
+            for var2sample in var2samples:
+                self.session.delete(var2sample)
+            self.session.delete(model)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                flash(gettext('Failed to delete record. %(error)s', error=str(ex)), 'error')
+                log.exception('Failed to delete record.')
+
+            self.session.rollback()
+
+            return False
+        else:
+            self.after_model_delete(model)
+
+        return True
+
+
 admin = Admin(app, index_view=MyAdminIndexView())
 admin.add_view(
     CustomView(
@@ -71,7 +99,7 @@ admin.add_view(
     )
 )
 admin.add_view(
-    CustomView(
+    SampleView(
         Sample,
         db.session,
         category="Analysis",
