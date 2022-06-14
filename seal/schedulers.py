@@ -7,6 +7,7 @@ import subprocess
 
 from pathlib import Path
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy import and_
 
 from anacore import annotVcf
 
@@ -144,6 +145,21 @@ def importvcf():
             interface = data["interface"]
         except KeyError:
             interface = False
+        
+        try:
+            sample_name = data["sample"]["name"]
+            run_name = data["run"]["name"]
+            run = Run.query.filter_by(name=run_name).first()
+            cnt = db.session.query(Sample).filter(and_(Sample.samplename==sample_name, Sample.runid==run.id)).count()
+            if cnt >= 1:
+                app.logger.info(f"already exist: {cnt}")
+                current_file.unlink()
+                path_locker.unlink()
+                return
+        except Exception as e:
+            app.logger.info(e)
+            app.logger.info("NOT IN DB !!!")
+            pass
 
         # Sample Creation
         try:
