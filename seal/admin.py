@@ -3,8 +3,12 @@ from flask_login import current_user
 from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
-from seal import app, db
+from seal import app, db, bcrypt
 from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run, Region, Bed, Phenotype, Omim
+import re
+
+
+BCRYPT_PATTERN = re.compile("^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
 
 
 class MyAdminIndexView(AdminIndexView):
@@ -74,9 +78,23 @@ class SampleView(CustomView):
         return True
 
 
+class UserView(CustomView):
+    def on_model_change(self, form, model, is_created):
+        if BCRYPT_PATTERN.match(model.password):
+            return False
+        model.password = bcrypt.generate_password_hash(model.password).decode('utf-8')
+
+    def validate_form(self, form):
+        """ Custom validation code that checks dates """
+        if form.password.data and (len(form.password.data) < 6 or len(form.password.data) > 12) and not BCRYPT_PATTERN.match(form.password.data):
+            flash("Password must be between 6 and 20 characters long or not a correct hash (please change)!")
+            return False
+        return super(UserView, self).validate_form(form)
+
+
 admin = Admin(app, index_view=MyAdminIndexView())
 admin.add_view(
-    CustomView(
+    UserView(
         User,
         db.session,
         category="Authentication",
