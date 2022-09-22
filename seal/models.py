@@ -86,6 +86,9 @@ class User(db.Model, UserMixin):
     def __repr__(self):
         return f"User('{self.username}', '{self.image_file}')"
 
+    def __str__(self):
+        return self.username
+
     def verify_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
@@ -97,6 +100,9 @@ class Team(db.Model):
 
     def __repr__(self):
         return f"Team('{self.teamname}','{self.color}')"
+
+    def __str__(self):
+        return self.teamname
 
 
 ################################################################################
@@ -125,7 +131,10 @@ class Sample(db.Model):
     )
 
     def __repr__(self):
-        return f"Sample('{self.samplename}','{self.status}')"
+        return f"Sample('{self.samplename}','{self.family}','{self.run}','{self.status}','{self.affected}','{self.index}')"
+
+    def __str__(self):
+        return f"{self.samplename} - {self.family} - {self.run}"
 
 
 class Family(db.Model):
@@ -135,6 +144,9 @@ class Family(db.Model):
 
     def __repr__(self):
         return f"Family('{self.family}')"
+
+    def __str__(self):
+        return self.family
 
 
 class Run(db.Model):
@@ -146,7 +158,10 @@ class Run(db.Model):
     reads = relationship("Read")
 
     def __repr__(self):
-        return f"Run('{self.name}')"
+        return f"Run('{self.name}','{self.alias}')"
+
+    def __str__(self):
+        return self.name
 
 
 class Variant(db.Model):
@@ -161,6 +176,9 @@ class Variant(db.Model):
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
+
+    def __str__(self):
+        return self.id
 
 
 class Comment(db.Model):
@@ -177,6 +195,9 @@ class Comment(db.Model):
     def __repr__(self):
         return f"Comment('{self.comment}','{self.date}')"
 
+    def __str__(self):
+        return self.comment
+
 
 class Var2Sample(db.Model):
     variant_ID = db.Column(db.Text, db.ForeignKey('variant.id'), primary_key=True)
@@ -191,6 +212,9 @@ class Var2Sample(db.Model):
 
     def __repr__(self):
         return f"Var2Sample('{self.sample}','{self.variant}')"
+
+    def __str__(self):
+        return f"{self.sample} - {self.variant}"
 
 
 team2filter = db.Table(
@@ -217,7 +241,10 @@ class Filter(db.Model):
     )
 
     def __repr__(self):
-        return f"{self.filtername}"
+        return f"Filter({self.filtername})"
+
+    def __str__(self):
+        return self.filtername
 
 
 class Transcript(db.Model):
@@ -235,6 +262,9 @@ class Transcript(db.Model):
 
     def __repr__(self):
         return f"Transcript('{self.feature}','{self.canonical}')"
+
+    def __str__(self):
+        return self.feature
 
 
 region2bed = db.Table(
@@ -264,13 +294,16 @@ team2bed = db.Table(
 
 class Region(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(75), unique=False, nullable=False)
+    name = db.Column(db.String(255), unique=False, nullable=False)
     chr = db.Column(db.String(50), unique=False, nullable=False)
     start = db.Column(db.Integer, unique=False, nullable=False)
     stop = db.Column(db.Integer, unique=False, nullable=False)
 
     def __repr__(self):
-        return f"Region('{self.name}')"
+        return f"Region('{self.name}','{self.chr}','{self.start}','{self.stop}')"
+
+    def __str__(self):
+        return self.name
 
     def varInRegion(self, variant):
         same_chr = (variant.chr == self.chr)
@@ -295,6 +328,9 @@ class Bed(db.Model):
 
     def __repr__(self):
         return f"BED('{self.name}')"
+
+    def __str__(self):
+        return self.name
 
     def varInBed(self, variant):
         for region in self.regions:
@@ -357,6 +393,9 @@ class Lane(db.Model):
     def __repr__(self):
         return f"Lane('{self.lane}')"
 
+    def __str__(self):
+        return self.lane
+
 
 class Read(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -377,6 +416,9 @@ class Read(db.Model):
     def __repr__(self):
         return f"Read('{self.read}')"
 
+    def __str__(self):
+        return self.read
+
 
 ################################################################################
 class Phenotype(db.Model):
@@ -387,7 +429,10 @@ class Phenotype(db.Model):
     phenotypeMappingKey = db.Column(db.Integer)
 
     def __repr__(self):
-        return f"PhenotypeOMIM('{self.phenotypeMimNumber}')"
+        return f"Phenotype('{self.phenotypeMimNumber}')"
+
+    def __str__(self):
+        return f"{self.phenotype} ({self.phenotypeMimNumber})"
 
 
 phenotype2OMIM = db.Table(
@@ -420,3 +465,6 @@ class Omim(db.Model):
 
     def __repr__(self):
         return f"Omim('{self.mimNumber}')"
+
+    def __str__(self):
+        return self.mimNumber
