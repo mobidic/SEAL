@@ -1,4 +1,4 @@
-from flask import redirect, url_for, request
+from flask import redirect, url_for, request, flash
 from flask_login import current_user
 from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
@@ -63,10 +63,8 @@ class SampleView(CustomView):
             self.session.delete(model)
             self.session.commit()
         except Exception as ex:
-            if not self.handle_view_exception(ex):
-                flash(gettext('Failed to delete record. %(error)s', error=str(ex)), 'error')
-                log.exception('Failed to delete record.')
-
+            flash(f'Failed to delete record: {ex} (Please contact the admin)', 'error')
+            app.logger.exception(f'Failed to delete record: {ex}')
             self.session.rollback()
 
             return False
@@ -150,7 +148,7 @@ admin.add_view(
         Var2Sample,
         db.session,
         category="Analysis",
-        column_searchable_list=["filter"],
+        column_searchable_list=["filter", "variant.id", "sample.samplename", "sample.family.family"],
         column_editable_list=["depth", "allelic_depth"]
     )
 )
