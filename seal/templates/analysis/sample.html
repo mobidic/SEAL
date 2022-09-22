@@ -57,17 +57,17 @@
                 {% endif %}
                 </button>
                 <div class="w3-dropdown-content w3-bar-block w3-border" style=" width:222px">
-                    <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
+                    <a onclick="toggle_status('{{ sample.id }}', 1)" class="w3-bar-item w3-button">
                         <span class="w3-text-flat-peter-river">
                             <i class="fas fa-user-clock"></i> <i><b>New</b></i>
                         </span>
                     </a>
-                    <a onclick="toggle_status({{ sample.id }}, 2)" class="w3-bar-item w3-button">
+                    <a onclick="toggle_status('{{ sample.id }}', 2)" class="w3-bar-item w3-button">
                         <span class="w3-text-flat-peter-river">
                             <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
                         </span>
                     </a>
-                    <a onclick="toggle_status({{ sample.id }}, 3)" class="w3-bar-item w3-button">
+                    <a onclick="toggle_status('{{ sample.id }}', 3)" class="w3-bar-item w3-button">
                         <span class="w3-text-flat-emerald">
                             <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
                         </span>
@@ -775,7 +775,7 @@
             var options = "";
             for (x in data) {
                 option = '<option value="' + x + '" '
-                if (x == {{ current_user.filter_id }}) {
+                if (x == "{{ current_user.filter_id }}") {
                     option += 'selected>' + data[x] + ' (default)</option>';
                 } else {
                     option += '>' + data[x] + '</option>';
@@ -962,7 +962,7 @@
                             if (data == null) {
                                 return "<i>NA</i>";
                             }
-                            mobidetails=" t "
+                            mobidetails="";
                             {%  if 'API_KEY_MD' in config %}
                                 mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
                             {% endif %}
@@ -1409,7 +1409,7 @@
                 },
             ],
             initComplete: function(settings, json) {
-                changeFilter({{ current_user.filter_id }});
+                changeFilter("{{ current_user.filter_id }}");
                 $('#selectFilter').prop('disabled', false);
                 $('#selectBed').prop('disabled', false);
                 table.button().add( 0, {
@@ -1809,7 +1809,7 @@
                     }
                 }
                 color = "w3-text-flat-peter-river";
-                if ({{ current_user.transcripts | safe }}.includes(data["annotations"]["ANN"][x]["Feature"])) {
+                if ("{{ current_user.transcripts | safe }}".includes(data["annotations"]["ANN"][x]["Feature"])) {
                     color = "w3-text-flat-alizarin";
                 }
                 if (data["annotations"]["ANN"][x]["canonical"]) {
@@ -2393,14 +2393,14 @@
                     if (data[x] == name) {
                         option += "selected"
                     }
-                    if (x == {{ current_user.filter_id }}) {
+                    if (x == "{{ current_user.filter_id }}") {
                         option += '>' + data[x] + ' (default)</option>';
                     } else {
                         option += '>' + data[x] + '</option>';
                     }
                     options += option;
                 }
-                $('#selectFilter').html(options)
+                $('#selectFilter').html(options);
             });
         })
     }
