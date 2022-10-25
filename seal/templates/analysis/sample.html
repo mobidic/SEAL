@@ -40,40 +40,7 @@
     <div class="w3-main">
         <div class="w3-container w3-center">
             <h1>{{ sample.samplename}}</h1>
-            <div class="w3-dropdown-hover" style="background-color:transparent !important;">
-                <button class="w3-button w3-white button-status w3-border" style=" width:222px">
-                {% if sample.status == 1 %}
-                    <span class="w3-text-flat-peter-river">
-                        <i class="fas fa-user-clock"></i> <i><b>New</b></i>
-                    </span>
-                {% elif sample.status == 2 %}
-                    <span class="w3-text-flat-peter-river">
-                        <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
-                    </span>
-                {% elif sample.status == 3 %}
-                    <span class="w3-text-flat-emerald">
-                        <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
-                    </span>
-                {% endif %}
-                </button>
-                <div class="w3-dropdown-content w3-bar-block w3-border" style=" width:222px">
-                    <a onclick="toggle_status('{{ sample.id }}', 1)" class="w3-bar-item w3-button">
-                        <span class="w3-text-flat-peter-river">
-                            <i class="fas fa-user-clock"></i> <i><b>New</b></i>
-                        </span>
-                    </a>
-                    <a onclick="toggle_status('{{ sample.id }}', 2)" class="w3-bar-item w3-button">
-                        <span class="w3-text-flat-peter-river">
-                            <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
-                        </span>
-                    </a>
-                    <a onclick="toggle_status('{{ sample.id }}', 3)" class="w3-bar-item w3-button">
-                        <span class="w3-text-flat-emerald">
-                            <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
-                        </span>
-                    </a>
-                </div>
-            </div>
+            {% include 'includes/button-status-sample.j2' %}
             <hr>
         </div>
         <div class="w3-padding">
@@ -496,11 +463,25 @@
             },
             success: function() {
                 if (status == 1) {
-                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New</b></i></span>';
+                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New Sample</b></i> <i class="fas fa-sort-down"></i></span>';
+                    $('#selectFilter').prop('disabled', false);
+                    $('#selectBed').prop('disabled', false);
+                    $('.seal-form-report').removeClass('w3-disabled');
                 } else if (status == 2) {
-                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Process</b></i></span>';
+                    response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Processing</b></i> <i class="fas fa-sort-down"></i></span>';
+                    $('#selectFilter').prop('disabled', false);
+                    $('#selectBed').prop('disabled', false);
+                    $('.seal-form-report').removeClass('w3-disabled');
                 } else if (status == 3) {
-                    response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Validate</b></i></span>';
+                    response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Interpreted</b></i> <i class="fas fa-sort-down"></i></span>';
+                    $('#selectFilter').prop('disabled', false);
+                    $('#selectBed').prop('disabled', false);
+                    $('.seal-form-report').removeClass('w3-disabled');
+                } else if (status == 4) {
+                    response = '<span class="w3-text-flat-pumpkin"><i class="fas fa-user-lock"></i> <i><b>Validated</b></i> <i class="fas fa-sort-down"></i></span>';
+                    $('#selectFilter').prop('disabled', true);
+                    $('#selectBed').prop('disabled', true);
+                    $('.seal-form-report').addClass('w3-disabled');
                 }
                 $('.button-status').html(response);
             }
@@ -1345,7 +1326,7 @@
                     },
                 },
                 {
-                    className: 'showTitle size-25 w3-center',
+                    className: '{% if sample.status == 4 %}w3-disabled{% endif %} seal-form-report showTitle size-25 w3-center',
                     data: {
                         _: "reported",
                         display: function ( data, type, row, meta ) {
@@ -1367,7 +1348,7 @@
                     }
                 },
                 {
-                    className: 'showTitle size-200 w3-center',
+                    className: '{% if sample.status == 4 %}w3-disabled{% endif %} seal-form-report showTitle size-200 w3-center',
                     data: {
                         _: "class_variant",
                         display: function ( data, type, row ) {
@@ -1410,8 +1391,10 @@
             ],
             initComplete: function(settings, json) {
                 changeFilter("{{ current_user.filter_id }}");
-                $('#selectFilter').prop('disabled', false);
-                $('#selectBed').prop('disabled', false);
+                {% if sample.status != 4 %}
+                    $('#selectFilter').prop('disabled', false);
+                    $('#selectBed').prop('disabled', false);
+                {% endif %}
                 table.button().add( 0, {
                     extend: 'searchBuilder',
                 } );

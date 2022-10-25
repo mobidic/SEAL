@@ -66,41 +66,7 @@
             border: 0; border-top: 1px solid #ccc;
             margin: 1em 0; padding: 0; ">
             {% endif %}
-            <div class="w3-dropdown-hover w3-right" style="background-color:transparent !important">
-                <button class="w3-button w3-white button-status">
-                {% if sample.status == 1 %}
-                    <span class="w3-text-flat-peter-river">
-                        <i class="fas fa-user-clock"></i> <i><b>New</b></i>
-                    </span>
-                {% elif sample.status == 2 %}
-                    <span class="w3-text-flat-peter-river">
-                        <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
-                    </span>
-                {% elif sample.status == 3 %}
-                    <span class="w3-text-flat-emerald">
-                        <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
-                    </span>
-                {% endif %}
-                </button>
-                <div class="w3-dropdown-content w3-bar-block w3-border">
-                    <a onclick="toggle_status({{ sample.id }}, 1)" class="w3-bar-item w3-button">
-                        <span class="w3-text-flat-peter-river">
-                            <i class="fas fa-user-clock"></i> <i><b>New</b></i>
-                        </span>
-                    </a>
-                    <a onclick="toggle_status({{ sample.id }}, 2)" class="w3-bar-item w3-button">
-                        <span class="w3-text-flat-peter-river">
-                            <i class="fas fa-user-edit"></i> <i><b>Process</b></i>
-                        </span>
-                    </a>
-                    <a onclick="toggle_status({{ sample.id }}, 3)" class="w3-bar-item w3-button">
-                        <span class="w3-text-flat-emerald">
-                            <i class="fas fa-user-check"></i> <i><b>Validate</b></i>
-                        </span>
-                    </a>
-                </div>
-            </div>
-		</div>
+            {% include 'includes/button-status-sample.j2' %}
     </div>
 </nav>
 

@@ -1,17 +1,17 @@
-import secrets
 import json
 import urllib
+import secrets
 import functools
-from datetime import datetime
 from PIL import Image
-from flask import render_template, flash, redirect, url_for, request, jsonify
-from seal import app, db, bcrypt
-from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region, Omim, Phenotype
-from flask_login import login_user, current_user, logout_user
-from flask_login.utils import EXEMPT_METHODS
-from sqlalchemy import or_, and_
 from pathlib import Path
+from datetime import datetime
+from sqlalchemy import or_, and_
+from seal import app, db, bcrypt
+from flask_login.utils import EXEMPT_METHODS
+from flask_login import login_user, current_user, logout_user
+from flask import render_template, flash, redirect, url_for, request, jsonify
+from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region, Omim
 
 ################################################################################
 # Define global variables
@@ -862,15 +862,16 @@ def toggle_varClass():
 def toggle_sampleStatus():
     sample_id = request.form["sample_id"]
     sample = Sample.query.get(sample_id)
+    status = int(request.form["status"]) if "status" in request.form else False
 
-    if "status" in request.form:
-        sample.status = request.form["status"]
-        db.session.commit()
-        return f"{sample} - {sample.status}"
-
-    if sample.status == 1:
+    if status:
+        if not(status == 4 and not (current_user.biologist or current_user.admin)):
+            sample.status = request.form["status"]
+            db.session.commit()
+    elif sample.status == 1:
         sample.status = 2
         db.session.commit()
+
     return f"{sample} - {sample.status}"
 
 
