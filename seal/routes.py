@@ -846,6 +846,29 @@ def toggle_varStatus():
     return f"{return_value}"
 
 
+@app.route("/toggle/sample/filter", methods=['POST'])
+@login_required
+def toggle_sampleFilter():
+    sample_id = request.form["id_sample"]
+    filter_id = request.form["id_filter"]
+    sample = Sample.query.get(sample_id)
+    sample.filter_id = filter_id
+    db.session.commit()
+    return f"{sample.filter_id}"
+
+
+@app.route("/toggle/sample/panel", methods=['POST'])
+@login_required
+def toggle_samplePanel():
+    sample_id = request.form["id_sample"]
+    panel_id = request.form["id_panel"] if "id_panel" in request.form and int(request.form["id_panel"]) > 0 else None
+    sample = Sample.query.get(sample_id)
+    sample.bed_id = panel_id
+    db.session.commit()
+    print(sample.bed_id)
+    return f"{sample.bed_id}"
+
+
 @app.route("/toggle/samples/variant/class", methods=['POST'])
 @login_required
 def toggle_varClass():

@@ -119,6 +119,12 @@ class Sample(db.Model):
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
 
+    filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=True)
+    filter = relationship("Filter", back_populates="samples")
+
+    bed_id = db.Column(db.Integer, db.ForeignKey('bed.id'), nullable=True)
+    bed = relationship("Bed", back_populates="samples")
+
     familyid = db.Column(db.Integer, db.ForeignKey('family.id'))
     family = relationship("Family", back_populates="samples")
 
@@ -134,7 +140,7 @@ class Sample(db.Model):
         return f"Sample('{self.samplename}','{self.family}','{self.run}','{self.status}','{self.affected}','{self.index}')"
 
     def __str__(self):
-        return f"{self.samplename} - {self.family} - {self.run}"
+        return self.samplename
 
 
 class Family(db.Model):
@@ -234,6 +240,7 @@ class Filter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filtername = db.Column(db.String(20), unique=True, nullable=False)
     filter = db.Column(db.JSON, nullable=True)
+    samples = relationship("Sample")
 
     teams = db.relationship(
         'Team', secondary=team2filter, lazy='subquery',
@@ -315,6 +322,7 @@ class Region(db.Model):
 class Bed(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(75), unique=True, nullable=False)
+    samples = relationship("Sample")
 
     regions = db.relationship(
         'Region', secondary=region2bed, lazy='subquery',

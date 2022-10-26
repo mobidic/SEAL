@@ -177,7 +177,7 @@ admin.add_view(
         category="Filter",
         column_searchable_list=["filtername", "filter"],
         column_editable_list=["filtername"],
-        form_excluded_columns=['users']
+        form_excluded_columns=['users','samples']
     )
 )
 
@@ -208,7 +208,7 @@ admin.add_view(
         category="Bed",
         column_searchable_list=["name"],
         column_editable_list=["name"],
-        form_excluded_columns=['regions']
+        form_excluded_columns=['regions','samples']
     )
 )
 

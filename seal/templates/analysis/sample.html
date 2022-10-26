@@ -46,11 +46,11 @@
         <div class="w3-padding">
             <div class="w3-row w3-padding">
                 <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
-                <select disabled id="selectFilter" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value);">
+                <select disabled id="selectFilter" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value, {{ sample.id }});">
                 </select>
 
                 <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fas fa-th-list"></i> <b>Choose a panel</b></div>
-                <select disabled id="selectBed" class="w3-select w3-border w3-col m3 l2 s6" onchange="applied_panel(value);">
+                <select disabled id="selectBed" class="w3-select w3-border w3-col m3 l2 s6" onchange="applied_panel(value, {{ sample.id }});">
                 </select>
             </div>
             <div class="w3-padding">
@@ -300,7 +300,7 @@
                 </div>
 
                 <div class="w3-section w3-center">
-                    {{ saveFilterForm.submit(id="validateSaveFilter", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="validateFilter();") }}
+                    {{ saveFilterForm.submit(id="validateSaveFilter", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="saveFilter();") }}
                 </div>
             </div>
             <footer class="w3-container w3-light-grey w3-padding">
@@ -756,20 +756,35 @@
             var options = "";
             for (x in data) {
                 option = '<option value="' + x + '" '
-                if (x == "{{ current_user.filter_id }}") {
-                    option += 'selected>' + data[x] + ' (default)</option>';
+                if (x == "{{ sample.filter_id }}") {
+                    option += 'selected>';
                 } else {
-                    option += '>' + data[x] + '</option>';
+                    option += '>';
                 }
+                option += data[x]
+                if (x == "{{ current_user.filter_id }}") {
+                    option += " (default)";
+                }
+                option += "</option>";
                 options += option;
             }
             $('#selectFilter').html(options);
         });
 
         $.getJSON("/json/beds", function(data) {
-            var options = '<option value="0" selected>No panel</option>';
+            var options = '<option value="0">No panel</option>';
             for (x in data) {
-                option = '<option value="' + x + '">' + data[x] + '</option>';
+                option = '<option value="' + x + '" '
+                if (x == "{{ sample.bed_id }}") {
+                    option += 'selected>';
+                } else {
+                    option += '>';
+                }
+                option += data[x]
+                if (x == "{{ current_user.bed_id }}") {
+                    option += " (default)";
+                }
+                option += "</option>";
                 options += option;
             }
             $('#selectBed').html(options);
@@ -805,7 +820,7 @@
             fixedHeader: {
                 headerOffset: $('#navHead').outerHeight(),
             },
-            ajax: '/json/variants/sample/{{ sample.id }}',
+            ajax: '/json/variants/sample/{{ sample.id }}{% if sample.bed_id %}/bed/{{ sample.bed_id }}{% endif %}',
             columns: [
                 {
                     className: 'showTitle control-size-100',
@@ -1390,7 +1405,7 @@
                 },
             ],
             initComplete: function(settings, json) {
-                changeFilter("{{ current_user.filter_id }}");
+                changeFilter("{{ sample.filter_id }}", {{ sample.id }});
                 {% if sample.status != 4 %}
                     $('#selectFilter').prop('disabled', false);
                     $('#selectBed').prop('disabled', false);
@@ -2213,7 +2228,7 @@
         evt.currentTarget.classList.add("w3-flat-turquoise");
     }
 
-    function changeFilter(id) {
+    function changeFilter(id, sample_id) {
         $.getJSON("/json/filter/" + id, function(data) {
             document.getElementById("variants_processing").style.visibility = "visible";
             document.getElementById("variants_processing").style.zIndex = "10";
@@ -2225,6 +2240,21 @@
                 document.getElementById("variants_processing").style.zIndex = "0";
                 $("#variants_processing").toggle();
                 document.getElementById("variants").style.opacity = "1";
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                        }
+                    }
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "/toggle/sample/filter",
+                    data: {
+                        "id_sample": sample_id,
+                        "id_filter": id
+                    }
+                });
             }, 30);
         });
     }
@@ -2343,7 +2373,7 @@
         });
     }
 
-    function validateFilter() {
+    function saveFilter() {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -2387,10 +2417,25 @@
             });
         })
     }
-    function applied_panel(id) {
+    function applied_panel(id, sample_id) {
         $("#variants_processing").css("visibility","show");
         $("#variants_processing").attr('style', 'display: block; z-index: 10000 !important');
         $("#variants").css('opacity', '0.6');
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", "{{ csrf_token() }}");
+                }
+            }
+        });
+        $.ajax({
+            type: "POST",
+            url: "/toggle/sample/panel",
+            data: {
+                "id_sample": sample_id,
+                "id_panel": id
+            }
+        });
         table = $('#variants').DataTable();
         table.ajax.url( '/json/variants/sample/{{ sample.id }}/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
     }
