@@ -533,8 +533,6 @@ def json_variants(id, idbed=False, version=-1):
             current_canonical = annot['canonical']
             current_refseq = True if annot['SOURCE'] == 'RefSeq' else False
             current_protein_coding = True if annot['BIOTYPE'] == 'protein_coding' else False
-            # current_transcript = Transcript.query.get(annot['Feature'])
-            # current_transcript = Transcript.query.get(annot['Feature'])
             current_preferred_transcript = True if annot['Feature'] in current_user.transcripts else False
 
             if preferred_transcript == current_preferred_transcript:
@@ -865,7 +863,6 @@ def toggle_samplePanel():
     sample = Sample.query.get(sample_id)
     sample.bed_id = panel_id
     db.session.commit()
-    print(sample.bed_id)
     return f"{sample.bed_id}"
 
 
