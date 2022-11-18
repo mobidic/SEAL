@@ -24,6 +24,7 @@
         Day #4 : 30 Days CSS
         */
         .dtfc-fixed-left{z-index:1;}
+        .dtfc-floatingparenthead{z-index:6!important;}
 
         .w3-modal {
             z-index: 6;
@@ -31,6 +32,9 @@
 
         #variants_processing {
             background: none;
+        }
+        .details-control{
+            z-index:5
         }
     </style>
 {% endblock %}
@@ -1378,10 +1382,10 @@
                                         '</a>'
                                 }
                                 response = `<div class="w3-dropdown-click w3-right" style="background-color:transparent">
-                                    <button class="w3-button button-class" onclick="toggle_dd_class('button-class-` + id_var + `')" id="button-class-` + id_var + `">
+                                    <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
                                         ` + class_variant_html[class_variant] + `
                                     </button>
-                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="position: fixed !important;right:0;min-width:200px" data-container="body" id="button-class-` + id_var + `-content">
+                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="top:0px;right:-105px;min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
                                         `+ dropdown +`
                                     </div>
                                 </div>`
