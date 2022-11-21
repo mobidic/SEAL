@@ -334,11 +334,9 @@ def create_variant():
             return redirect(url_for('index'))
 
         info = {
-            "sample": {
-                "name": uploadSampleForm.samplename.data,
-                "affected": uploadSampleForm.affected.data,
-                "index": uploadSampleForm.index.data,
-            },
+            "samplename": uploadSampleForm.samplename.data,
+            "affected": uploadSampleForm.affected.data,
+            "index": uploadSampleForm.index.data,
             "family": {
                 "name": uploadSampleForm.family.data
             },
