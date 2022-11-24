@@ -225,7 +225,6 @@ def create_sample(data):
 
     if "teams" in data:
         teams = data["teams"]
-        print(teams)
         for t in teams:
             id = t["id"] if "id" in t else None
             name = t["name"] if "name" in t else None
@@ -302,6 +301,7 @@ def importvcf():
             f" --custom {vep_config['gnomADg']},gnomADg,vcf,exact,0,AF_AFR,AF_AMR,AF_ASJ,AF_EAS,AF_FIN,AF_NFE,AF_OTH,AF " + \
             f" --fasta {vep_config['fasta']} " + \
             f" --fork {vep_config['fork']} " + \
+            " --format vcf " + \
             " --species homo_sapiens " + \
             " --assembly GRCh37 " + \
             " --cache " + \
