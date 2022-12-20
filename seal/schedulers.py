@@ -17,7 +17,7 @@ from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Te
 
 
 CONSEQUENCES_DICT = {
-    "stop_gained": 20,
+    "stop_gained": 20,  
     "stop_lost": 20,
     "splice_acceptor_variant": 10,
     "splice_donor_variant": 10,
@@ -244,14 +244,108 @@ def create_sample(data):
     return sample
 
 
+class CommandFailedError(Exception):
+    def __init__(self, returncode, stderr):
+        self.returncode = returncode
+        self.stderr = stderr
+
+    def __str__(self):
+        return f"Command failed with exit code {self.returncode} and error output: {self.stderr}"
+
+
+def extract_command_and_args(data, values):
+    """
+    Extract the command and arguments from the JSON data and format them using the provided values.
+
+    Args:
+        data (dict): A dictionary containing the command and arguments. The command should be stored in the 'command' key,
+                     and the arguments should be stored in the 'args' key as a dictionary.
+        values (dict): A dictionary of values to be used to replace placeholders in the command arguments.
+
+    Returns:
+        tuple: A tuple containing the command and a list of formatted arguments.
+    """
+    # Extract the command and arguments from the data dictionary
+    command = data['command']
+    args = data['args']
+
+    # Initialize an empty list to store the formatted arguments
+    formatted_args = []
+
+    # Iterate over the items in the args dictionary
+    for key, value in args.items():
+        # If the value is a boolean and is True, add the key to the formatted arguments list
+        if isinstance(value, bool):
+            if value:
+                formatted_args.append(key)
+        # If the value is a string, int, or float, format it using the values dictionary and add the key and formatted value to the formatted arguments list
+        elif isinstance(value, (str, int, float)):
+            formatted_args.append(key)
+            f_string = f"{value}"
+            formatted_value = f_string.format_map(values)
+            formatted_args.append(formatted_value)
+        # If the value is a list, iterate over the items in the list and process them in the same way as a string, int, or float value
+        elif isinstance(value, list):
+            for sub_value in value:
+                formatted_args.extend([key, f"{sub_value}".format_map(values)])
+
+    # Return a tuple containing the command and the formatted arguments list
+    return command, formatted_args
+
+
+def execute_shell_command(shell_command):
+    """Execute a shell command and log the standard output and error streams.
+
+    Args:
+        shell_command (list): A list containing the command and its arguments.
+
+    Returns:
+        tuple: A tuple containing the exit code and output of the command.
+    """
+    try:
+        output = subprocess.run(shell_command, capture_output=True, check=True)
+        app.logger.info(f"Command {shell_command} executed successfully with output: {output.stdout}")
+        return (output.returncode, output.stdout)
+    except subprocess.CalledProcessError as e:
+        app.logger.error(f"Command {shell_command} failed with exit code {e.returncode} and error output: {e.stderr}")
+        raise CommandFailedError(e.returncode, e.stderr)
+
+
+def create_and_execute_shell_command(json_file, values):
+    """Create and execute a shell command from a JSON file.
+
+    Args:
+        json_file (str): The path to the JSON file containing the command and its arguments.
+        values (dict): A dictionary of values to be used to replace placeholders in the command arguments.
+
+    Returns:
+        tuple: A tuple containing the exit code and output of the command.
+    """
+    # Load the JSON data from the file
+    with open(json_file, 'r') as f:
+        data = json.load(f)
+
+    # Extract the command and arguments from the JSON data
+    command, args = extract_command_and_args(data, values)
+
+    # Create the shell command by concatenating the command and arguments
+    shell_command = [command] + args
+
+    # Execute the shell command
+    exit_code, output = execute_shell_command(shell_command)
+
+    # If the exit code is non-zero, raise a custom exception
+    if exit_code != 0:
+        raise CommandFailedError(exit_code, output)
+
+    # Return the exit code and output
+    return exit_code, output
+
+
 # cron examples
 @scheduler.task('cron', id='import vcf', second="*/20")
 def importvcf():
     # Load config file
-
-    vep_config_file = Path(app.root_path).joinpath('static/vep.config.json')
-    with open(vep_config_file, "r") as tf:
-        vep_config = json.load(tf)
 
     # Check launchable
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
@@ -289,69 +383,17 @@ def importvcf():
 
         vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
         stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
-        vep_cmd = "vep " + \
-            f" --input_file {vcf_path} " + \
-            f" --output_file {vcf_vep} " + \
-            f" --stats_file {stats_vep} " + \
-            f" --dir {vep_config['dir']} " + \
-            f" --plugin dbNSFP,{vep_config['dbNSFP']},BayesDel_addAF_rankscore,BayesDel_noAF_rankscore,CADD_raw_rankscore,CADD_raw_rankscore_hg19,ClinPred_rankscore,DANN_rankscore,DEOGEN2_rankscore,Eigen-PC-raw_coding_rankscore,Eigen-raw_coding_rankscore,FATHMM_converted_rankscore,GERP++_RS_rankscore,GM12878_fitCons_rankscore,GenoCanyon_rankscore,H1-hESC_fitCons_rankscore,HUVEC_fitCons_rankscore,LINSIGHT_rankscore,LIST-S2_rankscore,LRT_converted_rankscore,M-CAP_rankscore,MPC_rankscore,MVP_rankscore,MetaLR_rankscore,MetaSVM_rankscore,MutPred_rankscore,MutationAssessor_rankscore,MutationTaster_converted_rankscore,PROVEAN_converted_rankscore,Polyphen2_HDIV_rankscore,Polyphen2_HVAR_rankscore,PrimateAI_rankscore,REVEL_rankscore,SIFT4G_converted_rankscore,SIFT_converted_rankscore,SiPhy_29way_logOdds_rankscore,VEST4_rankscore,bStatistic_converted_rankscore,fathmm-MKL_coding_rankscore,fathmm-XF_coding_rankscore,integrated_fitCons_rankscore,phastCons100way_vertebrate_rankscore,phastCons17way_primate_rankscore,phastCons30way_mammalian_rankscore,phyloP100way_vertebrate_rankscore,phyloP17way_primate_rankscore,phyloP30way_mammalian_rankscore " + \
-            f" --plugin  MaxEntScan,{vep_config['MaxEntScan']} " + \
-            f" --plugin SpliceAI,snv={vep_config['SpliceAI_snv']},indel={vep_config['SpliceAI_indel']} " + \
-            f" --plugin dbscSNV,{vep_config['dbscSNV']} " + \
-            f" --custom {vep_config['gnomADg']},gnomADg,vcf,exact,0,AF_AFR,AF_AMR,AF_ASJ,AF_EAS,AF_FIN,AF_NFE,AF_OTH,AF " + \
-            f" --fasta {vep_config['fasta']} " + \
-            f" --fork {vep_config['fork']} " + \
-            " --format vcf " + \
-            " --species homo_sapiens " + \
-            " --assembly GRCh37 " + \
-            " --cache " + \
-            " --offline " + \
-            " --merged " + \
-            " --buffer_size 5000 " + \
-            " --vcf " + \
-            " --variant_class " + \
-            " --sift b " + \
-            " --polyphen b " + \
-            " --nearest transcript " + \
-            " --distance 5000,5000 " + \
-            " --overlaps " + \
-            " --gene_phenotype " + \
-            " --regulatory " + \
-            " --show_ref_allele " + \
-            " --total_length " + \
-            " --numbers " + \
-            " --vcf_info_field ANN " + \
-            " --terms SO " + \
-            " --shift_3prime 0 " + \
-            " --shift_genomic 1 " + \
-            " --hgvs " + \
-            " --hgvsg " + \
-            " --shift_hgvs 1 " + \
-            " --transcript_version " + \
-            " --protein " + \
-            " --symbol " + \
-            " --ccds " + \
-            " --uniprot " + \
-            " --tsl " + \
-            " --appris " + \
-            " --canonical " + \
-            " --biotype " + \
-            " --domains " + \
-            " --xref_refseq " + \
-            " --check_existing " + \
-            " --clin_sig_allele 1 " + \
-            " --pubmed " + \
-            " --var_synonyms " + \
-            " --force"
 
-        app.logger.info("------ Variant Annotation with VEP ------")
-        args_vep = shlex.split(vep_cmd)
-        app.logger.info(args_vep)
-        with subprocess.Popen(args_vep, stdout=subprocess.PIPE) as proc:
-            app.logger.info(f"------ {proc.stdout.read()}")
-        app.logger.info("------ END VEP ------")
+        values = {
+            "vcf_path": vcf_path,
+            "vcf_vep": vcf_vep,
+            "stats_vep": stats_vep
+        }
 
         try:
+            app.logger.info("------ Variant Annotation with VEP ------")
+            create_and_execute_shell_command(Path(app.root_path).joinpath('static/vep.config.json'), values)
+            app.logger.info("------ END VEP ------")
             with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
                 for v in vcf_io:
                     if v.alt[0] == "*":
@@ -447,6 +489,9 @@ def importvcf():
                     v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0], filter=v.filter)
                     db.session.add(v2s)
 
+        except CommandFailedError as e:
+            app.logger.info(f"{type(e).__name__} : {e}")
+            sample.status = -1
         except Exception as e:
             db.session.remove()
             app.logger.info(f"{type(e).__name__} : {e}")

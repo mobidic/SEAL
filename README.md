@@ -30,6 +30,19 @@ It can be slightly different depending on your Operating System, Kernel, Archite
 ```bash
 conda activate seal
 ````
+- Install VEP
+  - Follow [VEP installation guide](https://www.ensembl.org/info/docs/tools/vep/script/vep_download.html#installer)
+  - Download all packages needed :
+    - dbNSFP
+    - MaxEntScan
+    - SpliceAI
+    - dbscSNV
+    - GnomAD
+  - Please edit file : `seal/static/vep.config.json` 
+    - {dir_vep}
+    - {dir_vep_plugins}
+    - {GnomAD_vcf}
+    - {fasta}
 - Export the environment variables
 ```bash
 export FLASK_APP=seal
