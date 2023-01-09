@@ -11,7 +11,7 @@ from flask_login.utils import EXEMPT_METHODS
 from flask_login import login_user, current_user, logout_user
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region, Omim
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region, Omim, History
 
 ################################################################################
 # Define global variables
@@ -827,18 +827,16 @@ def json_variant(id, version=-1, sample=None):
 def toggle_varStatus():
     id_var = request.form["id_var"]
     sample_id = request.form["sample_id"]
-    type = request.form["type"]
     v2s = Var2Sample.query.get((id_var, sample_id))
-    if type == "analyse1":
-        v2s.analyse1 = False if v2s.analyse1 else True
-        return_value = v2s.analyse1
-    if type == "analyse2":
-        v2s.analyse2 = False if v2s.analyse2 else True
-        return_value = v2s.analyse2
-    if type == "reported":
-        v2s.reported = False if v2s.reported else True
-        return_value = v2s.reported
+    v2s.reported = False if v2s.reported else True
+    return_value = v2s.reported
     db.session.commit()
+
+    report = "Report" if v2s.reported else "Unreport"
+    history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"{report} variant : {id_var}")
+    db.session.add(history)
+    db.session.commit()
+
     return f"{return_value}"
 
 
@@ -848,8 +846,14 @@ def toggle_sampleFilter():
     sample_id = request.form["id_sample"]
     filter_id = request.form["id_filter"]
     sample = Sample.query.get(sample_id)
+    old_filter = sample.filter_id
     sample.filter_id = filter_id
     db.session.commit()
+
+    if sample.filter_id != old_filter:
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change filter : {old_filter} to {sample.filter_id}")
+        db.session.add(history)
+        db.session.commit()
     return f"{sample.filter_id}"
 
 
@@ -859,8 +863,15 @@ def toggle_samplePanel():
     sample_id = request.form["id_sample"]
     panel_id = request.form["id_panel"] if "id_panel" in request.form and int(request.form["id_panel"]) > 0 else None
     sample = Sample.query.get(sample_id)
+    old_bed = sample.bed_id
     sample.bed_id = panel_id
     db.session.commit()
+
+    if sample.bed_id != old_bed:
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change panel : {old_bed} to {sample.bed_id}")
+        db.session.add(history)
+        db.session.commit()
+
     return f"{sample.bed_id}"
 
 
@@ -881,6 +892,7 @@ def toggle_sampleStatus():
     sample_id = request.form["sample_id"]
     sample = Sample.query.get(sample_id)
     status = int(request.form["status"]) if "status" in request.form else False
+    old_status = sample.status
 
     if status:
         if not(status == 4 and not (current_user.biologist or current_user.admin)):
@@ -890,6 +902,10 @@ def toggle_sampleStatus():
         sample.status = 2
         db.session.commit()
 
+    if sample.status != old_status:
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Toggle Status from status {old_status} to {sample.status}")
+        db.session.add(history)
+        db.session.commit()
     return f"{sample} - {sample.status}"
 
 

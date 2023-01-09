@@ -4,7 +4,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from seal import app, db, bcrypt
-from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run, Region, Bed, Phenotype, Omim
+from seal.models import User, Team, Sample, Family, Variant, Comment, Var2Sample, Filter, Transcript, Run, Region, Bed, Phenotype, Omim, History
 import re
 
 
@@ -122,6 +122,14 @@ admin.add_view(
         column_searchable_list=["samplename"],
         column_editable_list=['samplename', 'status'],
         form_excluded_columns=['variants']
+    )
+)
+admin.add_view(
+    CustomView(
+        History,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["action"]
     )
 )
 admin.add_view(

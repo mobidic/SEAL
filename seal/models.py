@@ -111,6 +111,13 @@ class Team(db.Model):
 ################################################################################
 # Analysis
 
+class History(db.Model):
+    user_ID = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, default=1)
+    sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, primary_key=True)
+
+    action = db.Column(db.Text)
+
 
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
