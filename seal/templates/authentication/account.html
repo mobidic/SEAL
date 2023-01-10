@@ -44,6 +44,22 @@
                     </div>
 
                     <div class="w3-row w3-section">
+                        <div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-key"></i></div>
+                        <div class="w3-rest">
+                            {% if update_account_form.api_key_md.errors %}
+                                {{ update_account_form.api_key_md(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in update_account_form.api_key_md.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ update_account_form.api_key_md(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="w3-row w3-section">
                         <div class="w3-col w3-text-flat-green-sea" style="width:50px"><i class="w3-xxlarge fas fa-camera"></i></div>
                         <div class="w3-rest">
                             {% if update_account_form.image_file.errors %}

@@ -6,7 +6,7 @@ from flask_login import current_user
 from seal.models import User, Sample, Run, Team, Bed, Region
 from seal import bcrypt
 import pandas as pd
-
+import requests
 
 ################################################################################
 # Authentication
@@ -34,6 +34,10 @@ class UpdateAccountForm(FlaskForm):
         'Mail',
         validators=[Optional(), Email()]
     )
+    api_key_md = StringField(
+        'API_key_md',
+        validators=[Optional()]
+    )
     image_file = FileField(
         'Update Profile Picture',
         validators=[FileAllowed(['png', 'jpg', 'jpeg'])]
@@ -51,6 +55,13 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(mail=mail.data).first()
             if user:
                 raise ValidationError('That mail is already taken. Please choose another one.')
+
+    def validate_api_key_md(self, api_key_md):
+        payload = {'api_key': api_key_md.data}
+        r = requests.post("https://mobidetails.iurc.montp.inserm.fr/MD/api/service/check_api_key", data=payload)
+        response = r.json()
+        if not response["api_key_pass_check"]:
+            raise ValidationError(f'API key status {response["api_key_status"]}. Please check your API key.')
 
 
 class UpdatePasswordForm(FlaskForm):

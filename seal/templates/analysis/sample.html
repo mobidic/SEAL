@@ -964,7 +964,7 @@
                                 return "<i>NA</i>";
                             }
                             mobidetails="";
-                            {%  if 'API_KEY_MD' in config %}
+                            {%  if current_user.api_key_md %}
                                 mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
                             {% endif %}
                             return mobidetails + data;
@@ -1615,7 +1615,7 @@
             data: {
                 variant_chgvs: encodeURIComponent(id),
                 caller: 'cli',
-                api_key: '{{ config["API_KEY_MD"] }}'
+                api_key: '{{ current_user.api_key_md }}'
             }
         })
         .done(function(data) {
@@ -1822,7 +1822,7 @@
                 }
                 mobidetails=""
                 if (data["annotations"]["ANN"][x]["HGVSc"] != null && data["annotations"]["ANN"][x]["HGVSc"].substr(0,3) == 'NM_') {
-                    {%  if 'API_KEY_MD' in config %}
+                    {%  if current_user.api_key_md %}
                         mobidetails = '<span onclick="openMD(\'' + data["annotations"]["ANN"][x]["HGVSc"] + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
                     {% endif %}
                 }

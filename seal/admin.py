@@ -99,8 +99,8 @@ admin.add_view(
         db.session,
         category="Authentication",
         column_exclude_list=['password', 'transcripts'],
-        column_searchable_list=['username', 'mail'],
-        column_editable_list=['username', 'mail', 'filter'],
+        column_searchable_list=['username', 'mail', 'api_key_md'],
+        column_editable_list=['username', 'mail', 'filter', "api_key_md"],
         form_excluded_columns=['comments', 'transcripts']
     )
 )

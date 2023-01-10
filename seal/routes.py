@@ -223,6 +223,7 @@ def account():
             current_user.image_file = picture_file
 
         current_user.mail = update_account_form.mail.data if update_account_form.mail.data != '' else None
+        current_user.api_key_md = update_account_form.api_key_md.data if update_account_form.api_key_md.data != '' else None
         current_user.username = update_account_form.username.data
         db.session.commit()
 
@@ -235,6 +236,7 @@ def account():
 
     update_account_form.username.data = current_user.username
     update_account_form.mail.data = current_user.mail
+    update_account_form.api_key_md.data = current_user.api_key_md
 
     return render_template(
         'authentication/account.html', title='Account',

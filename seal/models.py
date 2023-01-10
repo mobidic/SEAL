@@ -65,6 +65,7 @@ class User(db.Model, UserMixin):
         db.String(45), unique=False,
         nullable=False, default='default.jpg')
     password = db.Column(db.String(120), unique=False, nullable=False)
+    api_key_md = db.Column(db.String(60), unique=False, nullable=True)
     logged = db.Column(db.Boolean(), nullable=False, default=False)
     admin = db.Column(db.Boolean(), nullable=False, default=False)
     bioinfo = db.Column(db.Boolean(), nullable=False, default=False)
@@ -116,7 +117,7 @@ class History(db.Model):
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
     date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, primary_key=True)
 
-    action = db.Column(db.Text)
+    action = db.Column(db.Text, nullable=False)
 
 
 class Sample(db.Model):
