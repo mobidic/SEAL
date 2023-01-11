@@ -40,17 +40,6 @@
         pointer-events: none;
     }
 
-    {% for i in range(120) %}
-        .particle:nth-child({{ i+1 }}) {
-            top: {{ range(0,100) | random }}%;
-            left: {{ range(0,100) | random }}%;
-            font-weight: {{ ['normal', 'bold', 'bolder', 'lighter'] | random }};
-            font-size: {{ range(12,22) | random }}px;
-            filter: blur({{ (range(2,240,4) | random)/100 }}px);
-            animation: {{ range(20,40) | random }}s {{ ['float', 'floatReverse', 'float2','floatReverse2']|random }} infinite;
-        }
-    {% endfor %}
-
     @keyframes apparition {
         from {
             opacity: 0;
@@ -99,9 +88,7 @@
 {% block content %}
 
     <div class="w3-main">
-        {% for i in range(120) %}
-            <span class='particle'>{{ e.code | string | list | random() }}</span>
-        {% endfor %}
+        <div id="float-div"></div>
         <div class="w3-content w3-display-middle w3-padding" style="width:100%;">
             <div class="w3-content w3-card-4 content" style="width:100%">
 
@@ -113,4 +100,11 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript">
+        var eCode = "{{ e.code }}";
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='seal/essentials/error.js') }}"></script>
 {% endblock %}

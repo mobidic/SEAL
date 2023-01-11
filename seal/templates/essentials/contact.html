@@ -1,60 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="w3-content">
-        <div class="w3-row-padding w3-margin">
-            <div class="w3-col l4 w3-hide-small w3-hide-medium">
-                <div class="w3-text-flat-wet-asphalt" style="position: relative;width: 100%;padding-top: 200%;">
-                    <div class="w3-display-container w3-margin w3-paddin w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
-                        <h1 class="w3-display-middle"><b>CONTACT</b></h1>
+    {% include 'includes/sidebar.j2' %}
+    <div class="w3-main" {% if current_user.sidebar %}style="margin-left:350px"{% endif %}>
+        <div class="w3-content">
+            <div class="w3-row-padding w3-margin">
+                <div class="w3-col l4 w3-hide-small w3-hide-medium">
+                    <div class="w3-text-flat-wet-asphalt" style="position: relative;width: 100%;padding-top: 200%;">
+                        <div class="w3-display-container w3-margin w3-paddin w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
+                            <h1 class="w3-display-middle"><b>CONTACT</b></h1>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="w3-col l4 m6 w3-margin-bottom">
-                <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
-                    <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
-                        <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fas fa-paper-plane w3-middle"></i></div>
-                        <h3><b>EMAIL:</b></h3>
-                        <p class="w3-text-flat-clouds">c-vangoethem (at) chu-montpellier (dot) fr</p>
+                <div class="w3-col l4 m6 w3-margin-bottom">
+                    <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
+                        <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
+                            <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fas fa-paper-plane w3-middle"></i></div>
+                            <h3><b>EMAIL:</b></h3>
+                            <p class="w3-text-flat-clouds">c-vangoethem (at) chu-montpellier (dot) fr</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="w3-col l4 m6 w3-margin-bottom">
-                <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
-                    <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
-                        <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fab fa-github w3-middle"></i></div>
-                        <h3><b>GitHub:</b></h3>
-                        <p class="w3-text-flat-clouds">
-                            <a style="text-decoration:underline" href="https://github.com/mobidic/seal" target="_blank" title="GitHub SEAL">github.com/mobidic/seal</a>
-                            <a style="text-decoration:underline" href="https://github.com/mobidic" target="_blank" title="GitHub MoBiDiC">github.com/mobidic</a>
-                        </p>
+                <div class="w3-col l4 m6 w3-margin-bottom">
+                    <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
+                        <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
+                            <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fab fa-github w3-middle"></i></div>
+                            <h3><b>GitHub:</b></h3>
+                            <p class="w3-text-flat-clouds">
+                                <a style="text-decoration:underline" href="https://github.com/mobidic/seal" target="_blank" title="GitHub SEAL">github.com/mobidic/seal</a>
+                                <a style="text-decoration:underline" href="https://github.com/mobidic" target="_blank" title="GitHub MoBiDiC">github.com/mobidic</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="w3-col l4 m6 w3-margin-bottom">
-                <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
-                    <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
-                        <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fab fa-twitter w3-middle"></i></div>
-                        <h3><b>Twitter:</b></h3>
-                        <p class="w3-text-flat-clouds">
-                            <a style="text-decoration:underline" href="https://twitter.com/MoBiDiC_BioInfo" target="_blank" title="Twitter MoBiDiC">twitter.com/MoBiDiC_BioInfo</a>
-                            <a style="text-decoration:underline" href="https://twitter.com/Char_Al_" target="_blank" title="Twitter CharAl">twitter.com/Char_Al_</a>
-                        </p>
+                <div class="w3-col l4 m6 w3-margin-bottom">
+                    <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
+                        <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
+                            <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fab fa-twitter w3-middle"></i></div>
+                            <h3><b>Twitter:</b></h3>
+                            <p class="w3-text-flat-clouds">
+                                <a style="text-decoration:underline" href="https://twitter.com/MoBiDiC_BioInfo" target="_blank" title="Twitter MoBiDiC">twitter.com/MoBiDiC_BioInfo</a>
+                                <a style="text-decoration:underline" href="https://twitter.com/Char_Al_" target="_blank" title="Twitter CharAl">twitter.com/Char_Al_</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="w3-col l4 m6 w3-margin-bottom">
-                <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
-                    <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
-                        <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fas fa-bug w3-middle"></i></div>
-                        <h3><b>ANY ISSUE:</b></h3>
-                        <p class="w3-text-flat-clouds">
-                            <a style="text-decoration:underline" href="https://github.com/mobidic/SEAL/issues" target="_blank" title="GitHub issues">github.com/mobidic/SEAL/issues</a>
-                        </p>
+                <div class="w3-col l4 m6 w3-margin-bottom">
+                    <div class="w3-flat-wet-asphalt w3-text-flat-silver" style="position: relative;width: 100%;padding-top: 100%;">
+                        <div class="w3-margin w3-paddin w3-text-flat-silver w3-center" style="position:absolute;top: 0;left: 0;bottom: 0;right: 0;">
+                            <div class="w3-display-container w3-padding-16 w3-border-flat-clouds" style="height: 50%;width: 50%;border-radius: 50%; border:5px solid;margin: 0 auto;"><i class="w3-display-middle w3-xxxlarge fas fa-bug w3-middle"></i></div>
+                            <h3><b>ANY ISSUE:</b></h3>
+                            <p class="w3-text-flat-clouds">
+                                <a style="text-decoration:underline" href="https://github.com/mobidic/SEAL/issues" target="_blank" title="GitHub issues">github.com/mobidic/SEAL/issues</a>
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

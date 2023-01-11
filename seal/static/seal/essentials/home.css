@@ -1,0 +1,12 @@
+.access:hover {
+    cursor: pointer;
+}
+.disabled:hover {
+    cursor: not-allowed;
+}
+.load:hover {
+    cursor: wait;
+}
+.help:hover {
+    cursor: help;
+}
