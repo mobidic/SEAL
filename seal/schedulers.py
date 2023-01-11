@@ -13,7 +13,7 @@ from sqlalchemy import and_
 from anacore import annotVcf
 
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team, Bed
+from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team, Bed, Filter
 
 
 CONSEQUENCES_DICT = {
@@ -196,6 +196,18 @@ def get_bed(id=None, name=None):
     return False
 
 
+def get_filter(id=None, name=None):
+    if id:
+        filter = Filter.query.get(id)
+        if filter:
+            return filter
+    if name:
+        filter = Filter.query.filter_by(filtername=name).first()
+        if bool(filter):
+            return filter
+    return False
+
+
 def create_sample(data):
     if not "samplename" in data:
         raise KeyError
@@ -239,6 +251,13 @@ def create_sample(data):
         bed = get_bed(id, name)
         if bed:
             sample.bed = bed
+
+    if "filter" in data:
+        id = data["filter"]["id"] if "id" in data["filter"] else None
+        name = data["filter"]["name"] if "name" in data["filter"] else None
+        filter = get_filter(id, name)
+        if filter:
+            sample.filter = filter
 
     db.session.commit()
     return sample
