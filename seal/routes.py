@@ -11,7 +11,7 @@ from flask_login.utils import EXEMPT_METHODS
 from flask_login import login_user, current_user, logout_user
 from flask import render_template, flash, redirect, url_for, request, jsonify
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
-from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment, Run, Team, Bed, Region, Omim, History
+from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment_variant, Comment_sample, Run, Team, Bed, Region, Omim, History
 
 ################################################################################
 # Define global variables
@@ -914,7 +914,7 @@ def toggle_sampleStatus():
 @app.route("/add/comment/variant", methods=['POST'])
 @login_required
 def add_comment():
-    comment = Comment(comment=urllib.parse.unquote(request.form["comment"]), variantid=request.form["id_var"], date=datetime.now(), userid=current_user.id)
+    comment = Comment_variant(comment=urllib.parse.unquote(request.form["comment"]), variantid=request.form["id_var"], date=datetime.now(), userid=current_user.id)
     db.session.add(comment)
     db.session.commit()
     return 'ok'

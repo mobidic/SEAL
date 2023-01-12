@@ -77,7 +77,8 @@ class User(db.Model, UserMixin):
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=False, default=1)
     filter = relationship("Filter", backref=db.backref("users"))
     transcripts = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
-    comments = relationship("Comment")
+    comments_variants = relationship("Comment_variant")
+    comments_samples = relationship("Comment_sample")
 
     teams = db.relationship(
         'Team', secondary=team2member, lazy='subquery',
@@ -143,6 +144,7 @@ class Sample(db.Model):
         'Team', secondary=sample2team, lazy='subquery',
         backref=db.backref('samples', lazy=True)
     )
+    comments = relationship("Comment_sample")
 
     def __repr__(self):
         return f"Sample('{self.samplename}','{self.family}','{self.run}','{self.status}','{self.affected}','{self.index}')"
@@ -186,7 +188,7 @@ class Variant(db.Model):
     alt = db.Column(db.String(500), unique=False, nullable=False)
     class_variant = db.Column(db.Integer, unique=False, default=None)
     annotations = db.Column(db.JSON, nullable=True)
-    comments = relationship("Comment")
+    comments = relationship("Comment_variant")
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
@@ -195,7 +197,7 @@ class Variant(db.Model):
         return self.id
 
 
-class Comment(db.Model):
+class Comment_variant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.Text, nullable=False)
     date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
@@ -204,7 +206,25 @@ class Comment(db.Model):
     variant = relationship("Variant", back_populates="comments")
 
     userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    user = relationship("User", back_populates="comments")
+    user = relationship("User", back_populates="comments_variants")
+
+    def __repr__(self):
+        return f"Comment('{self.comment}','{self.date}')"
+
+    def __str__(self):
+        return self.comment
+
+
+class Comment_sample(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    comment = db.Column(db.Text, nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
+
+    sampleid = db.Column(db.Integer, db.ForeignKey('sample.id'), nullable=False)
+    variant = relationship("Sample", back_populates="comments")
+
+    userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user = relationship("User", back_populates="comments_samples")
 
     def __repr__(self):
         return f"Comment('{self.comment}','{self.date}')"
