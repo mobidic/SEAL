@@ -364,8 +364,6 @@ def create_and_execute_shell_command(json_file, values):
 # cron examples
 @scheduler.task('cron', id='import vcf', second="*/20")
 def importvcf():
-    # Load config file
-
     # Check launchable
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     current_token = get_token(path_inout)
