@@ -147,3 +147,9 @@ migrations
 
 # MacOS relative
 .DS_Store
+
+# SEAL
+*.token
+*.treat
+*.vcf
+*.bed
