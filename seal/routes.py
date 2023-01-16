@@ -345,6 +345,12 @@ def create_variant():
             "run": {
                 "name": uploadSampleForm.run.data,
             },
+            "filter": {
+                "name": uploadSampleForm.filter.data,
+            },
+            "bed": {
+                "name": uploadSampleForm.bed.data,
+            },
             "teams": [{"name": Team.query.get(id).teamname} for id in uploadSampleForm.teams.data],
             "interface": True
         }

@@ -17,8 +17,31 @@ $(document).ready(function(){
         }
     });
 
+    var filters=[];
+    $.getJSON('/json/filters', function(data, status, xhr){
+        for (let key in data) {
+            filters.push(data[key]);
+            console.log(data[key]);
+        }
+    });
+
+    var beds=[];
+    $.getJSON('/json/beds', function(data, status, xhr){
+        for (let key in data) {
+            beds.push(data[key]);
+        }
+    });
+
     $('#run').autocomplete({
         source: runs,
+    });
+
+    $('#filter').autocomplete({
+        source: filters,
+    });
+
+    $('#bed').autocomplete({
+        source: beds,
     });
 });
 

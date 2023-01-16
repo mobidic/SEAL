@@ -21,7 +21,7 @@
                     {{ form.hidden_tag() }}
                     <div class="w3-row w3-section">
                         <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px">
-                            <i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(class="w3-display-right", style="font-weight: bold;")}}
+                            <i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(required=form.samplename.flags.required, class="w3-display-right", style="font-weight: bold;") }}
                         </div>
                         <div class="w3-rest">
                             {% if form.samplename.errors %}
@@ -77,6 +77,40 @@
                         </div>
                     </div>
 
+
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-filter"></i> {{ form.filter.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.filter.errors %}
+                                {{ form.filter(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.filter.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.filter(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-th-list"></i> {{ form.bed.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.bed.errors %}
+                                {{ form.bed(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.bed.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.bed(class="w3-input w3-border") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <div class="w3-row w3-section w3-display-container">
                         <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.teams.label(class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
@@ -85,7 +119,7 @@
                     </div>
 
                     <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(required=form.vcf_file.flags.required, class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
                             {% if form.vcf_file.errors %}
                                 {{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}

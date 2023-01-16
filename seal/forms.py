@@ -104,6 +104,14 @@ class UploadVariantForm(FlaskForm):
         'Run',
         validators=[Optional(), Length(min=2, max=50)]
     )
+    bed = StringField(
+        'Bed',
+        validators=[Optional(), Length(min=2, max=50)]
+    )
+    filter = StringField(
+        'Filter',
+        validators=[Optional(), Length(min=2, max=50)]
+    )
     vcf_file = FileField(
         'Upload VCF file',
         validators=[DataRequired(), FileAllowed(['vcf', 'vcf.gz'])]
