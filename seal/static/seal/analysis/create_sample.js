@@ -21,7 +21,6 @@ $(document).ready(function(){
     $.getJSON('/json/filters', function(data, status, xhr){
         for (let key in data) {
             filters.push(data[key]);
-            console.log(data[key]);
         }
     });
 
@@ -43,6 +42,7 @@ $(document).ready(function(){
     $('#bed').autocomplete({
         source: beds,
     });
+    $('.js-example-basic-multiple').select2();
 });
 
 $('#multiSelectTeams').multiSelect({

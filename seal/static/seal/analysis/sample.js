@@ -1939,10 +1939,10 @@ function toggle_status(id, status) {
         var name = $("#filterName").val();
         var filter = JSON.parse($("#filterText").text());
         var teams = [];
-        var elt = $("#btn-group-multiSelectTeams").find('.vsb-menu').find('.multi').find('.active');
+        var elt = $("#create-filter").find('.select2-container').find('.selection').find('.select2-selection').find('.select2-selection__rendered').find('.select2-selection__choice');
         for (i in [...Array(elt.length).keys()]) {
-            teams.push(elt[i].value);
-            console.log(teams);
+            teams.push(elt[i].title);
+            console.log(elt[i].title);
         }
         $.ajax({
             type: "POST",
@@ -1994,10 +1994,7 @@ function toggle_status(id, status) {
         table = $('#variants').DataTable();
         table.ajax.url( '/json/variants/sample/' + sample_id + '/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
     }
-    $('#multiSelectTeams').multiSelect({
-        selectableHeader: "<div class='w3-container w3-teal'>Selectable Teams</div>",
-        selectionHeader: "<div class='w3-container w3-teal'>Selected Teams</div>",
-    });
+    $('.js-example-basic-multiple').select2();
 
 
     $(document).on("click", function(event){

@@ -2,10 +2,11 @@
 
 {% block static %}
     <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
-
-    <link href="{{ url_for('static', filename='lou-multi-select/css/multi-select.css') }}" media="screen" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='select2/css/select2.min.css') }}" rel="stylesheet" />
+    
     
     <link href="{{ url_for('static', filename='seal/analysis/create_sample.css') }}" rel="stylesheet" type="text/css">
+
 {% endblock %}
 
 {% block content %}
@@ -114,7 +115,7 @@
                     <div class="w3-row w3-section w3-display-container">
                         <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.teams.label(class="w3-display-right", style="font-weight: bold;")}}</div>
                         <div class="w3-rest">
-                            {{ form.teams(id="multiSelectTeams") }}
+                            {{ form.teams(class="js-example-basic-multiple", multiple="multiple", style="width:100%") }}
                         </div>
                     </div>
 
@@ -147,7 +148,7 @@
 
 {% block script %}
     <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='lou-multi-select/js/jquery.multi-select.js') }}"></script>
-    
+    <script src="{{ url_for('static', filename='select2/js/select2.full.min.js') }}"></script>
+
     <script type="text/javascript" src="{{ url_for('static', filename='seal/analysis/create_sample.js') }}"></script>
 {% endblock %}

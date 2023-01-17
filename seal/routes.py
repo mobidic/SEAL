@@ -930,9 +930,8 @@ def add_comment():
 @login_required
 def add_filter():
     teams = list()
-    for id in json.loads(request.form['teams']):
-        if id > 0:
-            teams.append(Team.query.get(id))
+    for name in json.loads(request.form['teams']):
+        teams.append(Team.query.filter_by(teamname=name).first())
     filter = Filter(
         filtername=urllib.parse.unquote(request.form["name"]),
         filter=json.loads(request.form["filter"]),
