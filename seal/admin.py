@@ -61,9 +61,15 @@ class SampleView(CustomView):
         """
         try:
             self.session.flush()
+
             var2samples = db.session.query(Var2Sample).filter(Var2Sample.sample_ID == int(model.id))
             for var2sample in var2samples:
                 self.session.delete(var2sample)
+
+            historical = db.session.query(History).filter(History.sample_ID == int(model.id))
+            for history in historical:
+                self.session.delete(history)
+
             self.session.delete(model)
             self.session.commit()
         except Exception as ex:
