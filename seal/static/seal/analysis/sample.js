@@ -1942,7 +1942,6 @@ function toggle_status(id, status) {
         var elt = $("#create-filter").find('.select2-container').find('.selection').find('.select2-selection').find('.select2-selection__rendered').find('.select2-selection__choice');
         for (i in [...Array(elt.length).keys()]) {
             teams.push(elt[i].title);
-            console.log(elt[i].title);
         }
         $.ajax({
             type: "POST",
