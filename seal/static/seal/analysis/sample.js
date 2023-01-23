@@ -1045,6 +1045,88 @@ function toggle_status(id, status) {
                                 }
                             }
                         },
+                        '<h3>Reported</h3>',
+                        {
+                            extend: 'copy',
+                            text: 'Copy',
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        if (column === 22) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 23) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                },
+                                rows: [function(data, row, column, node) {
+                                    if(row.reported) {
+                                        return data+1;
+                                    }
+                                }],
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        },
+                        {
+                            extend: 'excel',
+                            text: 'Excel',
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        if (column === 22) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 23) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                },
+                                rows: [function(data, row, column, node) {
+                                    if(row.reported) {
+                                        return data+1;
+                                    }
+                                }],
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        },
+                        {
+                            extend: 'csv',
+                            text: 'CSV',
+                            exportOptions: {
+                                orthogonal: 'export',
+                                format: {
+                                    body: function(data, row, column, node) {
+                                        if (column === 22) {
+                                            data = $(node).children().prop("checked")===true?"Yes":"No";
+                                        }
+                                        if (column === 23) {
+                                            value = $(node).children('div').children('button').text();
+                                            data = $.trim(value);
+                                        }
+                                        return data;
+                                    }
+                                },
+                                rows: [function(data, row, column, node) {
+                                    if(row.reported) {
+                                        return data+1;
+                                    }
+                                }],
+                                modifier: {
+                                    selected: null
+                                }
+                            }
+                        },
                         '<h3>Selected</h3>',
                         {
                             extend: 'copy',
