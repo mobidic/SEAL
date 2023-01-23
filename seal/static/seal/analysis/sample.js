@@ -961,7 +961,6 @@ function toggle_status(id, status) {
             initComplete: function(settings, json) {
                 changeFilter(sample_filter_id, sample_id);
                 if (sample_status != 4) {
-                    console.log ("ok");
                     $('#selectFilter').prop('disabled', false);
                     $('#selectBed').prop('disabled', false);
                 }
@@ -984,15 +983,9 @@ function toggle_status(id, status) {
                             extend: 'copy',
                             text: 'Copy',
                             exportOptions: {
-                                modifier: {
-                                    selected: null
-                                }
-                            },
-                            exportOptions: {
                                 orthogonal: 'export',
                                 format: {
                                     body: function(data, row, column, node) {
-                                        // Strip $ from salary column to make it numeric
                                         if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
@@ -1002,6 +995,9 @@ function toggle_status(id, status) {
                                         }
                                         return data;
                                     }
+                                },
+                                modifier: {
+                                    selected: null
                                 }
                             }
                         },
@@ -1009,15 +1005,9 @@ function toggle_status(id, status) {
                             extend: 'excel',
                             text: 'Excel',
                             exportOptions: {
-                                modifier: {
-                                    selected: null
-                                }
-                            },
-                            exportOptions: {
                                 orthogonal: 'export',
                                 format: {
                                     body: function(data, row, column, node) {
-                                        // Strip $ from salary column to make it numeric
                                         if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
@@ -1027,6 +1017,9 @@ function toggle_status(id, status) {
                                         }
                                         return data;
                                     }
+                                },
+                                modifier: {
+                                    selected: null
                                 }
                             }
                         },
@@ -1034,15 +1027,9 @@ function toggle_status(id, status) {
                             extend: 'csv',
                             text: 'CSV',
                             exportOptions: {
-                                modifier: {
-                                    selected: null
-                                }
-                            },
-                            exportOptions: {
                                 orthogonal: 'export',
                                 format: {
                                     body: function(data, row, column, node) {
-                                        // Strip $ from salary column to make it numeric
                                         if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
@@ -1052,6 +1039,9 @@ function toggle_status(id, status) {
                                         }
                                         return data;
                                     }
+                                },
+                                modifier: {
+                                    selected: null
                                 }
                             }
                         },
@@ -1060,15 +1050,9 @@ function toggle_status(id, status) {
                             extend: 'copy',
                             text: 'Copy',
                             exportOptions: {
-                                modifier: {
-                                    selected: true
-                                }
-                            },
-                            exportOptions: {
                                 orthogonal: 'export',
                                 format: {
                                     body: function(data, row, column, node) {
-                                        // Strip $ from salary column to make it numeric
                                         if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
@@ -1078,6 +1062,9 @@ function toggle_status(id, status) {
                                         }
                                         return data;
                                     }
+                                },
+                                modifier: {
+                                    selected: true
                                 }
                             }
                         },
@@ -1085,15 +1072,9 @@ function toggle_status(id, status) {
                             extend: 'excel',
                             text: 'Excel',
                             exportOptions: {
-                                modifier: {
-                                    selected: true
-                                }
-                            },
-                            exportOptions: {
                                 orthogonal: 'export',
                                 format: {
                                     body: function(data, row, column, node) {
-                                        // Strip $ from salary column to make it numeric
                                         if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
@@ -1103,6 +1084,9 @@ function toggle_status(id, status) {
                                         }
                                         return data;
                                     }
+                                },
+                                modifier: {
+                                    selected: true
                                 }
                             }
                         },
@@ -1110,15 +1094,9 @@ function toggle_status(id, status) {
                             extend: 'csv',
                             text: 'CSV',
                             exportOptions: {
-                                modifier: {
-                                    selected: true
-                                }
-                            },
-                            exportOptions: {
                                 orthogonal: 'export',
                                 format: {
                                     body: function(data, row, column, node) {
-                                        // Strip $ from salary column to make it numeric
                                         if (column === 22) {
                                             data = $(node).children().prop("checked")===true?"Yes":"No";
                                         }
@@ -1128,6 +1106,9 @@ function toggle_status(id, status) {
                                         }
                                         return data;
                                     }
+                                },
+                                modifier: {
+                                    selected: true
                                 }
                             }
                         },
