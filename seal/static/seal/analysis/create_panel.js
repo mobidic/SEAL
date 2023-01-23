@@ -1,3 +1,3 @@
-$(document).ready(function(){
+$(function(){
     $('.js-example-basic-multiple').select2();
 });

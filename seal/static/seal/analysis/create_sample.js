@@ -1,4 +1,4 @@
-$(document).ready(function(){
+$(function(){
     var families=[];
     $.getJSON('/json/families', function(data, status, xhr){
         for (var i = 0; i < data['data'].length; i++ ) {

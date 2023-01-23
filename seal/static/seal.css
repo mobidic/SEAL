@@ -191,10 +191,10 @@ table.dataTable thead th.sorting_desc:after {
 }
 
 .dtfc-fixed-left {
-    border-right: 1px solid #063027; !important;
+    border-right: 1px solid #063027 !important;
 }
 .dtfc-fixed-right {
-    border-left: 1px solid #063027; !important;
+    border-left: 1px solid #063027 !important;
 }
 
 .w3-dropdown-hover-turquoise:hover > .w3-button:first-child {
