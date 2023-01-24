@@ -178,6 +178,15 @@ def login():
     )
 
 
+@app.route("/maintenance")
+def maintenance():
+    if not app.config["SEAL_MAINTENANCE"]:
+        return redirect(url_for("index"))
+    return render_template(
+        "essentials/maintenance.html",
+    )
+
+
 def crop_center(pil_img, crop_width, crop_height):
     img_width, img_height = pil_img.size
     return pil_img.crop(((img_width - crop_width) // 2,

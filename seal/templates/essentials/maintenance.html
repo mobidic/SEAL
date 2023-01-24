@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>SEAL - Maintenance</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta charset="utf-8">
+
+        <style>
+            html {
+                background: #222;
+                overflow: hidden;
+                height: 100%;
+            }
+            body {
+                min-height:100%;
+                display: grid;
+                place-items: center;
+                font-size: 3vmin;
+            }
+            h1 {
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+                color: #51fc69;
+            }
+            h2 {
+                font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+                color: #50fbfb;
+            }
+            .dna {
+                transform: rotateZ(45deg);
+            }
+            .strand{
+                display: flex;
+                align-items: center;
+                gap: 0.35em;
+                margin: 0.75em auto;
+                --d: calc(var(--i) / var(--total));
+                --color: hsl(calc(-0.65turn + (var(--d) * 0.15turn)), 95%, 65%);
+                --duration: 1.5s;
+                --delay: calc((var(--duration) * -1) + 0.1s * var(--i));
+                animation: var(--duration) cubic-bezier(0.4, 0.0, 0.6, 1.0) infinite;
+                animation-delay: var(--delay);
+            }
+            .left,.right{
+                animation: inherit;
+                display: grid;
+                grid-template-areas: 'layer';
+                align-items: center;
+                width: 7em;
+
+            }
+            .left > *, .right > * {
+                grid-area: layer;
+            }
+            .left {
+                transform: translateZ(0px);
+            }
+            .right {
+                transform: scaleX(-1);
+            }
+            .dot{
+                animation: inherit;
+                animation-duration: calc(var(--duration) * 2);
+                width: 100%;
+                animation-name: move-dot;
+                --scale-start: 1;
+                --scale-end: 0.5;
+            }
+            @keyframes move-dot {
+                50%{
+                    transform: translateX(200%);
+                }
+            }
+            .right .dot {
+                --scale-start: 1;
+                --scale-end: 0.5;
+            }
+            .dot::before{
+                display: block;
+                content: '';
+                border-radius: 50%;
+                width: 0.35em;
+                height: 0.35em;
+                background: var(--color);
+                animation: inherit;
+                animation-name: scale-dot;
+            }
+            @keyframes scale-dot {
+                33%{
+                    transform: scale(var(--scale-start));
+                }
+                66%{
+                    transform: scale(var(--scale-end));
+                }
+            }
+            .line {
+                width: calc(100% - 1.5em);
+                height: 0.1em;
+                border-radius: 1em;
+                background: var(--color);
+                margin-left:auto;
+                transform-origin: center right;
+                animation: inherit;
+                animation-name: scale-line; 
+            }
+            @keyframes scale-line {
+                50% {
+                    transform: scaleX(0.1);
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>SEAL is in maintenance !</h1>
+        
+        <div class="dna" style="--total:20">
+            <div class="strand" style="--i:1">
+                <div class="left">
+                    <div class="dot">
+                    </div>
+                    <div class="line">
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="dot">
+                    </div>
+                    <div class="line">
+                    </div>
+                </div>
+            </div>
+            <div class="strand" style="--i:2">
+                <div class="left">
+                    <div class="dot">
+                    </div>
+                    <div class="line">
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="dot">
+                    </div>
+                    <div class="line">
+                    </div>
+                </div>
+            </div>
+            <div class="strand" style="--i:3">
+                <div class="left">
+                    <div class="dot">
+                    </div>
+                    <div class="line">
+                    </div>
+                </div>
+                <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:4">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:5">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:6">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:7">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:8">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:9">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:10">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:11">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:12">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:13">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:14">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:15">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:16">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:17">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:18">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:19">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+                <div class="strand" style="--i:20">
+                    <div class="left">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                    <div class="right">
+                        <div class="dot">
+                        </div>
+                        <div class="line">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h2>Come back later or contact us.</h2>
+        </body>
+</html>
