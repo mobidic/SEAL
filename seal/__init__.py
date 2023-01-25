@@ -22,9 +22,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///seal"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SCHEDULER_API_ENABLED'] = True
 app.config['SCHEDULER_TIMEZONE'] = "Europe/Paris"
-app.config['SCHEDULER_JOB_DEFAULTS'] = {"coalesce": False, "max_instances": 2}
-if os.environ.get("API_KEY_MD"):
-    app.config["API_KEY_MD"] = os.environ.get("API_KEY_MD")
+app.config['SCHEDULER_JOB_DEFAULTS'] = {"coalesce": False, "max_instances": 1}
 app.config["SEAL_MAINTENANCE"] = os.environ.get("SEAL_MAINTENANCE") if os.environ.get("SEAL_MAINTENANCE") else False
 
 # Plugins initialization
@@ -48,7 +46,6 @@ def before_request():
     app.permanent_session_lifetime = timedelta(minutes=20)
     session.modified = True
     g.user = current_user
-    print(app.config["SEAL_MAINTENANCE"])
     if app.config["SEAL_MAINTENANCE"] and request.path != url_for('maintenance'): 
         return redirect(url_for('maintenance'))
 
