@@ -49,10 +49,6 @@ export FLASK_APP=seal
 export FLASK_ENV=development
 export PYTHONPATH=${PWD}
 ```
-  - __[Optional]__ If you use [MobiDetails](https://mobidetails.iurc.montp.inserm.fr/MD/), add your API key
-```bash
-export API_KEY_MD="YOUR_MOBIDETAILS_API_KEY"
-```
 - Start database server
 ```bash
 initdb -D ${PWD}/seal/seal.db
@@ -85,6 +81,14 @@ flask run
 ```bash
 flask db migrate -m "message"
 flask db upgrade
+```
+- Enable/disable maintenance mode
+```bash
+# Enable
+export SEAL_MAINTENANCE="TRUE"  # possibilities : "true", "t", "1", "on" (case insensitive)
+# Disable
+export SEAL_MAINTENANCE="FALSE" # possibilities : "false", "f", "0", "off" (case insensitive)
+# unset SEAL_MAINTENANCE # disable Maintenance mode too
 ```
 - Stop the server
 ```bash

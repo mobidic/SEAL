@@ -16,6 +16,22 @@ scheduler = APScheduler()
 csrf = CSRFProtect()
 
 
+# from: https://stackoverflow.com/questions/63116419/evaluate-boolean-environment-variable-in-python
+def getenv_bool(name: str, default: bool = None) -> bool:
+    true_ = ('true', '1', 't', 'on')  # Add more entries if you want, like: `y`, `yes`, `on`, ...
+    false_ = ('false', '0', 'f', 'off')  # Add more entries if you want, like: `n`, `no`, `off`, ...
+    value = os.getenv(name, None)
+    if value is None:
+        if default is None:
+            raise ValueError(f'Variable `{name}` not set!')
+        else:
+            value = str(default)
+    if value.lower() not in true_ + false_:
+        raise ValueError(f'Invalid value `{value}` for variable `{name}`')
+    
+    return value.lower() in true_
+
+
 # Configure application option
 app.config['SECRET_KEY'] = '78486cd05859fc8c6baa29c430f06638'
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///seal"
@@ -23,7 +39,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SCHEDULER_API_ENABLED'] = True
 app.config['SCHEDULER_TIMEZONE'] = "Europe/Paris"
 app.config['SCHEDULER_JOB_DEFAULTS'] = {"coalesce": False, "max_instances": 1}
-app.config["SEAL_MAINTENANCE"] = os.environ.get("SEAL_MAINTENANCE") if os.environ.get("SEAL_MAINTENANCE") else False
+app.config["SEAL_MAINTENANCE"] = getenv_bool("SEAL_MAINTENANCE", False)
 
 # Plugins initialization
 db = SQLAlchemy(app)
