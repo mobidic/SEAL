@@ -707,12 +707,12 @@ function toggle_status(id, status) {
 
                             for (idx in data) {
                                 color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
-                                cell[color] += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
+                                cell[color] += " <span class='w3-tag w3-flat-" + color + "' " + style + ">|" + data[idx] + "|</span>"
                             }
                             return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
                         },
                         filter: function ( data, type, row, meta ) {
-                            return data.toString();
+                            return "|" + data.toString() + "|";
                         },
                         sort: function ( data, type, row, meta ) {
                             score = 0;
