@@ -88,6 +88,10 @@
         </script>
 
         <script type="text/javascript" src="{{ url_for('static', filename='seal/base.js') }}"></script>
+        
+        {% if current_user.logged %}
+        <script type="text/javascript" src="{{ url_for('static', filename='seal/includes/reconnect.js') }}"></script>
+        {% endif %}
 
         {% block script %}{% endblock %}
     </body>
