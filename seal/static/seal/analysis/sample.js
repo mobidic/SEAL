@@ -371,9 +371,9 @@ function toggle_status(id, status) {
                 style:    'os',
                 selector: 'td:not(:nth-last-child(-n+4))'
             },
-            fixedHeader: {
-                headerOffset: $('#navHead').outerHeight(),
-            },
+            // fixedHeader: {
+            //     headerOffset: $('#navHead').outerHeight(),
+            // },
             ajax: json_variants,
             columns: [
                 {
@@ -1795,7 +1795,7 @@ function toggle_status(id, status) {
 
             Plotly.newPlot('chartSplicing', data1, layout);
 
-            comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+            comments = '<table id="tableCommentsVar" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
             comments = comments + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
                 '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
@@ -1815,10 +1815,10 @@ function toggle_status(id, status) {
 
             comments = comments + '</tbody>';
             comments = comments + '</table>';
-            $("#commentsTable").html(comments);
-            $('.commentsCount').html(count);
+            $("#commentsTableVar").html(comments);
+            $('.commentsCountVar').html(count);
 
-            $('#tableComments').DataTable({
+            $('#tableCommentsVar').DataTable({
                 searching:false,
                 lengthMenu: [ 10 ],
                 dom: 'tip',
@@ -1934,7 +1934,7 @@ function toggle_status(id, status) {
         })
     }
 
-    function send_comment(id_var, comment) {
+    function send_comment(type="sample") {
         $.ajaxSetup({
             beforeSend: function(xhr, settings) {
                 if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -1942,52 +1942,98 @@ function toggle_status(id, status) {
                 }
             }
         });
-        var comment = $("#comment").val();
-        var id_var = $("#variant-id").text();
+        if( type == "var") {
+            var comment = $("#commentVar").val();
+            var id = $("#variant-id").text();
+            var url = "/add/comment/variant";
+        }
+        if( type == "sample") {
+            var comment = $("#comment_sample").val();
+            var id = sample_id;
+            var url = "/add/comment/sample";
+        }
         $.ajax({
             type: "POST",
-            url: "/add/comment/variant",
+            url: url,
             data: {
-                "id_var": id_var, "comment": encodeURI(comment)
+                "id": id, "comment": encodeURI(comment)
             }
         }).done(function() {
-            $("#comment").val("");
-            $.getJSON("/json/variant/" + id_var, function(data) {
+            if (type=="var") {
+                $("#commentVar").val("");
+                $.getJSON("/json/variant/" + id, function(data) {
+                    comments = '<table id="tableCommentsVar" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+                    comments = comments + '<thead class="w3-flat-silver"><tr>'+
+                        '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
+                        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
+                        '<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
+                    '</tr></thead>';
+                    comments = comments + '<tbody>';
 
-                comments = '<table id="tableComments" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
-                comments = comments + '<thead class="w3-flat-silver"><tr>'+
-                    '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
-                    '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
-                    '<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
-                '</tr></thead>';
-                comments = comments + '<tbody>';
+                    var count = 0;
+                    for (x in data["comments"]) {
+                        comments = comments + '<tr>'+
+                            '<td>' + data["comments"][x]["user"] + '</td>'+
+                            '<td>' + data["comments"][x]["comment"] + '</td>'+
+                            '<td>' + data["comments"][x]["date"] + '</td>'+
+                        '</tr>';
+                        count+=1;
+                    }
 
-                var count = 0;
-                for (x in data["comments"]) {
-                    comments = comments + '<tr>'+
-                        '<td>' + data["comments"][x]["user"] + '</td>'+
-                        '<td>' + data["comments"][x]["comment"] + '</td>'+
-                        '<td>' + data["comments"][x]["date"] + '</td>'+
-                    '</tr>';
-                    count+=1;
-                }
+                    comments = comments + '</tbody>';
+                    comments = comments + '</table>';
+                    $("#commentsTableVar").html(comments);
+                    $('.commentsCountVar').html(count);
 
-                comments = comments + '</tbody>';
-                comments = comments + '</table>';
-                $("#commentsTable").html(comments);
-                $('.commentsCount').html(count);
-
-                $('#tableComments').DataTable({
-                    searching:false,
-                    lengthMenu: [ 10 ],
-                    dom: 'tip',
-                    order: [[ 2, "desc" ]],
-                    columnDefs: [{
-                        orderable: false,
-                        targets:  "no-sort"
-                    }],
+                    $('#tableCommentsVar').DataTable({
+                        searching:false,
+                        lengthMenu: [ 10 ],
+                        dom: 'tip',
+                        order: [[ 2, "desc" ]],
+                        columnDefs: [{
+                            orderable: false,
+                            targets:  "no-sort"
+                        }],
+                    });
                 });
-            });
+            } else {
+                $("#comment_sample").val("");
+                $.getJSON("/json/comments/sample/" + id, function(data) {
+                    comments = '<table id="tableCommentsSample" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+                    comments = comments + '<thead class="w3-flat-silver"><tr>'+
+                        '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
+                        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
+                        '<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
+                    '</tr></thead>';
+                    comments = comments + '<tbody>';
+
+                    var count = 0;
+                    for (x in data["data"]) {
+                        comments = comments + '<tr>'+
+                            '<td>' + data["data"][x]["username"] + '</td>'+
+                            '<td>' + data["data"][x]["comment"] + '</td>'+
+                            '<td>' + data["data"][x]["date"] + '</td>'+
+                        '</tr>';
+                        count+=1;
+                    }
+
+                    comments = comments + '</tbody>';
+                    comments = comments + '</table>';
+                    $("#commentsTableSample").html(comments);
+                    $('.commentsCountSample').html(count);
+
+                    $('#tableCommentsSample').DataTable({
+                        searching:false,
+                        lengthMenu: [ 10 ],
+                        dom: 'tip',
+                        order: [[ 2, "desc" ]],
+                        columnDefs: [{
+                            orderable: false,
+                            targets:  "no-sort"
+                        }],
+                    });
+                });
+            }
         });
     }
 
@@ -2076,3 +2122,17 @@ function toggle_status(id, status) {
         $('#' + id +'-content').toggle();
         $('#' + id +'-content').toggleClass("ClassVisible");
     }
+
+
+    $('#tableCommentsSample').DataTable({
+        searching:false,
+        lengthMenu: [ 10 ],
+        dom: 'tip',
+        order: [[ 2, "desc" ]],
+        columnDefs: [
+               {
+                    orderable: false,
+                    targets:  "no-sort"
+               }
+           ],
+    });

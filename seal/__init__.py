@@ -50,7 +50,7 @@ login_manager.login_message_category = 'info'
 scheduler.init_app(app)
 scheduler.start()
 csrf.init_app(app)
-migrate = Migrate(app, db)
+migrate = Migrate(app, db, compare_type=True)
 
 app.logger.info(app.config)
 

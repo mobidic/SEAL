@@ -4,7 +4,7 @@ from flask_admin import Admin, AdminIndexView
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from seal import app, db, bcrypt
-from seal.models import User, Team, Sample, Family, Variant, Comment_variant, Var2Sample, Filter, Transcript, Run, Region, Bed, Phenotype, Omim, History
+from seal.models import User, Team, Sample, Family, Variant, Comment_variant, Comment_sample, Var2Sample, Filter, Transcript, Run, Region, Bed, Phenotype, Omim, History
 import re
 
 
@@ -172,6 +172,15 @@ admin.add_view(
 admin.add_view(
     CustomView(
         Comment_variant,
+        db.session,
+        category="Analysis",
+        column_searchable_list=["comment"],
+        column_editable_list=["comment"]
+    )
+)
+admin.add_view(
+    CustomView(
+        Comment_sample,
         db.session,
         category="Analysis",
         column_searchable_list=["comment"],

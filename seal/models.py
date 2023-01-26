@@ -221,7 +221,7 @@ class Comment_sample(db.Model):
     date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
 
     sampleid = db.Column(db.Integer, db.ForeignKey('sample.id'), nullable=False)
-    variant = relationship("Sample", back_populates="comments")
+    sample = relationship("Sample", back_populates="comments")
 
     userid = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     user = relationship("User", back_populates="comments_samples")

@@ -508,6 +508,26 @@ def json_samples():
     return jsonify(samples_json)
 
 
+
+@app.route("/json/comments/sample/<int:id>", methods=['GET', 'POST'])
+@login_required
+def json_comments_sample(id):
+    sample = Sample.query.get(int(id))
+    comments = {
+        "data": list()
+    }
+    for comment in sample.comments:
+        comments["data"].append({
+            "id": comment.id,
+            "comment": comment.comment,
+            "sample": str(comment.sample),
+            "date": comment.date.strftime("%Y/%m/%d at %H:%M:%S"),
+            "userid": comment.user.id,
+            "username": comment.user.username
+        })
+    return jsonify(comments)
+
+
 @app.route("/json/variants/sample/<int:id>", methods=['GET', 'POST'])
 @app.route("/json/variants/sample/<int:id>/bed/<int:idbed>", methods=['GET', 'POST'])
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
@@ -928,8 +948,17 @@ def toggle_sampleStatus():
 
 @app.route("/add/comment/variant", methods=['POST'])
 @login_required
-def add_comment():
-    comment = Comment_variant(comment=urllib.parse.unquote(request.form["comment"]), variantid=request.form["id_var"], date=datetime.now(), userid=current_user.id)
+def add_comment_variant():
+    comment = Comment_variant(comment=urllib.parse.unquote(request.form["comment"]), variantid=request.form["id"], date=datetime.now(), userid=current_user.id)
+    db.session.add(comment)
+    db.session.commit()
+    return 'ok'
+
+
+@app.route("/add/comment/sample", methods=['POST'])
+@login_required
+def add_comment_sample():
+    comment = Comment_sample(comment=urllib.parse.unquote(request.form["comment"]), sampleid=request.form["id"], date=datetime.now(), userid=current_user.id)
     db.session.add(comment)
     db.session.commit()
     return 'ok'
