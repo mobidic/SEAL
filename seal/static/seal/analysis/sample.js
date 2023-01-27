@@ -2136,3 +2136,17 @@ function toggle_status(id, status) {
                }
            ],
     });
+
+
+    $('#tableHistorySample').DataTable({
+        searching:true,
+        lengthMenu: [ 10 ],
+        dom: 'tip',
+        order: [[ 2, "desc" ]],
+        columnDefs: [
+               {
+                    orderable: false,
+                    targets:  "no-sort"
+               }
+           ],
+    });

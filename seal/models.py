@@ -79,6 +79,7 @@ class User(db.Model, UserMixin):
     transcripts = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     comments_variants = relationship("Comment_variant")
     comments_samples = relationship("Comment_sample")
+    historics = relationship("History")
 
     teams = db.relationship(
         'Team', secondary=team2member, lazy='subquery',
@@ -115,7 +116,9 @@ class Team(db.Model):
 
 class History(db.Model):
     user_ID = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True, default=1)
+    user = relationship("User", back_populates="historics")
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+    sample = relationship("Sample", back_populates="historics")
     date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, primary_key=True)
 
     action = db.Column(db.Text, nullable=False)
@@ -140,6 +143,7 @@ class Sample(db.Model):
     runid = db.Column(db.Integer, db.ForeignKey('run.id'))
     run = relationship("Run", back_populates="samples")
 
+    historics = relationship("History")
     teams = db.relationship(
         'Team', secondary=sample2team, lazy='subquery',
         backref=db.backref('samples', lazy=True)

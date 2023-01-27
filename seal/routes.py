@@ -521,7 +521,7 @@ def json_comments_sample(id):
             "id": comment.id,
             "comment": comment.comment,
             "sample": str(comment.sample),
-            "date": comment.date.strftime("%Y/%m/%d at %H:%M:%S"),
+            "date": comment.date.strftime("%Y/%m/%d %H:%M:%S"),
             "userid": comment.user.id,
             "username": comment.user.username
         })
@@ -900,12 +900,12 @@ def toggle_samplePanel():
     sample_id = request.form["id_sample"]
     panel_id = request.form["id_panel"] if "id_panel" in request.form and int(request.form["id_panel"]) > 0 else None
     sample = Sample.query.get(sample_id)
-    old_bed = sample.bed_id
+    old_bed = sample.bed
     sample.bed_id = panel_id
     db.session.commit()
 
     if sample.bed_id != old_bed:
-        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change panel : {old_bed} to {sample.bed_id}")
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change panel : '{old_bed.name}' ({old_bed.id}) to '{sample.bed.name}' ({old_bed.id})")
         db.session.add(history)
         db.session.commit()
 
@@ -938,9 +938,18 @@ def toggle_sampleStatus():
     elif sample.status == 1:
         sample.status = 2
         db.session.commit()
+    
+    status_dict = {
+        -1: "Error",
+        0: "Importing",
+        1: "New Sample",
+        2: "Processing",
+        3: "Interpreted",
+        4: "Validated"
+    }
 
     if sample.status != old_status:
-        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Toggle Status from status {old_status} to {sample.status}")
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Toggle Status from status '{status_dict[old_status]}' to '{status_dict[sample.status]}'")
         db.session.add(history)
         db.session.commit()
     return f"{sample} - {sample.status}"
