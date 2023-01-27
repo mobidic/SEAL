@@ -93,8 +93,8 @@ class UserView(CustomView):
     def validate_form(self, form):
         """ Custom validation code that checks dates """
         try:
-            if form.password.data and (len(form.password.data) < 6 or len(form.password.data) > 12) and not BCRYPT_PATTERN.match(form.password.data):
-                flash("Password must be between 6 and 20 characters long or not a correct hash (please change)!")
+            if form.password.data and len(form.password.data) < 6 and not BCRYPT_PATTERN.match(form.password.data):
+                flash("The password must be more than 6 characters long or a correct hash (please change)!")
                 return False
         except AttributeError:
             pass
