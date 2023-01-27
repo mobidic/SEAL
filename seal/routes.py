@@ -902,12 +902,12 @@ def toggle_sampleFilter():
     sample_id = request.form["id_sample"]
     filter_id = request.form["id_filter"]
     sample = Sample.query.get(sample_id)
-    old_filter = sample.filter_id
+    old_filter = sample.filter
     sample.filter_id = filter_id
     db.session.commit()
 
-    if sample.filter_id != old_filter:
-        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change filter : {old_filter} to {sample.filter_id}")
+    if sample.filter.id != old_filter.id:
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change filter : '{old_filter.filtername}' ({old_filter.id}) to '{sample.filter.filtername}' ({sample.filter.id})")
         db.session.add(history)
         db.session.commit()
     return f"{sample.filter_id}"

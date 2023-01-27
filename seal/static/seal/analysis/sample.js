@@ -37,6 +37,7 @@ function toggle_status(id, status) {
                     $('.seal-form-report').addClass('w3-disabled');
                 }
                 $('.button-status').html(response);
+                $('#tableHistorySample').DataTable().ajax.reload();
             }
         });
     }
@@ -1871,6 +1872,9 @@ function toggle_status(id, status) {
                     data: {
                         "id_sample": sample_id,
                         "id_filter": id
+                    },
+                    success: function() {
+                        $('#tableHistorySample').DataTable().ajax.reload();
                     }
                 });
             }, 30);
@@ -1930,6 +1934,9 @@ function toggle_status(id, status) {
             url: "/toggle/samples/variant/status",
             data: {
                 "id_var": id_var, "sample_id": sample_id, "type":type
+            },
+            success: function() {
+                $('#tableHistorySample').DataTable().ajax.reload();
             }
         })
     }
@@ -2097,6 +2104,9 @@ function toggle_status(id, status) {
             data: {
                 "id_sample": sample_id,
                 "id_panel": id
+            },
+            success: function() {
+                $('#tableHistorySample').DataTable().ajax.reload();
             }
         });
         table = $('#variants').DataTable();
@@ -2130,23 +2140,38 @@ function toggle_status(id, status) {
         dom: 'tip',
         order: [[ 2, "desc" ]],
         columnDefs: [
-               {
-                    orderable: false,
-                    targets:  "no-sort"
-               }
-           ],
+            {
+                orderable: false,
+                targets:  "no-sort"
+            }
+        ],
     });
 
 
-    $('#tableHistorySample').DataTable({
-        searching:true,
-        lengthMenu: [ 10 ],
-        dom: 'tip',
-        order: [[ 2, "desc" ]],
-        columnDefs: [
-               {
+    $(document).ready(function() {
+        $('#tableHistorySample').DataTable({
+            searching:true,
+            processing: true,
+            lengthMenu: [ 10 ],
+            dom: 'tip',
+            order: [[ 2, "desc" ]],
+            columnDefs: [
+                {
                     orderable: false,
                     targets:  "no-sort"
-               }
-           ],
+                }
+            ],
+            ajax: '/json/history/sample/' + sample_id,
+            columns: [
+                {
+                    data: "user",
+                },
+                {
+                    data: "action",
+                },
+                {
+                    data: "date",
+                }
+            ]
+        });
     });
