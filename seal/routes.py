@@ -800,6 +800,25 @@ def json_beds():
     return jsonify(bed)
 
 
+@app.route("/json/history/<string:type>/<int:id>")
+@login_required
+def json_history(type, id):
+    if type == "sample":
+        historics = History.query.filter_by(sample_ID= id)
+    elif type == "user":
+        historics = History.query.filter_by(user_ID= id)
+    historics_list = list()
+    for history in historics:
+        historics_list.append({
+            "user": history.user.username,
+            "sample": history.sample.samplename,
+            "action": history.action,
+            "date": history.date.strftime("%Y/%m/%d %H:%M:%S")
+        })
+
+    return jsonify({"data":historics_list})
+
+
 @app.route("/json/variant/<string:id>")
 @app.route("/json/variant/<string:id>/sample/<int:sample>")
 @app.route("/json/variant/<string:id>/version/<int:version>")
