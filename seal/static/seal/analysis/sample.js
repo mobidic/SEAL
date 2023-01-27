@@ -692,9 +692,9 @@ function toggle_status(id, status) {
                         _: function ( data, type, row, meta ) {
                             cell = "";
                             for (idx in data) {
-                                cell += data[idx] + " | "
+                                cell += "|" + data[idx] + "|"
                             }
-                            return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                            return cell;
                         },
                         display: function ( data, type, row, meta ) {
                             cell = {
@@ -713,7 +713,11 @@ function toggle_status(id, status) {
                             return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
                         },
                         filter: function ( data, type, row, meta ) {
-                            return "|" + data.toString() + "|";
+                            cell = "";
+                            for (idx in data) {
+                                cell += "|" + data[idx] + "|"
+                            }
+                            return cell;
                         },
                         sort: function ( data, type, row, meta ) {
                             score = 0;
