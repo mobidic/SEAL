@@ -906,8 +906,8 @@ def toggle_sampleFilter():
     sample.filter_id = filter_id
     db.session.commit()
 
-    if sample.filter.id != old_filter.id:
-        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change filter : '{old_filter.filtername}' ({old_filter.id}) to '{sample.filter.filtername}' ({sample.filter.id})")
+    if sample.filter != old_filter:
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change filter : '{str(old_filter)}' -> '{str(sample.filter)}'")
         db.session.add(history)
         db.session.commit()
     return f"{sample.filter_id}"
@@ -923,8 +923,8 @@ def toggle_samplePanel():
     sample.bed_id = panel_id
     db.session.commit()
 
-    if sample.bed_id != old_bed:
-        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change panel : '{old_bed.name}' ({old_bed.id}) to '{sample.bed.name}' ({old_bed.id})")
+    if sample.bed != old_bed:
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Change panel : '{str(old_bed)}' -> '{str(sample.bed)}'")
         db.session.add(history)
         db.session.commit()
 
@@ -968,7 +968,7 @@ def toggle_sampleStatus():
     }
 
     if sample.status != old_status:
-        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Toggle Status from status '{status_dict[old_status]}' to '{status_dict[sample.status]}'")
+        history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Status : '{status_dict[old_status]}' -> '{status_dict[sample.status]}'")
         db.session.add(history)
         db.session.commit()
     return f"{sample} - {sample.status}"
