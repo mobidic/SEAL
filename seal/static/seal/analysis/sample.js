@@ -1999,7 +1999,7 @@ function toggle_status(id, status) {
             } else {
                 $("#comment_sample").val("");
                 $.getJSON("/json/comments/sample/" + id, function(data) {
-                    comments = '<table id="tableCommentsSample" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+                    comments = '<table id="tableCommentsSample" class="w3-small w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
                     comments = comments + '<thead class="w3-flat-silver"><tr>'+
                         '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
                         '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
