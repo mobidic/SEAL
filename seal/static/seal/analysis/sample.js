@@ -902,8 +902,10 @@ function toggle_status(id, status) {
                 {
                     className: disabled_class + "seal-form-report showTitle size-200 w3-center",
                     data: {
-                        _: "reported",
-                        display: function ( data, type, row, meta ) {
+                        "data": "reported",
+                    },
+                    render: function ( data, type, row, meta ) {
+                        if(type === 'display') {
                             const id_var=data["id"];
                             const id=data["id"] + "reported";
                             if (data["reported"]) {
@@ -911,22 +913,22 @@ function toggle_status(id, status) {
                             } else {
                                 return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\');">';
                             }
-                        },
-                        sort: function ( data, type, row, meta ) {
-                            if (data["reported"]) {
-                                return 1;
-                            } else {
-                                return 0;
-                            }
+                        }
+                        return data["reported"] ? "Reported" : "Not Reported";
+                    },
+                    searchBuilder: {
+                        orthogonal: {
+                            display: 'filter'
                         }
                     }
                 },
                 {
                     className: disabled_class + "seal-form-report showTitle size-200 w3-center",
                     data: {
-                        _: "class_variant",
-                        display: function ( data, type, row ) {
-                            if(data) {
+                        "data": "class_variant"
+                    },
+                    render:function ( data, type, row ) {
+                            if(type === 'display') {
                                 id_var = data.id
                                 class_variant = data.class_variant ? data.class_variant : 0;
                                 dropdown = ""
@@ -943,9 +945,14 @@ function toggle_status(id, status) {
                                         `+ dropdown +`
                                     </div>
                                 </div>`
+                                return response;
                             }
-                            return response;
+                            return class_variant_html[data.class_variant ? data.class_variant : 0];
                         },
+                    searchBuilder: {
+                        orthogonal: {
+                            display: 'filter'
+                        }
                     }
                 },
                 {
@@ -1921,6 +1928,7 @@ function toggle_status(id, status) {
             success: function() {
                 id_button = 'button-class-' + id_var;
                 $("#"+id_button).html(class_variant_html[class_variant]);
+                $('#variants').DataTable().ajax.reload();
             }
         })
     }
@@ -1941,6 +1949,7 @@ function toggle_status(id, status) {
             },
             success: function() {
                 $('#tableHistorySample').DataTable().ajax.reload();
+                $('#variants').DataTable().ajax.reload();
             }
         })
     }
