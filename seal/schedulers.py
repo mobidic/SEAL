@@ -1,19 +1,14 @@
 import re
 import json
 import numpy
-import shlex
 import random
-import datetime
 import subprocess
-
 from pathlib import Path
-from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import and_
-
 from anacore import annotVcf
+from datetime import datetime
 
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team, Bed, Filter
+from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team, Bed, Filter, History
 
 
 CONSEQUENCES_DICT = {
@@ -384,6 +379,17 @@ def importvcf():
         with current_file.open('r') as json_sample:
             data = json.load(json_sample)
 
+        # Check user
+        try:
+            user_id = data["userid"]
+        except KeyError:
+            user_id = 1
+
+        try:
+            date_import = data["date"]
+        except KeyError:
+            date_import = datetime.now()
+
         # Come from interface
         try:
             interface = data["interface"]
@@ -396,7 +402,7 @@ def importvcf():
             return
 
         sample = create_sample(data)
-        current_date = datetime.datetime.now().isoformat()
+        current_date = datetime.now().isoformat()
 
         vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
         stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
@@ -512,16 +518,19 @@ def importvcf():
         except Exception as e:
             db.session.remove()
             app.logger.info(f"{type(e).__name__} : {e}")
-            sample = Sample.query.get(sample.id)
             sample.status = -1
         else:
             sample.status = 1
             current_file.unlink()
-            if interface:
-                vcf_path.unlink()
             vcf_vep.unlink()
             stats_vep.unlink()
+            if interface:
+                vcf_path.unlink()
+            history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=f"Import Sample")
+            db.session.add(history)
+            history = History(sample_ID=sample.id, user_ID=user_id, date=datetime.now(), action=f"Sample Imported")
+            db.session.add(history)
         finally:
             db.session.commit()
-            app.logger.info(f"---- Variant for Sample Added : {sample} - {sample.id} ----")
+            app.logger.info(f"---- Variants Added for Sample : {sample} - {sample.id} ----")
             path_locker.unlink()

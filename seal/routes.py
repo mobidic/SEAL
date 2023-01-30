@@ -348,6 +348,8 @@ def create_variant():
             "samplename": uploadSampleForm.samplename.data,
             "affected": uploadSampleForm.affected.data,
             "index": uploadSampleForm.index.data,
+            "userid": current_user.id,
+            "date": str(datetime.now()),
             "family": {
                 "name": uploadSampleForm.family.data
             },
