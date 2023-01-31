@@ -110,7 +110,7 @@ admin.add_view(
         column_exclude_list=['password', 'transcripts'],
         column_searchable_list=['username', 'mail', 'api_key_md'],
         column_editable_list=['username', 'mail', 'filter', "api_key_md"],
-        form_excluded_columns=['comments_variants', 'transcripts']
+        form_excluded_columns=['comments_variants', 'comments_samples', 'historics', 'transcripts']
     )
 )
 admin.add_view(
@@ -130,7 +130,7 @@ admin.add_view(
         category="Analysis",
         column_searchable_list=["samplename"],
         column_editable_list=['samplename', 'status'],
-        form_excluded_columns=['variants']
+        form_excluded_columns=['variants', 'historics']
     )
 )
 admin.add_view(
