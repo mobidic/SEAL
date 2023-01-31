@@ -407,7 +407,7 @@ def create_panel():
     uploadPanelForm.teams.data = [team.id for team in current_user.teams]
 
     return render_template(
-        'analysis/create_panel.html', title="Add Panel",
+        'analysis/panel.html', title="Add Panel",
         form=uploadPanelForm
     )
 
@@ -800,6 +800,23 @@ def json_beds():
             if bool(set(current_user.teams) & set(b.teams)) or not b.teams:
                 bed[b.id] = b.name
     return jsonify(bed)
+
+
+@app.route("/json/bed/<int:id>")
+@login_required
+def json_bed(id):
+    bed = Bed.query.get(int(id))
+    data = list()
+    if not bed:
+        return jsonify({"data": data})
+    for region in bed.regions:
+        data.append({
+            "chr": region.chr,
+            "start": region.start,
+            "stop": region.stop,
+            "name": region.name,
+        })
+    return jsonify({"data": data})
 
 
 @app.route("/json/history/<string:type>/<int:id>")

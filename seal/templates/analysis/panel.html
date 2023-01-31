@@ -4,13 +4,49 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
     <link href="{{ url_for('static', filename='select2/css/select2.min.css') }}" rel="stylesheet" />
     
-    <link href="{{ url_for('static', filename='seal/analysis/create_panel.css') }}" rel="stylesheet" type="text/css">
+    <link href="{{ url_for('static', filename='seal/analysis/panel.css') }}" rel="stylesheet" type="text/css">
     
 {% endblock %}
 
 {% block content %}
     {% include 'includes/sidebar.j2' %}
     <div class="w3-main">
+        <div class="w3-padding w3-mobile">
+            <div class="w3-card w3-padding w3-mobile">
+                <div class="w3-container w3-border-bottom">
+                    <h3>View A Panel</h3>
+                </div>
+
+                <div class="w3-margin-top">
+                    <div class="w3-container">
+                        <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fas fa-th-list"></i> <b>Choose a panel</b></div>
+                        <select id="selectBed" class="w3-select w3-border w3-col m3 l2 s6" onchange="view_panel(value);">
+                        </select>
+                    </div>
+                    <div class="w3-padding">
+                        <table id="regions" class="w3-table-all" style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th class='w3-flat-green-sea'>Chromosome</th>
+                                    <th class='w3-flat-green-sea'>Start</th>
+                                    <th class='w3-flat-green-sea'>End</th>
+                                    <th class='w3-flat-green-sea'>Name</th>
+                                </tr>
+                            </thead>
+                            <tfoot>
+                                <tr>
+                                    <th class='w3-flat-green-sea'>Chromosome</th>
+                                    <th class='w3-flat-green-sea'>Start</th>
+                                    <th class='w3-flat-green-sea'>End</th>
+                                    <th class='w3-flat-green-sea'>Name</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="w3-padding w3-mobile">
             <div class="w3-card w3-padding w3-mobile">
                 <div class="w3-container w3-border-bottom">
@@ -85,5 +121,5 @@
     <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="{{ url_for('static', filename='select2/js/select2.full.min.js') }}"></script>
 
-    <script type="text/javascript" src="{{ url_for('static', filename='seal/analysis/create_panel.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='seal/analysis/panel.js') }}"></script>
 {% endblock %}
