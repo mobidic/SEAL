@@ -126,7 +126,7 @@ class History(db.Model):
 
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    samplename = db.Column(db.String(20), unique=False, nullable=False)
+    samplename = db.Column(db.String(120), unique=False, nullable=False)
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
