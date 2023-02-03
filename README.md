@@ -90,8 +90,9 @@ export SEAL_MAINTENANCE="TRUE"  # possibilities : "true", "t", "1", "on" (case i
 export SEAL_MAINTENANCE="FALSE" # possibilities : "false", "f", "0", "off" (case insensitive)
 # unset SEAL_MAINTENANCE # disable Maintenance mode too
 ```
-- Stop the server
+- Start/Stop the datatabase server
 ```bash
+pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```
 
@@ -100,9 +101,8 @@ pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```bash
 conda activate seal
 export FLASK_APP=seal
-export FLASK_ENV=development
+export FLASK_DEBUG=on
 export PYTHONPATH=${PWD}
-# export API_KEY_MD="YOUR_MOBIDETAILS_API_KEY"
 initdb -D ${PWD}/seal/seal.db
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 # python insertdb.py
