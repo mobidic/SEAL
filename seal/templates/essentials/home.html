@@ -39,7 +39,6 @@
         var biologist = ("{{ current_user.biologist }}" == "True");
         var admin = ("{{ current_user.admin }}" == "True");
         var bio_or_admin = (biologist || admin);
-        console.log(bio_or_admin);
     </script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='seal/essentials/home.js') }}"></script>

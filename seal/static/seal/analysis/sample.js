@@ -514,7 +514,7 @@ function toggle_status(id, status) {
                                 return "<i>NA</i>";
                             }
                             mobidetails="";
-                            if (current_user_api_key_md) {
+                            if (current_user_api_key_md !== "None") {
                                 mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
                             }
                             return mobidetails + data;
