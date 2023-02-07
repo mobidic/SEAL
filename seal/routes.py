@@ -7,6 +7,7 @@ from pathlib import Path
 from datetime import datetime
 from sqlalchemy import or_, and_
 from seal import app, db, bcrypt
+from flask_wtf.csrf import CSRFError
 from flask_login.utils import EXEMPT_METHODS
 from flask_login import login_user, current_user, logout_user
 from flask import render_template, flash, redirect, url_for, request, jsonify
@@ -135,6 +136,13 @@ def contact():
     )
 
 
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    flash(f"{e.name} : {e.description} Please Retry.", 'warning')
+    return redirect(url_for('index'))
+
+
+@app.errorhandler(400)
 @app.errorhandler(404)
 @app.errorhandler(403)
 @app.errorhandler(405)
