@@ -2,35 +2,54 @@
 
 <!-- Sidebar/menu -->
 
-<nav class="w3-sidebar w3-bar-block w3-flat-clouds" style="z-index:5;width:350px;display:{% if current_user.sidebar %}block{% else %}none{% endif %}";" id="sidebar">
-	<div class="w3-container">
-		{% include "includes/flash.j2" %}
-		<div class="w3-row w3-display-container w3-margin">
-			<div class="w3-left w3-margin-right">
-				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-white w3-circle w3-margin-top">
-			</div>
-			<div class="w3-right w3-margin-ight">
-				<h2 style="margin-bottom:0">{{ current_user.username }}</h2>
-				<span class="w3-opacity w3-medium">{% if current_user.mail %}{{ current_user.mail }}{% endif %}</span>
-				<p>
-					{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px" aria-label="Admin" data-balloon-pos="up"><i class="fas fa-shield-alt"></i></span>{% endif %}
-					{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px" aria-label="Bioinfo" data-balloon-pos="up"><i class="fas fa-user-secret"></i></span>{% endif %}
-					{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px" aria-label="Technician" data-balloon-pos="up"><i class="fas fa-vial"></i></span>{% endif %}
-					{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px" aria-label="Biologist" data-balloon-pos="up"><i class="fas fa-user-md"></i></span>{% endif %}
-				</p>
-			</div>
+<nav class="w3-sidebar w3-bar-block w3-flat-clouds w3-container" style="z-index:5;width:350px;display:{% if current_user.sidebar %}block{% else %}none{% endif %}";" id="sidebar">
+	{% include "includes/flash.j2" %}
+	<div class="w3-row">
+		<div class="w3-col w3-container w3-half w3-cell w3-cell-middle">
+			<a href="{{ url_for('account') }}">
+				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-white w3-circle w3-margin">
+			</a>
 		</div>
-		<div class="w3-row w3-display-container w3-margin">
-			{% for team in current_user.teams %}
-				{% if loop.first %}
-					<h3><i>Team(s) :</i></h3>
-				{% endif %}
-				<span class="w3-tag" style="overflow:hidden;background-color:{{ team.color }}">{{ team.teamname }}</span>
-			{% endfor %}
+		<div class="w3-col w3-half w3-cell w3-cell-middle"">
+			<a href="{{ url_for('account') }}">
+				<h2 style="margin-bottom:0" class="control-size-150">{{ current_user.username }}</h2>
+			</a>
+			<p>
+				{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Admin" data-balloon-pos="down"><i class="fas fa-shield-alt"></i></span>{% endif %}
+				{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Bioinfo" data-balloon-pos="down"><i class="fas fa-user-secret"></i></span>{% endif %}
+				{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Technician" data-balloon-pos="down"><i class="fas fa-vial"></i></span>{% endif %}
+				{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Biologist" data-balloon-pos="down"><i class="fas fa-user-md"></i></span>{% endif %}
+			</p>
 		</div>
-		<div class="w3-row w3-display-container w3-margin">
-			<a href="{{ url_for('create_variant') }}" class="w3-text-flat-green-sea w3-hover-text-flat-turquoise"><span class="w3-left"><i class="w3-xlarge fas fa-plus-circle"></i></span> <span class="w3-margin-left w3-left"><b>Add A New Sample</b></span></a>
+		{% if current_user.mail %}
+		<div class="w3-col w3-opacity w3-medium">
+			<p class="control-size-300" style="margin: 0px">{{ current_user.mail }}</p>
 		</div>
+		{% endif %}
+	</div>
+	{% for team in current_user.teams %}
+		{% if loop.first %}
+	<hr style="display: block; height: 1px;
+	border: 0; border-top: 1px solid #ccc;
+	margin: 1em 0 ; padding: 0; ">
+	<div class="w3-row">
+		<h3 style="font-variant: small-caps;margin: 0px">Teams</h3>
+		{% endif %}
+		<span class="w3-tag" style="overflow:hidden;background-color:{{ team.color }}">{{ team.teamname }}</span>
+		{% if loop.last %}
+	</div>
+		{% endif %}
+		{% endfor %}
+	<hr style="display: block; height: 1px;
+		border: 0; border-top: 1px solid #ccc;
+		margin: 1em 0 ; padding: 0; ">
+	<div class="w3-row w3-display-container w3-margin">
+		<a href="{{ url_for('create_variant') }}" class="w3-row w3-text-flat-green-sea w3-hover-text-flat-turquoise">
+			<span class="w3-left">
+				<i class="w3-xlarge fas fa-user-plus w3-margin-right"></i>
+				<b>New Sample</b>
+			</span>
+		</a>
 	</div>
 </nav>
 
