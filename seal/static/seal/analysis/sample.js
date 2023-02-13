@@ -282,7 +282,7 @@ function toggle_status(id, status) {
     };
 
     const class_variant_html = [
-        '<span class="w3-text-flat-concrete"><i class="fas fa-ellipsis-h"></i></span>',
+        '<span><i class="fas fa-ellipsis-h"></i></span>',
         '<span class="w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
             '<i class="fas fa-bookmark"></i>'+
             '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
@@ -359,26 +359,24 @@ function toggle_status(id, status) {
                 infoPostFix: " [Total variants: " + sample_variants_length + "]",
             },
             dom: 'Blfrtip',
-            scrollX: true,
+            scrollY:        "40vh",
+            scrollX:        true,
+            scrollCollapse: true,
+            scroller:         true,
+            fixedHeader:  true,
             order: [[ 5, "asc" ]],
             fixedColumns: {
                 left:1,
                 right:1
             },
-            colReorder: {
-                realtime: false
-            },
             select: {
                 style:    'os',
                 selector: 'td:not(:nth-last-child(-n+4))'
             },
-            // fixedHeader: {
-            //     headerOffset: $('#navHead').outerHeight(),
-            // },
             ajax: json_variants,
             columns: [
                 {
-                    className: 'showTitle control-size-100',
+                    className: 'w3-border-right showTitle ',
                     data: "annotations.SYMBOL",
                     render: {
                         _: function ( data, type, row ) {
@@ -396,7 +394,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'showTitle control-size-100',
+                    className: 'showTitle ',
                     data: "annotations.Feature",
                     render: {
                         _: function ( data, type, row ) {
@@ -414,7 +412,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'showTitle w3-center control-size-75',
+                    className: 'showTitle w3-center ',
                     data: "annotations",
                     render: {
                         _: function ( data, type, row ) {
@@ -448,7 +446,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle control-size-150',
+                    className: 'showTitle ',
                     data: "annotations.EI",
                     render: {
                         _: function ( data, type, row ) {
@@ -474,7 +472,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'showTitle control-size-250',
+                    className: 'showTitle ',
                     data: "annotations.HGVSg",
                     render : {
                         _: function ( data, type, row, meta ) {
@@ -500,7 +498,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle control-size-250',
+                    className: 'showTitle ',
                     data: "annotations.HGVSc",
                     render: {
                         _: function ( data, type, row ) {
@@ -528,7 +526,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'showTitle control-size-250',
+                    className: 'showTitle ',
                     data: "annotations.HGVSp",
                     render: {
                         _: function ( data, type, row ) {
@@ -546,7 +544,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'showTitle size-200',
+                    className: 'showTitle ',
                     data: "filter",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -583,10 +581,10 @@ function toggle_status(id, status) {
                     },
                     sType: "numeric"
                 },
-                { className: 'showTitle control-size-100', data: "depth"},
-                { className: 'showTitle control-size-100', data: "allelic_depth"},
+                { className: 'showTitle ', data: "depth"},
+                { className: 'showTitle ', data: "allelic_depth"},
                 {
-                    className: 'showTitle control-size-100',
+                    className: 'showTitle ',
                     data: "allelic_frequency",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -605,7 +603,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'showTitle control-size-100',
+                    className: 'showTitle ',
                     data: "annotations.gnomADg_AF",
                     render : {
                         _: function ( data, type, row, meta ) {
@@ -641,7 +639,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle control-size-125',
+                    className: 'showTitle ',
                     data: "inseal",
                     render : {
                         _: function ( data, type, row, meta ) {
@@ -654,11 +652,11 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle control-size-125',
+                    className: 'showTitle ',
                     data: "inseal.occurrences",
                 },
                 {
-                    className: 'showTitle size-125',
+                    className: 'showTitle ',
                     data: "inseal",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -686,7 +684,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle size-300',
+                    className: 'showTitle ',
                     data: "annotations.CLIN_SIG",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -730,7 +728,7 @@ function toggle_status(id, status) {
                     sType: "numeric"
                 },
                 {
-                    className: 'showTitle size-100',
+                    className: 'showTitle ',
                     data: "annotations.IMPACT",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -751,7 +749,7 @@ function toggle_status(id, status) {
                     sType: "numeric"
                 },
                 {
-                    className: 'showTitle size-300',
+                    className: 'showTitle ',
                     data: "annotations.Consequence",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -788,7 +786,7 @@ function toggle_status(id, status) {
                     sType: "numeric"
                 },
                 {
-                    className: 'showTitle size-100',
+                    className: 'showTitle ',
                     data: "annotations.MES_var",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -802,7 +800,7 @@ function toggle_status(id, status) {
                                 return "<i>NA</i>";
                             }
                             value = parseFloat(data).toFixed(3)
-                            classw3css = "w3-text-black";
+                            classw3css = "";
                             if (Math.abs(value) >= 15) {
                                 classw3css = "w3-text-flat-pomegranate";
                             }
@@ -811,7 +809,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle size-125',
+                    className: 'showTitle ',
                     data: "annotations.spliceAI",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -825,7 +823,7 @@ function toggle_status(id, status) {
                                 return "<i>NA</i>";
                             }
                             value = parseFloat(data).toFixed(3)
-                            classw3css = "w3-text-black";
+                            classw3css = "";
                             if (value >= 0.8) {
                                 classw3css = "w3-text-flat-pomegranate";
                             } else if (value >= 0.5) {
@@ -838,7 +836,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'showTitle size-100',
+                    className: 'showTitle ',
                     data: "annotations.missensesMean",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -853,7 +851,7 @@ function toggle_status(id, status) {
                                 return "<i>NA</i>";
                             }
                             value = parseFloat(data).toFixed(3)
-                            classw3css = "w3-text-black";
+                            classw3css = "";
                             if (value >= 0.95) {
                                 classw3css = "w3-tag w3-flat-pomegranate";
                             } else if (value >= 0.9) {
@@ -876,7 +874,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: 'size-200',
+                    className: '',
                     data: "phenotypes",
                     render: {
                         _: function ( data, type, row, meta ) {
@@ -900,7 +898,7 @@ function toggle_status(id, status) {
                     },
                 },
                 {
-                    className: disabled_class + "seal-form-report showTitle size-200 w3-center",
+                    className: disabled_class + "seal-form-report showTitle  w3-center",
                     data: {
                         "data": "reported",
                     },
@@ -923,7 +921,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: disabled_class + "seal-form-report showTitle size-200 w3-center",
+                    className: disabled_class + "seal-form-report showTitle  w3-center",
                     data: {
                         "data": "class_variant"
                     },
@@ -956,7 +954,7 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: 'details-control w3-center',
+                    className: 'w3-border-left details-control w3-center',
                     orderable: false,
                     data: "id",
                     render: {
@@ -964,7 +962,7 @@ function toggle_status(id, status) {
                             return data;
                         },
                         display: function ( data, type, row ) {
-                            details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-peter-river w3-hover-text-flat-concrete fas fa-plus-circle" style="cursor: pointer;"></i>'
+                            details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;"></i>'
                             return details;
                         },
                     },
@@ -1257,7 +1255,7 @@ function toggle_status(id, status) {
     function openDetailsVariantModal(id, sample_id) {
         request = "/json/variant/" + id + "/sample/" + sample_id;
         $.getJSON(request, function(data) {
-            allTranscript = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            allTranscript = '<table class="table-modal-large w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0">';
             allTranscript = allTranscript + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver control-size-100" >Gene</th>'+
                 '<th class="w3-flat-silver control-size-200">Transcript</th>'+
@@ -1510,7 +1508,7 @@ function toggle_status(id, status) {
             $("#allTranscriptsTable").html(allTranscript);
 
 
-            inSeal = '<table class="table-modal-large w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            inSeal = '<table class="table-modal-large w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0">';
             inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver control-size-100">Sample</th>'+
                 '<th class="w3-flat-silver control-size-100">Family</th>'+
@@ -1568,7 +1566,7 @@ function toggle_status(id, status) {
             });
             $('.inSealCount').html(count);
 
-            tableScoresPredictions = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+            tableScoresPredictions = '<table class="table-modal w3-table-all w3-tiny w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
             tableScoresPredictions = tableScoresPredictions + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver">Name</th>'+
                 '<th class="w3-flat-silver">Score</th>'+
@@ -1584,7 +1582,7 @@ function toggle_status(id, status) {
             tableScoresPredictions = tableScoresPredictions + '</table>';
             $("#tableScoresPredictions").html(tableScoresPredictions);
 
-            tableScoresConservation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            tableScoresConservation = '<table class="table-modal w3-table-all w3-tiny w3-card" cellpadding="5" cellspacing="0" border="0">';
             tableScoresConservation = tableScoresConservation + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver">Name</th>'+
                 '<th class="w3-flat-silver">Score</th>'+
@@ -1600,7 +1598,7 @@ function toggle_status(id, status) {
             tableScoresConservation = tableScoresConservation + '</table>';
             $("#tableScoresConservation").html(tableScoresConservation);
 
-            tableScoresPopulation = '<table class="table-modal w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0">';
+            tableScoresPopulation = '<table class="table-modal w3-table-all w3-tiny w3-card" cellpadding="5" cellspacing="0" border="0">';
             tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver">Name</th>'+
                 '<th class="w3-flat-silver">Score</th>'+
@@ -1807,7 +1805,7 @@ function toggle_status(id, status) {
 
             Plotly.newPlot('chartSplicing', data1, layout);
 
-            comments = '<table id="tableCommentsVar" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+            comments = '<table id="tableCommentsVar" class="w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
             comments = comments + '<thead class="w3-flat-silver"><tr>'+
                 '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
                 '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
@@ -1982,7 +1980,7 @@ function toggle_status(id, status) {
             if (type=="var") {
                 $("#commentVar").val("");
                 $.getJSON("/json/variant/" + id, function(data) {
-                    comments = '<table id="tableCommentsVar" class="w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+                    comments = '<table id="tableCommentsVar" class="w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
                     comments = comments + '<thead class="w3-flat-silver"><tr>'+
                         '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
                         '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
@@ -2019,7 +2017,7 @@ function toggle_status(id, status) {
             } else {
                 $("#comment_sample").val("");
                 $.getJSON("/json/comments/sample/" + id, function(data) {
-                    comments = '<table id="tableCommentsSample" class="w3-small w3-table-all w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
+                    comments = '<table id="tableCommentsSample" class="w3-small w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
                     comments = comments + '<thead class="w3-flat-silver"><tr>'+
                         '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
                         '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+

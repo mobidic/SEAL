@@ -1,4 +1,3 @@
-
 .control-size-25 {
     width: 25px;
     max-width: 25px;
@@ -151,53 +150,66 @@
     max-width: 550px;
     min-width: 550px;
 }
+.min-size-25 {
+    min-width: 25px;
+}
+.min-size-75 {
+    min-width: 75px;
+}
+.min-size-100 {
+    min-width: 100px;
+}
+.min-size-125 {
+    min-width: 125px;
+}
+.min-size-150 {
+    min-width: 150px;
+}
+.min-size-200 {
+    min-width: 200px;
+}
+.min-size-225 {
+    min-width: 225px;
+}
+.min-size-250 {
+    min-width: 250px;
+}
+.min-size-300 {
+    min-width: 250px;
+}
+.min-size-550 {
+    min-width: 550px;
+}
 
 .no-padding {
     padding: 0px !important;
 }
 
-
-table.dataTable thead th,
-table.dataTable thead th.sorting_asc,
-table.dataTable thead th.sorting_desc {
-    position: relative;
-    background-image: none !important;
+.no-padding {
+    padding: 0px !important;
 }
-table.dataTable thead .sorting,
-table.dataTable thead th.sorting_asc,
-table.dataTable thead th.sorting_desc {
-    background-image: none !important;
+.dataTables_scrollBody {
+    background: #ecf0f1!important;
 }
-table.dataTable thead th.sorting:after,
-table.dataTable thead th.sorting_asc:after,
-table.dataTable thead th.sorting_desc:after {
-    position: absolute !important;
-    top: 12px !important;
-    right: 8px !important;
-    font-size: 0.8em !important;
-    font-family: 'Font Awesome\ 5 Free' !important;
-}
-table.dataTable thead th.sorting:after {
-    content: "\f0dc" !important;
-    opacity:0.5;
-}
-table.dataTable thead th.sorting_asc:after {
-    opacity:1;
-    content: "\f0dd" !important;
-}
-table.dataTable thead th.sorting_desc:after {
-    opacity:1;
-    content: "\f0de" !important;
+table.dataTable.display>tbody>tr {
+    background-color: white;
 }
 
-.dtfc-fixed-left {
-    border-right: 1px solid #063027 !important;
-}
-.dtfc-fixed-right {
-    border-left: 1px solid #063027 !important;
-}
+table.dataTable.display>tbody>tr.selected>td>.w3-text-flat-turquoise {
+    color: #fff !important;
 
-.w3-dropdown-hover-turquoise:hover > .w3-button:first-child {
-    color:#fff!important;
-    background-color:#1abc9c!important
+}table.dataTable.display>tbody>tr.selected>td>.w3-text-flat-turquoise:hover {
+    color: #000 !important;
+}
+table.dataTable.display>tbody>tr.odd.selected>* {
+    box-shadow: inset 0 0 0 9999px #68706e63 !important;
+}
+table.dataTable.display>tbody>tr.odd.selected>* {
+    box-shadow: inset 0 0 0 9999px #68706e63 !important;
+}
+table.dataTable.display>tbody>tr.even.selected>* {
+    box-shadow: inset 0 0 0 9999px #68706e84 !important;
+}
+table.dataTable.display>tbody>tr.selected:hover>* {
+    box-shadow: inset 0 0 0 9999px #4c525186 !important;
 }

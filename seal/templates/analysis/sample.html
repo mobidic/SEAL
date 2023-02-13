@@ -15,191 +15,191 @@
             {% include 'includes/button-status-sample.j2' %}
             <hr>
         </div>
-        <div class="w3-padding">
+        <div class="w3-padding w3-small">
             <div class="w3-row w3-padding">
-                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fa fa-filter"></i> <b>Choose a filter</b></div>
+                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-large fa fa-filter"></i> <b>Choose a filter</b></div>
                 <select disabled id="selectFilter" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value, '{{ sample.id }}');">
                 </select>
 
-                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-xlarge fas fa-th-list"></i> <b>Choose a panel</b></div>
+                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-large fas fa-th-list"></i> <b>Choose a panel</b></div>
                 <select disabled id="selectBed" class="w3-select w3-border w3-col m3 l2 s6" onchange="applied_panel(value, '{{ sample.id }}');">
                 </select>
             </div>
             <div class="w3-padding">
-                <table id="variants" class="w3-table-all" style="width:100%">
+                <table id="variants" class="w3-table display w3-small" style="width:100%">
                     <thead>
                         <tr>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Gene</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Feature</th>
-                            <th class='w3-flat-green-sea showTitle control-size-75'>Can.</th>
-                            <th class='w3-flat-green-sea showTitle control-size-150'>Exon/Intron</th>
-                            <th class='w3-flat-green-sea showTitle control-size-250'>HGVSg</th>
-                            <th class='w3-flat-green-sea showTitle control-size-250'>HGVSc</th>
-                            <th class='w3-flat-green-sea showTitle control-size-250'>HGVSp</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Filter</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Depth</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Allelic depth</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Allelic frequencies</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>GnomAD</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>SEAL (freq)</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>SEAL (count)</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>In Family</th>
-                            <th class='w3-flat-green-sea showTitle control-size-300'>ClinSig</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Impact</th>
-                            <th class='w3-flat-green-sea showTitle control-size-300'>Consequence</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>MES var</th>
-                            <th class='w3-flat-green-sea showTitle control-size-125'>SpliceAI DS</th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>Missense</th>
-                            <th class='w3-flat-green-sea showTitle control-size-200'>Transmission</th>
-                            <th class='w3-flat-green-sea showTitle control-size-25'>R</th>
-                            <th class='w3-flat-green-sea showTitle control-size-200'>Class</th>
-                            <th class="w3-flat-green-sea w3-center control-size-25"></th>
+                            <th class='min-size-75'>Gene</th>
+                            <th class='min-size-75'>Feature</th>
+                            <th class='min-size-75'>Can.</th>
+                            <th class='min-size-150'>Exon/Intron</th>
+                            <th class='min-size-75'>HGVSg</th>
+                            <th class='min-size-75'>HGVSc</th>
+                            <th class='min-size-75'>HGVSp</th>
+                            <th class='min-size-75'>Filter</th>
+                            <th class='min-size-75'>DP</th>
+                            <th class='min-size-75'>AD</th>
+                            <th class='min-size-75'>AF</th>
+                            <th class='min-size-150'>GnomAD</th>
+                            <th class='min-size-150'>SEAL (freq)</th>
+                            <th class='min-size-150'>SEAL (count)</th>
+                            <th class='min-size-150'>In Family</th>
+                            <th class='min-size-75'>ClinSig</th>
+                            <th class='min-size-75'>Impact</th>
+                            <th class='min-size-75'>Consequence</th>
+                            <th class='min-size-100'>MES var</th>
+                            <th class='min-size-100'>SpliceAI DS</th>
+                            <th class='min-size-100'>Missense</th>
+                            <th class='min-size-75'>Transmission</th>
+                            <th class='min-size-75'>R</th>
+                            <th class='min-size-75'>Class</th>
+                            <th class='min-size-25'></th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Gene
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Feature', content='The feature ID, mainly, corresponding to the RefSeq transcript, or the ensembl ID.', footer='For more information see : <a  href=\'http://grch37.ensembl.org/info/docs/tools/vep/script/index.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Feature
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-75'>
+                            <th>
                                 <span onclick="openHelpModal(title='Canonical', content='Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-alizarin fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Can.
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-150'>
+                            <th>
                                 <span onclick="openHelpModal(title='Exon/Intron', content='The number of the exon or intron wich have the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Exon/Intron
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-250'>
+                            <th>
                                 <span onclick="openHelpModal(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 HGVSg
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-250'>
+                            <th>
                                 <span onclick="openHelpModal(title='HGVSc', content='The HGVS coding sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 HGVSc
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-250'>
+                            <th>
                                 <span onclick="openHelpModal(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 HGVSp
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Filter
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Depth', content='Depth in DNA sequencing is the number of unique reads that include a given nucleotide in the reconstructed sequence.', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
-                                Depth
+                                DP
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Allelic depth', content='Depth of the observed allele.', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
-                                Allelic depth
+                                AD
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
-                                Allelic frequencies
+                                AF
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                 <i class="fas fa-question-circle"></i>
                             </span>
                                 GnomAD
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='SEAL (freq)', content='The frequency with which this variant is observed in SEAL among all other samples.', footer='Warning : this value exclude this sample')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 SEAL (freq)
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='SEAL (count)', content='The frequency with which this variant is observed in SEAL among all other samples.', footer='Warning : this value exclude this sample')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 SEAL (count)
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='In Family', content='Count variant presence in the case family and list all samples in the faimily with this variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 In Family
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-300'>
+                            <th>
                                 <span onclick="openHelpModal(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 ClinSig
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Impact
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-300'>
+                            <th>
                                 <span onclick="openHelpModal(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Consequence
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='MES alt', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li class=\'w3-text-flat-pomegranate\'>|percent variation| &ge; 15\%</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 MES var
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-125'>
+                            <th>
                                 <span onclick="openHelpModal(title='SpliceAI DS', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li class=\'w3-text-flat-sun-flower\'>0.2 (high recall)</li><li class=\'w3-text-flat-orange\'>0.5 (recommended)</li><li class=\'w3-text-flat-pomegranate\'>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 SpliceAI DS
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-100'>
+                            <th>
                                 <span onclick="openHelpModal(title='Missense', content='This score represents the mean rank scores of the top 10 missense predictions tools from dbNSFP v4.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul><br />The threshold are : <ul><li><span class=\'w3-tag w3-flat-pomegranate\'>0.95</span> <i>top 5% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-pomegranate\'>0.9</span> <i>top 10% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-orange\'>0.75</span> <i>top 25% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-sun-flower\'>0.5</span> <i>top 50% deleteriousness of all missense variant</i></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Missense
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-200'>
+                            <th>
                                 <span onclick="openHelpModal(title='Transmission', content='This column represent the transmission mode following OMIM data.<br /><ul><li><b>AD</b>: Autosomal dominant</li><li><b>AR</b>: Autosomal recessive</li><li><b>DD</b>: Digenic dominant</li><li><b>DR</b>: Digenic recessive</li><li><b>IC</b>: Isolated cases</li><li><b>Mito</b>: Mitochondrial</li><li><b>MF</b>: Multifactorial</li><li><b>PAD</b>: Pseudoautosomal dominant</li><li><b>PAR</b>: Pseudoautosomal recessive</li><li><b>SMos</b>: Somatic mosaicism</li><li><b>SMut</b>: Somatic mutation</li><li><b>XL</b>: X-linked</li><li><b>XLD</b>: X-linked dominant</li><li><b>XLR</b>: X-linked recessive</li><li><b>YL</b>: Y-linked</li></ul><br /><i class=\'fas fa-question-circle\'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional', footer='For more information see : <a  href=\'https://www.omim.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>OMIM</i></a>' )" class="w3-opacity-max w3-hover-opacity">
                                 <i class="fas fa-question-circle"></i>
                                 </span>
                                 Transmission
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-25'>
+                            <th>
                                 R
                             </th>
-                            <th class='w3-flat-green-sea showTitle control-size-200'>
+                            <th>
                                 <span onclick="openHelpModal(title='Class', content='You can choose the classification:<ul><li class=\'w3-text-flat-green-sea\'>Benign</li><li class=\'w3-text-flat-nephritis\'>Likely Benign</li><li class=\'w3-text-flat-belize-hole\'>VUS</li><li class=\'w3-text-flat-pumpkin\'>Likely Pathogenic</li><li class=\'w3-text-flat-pomegranate\'>Pathogenic</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4544753/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ACMG guidelines</i></a>')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle"></i>
                                 </span>
                                 Class
                             </th>
-                            <th class="w3-flat-green-sea w3-center control-size-25"></th>
+                            <th></th>
                         </tr>
                     </tfoot>
                 </table>
@@ -355,12 +355,12 @@
             </div>
 
             <div id="allTranscripts" class="w3-container detail">
-                <h1>Transcripts</h1>
+                <h3>Transcripts</h3>
                 <div id="allTranscriptsTable"></div>
             </div>
 
             <div id="missense" class="w3-container detail">
-                <h1>Missense</h1>
+                <h3>Missense</h3>
                 <div class="w3-row">
                     <div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
                     <div class="w3-col l6 m12 s12">
@@ -370,7 +370,7 @@
             </div>
 
             <div id="conservation" class="w3-container detail">
-                <h1>Conservation</h1>
+                <h3>Conservation</h3>
                 <div class="w3-row">
                     <div id='radarConservation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
                     <div class="w3-col l6 m12 s12">
@@ -380,7 +380,7 @@
             </div>
 
             <div id="population" class="w3-container detail">
-                <h1>Population</h1>
+                <h3>Population</h3>
                 <div class="w3-row">
                     <div id='radarPopulation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
                     <div class="w3-col l6 m12 s12">
@@ -390,14 +390,14 @@
             </div>
 
             <div id="splicing" class="w3-container detail">
-                <h1>Splicing</h1>
+                <h3>Splicing</h1>
                 <div class="w3-row">
                     <div id='chartSplicing' class="w3-col l3 m6 s6"><!-- Plotly chart will be drawn inside this DIV --></div>
                 </div>
             </div>
 
             <div id="links" class="w3-container detail">
-                <h1>Links</h1>
+                <h3>Links</h3>
                 <div id="links_exterior" style="column-count: 3;"></div>
                 <div class="w3-padding w3-display-bottommiddle w3-tiny">
                     <span><i class="w3-text-flat-asbestos fas fa-flag"></i> dbSNP</span>
@@ -409,12 +409,12 @@
             </div>
 
             <div id="inseal" class="w3-container detail">
-                <h1>In Seal (<span class="inSealCount"></span>)</h1>
+                <h3>In Seal (<span class="inSealCount"></span>)</h3>
                 <div id="inSEALTable"></div>
             </div>
 
             <div id="comments" class="w3-container detail">
-                <h1>Comments (<span class="commentsCountVar"></span>)</h1>
+                <h3>Comments (<span class="commentsCountVar"></span>)</h3>
 
                 {{ form.hidden_tag() }}
                 <div class="w3-row w3-section">

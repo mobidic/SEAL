@@ -7,26 +7,26 @@
 {% block content %}
     {% include 'includes/sidebar.j2' %}
     <div class="w3-main" {% if current_user.sidebar %}style="margin-left:350px"{% endif %}>
-        <div class="w3-padding">
-            <table id="samples" class="w3-table-all" style="width:100%">
+        <div class="w3-padding w3-small">
+            <table id="samples" class="w3-table display w3-small" style="width:100%">
                 <thead>
                     <tr>
-                        <th class="w3-flat-green-sea"><div>Sample Name</div></th>
-                        <th class="w3-flat-green-sea"><div>Family</div></th>
-                        <th class="w3-flat-green-sea"><div>Run</div></th>
-                        <th class="w3-flat-green-sea"><div>Run Alias</div></th>
-                        <th class="w3-flat-green-sea"><div>Status</div></th>
-                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
+                        <th><div>Sample Name</div></th>
+                        <th><div>Family</div></th>
+                        <th><div>Run</div></th>
+                        <th><div>Run Alias</div></th>
+                        <th><div>Status</div></th>
+                        <th><div>Team(s)</div></th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
-                        <th class="w3-flat-green-sea"><div>Sample Name</div></th>
-                        <th class="w3-flat-green-sea"><div>Family</div></th>
-                        <th class="w3-flat-green-sea"><div>Run</div></th>
-                        <th class="w3-flat-green-sea"><div>Run Alias</div></th>
-                        <th class="w3-flat-green-sea"><div>Status</div></th>
-                        <th class="w3-flat-green-sea"><div>Team(s)</div></th>
+                        <th><div>Sample Name</div></th>
+                        <th><div>Family</div></th>
+                        <th><div>Run</div></th>
+                        <th><div>Run Alias</div></th>
+                        <th><div>Status</div></th>
+                        <th><div>Team(s)</div></th>
                     </tr>
                 </tfoot>
             </table>

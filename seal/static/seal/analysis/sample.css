@@ -1,27 +1,3 @@
-/* https://datatables.net/forums/discussion/33008/scrolx-create-scrolbar-under-fixed-columns-on-firefox-with-bootstrap*/
-.tableFixHead {
-    overflow-y: auto;
-    height: 434.5px;
-}
-.tableFixHead thead th {
-    position: sticky;
-    top: 0;
-}
-/*
-©Raj Rajhans
-rajrajhans.com
-Day #4 : 30 Days CSS
-*/
-.dtfc-fixed-left{z-index:1;}
-.dtfc-floatingparenthead{z-index:6!important;}
-
 .w3-modal {
     z-index: 6;
-}
-
-#variants_processing {
-    background: none;
-}
-.details-control{
-    z-index:3
 }

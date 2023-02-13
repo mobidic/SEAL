@@ -6,17 +6,16 @@
         <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 
         <link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='seal.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='balloon.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-5/css/all.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
-
+        
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
         <script type="text/javascript" src="{{ url_for('static', filename='DataTables/datatables.min.js') }}"></script>
-
-
+        
         <script defer src="{{ url_for('static', filename='fontawesome-free-5/js/all.js') }}"></script>
-
+        <link rel="stylesheet" href="{{ url_for('static', filename='seal.css') }}">
+        
         {% if current_user.sidebar %}<style>.w3-main {margin-left:350px}</style>{% endif %}
 
         {% block static %}
@@ -25,7 +24,7 @@
 
     <body>
 
-        <header class="w3-top" style="z-index:6" id="navHead">
+        <header class="fh-fixedHeader w3-top" style="z-index:6" id="navHead">
             <div class="w3-bar w3-flat-green-sea w3-left-align w3-large">
                 {% if current_user.logged %}
                     <span class="w3-bar-item w3-padding-large w3-hover-flat-turquoise w3-left" onclick="w3_toggle_menu()"  aria-label="SideBar" data-balloon-pos="right"><i class="fas fa-window-maximize fa-rotate-270"></i></span>
