@@ -35,11 +35,11 @@ class UpdateAccountForm(FlaskForm):
         validators=[Optional(), Email()]
     )
     api_key_md = StringField(
-        'API_key_md',
+        'MobiDetails API Key',
         validators=[Optional()]
     )
     image_file = FileField(
-        'Update Profile Picture',
+        'Profile Picture',
         validators=[FileAllowed(['png', 'jpg', 'jpeg'])]
     )
     submit_update = SubmitField('Update Profile')
