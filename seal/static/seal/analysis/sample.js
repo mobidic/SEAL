@@ -556,7 +556,7 @@ function toggle_status(id, status) {
                         },
                         display: function ( data, type, row, meta ) {
                             cell = ""
-                            style = "style='max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+                            style = "style='display:inline-table;max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
 
                             for (idx in data) {
                                 color = "asbestos";
@@ -706,7 +706,7 @@ function toggle_status(id, status) {
 
                             for (idx in data) {
                                 color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
-                                cell[color] += " <span class='w3-tag w3-flat-" + color + "' " + style + ">|" + data[idx] + "|</span>"
+                                cell[color] += " <span style='display:inline-table;' class='w3-tag w3-flat-" + color + "' " + style + ">|" + data[idx] + "|</span>"
                             }
                             return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
                         },
@@ -735,7 +735,7 @@ function toggle_status(id, status) {
                             return data;
                         },
                         display: function ( data, type, row, meta ) {
-                            style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
+                            style = "style='display:inline-table;max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
                             cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
                             return cell;
                         },
@@ -766,7 +766,7 @@ function toggle_status(id, status) {
                             for (idx in consequences_dict) {
                                 if (data.includes(idx)){
                                     color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
-                                    style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
+                                    style = "style='display:inline-table;max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
                                     cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
                                 }
                             }
@@ -861,7 +861,7 @@ function toggle_status(id, status) {
                             } else if (value >= 0.5) {
                                 classw3css = "w3-text-flat-sun-flower";
                             }
-                            return "<span class='" + classw3css + "'>" + value + "</span>";
+                            return "<span style='display:inline-table;' class='" + classw3css + "'>" + value + "</span>";
                         },
                         sort: function ( data, type, row, meta ) {
                             if(data != null) {
@@ -906,11 +906,10 @@ function toggle_status(id, status) {
                         if(type === 'display') {
                             const id_var=data["id"];
                             const id=data["id"] + "reported";
+                            var check="";
                             if (data["reported"]) {
-                                return '<input id="'+ id +'" class="w3-check" type="checkbox" checked="checked" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\');">';
-                            } else {
-                                return '<input id="'+ id +'" class="w3-check" type="checkbox" onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\');">';
-                            }
+                                check='checked="checked"';                            }
+                            return '<input id="'+ id +'" type="checkbox" ' + check + ' onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\');">';
                         }
                         return data["reported"] ? "Reported" : "Not Reported";
                     },
@@ -921,11 +920,12 @@ function toggle_status(id, status) {
                     }
                 },
                 {
-                    className: disabled_class + "seal-form-report showTitle  w3-center",
+                    className: disabled_class + "no-padding seal-form-report showTitle  w3-center",
                     data: {
                         "data": "class_variant"
                     },
                     render:function ( data, type, row ) {
+                            // return "";
                             if(type === 'display') {
                                 id_var = data.id
                                 class_variant = data.class_variant ? data.class_variant : 0;
@@ -935,11 +935,11 @@ function toggle_status(id, status) {
                                             class_variant_html[c]+
                                         '</a>'
                                 }
-                                response = `<div class="w3-dropdown-click w3-right" style="background-color:transparent">
+                                response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
                                     <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
                                         ` + class_variant_html[class_variant] + `
                                     </button>
-                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="top:0px;right:-105px;min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
+                                    <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
                                         `+ dropdown +`
                                     </div>
                                 </div>`
