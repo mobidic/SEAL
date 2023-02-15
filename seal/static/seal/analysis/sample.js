@@ -925,7 +925,6 @@ function toggle_status(id, status) {
                         "data": "class_variant"
                     },
                     render:function ( data, type, row ) {
-                            // return "";
                             if(type === 'display') {
                                 id_var = data.id
                                 class_variant = data.class_variant ? data.class_variant : 0;
@@ -2015,42 +2014,11 @@ function toggle_status(id, status) {
                     });
                 });
             } else {
-                $("#comment_sample").val("");
-                $.getJSON("/json/comments/sample/" + id, function(data) {
-                    comments = '<table id="tableCommentsSample" class="w3-small w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0" style="width:100%">';
-                    comments = comments + '<thead class="w3-flat-silver"><tr>'+
-                        '<th class="w3-flat-silver no-sort" style="width:100px;min-width:100px;max-width:100px;">User</th>'+
-                        '<th class="w3-flat-silver no-sort" style="width:462px;min-width:462px;max-width:462px;">Comment</th>'+
-                        '<th class="w3-flat-silver" style="width:200px;min-width:200px;max-width:200px;">Date</th>'+
-                    '</tr></thead>';
-                    comments = comments + '<tbody>';
-
-                    var count = 0;
-                    for (x in data["data"]) {
-                        comments = comments + '<tr>'+
-                            '<td>' + data["data"][x]["username"] + '</td>'+
-                            '<td>' + data["data"][x]["comment"] + '</td>'+
-                            '<td>' + data["data"][x]["date"] + '</td>'+
-                        '</tr>';
-                        count+=1;
-                    }
-
-                    comments = comments + '</tbody>';
-                    comments = comments + '</table>';
-                    $("#commentsTableSample").html(comments);
-                    $('.commentsCountSample').html(count);
-
-                    $('#tableCommentsSample').DataTable({
-                        searching:false,
-                        lengthMenu: [ 10 ],
-                        dom: 'tip',
-                        order: [[ 2, "desc" ]],
-                        columnDefs: [{
-                            orderable: false,
-                            targets:  "no-sort"
-                        }],
-                    });
+                $.getJSON("/json/comments/sample/" + sample_id, function(data) {
+                    $('.commentsCountSample').html(data.data.length);
                 });
+                $("#comment_sample").val("");
+                $('#tableCommentsSample').DataTable().ajax.reload();
             }
         });
     }
@@ -2156,6 +2124,19 @@ function toggle_status(id, status) {
                 targets:  "no-sort"
             }
         ],
+        ajax: "/json/comments/sample/" + sample_id,
+        columns:[
+            {
+                data: "username",
+            },
+            {
+                data: "comment",
+            },
+            {
+                data: "date",
+            }
+        ]
+
     });
 
 

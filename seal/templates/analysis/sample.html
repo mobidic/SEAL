@@ -222,15 +222,6 @@
                                 <th style="width:20%">Date</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {% for comment in sample.comments %}
-                            <tr>
-                                <td>{{ comment.user.username }}</td>
-                                <td>{{ comment.comment }}</td>
-                                <td>{{ comment.date.strftime("%Y/%m/%d %H:%M:%S") }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
                     </table>
                 </div>
 
