@@ -184,10 +184,6 @@
 .no-padding {
     padding: 0px !important;
 }
-
-.no-padding {
-    padding: 0px !important;
-}
 .dataTables_scrollBody {
     background: #ecf0f1!important;
 }
@@ -213,3 +209,21 @@ table.dataTable.display>tbody>tr.even.selected>* {
 table.dataTable.display>tbody>tr.selected:hover>* {
     box-shadow: inset 0 0 0 9999px #4c525186 !important;
 }
+
+/* from https://www.freecodecamp.org/news/how-to-keep-your-footer-where-it-belongs-59c6aa05c59c/ by Dominic Fraser */
+#page-container {
+    position: relative;
+    min-height: 100vh;
+}
+
+#content-wrap {
+    padding-bottom: 2.5rem;    /* Footer height */
+}
+
+#footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 2.5rem;            /* Footer height */
+}
+/* --------------------------------------------------------------------------------------------------------------- */
