@@ -92,6 +92,15 @@ SPLICEAI = [
     "DL"
 ]
 
+# https://www.tutorialspoint.com/python-check-if-two-lists-have-any-element-in-common
+def commonelems(x,y):
+   if not x or not y:
+       return True
+   for value in x:
+        if value in y:
+            return True
+   return False
+
 
 def login_required(func):
     @functools.wraps(func)
@@ -658,8 +667,8 @@ def json_variants(id, idbed=False, version=-1):
                         "inheritances": str(pheno.inheritances),
                         "phenotypeMappingKey": pheno.phenotypeMappingKey
                     })
-        cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID)).count()
-        total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id)).count()
+        cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, Var2Sample.variant_ID == var2sample.variant_ID, or_(Sample.teams == None, Sample.teams.any(Team.id.in_([t.id for t in sample.teams])), sample.teams == None ))).count()
+        total_samples = db.session.query(Sample).filter(and_(Sample.status >= 1, Sample.id != sample.id, or_(Sample.teams == None, Sample.teams.any(Team.id.in_([t.id for t in sample.teams])), sample.teams == None ))).count()
 
         members = []
         if sample.familyid is None:
@@ -859,23 +868,24 @@ def json_variant(id, version=-1, sample=None):
     for v2s in variant.samples:
         current_family = False
         current = False
-        if v2s.sample.status >= 1:
-            if sample and v2s.sample.familyid == sample.familyid and sample.familyid is not None:
-                current_family = True
-            if sample and v2s.sample.id == sample.id:
-                current = True
-            allelic_frequency = v2s.allelic_depth / v2s.depth
-            samples.append({
-                "samplename": v2s.sample.samplename,
-                "affected": v2s.sample.affected,
-                "family": v2s.sample.family.family if v2s.sample.family else "",
-                "current_family": current_family,
-                "current": current,
-                "depth": v2s.depth,
-                "allelic_depth": v2s.allelic_depth,
-                "allelic_frequency": f"{allelic_frequency:.4f}",
-                "reported": v2s.reported
-            })
+        if commonelems(sample.teams, v2s.sample.teams):
+            if v2s.sample.status >= 1:
+                if sample and v2s.sample.familyid == sample.familyid and sample.familyid is not None:
+                    current_family = True
+                if sample and v2s.sample.id == sample.id:
+                    current = True
+                allelic_frequency = v2s.allelic_depth / v2s.depth
+                samples.append({
+                    "samplename": v2s.sample.samplename,
+                    "affected": v2s.sample.affected,
+                    "family": v2s.sample.family.family if v2s.sample.family else "",
+                    "current_family": current_family,
+                    "current": current,
+                    "depth": v2s.depth,
+                    "allelic_depth": v2s.allelic_depth,
+                    "allelic_frequency": f"{allelic_frequency:.4f}",
+                    "reported": v2s.reported
+                })
 
     comments = list()
 
