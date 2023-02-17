@@ -40,6 +40,7 @@ app.config['SCHEDULER_API_ENABLED'] = True
 app.config['SCHEDULER_TIMEZONE'] = "Europe/Paris"
 app.config['SCHEDULER_JOB_DEFAULTS'] = {"coalesce": False, "max_instances": 1}
 app.config["SEAL_MAINTENANCE"] = getenv_bool("SEAL_MAINTENANCE", False)
+app.config["DEBUG_FLASK"] = getenv_bool("DEBUG_FLASK", True)
 
 # Plugins initialization
 db = SQLAlchemy(app)
@@ -65,6 +66,9 @@ def before_request():
     if app.config["SEAL_MAINTENANCE"] and request.path != url_for('maintenance'): 
         return redirect(url_for('maintenance'))
 
+@app.context_processor
+def inject_debug():
+    return dict(DEBUG_FLASK=app.config["DEBUG_FLASK"])
 
 from seal import routes
 from seal import schedulers
