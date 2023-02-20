@@ -54,12 +54,19 @@ export PYTHONPATH=${PWD}
 initdb -D ${PWD}/seal/seal.db
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 ```
-  - __[Optional]__ Initialize database
-  ```bash
-  python insertdb.py
-  flask db init
-  flask db migrate -m "Init DataBase"
+- Issue [#26](https://github.com/mobidic/SEAL/issues/26)
+  - comment line on `seal/__init__.py`
+  ```python
+  # from seal import routes
+  # from seal import schedulers
+  # from seal import admin
   ```
+- Initialize database
+```bash
+python insertdb.py
+flask db init
+flask db migrate -m "Init DataBase"
+```
   - __[Optional]__ Add Gene as Region (usefull to create _in-silico_ panels)
   ```bash
   wget -qO- http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/ncbiRefSeq.txt.gz   | gunzip -c - | awk -v OFS="\t" '{ if (!match($13, /.*-[0-9]+/)) { print $3, $5-2000, $6+2000, $13; } }' -  | sort -u > ncbiRefSeq.hg19.sorted.bed
@@ -69,6 +76,13 @@ pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
   ```bash
   wget -qO- https://data.omim.org/downloads/{{YOUR API KEY}}/genemap2.txt
   python insert_OMIM.py
+  ```
+- Issue [#26](https://github.com/mobidic/SEAL/issues/26)
+  - uncomment line on `seal/__init__.py`
+  ```python
+  from seal import routes
+  from seal import schedulers
+  from seal import admin
   ```
 - Launch the flask app
 ```bash
