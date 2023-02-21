@@ -1931,6 +1931,27 @@ function toggle_class(id_var, sample_id, class_variant) {
     })
 }
 
+function toggle_on_off(div) {
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+    $.ajax({
+        type: "POST",
+        url: "/toggle/sample/" + div,
+        data: {
+            "sample_id": sample_id
+        },
+        success: function() {
+            $("#toggle-" + div).toggleClass(["fa-toggle-on", "fa-toggle-off", "w3-text-flat-green-sea"]);
+            $('#tableHistorySample').DataTable().ajax.reload();
+        }
+    })
+}
+
 function toggle_var2sample_status(id, id_var, sample_id, type) {
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {

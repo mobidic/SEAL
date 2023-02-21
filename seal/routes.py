@@ -933,6 +933,37 @@ def toggle_varStatus():
     return f"{return_value}"
 
 
+@app.route("/toggle/sample/index", methods=['POST'])
+@login_required
+def toggle_sampleIndex():
+    sample_id = request.form["sample_id"]
+    sample = Sample.query.get(sample_id)
+    old = sample.index
+    sample.index = False if sample.index else True
+
+    history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Toggle index : '{str(old)}' -> '{str(sample.index)}'")
+    print(history)
+    db.session.add(history)
+    db.session.commit()
+
+    return "ok"
+
+
+@app.route("/toggle/sample/affected", methods=['POST'])
+@login_required
+def toggle_sampleAffected():
+    sample_id = request.form["sample_id"]
+    sample = Sample.query.get(sample_id)
+    old = sample.affected
+    sample.affected = False if sample.affected else True
+
+    history = History(sample_ID=sample.id, user_ID=current_user.id, date=datetime.now(), action=f"Toggle affected : '{str(old)}' -> '{str(sample.affected)}'")
+    db.session.add(history)
+    db.session.commit()
+
+    return "ok"
+
+
 @app.route("/toggle/sample/filter", methods=['POST'])
 @login_required
 def toggle_sampleFilter():
