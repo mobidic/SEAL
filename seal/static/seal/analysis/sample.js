@@ -1907,6 +1907,40 @@ window.onclick = function(event) {
     }
 }
 
+$("#edit-name").keyup(function(event) {
+    if (event.keyCode === 13) {
+        edit_name()
+    }
+});
+
+function edit_name() {
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrf_token);
+            }
+        }
+    });
+    $.ajax({
+        type: "POST",
+        url: "/edit/sample/name",
+        data: {
+            "sample_id": sample_id,
+            "new_name": $('#edit-name').val()
+        },
+        success: function() {
+            $( "#error-message-edit-name" ).remove();
+            $("h1").html($('#edit-name').val());
+            $('#tableHistorySample').DataTable().ajax.reload();
+        },
+        error: function(XMLHttpRequest) {
+            $( "#error-message-edit-name" ).remove();
+            msg = "<p id='error-message-edit-name' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
+            $( "#sample-name-sidebar" ).after( msg );
+        }  
+    })
+}
+
 function toggle_class(id_var, sample_id, class_variant) {
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {

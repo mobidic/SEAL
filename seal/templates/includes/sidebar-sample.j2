@@ -7,18 +7,21 @@
 		{% include "includes/flash.j2" %}
 		<div class="w3-row w3-display-container w3-margin" style="overflow-wrap: anywhere;">
             <h3>
-                <div class="w3-cell-row">
+                <div id="sample-name-sidebar" class="w3-cell-row">
                     <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
-                        <i class="fas fa-user-tag"></i>
+                        <i class="fas fa-user-edit"></i>
                     </div>
                     <div class="w3-container w3-cell">
-                        <i>{{ sample.samplename }}</i>
+                        <input id="edit-name" maxlength="20" minlength="2" type="text"  style="width:210px!important;" placeholder="samplename" value="{{ sample.samplename }}">
+                    </div>
+                    <div class="w3-center w3-container w3-cell" style="width:20px;padding: 0px !important;">
+                        <i class="fas fa-check-square w3-text-flat-green-sea w3-hover-text-flat-turquoise" style="cursor: pointer;" onclick="edit_name()"></i>
                     </div>
                 </div>
             </h3>
             <div>
-                <span class="w3-cell-row" onclick="toggle_on_off('index')" style="cursor: pointer;"><i id="toggle-index" class="fas fa-toggle-{% if sample.index %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Index</span>
-                <span class="w3-cell-row" onclick="toggle_on_off('affected')" style="cursor: pointer;"><i id="toggle-affected" class="fas fa-toggle-{% if sample.affected %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Affected</span>
+                <span class="w3-row" onclick="toggle_on_off('index')" style="cursor: pointer;"><i id="toggle-index" class="fas fa-toggle-{% if sample.index %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Index</span>
+                <span class="w3-row" onclick="toggle_on_off('affected')" style="cursor: pointer;"><i id="toggle-affected" class="fas fa-toggle-{% if sample.affected %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Affected</span>
             </div>
             <hr style="display: block; height: 1px;
     border: 0; border-top: 1px solid #ccc;

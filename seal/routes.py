@@ -10,7 +10,7 @@ from seal import app, db, bcrypt
 from flask_wtf.csrf import CSRFError
 from flask_login.utils import EXEMPT_METHODS
 from flask_login import login_user, current_user, logout_user
-from flask import render_template, flash, redirect, url_for, request, jsonify
+from flask import render_template, flash, redirect, url_for, request, jsonify, abort
 from seal.forms import LoginForm, UpdateAccountForm, UpdatePasswordForm, UploadVariantForm, UploadPanelForm, AddCommentForm, SaveFilterForm
 from seal.models import User, Sample, Filter, Transcript, Family, Variant, Var2Sample, Comment_variant, Comment_sample, Run, Team, Bed, Region, Omim, History
 
@@ -91,6 +91,27 @@ SPLICEAI = [
     "DG",
     "DL"
 ]
+
+# https://flask.palletsprojects.com/en/2.2.x/errorhandling/
+class InvalidAPIUsage(Exception):
+    status_code = 400
+
+    def __init__(self, message, status_code=None, payload=None):
+        super().__init__()
+        self.message = message
+        if status_code is not None:
+            self.status_code = status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = dict(self.payload or ())
+        rv['message'] = self.message
+        return rv
+
+@app.errorhandler(InvalidAPIUsage)
+def invalid_api_usage(e):
+    return jsonify(e.to_dict()), e.status_code
+
 
 # https://www.tutorialspoint.com/python-check-if-two-lists-have-any-element-in-common
 def commonelems(x,y):
@@ -907,6 +928,26 @@ def json_variant(id, version=-1, sample=None):
         "comments": comments
     }
     return jsonify(variant_json)
+
+
+@app.route("/edit/sample/name", methods=['POST'])
+@login_required
+def edit_name():
+    sample_id = request.form["sample_id"]
+    new_name = request.form["new_name"]
+    sample = Sample.query.get(sample_id)
+    if sample.samplename == new_name:
+        return "No Changes"
+    old_name = sample.samplename
+    if len(new_name) < 2 or len(new_name) > 20:
+        raise InvalidAPIUsage("The samplename must be between 2 and 20 characters long.")
+    
+    sample.samplename = new_name
+    history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Sample rename : '{old_name}' -> '{sample.samplename}")
+    db.session.add(history)
+    db.session.commit()
+
+    return "ok"
 
 
 ################################################################################
