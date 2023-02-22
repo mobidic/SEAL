@@ -5,6 +5,11 @@ $(document).ready(function() {
         },
         scrollX: true,
         "proccessing": true,  "serverSide": true,
+        scrollY:        "40vh",
+        scrollX:        true,
+        scrollCollapse: true,
+        scroller:         true,
+        fixedHeader:  true,
         ajax: {
             url: '/json/transcripts',
             type: 'POST',

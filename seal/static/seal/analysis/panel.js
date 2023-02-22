@@ -17,11 +17,16 @@ $(document).ready(function() {
     table = $('#regions').DataTable({
         ajax: '/json/bed/0',
         "columns": [
-            { 'className': 'showTitle control-size-200', 'data': 'chr'},
-            { 'className': 'showTitle control-size-300', 'data': 'start'},
-            { 'className': 'showTitle control-size-200', 'data': 'stop'},
+            { 'className': 'showTitle control-size-100', 'data': 'chr'},
+            { 'className': 'showTitle control-size-100', 'data': 'start'},
+            { 'className': 'showTitle control-size-100', 'data': 'stop'},
             { 'className': 'showTitle control-size-150', 'data': 'name'},
         ],
+        scrollY:        "40vh",
+        scrollX:        true,
+        scrollCollapse: true,
+        scroller:         true,
+        fixedHeader:  true,
         dom: 'lBfrtip',
         buttons: [
             'copy', 'csv'
