@@ -883,13 +883,17 @@ def json_history(type, id):
 @login_required
 def json_variant(id, version=-1, sample=None):
     variant = Variant.query.get(id)
-    sample = Sample.query.get(sample)
+    if sample is None:
+        s_teams = None
+    else:
+        sample = Sample.query.get(sample)
+        s_teams = sample.teams
 
     samples = list()
     for v2s in variant.samples:
         current_family = False
         current = False
-        if commonelems(sample.teams, v2s.sample.teams):
+        if commonelems(s_teams, v2s.sample.teams):
             if v2s.sample.status >= 1:
                 if sample and v2s.sample.familyid == sample.familyid and sample.familyid is not None:
                     current_family = True
