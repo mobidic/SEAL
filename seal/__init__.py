@@ -8,7 +8,6 @@ from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
-from apscheduler.schedulers.background import BackgroundScheduler
 
 
 app = Flask(__name__)
@@ -18,8 +17,27 @@ csrf = CSRFProtect()
 
 # from: https://stackoverflow.com/questions/63116419/evaluate-boolean-environment-variable-in-python
 def getenv_bool(name: str, default: bool = None) -> bool:
-    true_ = ('true', '1', 't', 'on')  # Add more entries if you want, like: `y`, `yes`, `on`, ...
-    false_ = ('false', '0', 'f', 'off')  # Add more entries if you want, like: `n`, `no`, `off`, ...
+    """
+    Retrieve a boolean value from an environment variable.
+
+    Args:
+        name (str): The name of the environment variable.
+        default (bool, optional): The default value to return if the
+        environment variable is not set.
+
+    Returns:
+        bool: The boolean value of the environment variable.
+
+    Raises:
+        ValueError: If the value of the environment variable is not a valid
+                    boolean value.
+                    If the environment variable is not set and no default value
+                    is provided.
+    """
+    # Add more entries if you want, like: `y`, `yes`, `on`, ...
+    true_ = ('true', '1', 't', 'on')
+    # Add more entries if you want, like: `n`, `no`, `off`, ...
+    false_ = ('false', '0', 'f', 'off') 
     value = os.getenv(name, None)
     if value is None:
         if default is None:
@@ -59,6 +77,9 @@ app.logger.info(app.config)
 # Configure Timeout
 @app.before_request
 def before_request():
+    """
+    Set session and user information before processing the request.
+    """
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=20)
     session.modified = True
@@ -68,6 +89,10 @@ def before_request():
 
 @app.context_processor
 def inject_debug():
+    """
+    This function injects the Flask application's 'DEBUG_FLASK' configuration
+    option as a variable in the context.
+    """
     return dict(DEBUG_FLASK=app.config["DEBUG_FLASK"])
 
 from seal import routes
