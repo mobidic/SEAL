@@ -1,7 +1,8 @@
 import os
 from datetime import timedelta
+import yaml
 
-from flask import Flask, session, g, request, render_template, redirect, url_for
+from flask import Flask, session, g, request, redirect, url_for
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, current_user
@@ -11,56 +12,17 @@ from flask_wtf import CSRFProtect
 
 
 app = Flask(__name__)
-scheduler = APScheduler()
-csrf = CSRFProtect()
 
+with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "config.yaml"), "r") as config_file:
+    config = yaml.safe_load(config_file)
 
-# from: https://stackoverflow.com/questions/63116419/evaluate-boolean-environment-variable-in-python
-def getenv_bool(name: str, default: bool = None) -> bool:
-    """
-    Retrieve a boolean value from an environment variable.
+app.config.update(config['FLASK'])
+app.permanent_session_lifetime = timedelta(minutes=20)
 
-    Args:
-        name (str): The name of the environment variable.
-        default (bool, optional): The default value to return if the
-        environment variable is not set.
-
-    Returns:
-        bool: The boolean value of the environment variable.
-
-    Raises:
-        ValueError: If the value of the environment variable is not a valid
-                    boolean value.
-                    If the environment variable is not set and no default value
-                    is provided.
-    """
-    # Add more entries if you want, like: `y`, `yes`, `on`, ...
-    true_ = ('true', '1', 't', 'on')
-    # Add more entries if you want, like: `n`, `no`, `off`, ...
-    false_ = ('false', '0', 'f', 'off') 
-    value = os.getenv(name, None)
-    if value is None:
-        if default is None:
-            raise ValueError(f'Variable `{name}` not set!')
-        else:
-            value = str(default)
-    if value.lower() not in true_ + false_:
-        raise ValueError(f'Invalid value `{value}` for variable `{name}`')
-    
-    return value.lower() in true_
-
-
-# Configure application option
-app.config['SECRET_KEY'] = '78486cd05859fc8c6baa29c430f06638'
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql:///seal"
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['SCHEDULER_API_ENABLED'] = True
-app.config['SCHEDULER_TIMEZONE'] = "Europe/Paris"
-app.config['SCHEDULER_JOB_DEFAULTS'] = {"coalesce": False, "max_instances": 1}
-app.config["SEAL_MAINTENANCE"] = getenv_bool("SEAL_MAINTENANCE", False)
-app.config["DEBUG_FLASK"] = getenv_bool("DEBUG_FLASK", True)
 
 # Plugins initialization
+scheduler = APScheduler()
+csrf = CSRFProtect()
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
@@ -71,29 +33,39 @@ scheduler.start()
 csrf.init_app(app)
 migrate = Migrate(app, db, compare_type=True)
 
+
 app.logger.info(app.config)
 
 
-# Configure Timeout
 @app.before_request
 def before_request():
     """
     Set session and user information before processing the request.
+    Check if the website is under maintenance, and redirect the maintenance
+    page if so.
+
+    Returns:
+        Redirect to the maintenance page if needed
     """
     session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=20)
     session.modified = True
     g.user = current_user
-    if app.config["SEAL_MAINTENANCE"] and request.path != url_for('maintenance'): 
+    if app.config["MAINTENANCE"] and request.path != url_for('maintenance'): 
         return redirect(url_for('maintenance'))
 
+
 @app.context_processor
-def inject_debug():
+def inject_config():
     """
-    This function injects the Flask application's 'DEBUG_FLASK' configuration
-    option as a variable in the context.
+    This function injects the Flask application's configurations as a dict
+    variable in the context.
+
+    Returns:
+        dict: a dict containining app.config
     """
-    return dict(DEBUG_FLASK=app.config["DEBUG_FLASK"])
+    return dict(app.config)
+
+
 
 from seal import routes
 from seal import schedulers

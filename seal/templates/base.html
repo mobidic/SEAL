@@ -25,44 +25,44 @@
     <body>
 
         <header class="fh-fixedHeader w3-top" style="z-index:6" id="navHead">
-            <div class="w3-bar {% if DEBUG_FLASK %}w3-flat-pomegranate{% else %}w3-flat-green-sea{% endif %} w3-left-align w3-large">
+            <div class="w3-bar {% if ENV|upper != 'PRODUCTION' %}w3-flat-pomegranate{% else %}w3-flat-green-sea{% endif %} w3-left-align w3-large">
                 {% if current_user.logged %}
-                    <span class="w3-bar-item w3-padding-large {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" onclick="w3_toggle_menu()" aria-label="SideBar" data-balloon-pos="right"><i class="fas fa-window-maximize fa-rotate-270"></i></span>
+                    <span class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" onclick="w3_toggle_menu()" aria-label="SideBar" data-balloon-pos="right"><i class="fas fa-window-maximize fa-rotate-270"></i></span>
                 {% endif %}
-                <a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" aria-label="Home" data-balloon-pos="right"><span class="icon-seal"></span> SEAL</a>
-                {% if DEBUG_FLASK %}<span class="w3-bar-item w3-padding-large w3-left" aria-label="DO NOT USE IN PRODUCTION" data-balloon-pos="right"><i class="fas fa-exclamation-triangle"></i><span class="w3-hide-small w3-hide-medium"> DO NOT USE IN PRODUCTION <i class="fas fa-exclamation-triangle"></i></span></span>{% endif %}
+                <a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" aria-label="Home" data-balloon-pos="right"><span class="icon-seal"></span> SEAL</a>
+                {% if ENV|upper != 'PRODUCTION' %}<span class="w3-bar-item w3-padding-large w3-left" aria-label="{{ ENV|upper }}" data-balloon-pos="right"><i class="fas fa-exclamation-triangle"></i><span class="w3-hide-small w3-hide-medium"> {{ ENV|upper }} <i class="fas fa-exclamation-triangle"></i></span></span>{% endif %}
                 {% if current_user.is_authenticated %}
                     {% if current_user.logged %}
                         <div class="w3-dropdown-hover w3-dropdown-hover-turquoise w3-right">
-                            <button class="w3-button w3-ba-item w3-padding-large {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}" aria-label="Menu" data-balloon-pos="left"><i class="fa fa-bars"></i></button>
+                            <button class="w3-button w3-ba-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}" aria-label="Menu" data-balloon-pos="left"><i class="fa fa-bars"></i></button>
                             <div class="w3-dropdown-content w3-bar-block w3-card-4" style="right:0">
-                                <a href="{{ url_for('create_variant') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                <a href="{{ url_for('create_variant') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                     <i class="fas fa-user-plus fa-fw w3-margin-right"></i> New sample
                                 </a>
-                                <a href="{{ url_for('create_panel') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                <a href="{{ url_for('create_panel') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                     <i class="fas fa-th-list fa-fw w3-margin-right"></i> Panels
                                 </a>
-                                <a href="{{ url_for('transcripts') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                <a href="{{ url_for('transcripts') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                     <i class="fas fa-dna fa-fw w3-margin-right"></i> Transcripts
                                 </a>
                                 {% if current_user.admin %}
-                                    <a href="{{ url_for('admin.index') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                    <a href="{{ url_for('admin.index') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                         <i class="fas fa-tools fa-fw w3-margin-right"></i> Admin tools
                                     </a>
                                 {% endif %}
-                                <a href="{{ url_for('logout') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                <a href="{{ url_for('logout') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                     <i class="fas fa-sign-out-alt fa-fw w3-margin-right"></i> Logout
                                 </a>
                             </div>
                         </div>
-                        <a href="{{ url_for('account') }}" class="w3-bar-item {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="My Account" data-balloon-pos="left">
+                        <a href="{{ url_for('account') }}" class="w3-bar-item {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="My Account" data-balloon-pos="left">
                             <img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:35px; height:35px" style="padding:0px" class="w3-white w3-circle">  <span class="w3-hide-small">{{ current_user.username }}</span>
                         </a>
                     {% else %}
-                        <a href="{{ url_for('logout') }}" class="w3-bar-item w3-padding-large {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="Logout" data-balloon-pos="left"><i class="fas fa-sign-out-alt"></i></a>
+                        <a href="{{ url_for('logout') }}" class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="Logout" data-balloon-pos="left"><i class="fas fa-sign-out-alt"></i></a>
                     {% endif %}
                 {% else %}
-                <a href="{{ url_for('login') }}" class="w3-bar-item w3-padding-large {% if DEBUG_FLASK %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="Login" data-balloon-pos="left"><i class="fas fa-sign-in-alt"></i></a>
+                <a href="{{ url_for('login') }}" class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="Login" data-balloon-pos="left"><i class="fas fa-sign-in-alt"></i></a>
                 {% endif %}
         </div>
             </div>

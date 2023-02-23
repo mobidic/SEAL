@@ -335,7 +335,7 @@ def maintenance():
     Returns:
         A rendered template for the maintenace page or redirect to index.
     """
-    if not app.config["SEAL_MAINTENANCE"]:
+    if not app.config["MAINTENANCE"]:
         return redirect(url_for("index"))
     return render_template(
         "essentials/maintenance.html",
