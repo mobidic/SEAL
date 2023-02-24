@@ -11,6 +11,7 @@ from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
 from sqlalchemy import and_, or_
+
 from seal import app, bcrypt, db
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
@@ -395,7 +396,7 @@ def login():
             if next_page:
                 return redirect(next_page)
             else:
-                redirect(url_for('index'))
+                return redirect(url_for('index'))
         else:
             flash('Login unsuccessful. Please check username and/or password!',
                   'error')
