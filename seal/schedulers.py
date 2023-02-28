@@ -8,8 +8,10 @@ from anacore import annotVcf
 from datetime import datetime
 
 from seal import app, scheduler, db
-from seal.models import Sample, Variant, Family, Var2Sample, Run, Transcript, Team, Bed, Filter, History
+from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
+                         Team, Bed, Filter, History, Comment_sample)
 
+from sqlalchemy import exc
 
 CONSEQUENCES_DICT = {
     "stop_gained": 20,  
@@ -253,7 +255,7 @@ def create_sample(data):
         filter = get_filter(id, name)
         if filter:
             sample.filter = filter
-
+    db.session.add(sample)
     db.session.commit()
     return sample
 
@@ -402,7 +404,9 @@ def importvcf():
             return
 
         sample = create_sample(data)
-        current_date = datetime.now().isoformat()
+        history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=f"Import Sample")
+        db.session.add(history)
+        db.session.commit()
 
         vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
         stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
@@ -413,124 +417,159 @@ def importvcf():
             "stats_vep": stats_vep
         }
 
+        current_date = datetime.now().isoformat()
         try:
             app.logger.info("------ Variant Annotation with VEP ------")
             create_and_execute_shell_command(Path(app.root_path).joinpath('static/vep.config.json'), values)
             app.logger.info("------ END VEP ------")
-            with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
-                for v in vcf_io:
-                    if v.alt[0] == "*":
-                        continue
-                    variant = Variant.query.get(f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}")
-                    if not variant:
-                        annotations = [{
-                            "date": current_date,
-                            "ANN": list()
-                        }]
-
-                        for annot in v.info["ANN"]:
-                            # Split annotations
-                            for splitAnn in ANNOT_TO_SPLIT:
-                                if splitAnn == 'VAR_SYNONYMS':
-                                    try:
-                                        var_synonyms = dict()
-                                        for vs in annot[splitAnn].split("--"):
-                                            key, values = vs.split("::")
-                                            values_array = values.split("&")
-                                            var_synonyms[key] = values_array
-
-                                        annot[splitAnn] = var_synonyms
-                                    except AttributeError:
-                                        annot[splitAnn] = dict()
-                                else:
-                                    try:
-                                        annot[splitAnn] = annot[splitAnn].split("&")
-                                    except AttributeError:
-                                        annot[splitAnn] = []
-
-                            # transcript
-                            transcript = Transcript.query.get(annot["Feature"])
-                            if not transcript and annot["Feature"] is not None:
-                                transcript = Transcript(
-                                    feature=annot["Feature"],
-                                    biotype=annot["BIOTYPE"],
-                                    feature_type=annot["Feature_type"],
-                                    symbol=annot["SYMBOL"],
-                                    symbol_source=annot["SYMBOL_SOURCE"],
-                                    gene=annot["Gene"],
-                                    source=annot["SOURCE"],
-                                    protein=annot["ENSP"],
-                                    canonical=annot["CANONICAL"],
-                                    hgnc=annot["HGNC_ID"]
-                                )
-                                db.session.add(transcript)
-
-                            # Get consequence score
-                            consequence_score = 0
-                            for consequence in annot["Consequence"]:
-                                consequence_score += CONSEQUENCES_DICT[consequence]
-                            annot["consequenceScore"] = consequence_score
-
-                            # Get Exon/Intron
-                            annot["EI"] = None
-                            if annot["EXON"] is not None:
-                                annot["EI"] = f"Exon {annot['EXON']}"
-                            if annot["INTRON"] is not None:
-                                annot["EI"] = f"Intron {annot['INTRON']}"
-
-                            # Get Exon/Intron
-                            annot["canonical"] = True if annot['CANONICAL'] == 'YES' else False
-
-                            # missense
-                            missenses = list()
-                            for value in MISSENSES:
-                                missenses.append(annot[value])
-                            missenses = numpy.array(missenses, dtype=numpy.float64)
-                            mean = numpy.nanmean(missenses)
-                            annot["missensesMean"] = None if numpy.isnan(mean) else mean
-
-                            # max spliceAI
-                            spliceAI = list()
-                            for value in SPLICEAI:
-                                spliceAI.append(annot[value])
-                            spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
-                            max = numpy.nanmax(spliceAI)
-                            annot["spliceAI"] = None if numpy.isnan(max) else max
-
-                            # max MaxEntScan
-                            annot["MES_var"] = None
-                            if annot["MaxEntScan_alt"] is not None and annot["MaxEntScan_ref"] is not None:
-                                annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
-
-                            annotations[-1]["ANN"].append(annot)
-
-                        # app.logger.debug(f"       - Create Variant : {sample}")
-                        variant = Variant(id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", chr=v.chrom, pos=v.pos, ref=v.ref, alt=v.alt[0], annotations=annotations)
-                        db.session.add(variant)
-
-                    # sample.variants.append(variant)
-                    v2s = Var2Sample(variant_ID=variant.id, sample_ID=sample.id, depth=v.getPopDP(), allelic_depth=v.getPopAltAD()[0], filter=v.filter)
-                    db.session.add(v2s)
-
         except CommandFailedError as e:
             app.logger.info(f"{type(e).__name__} : {e}")
             sample.status = -1
-        except Exception as e:
-            db.session.remove()
-            app.logger.info(f"{type(e).__name__} : {e}")
-            sample.status = -1
-        else:
-            sample.status = 1
-            current_file.unlink()
-            vcf_vep.unlink()
-            stats_vep.unlink()
-            if interface:
-                vcf_path.unlink()
-            history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=f"Import Sample")
-            db.session.add(history)
-            history = History(sample_ID=sample.id, user_ID=user_id, date=datetime.now(), action=f"Sample Imported")
-            db.session.add(history)
-        finally:
-            db.session.commit()
-            app.logger.info(f"---- Variants Added for Sample : {sample} - {sample.id} ----")
             path_locker.unlink()
+            db.session.commit()
+            error_file = current_file.with_suffix('.error')
+            current_file.rename(error_file)
+            return
+        
+        with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
+            for v in vcf_io:
+                if v.alt[0] == "*":
+                    continue
+                variant = Variant.query.get(f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}")
+                if not variant:
+                    annotations = [{
+                        "date": current_date,
+                        "ANN": list()
+                    }]
+
+                    for annot in v.info["ANN"]:
+                        # Split annotations
+                        for splitAnn in ANNOT_TO_SPLIT:
+                            if splitAnn == 'VAR_SYNONYMS':
+                                try:
+                                    var_synonyms = dict()
+                                    for vs in annot[splitAnn].split("--"):
+                                        key, values = vs.split("::")
+                                        values_array = values.split("&")
+                                        var_synonyms[key] = values_array
+
+                                    annot[splitAnn] = var_synonyms
+                                except AttributeError:
+                                    annot[splitAnn] = dict()
+                            else:
+                                try:
+                                    annot[splitAnn] = annot[splitAnn].split("&")
+                                except AttributeError:
+                                    annot[splitAnn] = []
+
+                        # transcript
+                        transcript = Transcript.query.get(annot["Feature"])
+                        if not transcript and annot["Feature"] is not None:
+                            transcript = Transcript(
+                                feature=annot["Feature"],
+                                biotype=annot["BIOTYPE"],
+                                feature_type=annot["Feature_type"],
+                                symbol=annot["SYMBOL"],
+                                symbol_source=annot["SYMBOL_SOURCE"],
+                                gene=annot["Gene"],
+                                source=annot["SOURCE"],
+                                protein=annot["ENSP"],
+                                canonical=annot["CANONICAL"],
+                                hgnc=annot["HGNC_ID"]
+                            )
+                            db.session.add(transcript)
+
+                        # Get consequence score
+                        consequence_score = 0
+                        for consequence in annot["Consequence"]:
+                            consequence_score += CONSEQUENCES_DICT[consequence]
+                        annot["consequenceScore"] = consequence_score
+
+                        # Get Exon/Intron
+                        annot["EI"] = None
+                        if annot["EXON"] is not None:
+                            annot["EI"] = f"Exon {annot['EXON']}"
+                        if annot["INTRON"] is not None:
+                            annot["EI"] = f"Intron {annot['INTRON']}"
+
+                        # Get Exon/Intron
+                        annot["canonical"] = True if annot['CANONICAL'] == 'YES' else False
+
+                        # missense
+                        missenses = list()
+                        for value in MISSENSES:
+                            missenses.append(annot[value])
+                        missenses = numpy.array(missenses, dtype=numpy.float64)
+                        mean = numpy.nanmean(missenses)
+                        annot["missensesMean"] = None if numpy.isnan(mean) else mean
+
+                        # max spliceAI
+                        spliceAI = list()
+                        for value in SPLICEAI:
+                            spliceAI.append(annot[value])
+                        spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
+                        max = numpy.nanmax(spliceAI)
+                        annot["spliceAI"] = None if numpy.isnan(max) else max
+
+                        # max MaxEntScan
+                        annot["MES_var"] = None
+                        if (annot["MaxEntScan_alt"] is not None
+                                and annot["MaxEntScan_ref"] is not None):
+                            annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
+
+                        annotations[-1]["ANN"].append(annot)
+
+                    # app.logger.debug(f"       - Create Variant : {sample}")
+                    variant = Variant(
+                        id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", 
+                        chr=v.chrom, 
+                        pos=v.pos, 
+                        ref=v.ref, 
+                        alt=v.alt[0], 
+                        annotations=annotations)
+                    db.session.add(variant)
+
+                # If duplicate variant for sample :
+                #   - catch exception
+                #   - add to history & comments
+                try:
+                    v2s = Var2Sample(
+                        variant_ID=variant.id, 
+                        sample_ID=sample.id, 
+                        depth=v.getPopDP(), 
+                        allelic_depth=v.getPopAltAD()[0],
+                        filter=v.filter)
+                    db.session.add(v2s)
+                    db.session.commit()
+                except exc.IntegrityError as e:
+                    db.session.rollback()
+                    app.logger.info(f"{type(e).__name__} : {e}")
+                    history = History(
+                        sample_ID=sample.id,
+                        user_ID=user_id,
+                        date=datetime.now(),
+                        action=f"{type(e).__name__}")
+                    db.session.add(history)
+                    comment = Comment_sample(
+                        comment=f"{type(e).__name__} : {e}", 
+                        sampleid=sample.id, 
+                        date=datetime.now(), 
+                        userid=user_id)
+                    db.session.add(comment)
+                    db.session.commit
+                        
+        path_locker.unlink()
+        db.session.commit()
+        current_file.unlink()
+        vcf_vep.unlink()
+        stats_vep.unlink()
+        if interface:
+            vcf_path.unlink()
+        history = History(
+            sample_ID=sample.id, 
+            user_ID=user_id, 
+            date=datetime.now(), 
+            action=f"Sample Imported")
+        db.session.add(history)
+        sample.status = 1
+        db.session.commit()
