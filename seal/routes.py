@@ -1,12 +1,14 @@
 from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 import functools
 import json
 import secrets
 import urllib
 
 from PIL import Image
-from flask import flash, jsonify, redirect, render_template, request, url_for
+from flask import (flash, jsonify, redirect, render_template, request, url_for,
+                   send_file)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
@@ -23,6 +25,33 @@ from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
 
 ###############################################################################
 # Decorators/Exceptions and handler
+
+
+# Here define safe host authorized for a redirection
+SAFE_HOST = []
+
+
+def redirect_dest(fallback):
+    """
+    Redirects the user to a given URL after validating it's safe.
+
+    Args:
+        fallback (str): the URL to redirect the user to if the 'next' URL is
+                        invalid or unsafe.
+
+    Returns:
+        A Flask response object that redirects the user to the next URL or
+        fallback URL.
+    """
+    dest = request.args.get('next')
+    url = urlparse(dest)
+    if url.path and not url.netloc:
+        return redirect(url.path)
+    if url.hostname and url.hostname in SAFE_HOST:
+        return redirect(url.geturl())
+    else:
+        flash(f"Redirection to '{url.hostname}' forbidden !", "error")
+        return redirect(fallback)
 
 
 def login_required(func):
@@ -393,10 +422,7 @@ def login():
                 return redirect(url_for('first_connexion', next=next_page))
 
             flash(f'You are logged in as: {user.username}!', 'success')
-            if next_page:
-                return redirect(next_page)
-            else:
-                return redirect(url_for('index'))
+            return redirect_dest(fallback=url_for('index'))
         else:
             flash('Login unsuccessful. Please check username and/or password!',
                   'error')
@@ -477,7 +503,7 @@ def first_connexion():
     update_password_form = UpdatePasswordForm()
     next_page = request.args.get('next')
     if current_user.logged:
-        return redirect(next_page) if next_page else redirect(url_for('index'))
+        return redirect_dest(fallback=url_for('index'))
     if ("submit_password" in request.form 
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
@@ -485,7 +511,7 @@ def first_connexion():
         current_user.logged = True
         db.session.commit()
         flash('Your password has been changed!', 'success')
-        return redirect(next_page) if next_page else redirect(url_for('index'))
+        return redirect_dest(fallback=url_for('index'))
 
     return render_template(
         'authentication/first_connexion.html', title='First Connexion',
@@ -1709,5 +1735,34 @@ def toggle_user_sidebar():
     current_user.sidebar = (not current_user.sidebar)
     db.session.commit()
     return "OK"
+
+# from anacore.vcf import VCFIO, VCFRecord, HeaderInfoAttr, HeaderFormatAttr
+# import tempfile
+
+# @app.route("/variants/all/vcf")
+# def get_variant_vcf():
+#     """
+#     Send variant into vcf.
+
+#     Returns:
+#         str: Returns all variants into a vcf file.
+#     """
+#     handle, filepath = tempfile.mkstemp(suffix=".vcf.gz")
+#     with VCFIO(filepath, "w") as writer:
+#         writer.samples = ["my_sample"]
+#         writer.extra_header = [
+#             "##source=seal",
+#         ]
+#         writer.info = {
+#             "DB": HeaderInfoAttr("DB", "dbSNP membership, build 129", "Flag", 0)
+#         }
+#         writer.format = {
+#             "AF": HeaderFormatAttr("AF", "Allele Frequency", "Float", "A")
+#         }
+#         writer.writeHeader()
+#         writer.writer(VCFRecord("chr3", "12", '', "A", "T", 30, ["PASS"], {'DB':'T'}, ["AF"], {"10"}))
+#         # for record in vcf_record_list:
+#         #     writer.write(record)
+#     return send_file()
 
 ###############################################################################

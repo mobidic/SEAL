@@ -1930,7 +1930,7 @@ function edit_name() {
         },
         success: function() {
             $( "#error-message-edit-name" ).remove();
-            $("h1").html($('#edit-name').val());
+            $("h1").html(DOMPurify.sanitize($('#edit-name').val()));
             $('#tableHistorySample').DataTable().ajax.reload();
         },
         error: function(XMLHttpRequest) {
