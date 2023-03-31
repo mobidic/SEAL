@@ -1,6 +1,6 @@
 
-<div class="w3-dropdown-hover" style="background-color:transparent !important;">
-    <button class="w3-button w3-white button-status w3-border" style=" width:222px">
+<div class="{% if ((current_user.admin or current_user.biologist) or sample.status != 4) %}w3-dropdown-hover{% endif %}" style="background-color:transparent !important;">
+    <button class="{% if (not (current_user.admin or current_user.biologist) and sample.status == 4) %}w3-disabled{% endif %} w3-button w3-white button-status w3-border" style=" width:222px">
     {% if sample.status == 1 %}
         <span class="w3-text-flat-peter-river">
             <i class="fas fa-user-clock"></i> <i><b>New Sample</b> <i class="fas fa-sort-down"></i></i>
