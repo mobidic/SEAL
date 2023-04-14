@@ -17,8 +17,13 @@
         <span class="w3-text-flat-pumpkin">
             <i class="fas fa-user-lock"></i> <i><b>Validated</b> <i class="fas fa-sort-down"></i></i>
         </span>
+    {% elif sample.status == 5 %}
+        <span class="w3-text-flat-pumpkin">
+            <i class="fas fa-user-lock"></i> <i><b>Archived</b> <i class="fas fa-sort-down"></i></i>
+        </span>
     {% endif %}
     </button>
+    {% if sample.status != 5 %}
     <div class="w3-dropdown-content w3-bar-block w3-border" style=" width:222px">
         <a {% if ((current_user.admin or current_user.biologist) or sample.status != 4) %}onclick="toggle_status('{{ sample.id }}', 1)"{% endif %}  class="{% if (not (current_user.admin or current_user.biologist) and sample.status == 4) %}w3-disabled{% endif %} w3-bar-item w3-button">
             <span class="w3-text-flat-peter-river">
@@ -41,4 +46,5 @@
             </span>
         </a>
     </div>
+    {% endif %}
 </div>

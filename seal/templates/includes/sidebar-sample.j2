@@ -2,7 +2,7 @@
 
 <!-- Sidebar/menu -->
 
-<nav class="w3-sidebar w3-bar-block w3-flat-clouds" style="z-index:5;width:350px;display:{% if current_user.sidebar %}block{% else %}none{% endif %}" id="sidebar">
+<nav class="{% if sample.status == 5 %}w3-disabled {% endif %}w3-sidebar w3-bar-block w3-flat-clouds" style="z-index:5;width:350px;display:{% if current_user.sidebar %}block{% else %}none{% endif %}" id="sidebar">
 	<div class="w3-container" style="margin-bottom:85px">
 		{% include "includes/flash.j2" %}
 		<div class="w3-row w3-display-container w3-margin" style="overflow-wrap: anywhere;">
@@ -11,7 +11,7 @@
                     <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
                         <i class="fas fa-user-edit"></i>
                     </div>
-                    <div class="w3-container w3-cell">
+                    <div class="{% if sample.status == 4 %}w3-disabled {% endif %}w3-container w3-cell seal-form-report" id="edit-samplename">
                         <input id="edit-name" maxlength="20" minlength="2" type="text"  style="width:210px!important;" placeholder="samplename" value="{{ sample.samplename }}">
                     </div>
                     <div class="w3-center w3-container w3-cell" style="width:20px;padding: 0px !important;">
@@ -19,9 +19,9 @@
                     </div>
                 </div>
             </h3>
-            <div>
-                <span class="w3-row" onclick="toggle_on_off('index')" style="cursor: pointer;"><i id="toggle-index" class="fas fa-toggle-{% if sample.index %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Index</span>
-                <span class="w3-row" onclick="toggle_on_off('affected')" style="cursor: pointer;"><i id="toggle-affected" class="fas fa-toggle-{% if sample.affected %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Affected</span>
+            <div >
+                <span class="w3-row seal-form-toggle" {% if sample.status != 4 %}onclick="toggle_on_off('index')" style="cursor: pointer;"{% endif %}><i id="toggle-index" class="fas fa-toggle-{% if sample.index %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Index</span>
+                <span class="w3-row seal-form-toggle" {% if sample.status != 4 %}onclick="toggle_on_off('affected')" style="cursor: pointer;"{% endif %}><i id="toggle-affected" class="fas fa-toggle-{% if sample.affected %}on w3-text-flat-green-sea{% else %}off{% endif%}"></i> Affected</span>
             </div>
             <hr style="display: block; height: 1px;
     border: 0; border-top: 1px solid #ccc;
