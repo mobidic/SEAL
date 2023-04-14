@@ -85,7 +85,7 @@ $(document).ready(function() {
                     display: function ( data, type, row ) {
                         response = "";
                         if(data) {
-                            test = {
+                            status_sample = {
                                 "-1": {
                                     "class": "w3-text-flat-alizarin",
                                     "icon": '<i class="fas fa-times-circle"></i>',
@@ -116,17 +116,23 @@ $(document).ready(function() {
                                     "icon": '<i class="fas fa-user-lock"></i>',
                                     "text": '<i><b>Validated</b></i>',
                                 },
+                                "5": {
+                                    "class": "w3-text-flat-pumpkin",
+                                    "icon": '<i class="fas fa-archive"></i>',
+                                    "text": '<i><b>Archived</b></i>',
+                                },
                             }
-                            
-                            response = '<span class="' + test[data.status]["class"] + '">' + test[data.status]["icon"] + " " + test[data.status]["text"] + ' <i class="fas fa-sort-down"></i></span>';
-                            
-                            valid = (data.status == 4 ? true : false);
+                            if (!data.status || !(data.status in status_sample)) {
+                                data.status = -1
+                            }
+
+                            response = '<span class="' + status_sample[data.status]["class"] + '">' + status_sample[data.status]["icon"] + " " + status_sample[data.status]["text"] + ' <i class="fas fa-sort-down"></i></span>';
 
                             sample_id = data.id;
 
                             disabled = "w3-disabled";
                             dropdown = "";
-                            if (data.status != 4 || bio_or_admin) {
+                            if ((data.status != 4 || bio_or_admin) && (data.status != 5)) {
                                 dropdown = '<div class="w3-dropdown-content w3-bar-block" style="position: fixed !important;right:0" id="button-status-' + sample_id + '-content">';
                                 for (const idx of [1,2,3,4]) {
                                     var onclick = `onclick="toggle_status(` + sample_id + `, ` + idx +`)"`;
@@ -145,7 +151,7 @@ $(document).ready(function() {
 
                                     a = `
                                             <a `+onclick+` class="`+ border +` w3-bar-item w3-button">
-                                                <span class="` + disabled + ` ` + test[idx]["class"] + `">` + test[idx]["icon"] + ` ` + test[idx]["text"] + `</span>
+                                                <span class="` + disabled + ` ` + status_sample[idx]["class"] + `">` + status_sample[idx]["icon"] + ` ` + status_sample[idx]["text"] + `</span>
                                             </a>`;
                                     dropdown = dropdown + a;
                                 }
@@ -184,7 +190,7 @@ $(document).ready(function() {
             }
         ],
         createdRow: function( row, data, dataIndex ) {
-            if ( data.status < 1 || data.status > 4) {
+            if ( data.status < 1 ) {
                 $(row).addClass( 'w3-disabled' );
             }
         }
