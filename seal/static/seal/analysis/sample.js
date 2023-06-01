@@ -17,23 +17,15 @@ function toggle_status(id, status) {
         success: function() {
             if (status == 1) {
                 response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New Sample</b></i> <i class="fas fa-sort-down"></i></span>';
-                $('#selectFilter').prop('disabled', false);
-                $('#selectBed').prop('disabled', false);
                 $('.seal-form-report').removeClass('w3-disabled');
             } else if (status == 2) {
                 response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Processing</b></i> <i class="fas fa-sort-down"></i></span>';
-                $('#selectFilter').prop('disabled', false);
-                $('#selectBed').prop('disabled', false);
                 $('.seal-form-report').removeClass('w3-disabled');
             } else if (status == 3) {
                 response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Interpreted</b></i> <i class="fas fa-sort-down"></i></span>';
-                $('#selectFilter').prop('disabled', false);
-                $('#selectBed').prop('disabled', false);
                 $('.seal-form-report').removeClass('w3-disabled');
             } else if (status == 4) {
                 response = '<span class="w3-text-flat-pumpkin"><i class="fas fa-user-lock"></i> <i><b>Validated</b></i> <i class="fas fa-sort-down"></i></span>';
-                $('#selectFilter').prop('disabled', true);
-                $('#selectBed').prop('disabled', true);
                 $('.seal-form-report').addClass('w3-disabled');
             }
             $('.button-status').html(response);
@@ -527,7 +519,7 @@ $(document).ready(function() {
                 }
             },
             {
-                className: 'showTitle ',
+                className: 'showTitle w3-border-right ',
                 data: "annotations.HGVSp",
                 render: {
                     _: function ( data, type, row ) {
@@ -585,7 +577,7 @@ $(document).ready(function() {
             { className: 'showTitle ', data: "depth"},
             { className: 'showTitle ', data: "allelic_depth"},
             {
-                className: 'showTitle ',
+                className: 'showTitle w3-border-right ',
                 data: "allelic_frequency",
                 render: {
                     _: function ( data, type, row, meta ) {
@@ -657,7 +649,7 @@ $(document).ready(function() {
                 data: "inseal.occurrences",
             },
             {
-                className: 'showTitle ',
+                className: 'showTitle w3-border-right ',
                 data: "inseal",
                 render: {
                     _: function ( data, type, row, meta ) {
@@ -729,6 +721,30 @@ $(document).ready(function() {
                 sType: "numeric"
             },
             {
+                className: ' w3-border-right ',
+                data: "phenotypes",
+                render: {
+                    _: function ( data, type, row, meta ) {
+                        inheritances = ""
+                        for (d in data) {
+                            inheritances = inheritances + data[d]["inheritances"] + ' | ';
+                        }
+                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                    },
+                    display: function ( data, type, row, meta ) {
+                        inheritances = ""
+                        for (d in data) {
+                            if (data[d]["inheritance"] != "[]") {
+                                link = "https://www.omim.org/entry/" + data[d]["phenotypeMimNumber"];
+                                title=data[d]["phenotype"];
+                                inheritances = inheritances + '<a class="w3-text-flat-peter-river  w3-hover-flat-belize-hole" href="'+link+'" target="_blank" title="' + title + '">' + data[d]["inheritances"] + '</a> | ';
+                            }
+                        }
+                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                    }
+                },
+            },
+            {
                 className: 'showTitle ',
                 data: "annotations.IMPACT",
                 render: {
@@ -750,7 +766,7 @@ $(document).ready(function() {
                 sType: "numeric"
             },
             {
-                className: 'showTitle ',
+                className: 'showTitle w3-border-right ',
                 data: "annotations.Consequence",
                 render: {
                     _: function ( data, type, row, meta ) {
@@ -837,7 +853,7 @@ $(document).ready(function() {
                 },
             },
             {
-                className: 'showTitle ',
+                className: 'showTitle w3-border-right ',
                 data: "annotations.missensesMean",
                 render: {
                     _: function ( data, type, row, meta ) {
@@ -875,31 +891,7 @@ $(document).ready(function() {
                 },
             },
             {
-                className: '',
-                data: "phenotypes",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        inheritances = ""
-                        for (d in data) {
-                            inheritances = inheritances + data[d]["inheritances"] + ' | ';
-                        }
-                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    },
-                    display: function ( data, type, row, meta ) {
-                        inheritances = ""
-                        for (d in data) {
-                            if (data[d]["inheritance"] != "[]") {
-                                link = "https://www.omim.org/entry/" + data[d]["phenotypeMimNumber"];
-                                title=data[d]["phenotype"];
-                                inheritances = inheritances + '<a class="w3-text-flat-peter-river  w3-hover-flat-belize-hole" href="'+link+'" target="_blank" title="' + title + '">' + data[d]["inheritances"] + '</a> | ';
-                            }
-                        }
-                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    }
-                },
-            },
-            {
-                className: disabled_class + "seal-form-report showTitle  w3-center",
+                className: disabled_class + "seal-form-report showTitle  w3-center w3-border-right ",
                 data: {
                     "data": "reported",
                 },
@@ -921,7 +913,7 @@ $(document).ready(function() {
                 }
             },
             {
-                className: disabled_class + "no-padding seal-form-report showTitle  w3-center",
+                className: disabled_class + "no-padding seal-form-report showTitle  w3-center w3-border-right ",
                 data: {
                     "data": "class_variant"
                 },
