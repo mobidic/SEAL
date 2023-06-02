@@ -488,9 +488,9 @@ def importvcf():
                         # Get Exon/Intron
                         annot["EI"] = None
                         if annot["EXON"] is not None:
-                            annot["EI"] = f"Exon {annot['EXON']}"
+                            annot["EI"] = f"{annot['EXON']}"
                         if annot["INTRON"] is not None:
-                            annot["EI"] = f"Intron {annot['INTRON']}"
+                            annot["EI"] = f"{annot['INTRON']}"
 
                         # Get Exon/Intron
                         annot["canonical"] = True if annot['CANONICAL'] == 'YES' else False

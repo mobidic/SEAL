@@ -388,84 +388,6 @@ $(document).ready(function() {
             },
             {
                 className: 'showTitle ',
-                data: "annotations.Feature",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return -1;
-                        }
-                        return data;
-                    }
-                }
-            },
-            {
-                className: 'showTitle w3-center ',
-                data: "annotations",
-                render: {
-                    _: function ( data, type, row ) {
-                        return data["canonical"];
-                    },
-                    export:function ( data, type, row ) {
-                        select = data["preferred"]? " (selected)": "";
-                        canonical = data["canonical"]? "Yes": "No";
-                        return canonical + select;
-                    },
-                    display: function ( data, type, row ) {
-                        color = "w3-text-flat-peter-river";
-                        if (data["preferred"]) {
-                            color = "w3-text-flat-alizarin";
-                        }
-                        if (data["canonical"]) {
-                            response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
-                        } else {
-                            response = '<i title="" class="' + color + ' far fa-star"></i>';
-                        }
-                        return response;
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data["canonical"]) {
-                            response = true;
-                        } else {
-                            response = false;
-                        }
-                        return response;
-                    },
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.EI",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return "NA";
-                        }
-                        pos_split = data.split(/\s|\//);
-                        if(pos_split[0] == "Exon") {
-                            myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_0";
-                        } else if (pos_split[0] == "Intron") {
-                            myvar = Number(pos_split[1]).toString().padStart(4, "0") + "_" + Number(pos_split[2]).toString().padStart(4, "0") + "_1";
-                        } else {
-                            myvar = "NA"
-                        }
-                        return myvar
-                    },
-                }
-            },
-            {
-                className: 'showTitle ',
                 data: "annotations.HGVSg",
                 render : {
                     _: function ( data, type, row, meta ) {
@@ -492,23 +414,32 @@ $(document).ready(function() {
             },
             {
                 className: 'showTitle ',
-                data: "annotations.HGVSc",
+                data: "annotations",
                 render: {
                     _: function ( data, type, row ) {
-                        if (data == null) {
+                        if (data["HGVSc"] == null) {
                             return "NA";
                         }
-                        return data;
+                        return data["HGVSc"];
                     },
                     display: function ( data, type, row ) {
                         if (data == null) {
                             return "<i>NA</i>";
                         }
+                        color = "w3-text-flat-peter-river";
+                        if (data["preferred"]) {
+                            color = "w3-text-flat-alizarin";
+                        }
+                        if (data["canonical"]) {
+                            response = '<i title="CANONICAL" class="' + color + ' fas fa-star w3-tiny"></i> ';
+                        } else {
+                            response = '<i title="" class="' + color + ' far fa-star w3-tiny"></i> ';
+                        }
                         mobidetails="";
                         if (current_user_api_key_md !== "None") {
-                            mobidetails = '<span onclick="openMD(\'' + data + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
+                            mobidetails = '<span onclick="openMD(\'' + data["HGVSc"] + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
                         }
-                        return mobidetails + data;
+                        return mobidetails + response + data["HGVSc"];
                     },
                     sort: function ( data, type, row ) {
                         if (data == null) {
@@ -519,7 +450,7 @@ $(document).ready(function() {
                 }
             },
             {
-                className: 'showTitle w3-border-right ',
+                className: 'showTitle ',
                 data: "annotations.HGVSp",
                 render: {
                     _: function ( data, type, row ) {
@@ -534,6 +465,34 @@ $(document).ready(function() {
                         }
                         return data;
                     }
+                }
+            },
+            {
+                className: 'showTitle w3-border-right ',
+                data: "annotations",
+                render: {
+                    _: function ( data, type, row ) {
+                        if (data["EXON"] == null) {
+                            if(data["INTRON"] == null) {
+                                return "<i>NA</i>";
+                            }
+                            return data["INTRON"];
+                        }
+                        return data["EXON"];
+                    },
+                    sort: function ( data, type, row ) {
+                        prefix = data
+                        if (data["EXON"] == null) {
+                            if(data["INTRON"] == null) {
+                                return "NA";
+                            }
+                            ei = data["INTRON"];
+                        } else {
+                            ei = data["EXON"];
+                        }
+                        pos_split = ei.split(/\//);
+                        return pos_split[0];
+                    },
                 }
             },
             {
@@ -574,29 +533,29 @@ $(document).ready(function() {
                 },
                 sType: "numeric"
             },
-            { className: 'showTitle ', data: "depth"},
-            { className: 'showTitle ', data: "allelic_depth"},
             {
-                className: 'showTitle w3-border-right ',
+                className: 'showTitle',
                 data: "allelic_frequency",
                 render: {
                     _: function ( data, type, row, meta ) {
-                        return data
+                        return data;
                     },
                     display: function ( data, type, row, meta ) {
                         if (data >=0 && data < 0.25) {
-                            return '<i class="far fa-dot-circle"></i> ' + data;
+                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
                         } else if (data < 0.75) {
-                            return '<i class="fas fa-adjust"></i> ' + data;
+                            return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data*100) + "%";
                         } else if (data <= 1)  {
-                            return '<i class="fas fa-circle"></i> ' + data;
+                            return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
                         }
-                        return '<i class="far fa-question-circle"></i> ' + data;
+                        return '<i class="far fa-question-circle w3-tiny"></i> ' + data;
                     },
                 }
             },
+            { className: 'showTitle ', data: "depth"},
+            { className: 'showTitle  w3-border-right ', data: "allelic_depth"},
             {
-                className: 'showTitle ',
+                className: ' ',
                 data: "annotations.gnomADg_AF",
                 render : {
                     _: function ( data, type, row, meta ) {
@@ -614,7 +573,13 @@ $(document).ready(function() {
                             if (isNaN(parseFloat(data).toFixed(6))) {
                                 return "<i>NA</i>"
                             }
-                            return parseFloat(data).toFixed(6);
+                            gnomad = parseFloat(data);
+                            if (gnomad > 0.01) {
+                                response = parseFloat(data).toFixed(4)
+                            } else {
+                                response = parseFloat(data).toExponential(2)
+                            }
+                            return "<span title='"+ gnomad +"'>" + response + "</span>";
                         } else {
                             return "<i>NA</i>";
                         }
@@ -637,7 +602,14 @@ $(document).ready(function() {
                 render : {
                     _: function ( data, type, row, meta ) {
                         if (data["total_samples"] > 0) {
-                                return (data["occurrences"]/data["total_samples"]).toFixed(4);
+                                return ((data["occurrences"]/data["total_samples"])*100).toFixed(2) + "%";
+                        } else {
+                            return 0
+                        }
+                    },
+                    sort: function ( data, type, row, meta ) {
+                        if (data["total_samples"] > 0) {
+                                return ((data["occurrences"]/data["total_samples"])*100).toFixed(2);
                         } else {
                             return 0
                         }
@@ -816,7 +788,7 @@ $(document).ready(function() {
                         if (data == null){
                             return "<i>NA</i>";
                         }
-                        value = parseFloat(data).toFixed(3)
+                        value = parseFloat(data).toFixed(2)
                         classw3css = "";
                         if (Math.abs(value) >= 15) {
                             classw3css = "w3-text-flat-pomegranate";
@@ -839,7 +811,7 @@ $(document).ready(function() {
                         if (data == null){
                             return "<i>NA</i>";
                         }
-                        value = parseFloat(data).toFixed(3)
+                        value = parseFloat(data).toFixed(2)
                         classw3css = "";
                         if (value >= 0.8) {
                             classw3css = "w3-text-flat-pomegranate";
