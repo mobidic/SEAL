@@ -443,9 +443,9 @@ $(document).ready(function() {
                         if (data == null) {
                             return "<i>NA</i>";
                         }
-                        color = "w3-text-flat-peter-river";
+                        color = "";
                         if (data["preferred"]) {
-                            color = "w3-text-flat-alizarin";
+                            color = "w3-text-flat-peter-river";
                         }
                         if (data["canonical"]) {
                             response = '<i title="CANONICAL" class="' + color + ' fas fa-star w3-tiny"></i> ';
