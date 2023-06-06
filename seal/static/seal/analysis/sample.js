@@ -359,7 +359,7 @@ $(document).ready(function() {
         fixedHeader:  true,
         order: [[ 5, "asc" ]],
         fixedColumns: {
-            left:1,
+            left:2,
             right:1
         },
         select: {
@@ -369,7 +369,7 @@ $(document).ready(function() {
         ajax: json_variants,
         columns: [
             {
-                className: 'w3-border-right showTitle ',
+                className: 'showTitle ',
                 data: "annotations.SYMBOL",
                 render: {
                     _: function ( data, type, row ) {
@@ -383,6 +383,23 @@ $(document).ready(function() {
                             return -1;
                         }
                         return data;
+                    }
+                }
+            },
+            {
+                className: 'w3-border-right no-padding',
+                data: null,
+                orderable: false,
+                render: {
+                    _: function ( data, type, row ) {
+                        mobidetails="";
+                        if (current_user_api_key_md !== "None") {
+                            mobidetails = '<span onclick="openMD(\'' + data["annotations"]["HGVSc"] + '\')" class="fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> MobiDetails</span> <br />'
+                        }
+                        franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
+                        gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">G</span></span> GnomAD</a> ';
+                        return "<div class='w3-tiny'>" + mobidetails + franklin + "<br />" + gnomad + "</div>";
+                        return mobidetails + franklin + gnomad;
                     }
                 }
             },
@@ -435,11 +452,7 @@ $(document).ready(function() {
                         } else {
                             response = '<i title="" class="' + color + ' far fa-star w3-tiny"></i> ';
                         }
-                        mobidetails="";
-                        if (current_user_api_key_md !== "None") {
-                            mobidetails = '<span onclick="openMD(\'' + data["HGVSc"] + '\')" class="fa-layers fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"> <i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> '
-                        }
-                        return mobidetails + response + data["HGVSc"];
+                        return response + data["HGVSc"];
                     },
                     sort: function ( data, type, row ) {
                         if (data == null) {
@@ -873,7 +886,8 @@ $(document).ready(function() {
                         const id=data["id"] + "reported";
                         var check="";
                         if (data["reported"]) {
-                            check='checked="checked"';                            }
+                            check='checked="checked"';
+                        }
                         return '<input id="'+ id +'" type="checkbox" ' + check + ' onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\');">';
                     }
                     return data["reported"] ? "Reported" : "Not Reported";
@@ -890,27 +904,27 @@ $(document).ready(function() {
                     "data": "class_variant"
                 },
                 render:function ( data, type, row ) {
-                        if(type === 'display') {
-                            id_var = data.id
-                            class_variant = data.class_variant ? data.class_variant : 0;
-                            dropdown = ""
-                            for (c in class_variant_html) {
-                                dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +')" class="w3-bar-item w3-button" style="width:inherit">'+
-                                        class_variant_html[c]+
-                                    '</a>'
-                            }
-                            response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
-                                <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
-                                    ` + class_variant_html[class_variant] + `
-                                </button>
-                                <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
-                                    `+ dropdown +`
-                                </div>
-                            </div>`
-                            return response;
+                    if(type === 'display') {
+                        id_var = data.id
+                        class_variant = data.class_variant ? data.class_variant : 0;
+                        dropdown = ""
+                        for (c in class_variant_html) {
+                            dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +')" class="w3-bar-item w3-button" style="width:inherit">'+
+                                    class_variant_html[c]+
+                                '</a>'
                         }
-                        return class_variant_html[data.class_variant ? data.class_variant : 0];
-                    },
+                        response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
+                            <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
+                                ` + class_variant_html[class_variant] + `
+                            </button>
+                            <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
+                                `+ dropdown +`
+                            </div>
+                        </div>`
+                        return response;
+                    }
+                    return class_variant_html[data.class_variant ? data.class_variant : 0];
+                },
                 searchBuilder: {
                     orthogonal: {
                         display: 'filter'
@@ -940,6 +954,9 @@ $(document).ready(function() {
             }
             table.button().add( 0, {
                 extend: 'searchBuilder',
+                config: {
+                    columns: [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+                }
             } );
             table.button().add( 1, {
                 text: 'Save Filter',
@@ -960,10 +977,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -982,10 +999,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1004,10 +1021,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1027,10 +1044,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1054,10 +1071,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1081,10 +1098,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1109,10 +1126,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1131,10 +1148,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
@@ -1153,10 +1170,10 @@ $(document).ready(function() {
                             orthogonal: 'export',
                             format: {
                                 body: function(data, row, column, node) {
-                                    if (column === 22) {
+                                    if (column === 21) {
                                         data = $(node).children().prop("checked")===true?"Yes":"No";
                                     }
-                                    if (column === 23) {
+                                    if (column === 22) {
                                         value = $(node).children('div').children('button').text();
                                         data = $.trim(value);
                                     }
