@@ -364,7 +364,7 @@ $(document).ready(function() {
         },
         select: {
             style:    'os',
-            selector: 'td:not(:nth-last-child(-n+4))'
+            selector: 'td:not(:nth-child(2), :nth-child(16), :nth-last-child(-n+3))'//td:not(:nth-last-child(-n+3))'
         },
         ajax: json_variants,
         columns: [
@@ -964,6 +964,19 @@ $(document).ready(function() {
                     save_filters()
                 }
             } );
+            var format_base = {
+                body: function(data, row, column, node) {
+                    if (column === 21) {
+                        data = $(node).children().prop("checked")===true?"Yes":"No";
+                    }
+                    if (column === 22) {
+                        value = $(node).children('div').children('button').text();
+                        data = $.trim(value);
+                    }
+                    return data;
+                }
+            };
+            var columns_base = [23, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
             table.button().add(3, {
                 extend: 'collection',
                 text: 'Export',
@@ -975,43 +988,23 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
-                            },
+                            format: format_base,
                             modifier: {
                                 selected: null
-                            }
-                        }
+                            },
+                            columns: columns_base
+                        },
                     },
                     {
                         extend: 'excel',
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
-                            },
+                            format: format_base,
                             modifier: {
                                 selected: null
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     {
@@ -1019,21 +1012,11 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
-                            },
+                            format: format_base,
                             modifier: {
                                 selected: null
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     '<h3>Reported</h3>',
@@ -1042,17 +1025,9 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
+                            format: format_base,
+                            modifier: {
+                                selected: null
                             },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
@@ -1061,7 +1036,8 @@ $(document).ready(function() {
                             }],
                             modifier: {
                                 selected: null
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     {
@@ -1069,17 +1045,9 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
+                            format: format_base,
+                            modifier: {
+                                selected: null
                             },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
@@ -1088,7 +1056,8 @@ $(document).ready(function() {
                             }],
                             modifier: {
                                 selected: null
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     {
@@ -1096,17 +1065,9 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
+                            format: format_base,
+                            modifier: {
+                                selected: null
                             },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
@@ -1115,7 +1076,8 @@ $(document).ready(function() {
                             }],
                             modifier: {
                                 selected: null
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     '<h3>Selected</h3>',
@@ -1124,21 +1086,11 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
-                            },
+                            format: format_base,
                             modifier: {
                                 selected: true
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     {
@@ -1146,21 +1098,11 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
-                            },
+                            format: format_base,
                             modifier: {
                                 selected: true
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                     {
@@ -1168,21 +1110,11 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: {
-                                body: function(data, row, column, node) {
-                                    if (column === 21) {
-                                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                                    }
-                                    if (column === 22) {
-                                        value = $(node).children('div').children('button').text();
-                                        data = $.trim(value);
-                                    }
-                                    return data;
-                                }
-                            },
+                            format: format_base,
                             modifier: {
                                 selected: true
-                            }
+                            },
+                            columns: columns_base
                         }
                     },
                 ]
