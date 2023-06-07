@@ -1827,31 +1827,48 @@ $("#edit-name").keyup(function(event) {
 });
 
 function edit_name() {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will rename the sample.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, rename it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Renamed!',
+                'The sample will be renamed.',
+                'success'
+            )
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/edit/sample/name",
+                data: {
+                    "sample_id": sample_id,
+                    "new_name": $('#edit-name').val()
+                },
+                success: function() {
+                    $( "#error-message-edit-name" ).remove();
+                    $("h1").html(DOMPurify.sanitize($('#edit-name').val()));
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                },
+                error: function(XMLHttpRequest) {
+                    $( "#error-message-edit-name" ).remove();
+                    msg = "<p id='error-message-edit-name' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
+                    $( "#sample-name-sidebar" ).after( msg );
+                }  
+            })
         }
-    });
-    $.ajax({
-        type: "POST",
-        url: "/edit/sample/name",
-        data: {
-            "sample_id": sample_id,
-            "new_name": $('#edit-name').val()
-        },
-        success: function() {
-            $( "#error-message-edit-name" ).remove();
-            $("h1").html(DOMPurify.sanitize($('#edit-name').val()));
-            $('#tableHistorySample').DataTable().ajax.reload();
-        },
-        error: function(XMLHttpRequest) {
-            $( "#error-message-edit-name" ).remove();
-            msg = "<p id='error-message-edit-name' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
-            $( "#sample-name-sidebar" ).after( msg );
-        }  
-    })
+      })
 }
 
 function toggle_class(id_var, sample_id, class_variant) {
@@ -1879,24 +1896,41 @@ function toggle_class(id_var, sample_id, class_variant) {
 }
 
 function toggle_on_off(div) {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will change sample status: switch '" + div + "' status.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, edit it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Edited!',
+                "The sample status '" + div + "' switched.",
+                'success'
+            )
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/toggle/sample/" + div,
+                data: {
+                    "sample_id": sample_id
+                },
+                success: function() {
+                    $("#toggle-" + div).toggleClass(["fa-toggle-on", "fa-toggle-off", "w3-text-flat-green-sea"]);
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                }
+            })
         }
-    });
-    $.ajax({
-        type: "POST",
-        url: "/toggle/sample/" + div,
-        data: {
-            "sample_id": sample_id
-        },
-        success: function() {
-            $("#toggle-" + div).toggleClass(["fa-toggle-on", "fa-toggle-off", "w3-text-flat-green-sea"]);
-            $('#tableHistorySample').DataTable().ajax.reload();
-        }
-    })
+      })
 }
 
 function toggle_var2sample_status(id, id_var, sample_id, type) {
