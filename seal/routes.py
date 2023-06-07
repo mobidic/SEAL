@@ -8,7 +8,7 @@ import urllib
 
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
-                   send_file)
+                   send_file, escape)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
@@ -1552,7 +1552,7 @@ def toggle_sampleFilter():
             action=f"Change filter : '{str(old_filter)}' -> '{str(sample.filter)}'")
         db.session.add(history)
         db.session.commit()
-    return f"{sample.filter_id}"
+    return escape(f"{sample.filter_id}")
 
 
 @app.route("/toggle/sample/panel", methods=['POST'])
@@ -1580,7 +1580,7 @@ def toggle_samplePanel():
         db.session.add(history)
         db.session.commit()
 
-    return f"{sample.bed_id}"
+    return escape(f"{sample.bed_id}")
 
 
 @app.route("/toggle/samples/variant/class", methods=['POST'])
@@ -1597,7 +1597,7 @@ def toggle_varClass():
     variant = Variant.query.get(id_var)
     variant.class_variant = class_variant
     db.session.commit()
-    return f"{variant.class_variant}"
+    return escape(f"{variant.class_variant}")
 
 
 @app.route("/toggle/sample/status", methods=['POST'])
@@ -1638,7 +1638,7 @@ def toggle_sampleStatus():
             action=f"Status : '{status_dict[old_status]}' -> '{status_dict[sample.status]}'")
         db.session.add(history)
         db.session.commit()
-    return f"{sample} - {sample.status}"
+    return escape(f"{sample} - {sample.status}")
 
 
 @app.route("/add/comment/variant", methods=['POST'])
