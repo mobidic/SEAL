@@ -615,23 +615,31 @@ $(document).ready(function() {
                 render : {
                     _: function ( data, type, row, meta ) {
                         if (data["total_samples"] > 0) {
-                                return ((data["occurrences"]/data["total_samples"])*100).toFixed(2) + "%";
+                                return parseFloat(data["occurrences"]/data["total_samples"]).toFixed(4);
                         } else {
-                            return 0
+                            return -1
+                        }
+                    },
+                    display: function ( data, type, row, meta ) {
+                        if (data["total_samples"] > 0 && data["occurrences"] > 0) {
+                            freq =  parseFloat((data["occurrences"]/data["total_samples"]));
+                            if (freq > 0.01) {
+                                return freq.toFixed(4) + "(" + data["occurrences"] + ")";
+                            } else {
+                                return freq.toExponential(2) + " (" + data["occurrences"] + ")";
+                            }
+                        } else {
+                            return "<i>NA</i>"
                         }
                     },
                     sort: function ( data, type, row, meta ) {
                         if (data["total_samples"] > 0) {
-                                return ((data["occurrences"]/data["total_samples"])*100).toFixed(2);
+                                return data["occurrences"]/data["total_samples"];
                         } else {
-                            return 0
+                            return -1
                         }
                     }
                 },
-            },
-            {
-                className: 'showTitle ',
-                data: "inseal.occurrences",
             },
             {
                 className: 'showTitle w3-border-right ',
@@ -955,7 +963,7 @@ $(document).ready(function() {
             table.button().add( 0, {
                 extend: 'searchBuilder',
                 config: {
-                    columns: [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22]
+                    columns: [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
                 }
             } );
             table.button().add( 1, {
@@ -966,17 +974,17 @@ $(document).ready(function() {
             } );
             var format_base = {
                 body: function(data, row, column, node) {
-                    if (column === 21) {
+                    if (column === 20) {
                         data = $(node).children().prop("checked")===true?"Yes":"No";
                     }
-                    if (column === 22) {
+                    if (column === 21) {
                         value = $(node).children('div').children('button').text();
                         data = $.trim(value);
                     }
                     return data;
                 }
             };
-            var columns_base = [23, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22];
+            var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
             table.button().add(3, {
                 extend: 'collection',
                 text: 'Export',

@@ -36,7 +36,7 @@
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle"></span></th>
                             <th colspan="4" class="w3-border-right">Nomenclature</th>
                             <th colspan="4" class="w3-border-right">Variant Quality</th>
-                            <th colspan="4" class="w3-border-right">Population Frequency</th>
+                            <th colspan="3" class="w3-border-right">Population Frequency</th>
                             <th colspan="2" class="w3-border-right">Clinical Informations</th>
                             <th colspan="2" class="w3-border-right">Localisation</th>
                             <th colspan="3" class="w3-border-right">Predictions</th>
@@ -55,8 +55,7 @@
                             <th class='min-size-50'>DP</th>
                             <th class='min-size-50'>AD</th>
                             <th class='min-size-75'>GnomAD</th>
-                            <th class='min-size-75'>SEAL %</th>
-                            <th class='min-size-75'>SEAL #</th>
+                            <th class='min-size-75'>SEAL</th>
                             <th class='min-size-75'>In Family</th>
                             <th class='min-size-75'>ClinSig</th>
                             <th class='min-size-75'>Transmission</th>
@@ -131,16 +130,10 @@
                                 GnomAD
                             </th>
                             <th>
-                                <span onclick="openHelpModal(title='SEAL (freq)', content='The frequency with which this variant is observed in SEAL among all other samples.', footer='Warning : this value exclude this sample')" class="w3-opacity-max w3-hover-opacity">
+                                <span onclick="openHelpModal(title='SEAL', content='The frequency with which this variant is observed in SEAL among all other samples.', footer='Warning : this value exclude this sample')" class="w3-opacity-max w3-hover-opacity">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                SEAL %
-                            </th>
-                            <th>
-                                <span onclick="openHelpModal(title='SEAL (count)', content='The frequency with which this variant is observed in SEAL among all other samples.', footer='Warning : this value exclude this sample')" class="w3-opacity-max w3-hover-opacity">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                SEAL #
+                                SEAL
                             </th>
                             <th>
                                 <span onclick="openHelpModal(title='In Family', content='Count variant presence in the case family and list all samples in the faimily with this variant.', footer='')" class="w3-opacity-max w3-hover-opacity">
