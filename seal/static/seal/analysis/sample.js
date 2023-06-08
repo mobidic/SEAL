@@ -357,7 +357,7 @@ $(document).ready(function() {
         scrollCollapse: true,
         scroller:         true,
         fixedHeader:  true,
-        order: [[ 5, "asc" ]],
+        order: [[ 2, "asc" ]],
         fixedColumns: {
             left:2,
             right:1
