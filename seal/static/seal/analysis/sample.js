@@ -972,6 +972,12 @@ $(document).ready(function() {
                     save_filters()
                 }
             } );
+            table.button().add( 2, {
+                text: 'Update Filter',
+                action: function ( e, dt, node, config ) {
+                    update_filter()
+                }
+            } );
             var format_base = {
                 body: function(data, row, column, node) {
                     if (column === 20) {
@@ -1135,6 +1141,21 @@ function save_filters() {
     var d = table.searchBuilder.getDetails();
     $('#filterText').html(JSON.stringify(d));
     $('#filter-modal').toggle();
+}
+
+function update_filter() {
+    var d = table.searchBuilder.getDetails();
+    var id = $('#selectFilter').children(":selected").attr("value");
+    console.log(id);
+    $.ajax({
+        type: "POST",
+        url: "/add/filter",
+        data: {
+            id: id,
+            filter: JSON.stringify(d),
+            edit: true
+        }
+    })
 }
 
 function openHelpModal(title="Some help", content='Some Content', footer='footer') {
@@ -2055,7 +2076,8 @@ function saveFilter() {
         data: {
             name: name,
             filter: JSON.stringify(filter),
-            teams: JSON.stringify(teams)
+            teams: JSON.stringify(teams),
+            edit: false
         }
     }).done(function() {
         $('#filter-modal').toggle();
@@ -2075,6 +2097,13 @@ function saveFilter() {
             }
             $('#selectFilter').html(options);
         });
+    }).fail(function (jqXHR, textStatus) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            footer: jqXHR["responseText"]
+        })
     })
 }
 function applied_panel(id, sample_id) {

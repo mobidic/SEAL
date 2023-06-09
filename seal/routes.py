@@ -13,6 +13,8 @@ from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
 from sqlalchemy import and_, or_
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
 
 from seal import app, bcrypt, db
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
@@ -1683,21 +1685,31 @@ def add_comment_sample():
 @login_required
 def add_filter():
     """
-    Adds a filter to the database.
+    Add or edit a filter.
 
     Returns:
         str: A message indicating the filter was added.
     """
-    teams = list()
-    for name in json.loads(request.form['teams']):
-        teams.append(Team.query.filter_by(teamname=name).first())
-    filter = Filter(
-        filtername=urllib.parse.unquote(request.form["name"]),
-        filter=json.loads(request.form["filter"]),
-        teams=teams
-    )
-    db.session.add(filter)
-    db.session.commit()
+    
+    if request.form["edit"] == "true":
+        filter = Filter.query.get(request.form["id"])
+        filter.filter = json.loads(request.form["filter"])
+        db.session.commit()
+    else:
+        teams = list()
+        for name in json.loads(request.form['teams']):
+            teams.append(Team.query.filter_by(teamname=name).first())
+        filter = Filter(
+            filtername=urllib.parse.unquote(request.form["name"]),
+            filter=json.loads(request.form["filter"]),
+            teams=teams
+        )
+        try:
+            db.session.add(filter)
+            db.session.commit()
+        except IntegrityError as e:
+            assert isinstance(e.orig, UniqueViolation)  # proves the original exception
+            return "This filter name already exist!", 500
     return 'ok'
 
 
