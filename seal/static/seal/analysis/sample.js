@@ -342,7 +342,7 @@ $(document).ready(function() {
         processing: true,
         language: {
             loadingRecords: '<div class="animation-bar-1"><span style="width:100%"></span></div>',
-            processing: '<span style="width:50%"><i class="fas fa-cog fa-spin"></i> Processing...</span>',
+            processing: '<span><i class="fas fa-cog fa-spin"></i> Processing...</span>',
             searchBuilder: {
                 button: {
                     0: 'Create filter',
@@ -1147,8 +1147,8 @@ $(document).ready(function() {
                 attr: { id: 'reload-button' },
                 action: function ( e, dt, node, config ) {
                     $('#variants').DataTable()
-                    .clear()
-                    .draw();
+                        .clear()
+                        .draw();
                     $('td.dataTables_empty', $('#variants')).html('<div class="animation-bar-1"><span style="width:100%"></span></div>');
                     $('#variants').DataTable().ajax.reload();
                     $('#reload-button').html("<span>Reload table</span>");
@@ -2173,9 +2173,11 @@ function saveFilter() {
     })
 }
 function applied_panel(id, sample_id) {
-    $("#variants_processing").css("visibility","show");
-    $("#variants_processing").attr('style', 'display: block; z-index: 10000 !important');
-    $("#variants").css('opacity', '0.6');
+    $('#variants').DataTable()
+        .clear()
+        .draw();
+    $('td.dataTables_empty', $('#variants')).html('<div class="animation-bar-1"><span style="width:100%"></span></div>');
+    
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
