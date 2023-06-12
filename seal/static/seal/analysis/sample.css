@@ -9,3 +9,9 @@
     transform: translate(-50%,-50%);
     -ms-transform: translate(-50%,-50%);
 }
+#variants tr td {
+    height: 29px;
+}
+.toolbar-variants {
+    padding:9px
+}

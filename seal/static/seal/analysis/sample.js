@@ -351,7 +351,7 @@ $(document).ready(function() {
             },
             infoPostFix: " [Total variants: " + sample_variants_length + "]",
         },
-        dom: 'Blfrtip',
+        dom: 'Blfrti<"toolbar-variants">',
         scrollY:        "40vh",
         scrollX:        true,
         scrollCollapse: true,
@@ -948,8 +948,9 @@ $(document).ready(function() {
                         return data;
                     },
                     display: function ( data, type, row ) {
-                        details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;"></i>'
-                        return details;
+                        details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>'
+                        hide = '<i onclick="hideRow(this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-minus-circle remove" style="cursor: pointer;" title="Hide row"></i>';
+                        return details + " " + hide;
                     },
                 },
             },
@@ -961,22 +962,29 @@ $(document).ready(function() {
                 $('#selectBed').prop('disabled', false);
             }
             table.button().add( 0, {
-                extend: 'searchBuilder',
-                config: {
-                    columns: [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
-                }
-            } );
-            table.button().add( 1, {
-                text: 'Save Filter',
-                action: function ( e, dt, node, config ) {
-                    save_filters()
-                }
-            } );
-            table.button().add( 2, {
-                text: 'Update Filter',
-                action: function ( e, dt, node, config ) {
-                    update_filter()
-                }
+                extend: 'collection',
+                autoClose: true,
+                text: 'Filter',
+                className: 'custom-html-collection',
+                buttons: [
+                    {
+                        extend: 'searchBuilder',
+                        config: {
+                            columns: [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+                        }
+                    },
+                    {
+                        text: 'Save Filter',
+                        action: function ( e, dt, node, config ) {
+                            save_filters()
+                        }
+                    }, {
+                        text: 'Update Filter',
+                        action: function ( e, dt, node, config ) {
+                            update_filter()
+                        }
+                    }
+                ]
             } );
             var format_base = {
                 body: function(data, row, column, node) {
@@ -991,9 +999,10 @@ $(document).ready(function() {
                 }
             };
             var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-            table.button().add(3, {
+            table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
+                autoClose: true,
                 className: 'custom-html-collection',
                 buttons: [
                     '<h3>All</h3>',
@@ -1133,9 +1142,32 @@ $(document).ready(function() {
                     },
                 ]
             });
+            table.button().add( 2, {
+                text: 'Reload table',
+                attr: { id: 'reload-button' },
+                action: function ( e, dt, node, config ) {
+                    $('#variants').DataTable()
+                    .clear()
+                    .draw();
+                    $('td.dataTables_empty', $('#variants')).html('<div class="animation-bar-1"><span style="width:100%"></span></div>');
+                    $('#variants').DataTable().ajax.reload();
+                    $('#reload-button').html("<span>Reload table</span>");
+                    $('.toolbar-variants').html('');
+                }
+            });
         }
     });
 } );
+
+function hideRow(item) {
+    $('#variants').DataTable()
+        .row($(item).parents('tr'))
+        .remove()
+        .draw();
+    var cpt = parseInt($('#cpt-hide-row').text()) || 0;
+    $('#reload-button span').html("<span>Reload table (<span id='cpt-hide-row'>"+ (cpt+1) +"</span>  rows hidden)</span>");
+    $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> '+ (cpt+1) +' row(s) hidden (reload table to show all)<span>');
+}
 
 function save_filters() {
     var d = table.searchBuilder.getDetails();
@@ -1146,16 +1178,50 @@ function save_filters() {
 function update_filter() {
     var d = table.searchBuilder.getDetails();
     var id = $('#selectFilter').children(":selected").attr("value");
-    console.log(id);
-    $.ajax({
-        type: "POST",
-        url: "/add/filter",
-        data: {
-            id: id,
-            filter: JSON.stringify(d),
-            edit: true
-        }
-    })
+    if (id == 1) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'You cannot update default filter!',
+            timer: 2000,
+            showConfirmButton: false
+          })
+    } else {
+        var t= $("#selectFilter option:selected").text();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will update filter '" + t + "'.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire(
+                    'Updated!',
+                    "The filter '" + t + "' has been updated.",
+                    'success'
+                )
+                $.ajaxSetup({
+                    beforeSend: function(xhr, settings) {
+                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                        }
+                    }
+                });
+                $.ajax({
+                    type: "POST",
+                    url: "/add/filter",
+                    data: {
+                        id: id,
+                        filter: JSON.stringify(d),
+                        edit: true
+                    }
+                })
+            }
+        })
+    }
 }
 
 function openHelpModal(title="Some help", content='Some Content', footer='footer') {
@@ -1864,7 +1930,7 @@ function edit_name() {
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, rename it!'
-      }).then((result) => {
+    }).then((result) => {
         if (result.isConfirmed) {
             Swal.fire(
                 'Renamed!',
@@ -1897,7 +1963,7 @@ function edit_name() {
                 }  
             })
         }
-      })
+    })
 }
 
 function toggle_class(id_var, sample_id, class_variant) {
@@ -1919,7 +1985,7 @@ function toggle_class(id_var, sample_id, class_variant) {
         success: function() {
             id_button = 'button-class-' + id_var;
             $("#"+id_button).html(class_variant_html[class_variant]);
-            $('#variants').DataTable().ajax.reload();
+            // CREATE SWEET ALERT
         }
     })
 }
@@ -2129,6 +2195,7 @@ function applied_panel(id, sample_id) {
         }
     });
     table = $('#variants').DataTable();
+    $('#reload-button').html("<span>Reload table</span>");
     table.ajax.url( '/json/variants/sample/' + sample_id + '/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
 }
 $('.js-example-basic-multiple').select2();
