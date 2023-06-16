@@ -55,6 +55,7 @@ $(document).ready(function() {
         scrollX: true,
         proccessing: true,
         serverSide: true,
+        order: [[5, 'desc']],
         ajax: {
             url: '/json/samples',
             type: 'POST',
@@ -171,6 +172,7 @@ $(document).ready(function() {
                     }
                 }
             },
+            { className: 'showTitle', data: "lastAction.date" },
             {
                 className: 'showTitle',
                 orderable: false,

@@ -757,6 +757,10 @@ def json_samples():
             - run: a dictionary containing the name and alias of the run the
                    sample belongs to (if any)
             - status: the status of the sample
+            - lastAction: the last action concerning this sample
+                - date: when it append
+                - user: who did it
+                - action: what it does
             - teams: a list of dictionaries, each containing the name and color
                      of a team associated with the sample
     """
@@ -766,14 +770,16 @@ def json_samples():
             Family.family.asc(),
             Run.name.asc(),
             Run.alias.asc(),
-            Sample.status.asc()
+            Sample.status.asc(),
+            Sample.lastAction.asc()
         ],
         "desc": [
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.name.desc(),
             Run.alias.desc(),
-            Sample.status.desc()
+            Sample.status.desc(),
+            Sample.lastAction.desc()
         ]
     }
     filters = or_(
@@ -819,6 +825,11 @@ def json_samples():
                 "alias": sample.run.alias if sample.runid else None
             },
             "status": sample.status,
+            "lastAction": {
+                "date": sample.lastAction.date.strftime("%Y/%m/%d %H:%M:%S") if sample.lastAction else None,
+                "user": sample.lastAction.user.username if sample.lastAction else None,
+                "action": sample.lastAction.action if sample.lastAction else None
+            },
             "teams": teams
         })
     return jsonify(samples_json)
