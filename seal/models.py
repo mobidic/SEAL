@@ -1,5 +1,8 @@
 from seal import db, login_manager, bcrypt
 from flask_login import UserMixin
+from sqlalchemy.ext.hybrid import hybrid_property
+
+from sqlalchemy import case, select, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import Mutable
 
@@ -155,6 +158,15 @@ class Sample(db.Model):
 
     def __str__(self):
         return self.samplename
+    
+    @hybrid_property
+    def lastAction(self):
+        return History.query.filter_by(sample_ID = self.id).order_by(History.date.desc()).first()
+    
+    @lastAction.expression
+    def lastAction(cls):
+        return select(func.max(History.date)).\
+            where(History.sample_ID==cls.id).scalar_subquery()
 
 
 class Family(db.Model):
