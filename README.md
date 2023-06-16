@@ -52,7 +52,7 @@ SEAL db:
   - SpliceAI
   - dbscSNV
   - GnomAD
-
+Óµ
 The installation instructions for VEP plugins can be found ([here](https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html)).
 
 *__A more complete guide will be written soon__*
@@ -94,9 +94,8 @@ commands:
 ```bash
 initdb -D ${PWD}/seal/seal.db
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
-python insertdb.py
-flask --app seal --debug db init
-flask --app seal --debug db migrate -m "Init DataBase"
+psql postgres -c "CREATE DATABASE seal;"
+python insertdb.py -p password
 ```
 
 > uncomment line on `seal/__init__.py` (see [#26](https://github.com/mobidic/SEAL/issues/26))
@@ -105,6 +104,11 @@ flask --app seal --debug db migrate -m "Init DataBase"
 > from seal import schedulers
 > from seal import admin
 > ```
+
+```bash
+flask --app seal --debug db init
+flask --app seal --debug db migrate -m "Init DataBase"
+```
 
 The database will be intialise with an admin user :
 - username : `admin`
