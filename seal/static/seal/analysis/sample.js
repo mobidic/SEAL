@@ -373,10 +373,11 @@ $(document).ready(function() {
                 data: "annotations.SYMBOL",
                 render: {
                     _: function ( data, type, row ) {
+                        hide = '<i onclick="hideRow(this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-minus-circle remove" style="cursor: pointer;" title="Hide row"></i> ';
                         if (data == null) {
-                            return "<i>NA</i>";
+                            return hide + "<i>NA</i>";
                         }
-                        return data;
+                        return hide + data;
                     },
                     sort: function ( data, type, row ) {
                         if (data == null) {
@@ -614,13 +615,6 @@ $(document).ready(function() {
                 data: "inseal",
                 render : {
                     _: function ( data, type, row, meta ) {
-                        if (data["total_samples"] > 0) {
-                                return parseFloat(data["occurrences"]/data["total_samples"]).toFixed(4);
-                        } else {
-                            return -1
-                        }
-                    },
-                    display: function ( data, type, row, meta ) {
                         if (data["total_samples"] > 0 && data["occurrences"] > 0) {
                             freq =  parseFloat((data["occurrences"]/data["total_samples"]));
                             if (freq > 0.01) {
@@ -949,8 +943,7 @@ $(document).ready(function() {
                     },
                     display: function ( data, type, row ) {
                         details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>'
-                        hide = '<i onclick="hideRow(this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-minus-circle remove" style="cursor: pointer;" title="Hide row"></i>';
-                        return details + " " + hide;
+                        return details;
                     },
                 },
             },
