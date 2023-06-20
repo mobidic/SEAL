@@ -52,7 +52,7 @@ SEAL db:
   - SpliceAI
   - dbscSNV
   - GnomAD
-Óµ
+
 The installation instructions for VEP plugins can be found ([here](https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html)).
 
 *__A more complete guide will be written soon__*
