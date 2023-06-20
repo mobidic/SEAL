@@ -703,7 +703,7 @@ def json_families():
             - id: The unique identifier of the family.
             - family: The name of the family.
     """
-    families = db.session.query(Family.id, Family.family).all()
+    families = Family.query.all()
     families_json = {"data": list()}
     for family in families:
         families_json["data"].append({
@@ -727,7 +727,7 @@ def json_runs():
             - name: the name of the run
             - alias: the alias of the run
     """
-    runs = db.session.query(Run.id, Run.name, Run.alias).all()
+    runs = Run.query.all()
     runs_json = {"data": list()}
     for run in runs:
         runs_json["data"].append({
@@ -789,14 +789,13 @@ def json_samples():
         Run.alias.op('~')(request.form['search[value]'])
     )
 
-    if current_user.admin:
-        samples = db.session.query(Sample)
-    else:
+    samples = Sample.query
+    if not current_user.admin:
         filter_samples_teams = or_(
             Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])), 
             Sample.teams == None
         )
-        samples = db.session.query(Sample).filter(filter_samples_teams)
+        samples = samples.filter(filter_samples_teams)
     recordsTotal = samples.count()
     samples_filter = samples.outerjoin(Family, Sample.family)\
                             .outerjoin(Run, Sample.run).filter(filters)
@@ -934,11 +933,8 @@ def json_variants(id, idbed=False, version=-1):
 
     ##################################################
 
-    var2samples = db.session.query(Var2Sample)\
-                    .filter(Var2Sample.sample_ID == int(id))
-    for var2sample in var2samples:
-        variant = db.session.query(Variant)\
-                    .filter(Variant.id == var2sample.variant_ID).first()
+    for var2sample in sample.variants:
+        variant = var2sample.variant
         try:
             if bed and not bed.varInBed(variant):
                 continue
@@ -1037,28 +1033,42 @@ def json_variants(id, idbed=False, version=-1):
                         "inheritances": str(pheno.inheritances),
                         "phenotypeMappingKey": pheno.phenotypeMappingKey
                     })
-        cnt = db.session.query(Sample.samplename).outerjoin(Var2Sample) \
-                .filter(and_(Sample.status >= 1, Sample.id != sample.id, 
-                             Var2Sample.variant_ID == var2sample.variant_ID,
-                             or_(Sample.teams == None,
-                                 Sample.teams.any(Team.id.in_([t.id for t in sample.teams])),
-                                 sample.teams == None))).count()
-        total_samples = db.session.query(Sample) \
-                          .filter(and_(Sample.status >= 1,
-                                       Sample.id != sample.id,
-                                       or_(Sample.teams == None,
-                                           Sample.teams.any(Team.id.in_([t.id for t in sample.teams])),
-                                           sample.teams == None ))).count()
+        cnt = Sample.query.outerjoin(Var2Sample).filter(
+            and_(
+                Sample.status >= 1,
+                Sample.id != sample.id, 
+                Var2Sample.variant_ID == var2sample.variant_ID,
+                or_(
+                    Sample.teams == None,
+                    Sample.teams.any(Team.id.in_([t.id for t in sample.teams])),
+                    sample.teams == None
+                )
+            )
+        ).count()
+        total_samples = Sample.query.filter(
+            and_(
+                Sample.status >= 1,
+                Sample.id != sample.id,
+                or_(
+                    Sample.teams == None,
+                    Sample.teams.any(Team.id.in_([t.id for t in sample.teams])),
+                    sample.teams == None
+                )
+            )
+        ).count()
 
         members = []
         if sample.familyid is None:
             cnt_family = None
         else:
-            request_family = db.session.query(Sample.samplename).outerjoin(Var2Sample)\
-                               .filter(and_(Sample.familyid == sample.familyid,
-                                            Sample.status >= 1,
-                                            Sample.id != sample.id,
-                                            Var2Sample.variant_ID == var2sample.variant_ID))
+            request_family = Sample.query.outerjoin(Var2Sample).filter(
+                and_(
+                    Sample.familyid == sample.familyid,
+                    Sample.status >= 1,
+                    Sample.id != sample.id,
+                    Var2Sample.variant_ID == var2sample.variant_ID
+                )
+            )
             cnt_family = request_family.count()
             if cnt_family >= 0:
                 for member in request_family:
@@ -1157,7 +1167,7 @@ def json_transcripts():
         Transcript.hgnc.op('~')(request.form['search[value]'])
     )
 
-    transcripts = db.session.query(Transcript)
+    transcripts = Transcript.query
     recordsTotal = transcripts.count()
     transcripts_filter = transcripts.filter(filters)
     recordsFiltered = transcripts_filter.count()
@@ -1734,7 +1744,7 @@ def add_preferred():
     Returns:
         str: Returns the string 'ok' if the operation was successful.
     """
-    user = db.session.query(User).filter_by(id=current_user.get_id()).first()
+    user = User.query.filter_by(id=current_user.get_id()).first()
 
     transcript = urllib.parse.unquote(request.form["transcript"])
     # transcript = Transcript.query.get(transcript_id)
