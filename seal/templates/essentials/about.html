@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block static %}
+    <link href="{{ url_for('static', filename='seal/essentials/about.css') }}" rel="stylesheet" type="text/css">
+{% endblock %}
+
 {% block content %}
     {% include 'includes/sidebar.j2' %}
     <div class="w3-main" {% if current_user.sidebar %}style="margin-left:350px"{% endif %}>
@@ -52,5 +56,195 @@
                 </ul>
             </ul>
         </div>
+
+        <div id="releases" class="w3-content w3-padding">
+            <h2>Releases</h2>
+            <div id="releases-notes" class="w3-small">
+                <div class="w3-panel w3-leftbar w3-blue">
+                    <h3>dev - Current Realease</h3>
+                    <p></p>
+
+                    <h4>New Features</h4>
+
+                    <ul>
+                        <li><b>Add Last Action</b> for samples : sorts the sample table by modification date</li>
+                        <li>Other minor front-end enhancements</li>
+                    </ul>
+
+                    <h4>Fixes</h4>
+
+                    <ul>
+                        <li><b></b></li>
+                    </ul>
+
+                    <h4>Other Changes</h4>
+
+                    <ul>
+                        <li><b>Documentation</b></li>
+                    </ul>
+
+
+                    <h4>Known Issues</h4>
+
+                    <ul>
+                        <li><b>Initialisation of database</b></li>
+                    </ul>
+                </div>
+
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-text-gray">
+                    <h3>v1.1.3 [June 13, 2023]</h3>
+                    <p>This minor version mainly enhances the interface to improve the user experience.</p>
+
+                    <h4>New Features</h4>
+
+                    <ul>
+                        <li><b>Add new status</b> : Archived</li>
+                        <li><b>Better table variant</b></li>
+                        <ul>
+                            <li>Add subheader</li>
+                            <li>Reorder, delete and merge columns</li>
+                            <li>Add some extra links (Franklin & GnomAD)</li>
+                            <li>Add SweetAlert</li>
+                            <li>Add possibility to hide some rows</li>
+                            <li>Add possibility to edit filter</li>
+                        </ul>
+                        <li>Other minor front-end enhancements</li>
+                    </ul>
+
+                    <h4>Fixes</h4>
+
+                    <ul>
+                        <li><b>Fix security issues</b></li>
+                        <li><b>Fix status on sidebar</b></li>
+                    </ul>
+
+                    <h4>Known Issues</h4>
+
+                    <ul>
+                        <li><b>Initialisation of database</b></li>
+                    </ul>
+                </div>
+
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-text-gray">
+                    <h3>v1.1.2 [March 1, 2023]</h3>
+                    <p>This minor release features significant documentation improvements, as well as a few front-end tweaks to enhance usability and user experience.</p>
+
+                    <h4>New Features</h4>
+
+                    <ul>
+                        <li><b>Frequency of variant calculate from "visible" sample (SEAL count)</b></li>
+                        <li><b>Add warnings (banner) if not production version</b></li>
+                        <li><b>Add ability to edit some sample fields </b></li>
+                        <li><b>Use a config file to launch the app</b></li>
+                    </ul>
+
+                    <h4>Fixes</h4>
+
+                    <ul>
+                        <li><b>JSON Variant : Check if a sample id is provided</b></li>
+                    </ul>
+
+                    <h4>Other Changes</h4>
+
+                    <ul>
+                        <li><b>Upgrade DataTable</b></li>
+                        <li><b>Improve handling exception in scheduler</b></li>
+                        <li><b>Documentation</b></li>
+                    </ul>
+
+                    <h4>Known Issues</h4>
+
+                    <ul>
+                        <li><b>Initialisation of database</b></li>
+                    </ul>
+                </div>
+
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-text-gray">
+                    <h3>v1.1.1 [February 15, 2023]</h3>
+                    <p>This minor update brings a number of front-end improvements that are designed to enhance the user experience.</p>
+
+                    <h4>Fixes</h4>
+
+                    <ul>
+                        <li><b>MobiDetails API key check</b></li>
+                        <li><b>CSRF error redirection on login</b></li>
+                        <li><b>Fixed Header of variant table</b></li>
+                    </ul>
+
+                    <h4>Other Changes</h4>
+
+                    <ul>
+                        <li><b>Upgrade DataTable</b></li>
+                        <li><b>Add labels for update account view</b></li>
+                        <li><b>Some Style</b></li>
+                    </ul>
+
+                    <h4>Known Issues</h4>
+
+                    <ul>
+                        <li><b>Initialisation of database</b></li>
+                    </ul>
+                </div>
+
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-text-gray">
+                    <h3>v1.1.0 [February 6, 2023]</h3>
+                    <p>We are excited to announce the new release of SEAL.
+                    <br/>This update cames with a range of new features, bug fixes and improvements for better maintanability.
+                    <br/>Read on for full details!</p>
+
+                    <h4>New Features</h4>
+
+                    <ul>
+                        <li><b>History of samples (e9243df, a5f6d04)</b></li>
+                        <li><b>Use of personal MobiDetails API key (620b470)</b></li>
+                        <li><b>Comments on samples (0fce092, e32984c)</b></li>
+                        <li><b>Filter and bed in sample form (6a0af55)</b></li>
+                        <li><b>Export only reported variants (12e1582)</b></li>
+                        <li><b>Maintenance mode (599aa56)</b></li>
+                        <li><b>Ability to check panels (#19, 1e4e780)</b></li>
+                    </ul>
+
+                    <h4>Fixes</h4>
+
+                    <ul>
+                        <li><b>Filter variants on class and report (#21)</b></li>
+                        <li><b>Password bug in admin interface (#29)</b></li>
+                        <li><b>Exportation of datatables (#34)</b></li>
+                        <li><b>Filter on clinsig (#36)</b></li>
+                        <li><b>CSS fixes</b></li>
+                    </ul>
+
+                    <h4>Other Changes</h4>
+
+                    <ul>
+                        <li><b>Upgrade dependencies</b></li>
+                        <li><b>Better maintainability</b></li>
+                        <li><b>Select2 replacement</b></li>
+                        <li><b>Auto-refresh</b></li>
+                    </ul>
+
+                    <h4>Known Issues</h4>
+
+                    <ul>
+                        <li><b>Initialisation of database</b></li>
+                        <li><b>Fixed header of datatables when scrolling</b></li>
+                    </ul>
+                </div>
+
+                <div class="w3-panel w3-leftbar w3-pale-blue w3-text-gray">
+                    <h3>v1.0.0 [January 5, 2023]</h3>
+                    <p>We are proud to announce the first official release of SEAL, a web application for analyzing and annotating genetic variants.</p>
+
+                    <p>In this initial release, SEAL includes the following key features:</p>
+
+                    <ul>
+                        <li>An intuitive interface for uploading and managing VCF files</li>
+                        <li>Annotation of variants using the Ensembl Variant Effect Predictor (VEP)</li>
+                        <li>Sample and family management tools for tracking variant inheritance patterns</li>
+                        <li>A rich set of visualizations and reports to help interpret variant data</li>
+                    </ul>
+                </div>
+            </div>
+        <div>
     </div>
 {% endblock %}

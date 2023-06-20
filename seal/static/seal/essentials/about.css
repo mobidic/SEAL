@@ -1,0 +1,13 @@
+.w3-small h3  {
+    font-size:20px;
+}
+.w3-small h4  {
+    font-size:16px;
+}
+
+@media screen and (min-height:600px){
+    #releases-notes {
+        height: 50vh;
+        overflow: scroll;
+    }
+}
