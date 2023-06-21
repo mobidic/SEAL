@@ -19,7 +19,7 @@ function view_sample(id) {
     });
 }
 
-function toggle_status(id, status) {
+function toggle_status(id, status, self) {
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -36,16 +36,10 @@ function toggle_status(id, status) {
             "status": status
         },
         success: function() {
-            if (status == 1) {
-                response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-clock"></i> <i><b>New Sample</b></i> <i class="fas fa-sort-down"></i></span>';
-            } else if (status == 2) {
-                response = '<span class="w3-text-flat-peter-river"><i class="fas fa-user-edit"></i> <i><b>Processing</b></i> <i class="fas fa-sort-down"></i></span>';
-            } else if (status == 3) {
-                response = '<span class="w3-text-flat-emerald"><i class="fas fa-user-check"></i> <i><b>Interpreted</b></i> <i class="fas fa-sort-down"></i></span>';
-            } else if (status == 4) {
-                response = '<span class="w3-text-flat-pumpkin"><i class="fas fa-user-lock"></i> <i><b>Validated</b></i> <i class="fas fa-sort-down"></i></span>';
-            }
-            document.getElementById("button-status-" + id).innerHTML = response;
+            var cell = $('#samples').DataTable().cell(self.closest('td'))
+            var data = cell.data();
+            console.log(data);
+            cell.data(status).draw();
         }
     });
 }
@@ -136,7 +130,7 @@ $(document).ready(function() {
                             if ((data.status != 4 || bio_or_admin) && (data.status != 5)) {
                                 dropdown = '<div class="w3-dropdown-content w3-bar-block" style="position: fixed !important;right:0" id="button-status-' + sample_id + '-content">';
                                 for (const idx of [1,2,3,4]) {
-                                    var onclick = `onclick="toggle_status(` + sample_id + `, ` + idx +`)"`;
+                                    var onclick = `onclick="toggle_status(` + sample_id + `, ` + idx +`, this)"`;
                                     var border = "w3-border-left w3-border-right";
                                     var disabled = "";
                                     if (idx == 4) {
