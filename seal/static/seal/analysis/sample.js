@@ -373,7 +373,7 @@ $(document).ready(function() {
                 data: "annotations.SYMBOL",
                 render: {
                     _: function ( data, type, row ) {
-                        hide = '<i onclick="hideRow(this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-minus-circle remove" style="cursor: pointer;" title="Hide row"></i> ';
+                        hide = '<i onclick="hideRow(this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i> ';
                         if (data == null) {
                             return hide + "<i>NA</i>";
                         }
@@ -890,7 +890,7 @@ $(document).ready(function() {
                         if (data["reported"]) {
                             check='checked="checked"';
                         }
-                        return '<input id="'+ id +'" type="checkbox" ' + check + ' onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\');">';
+                        return '<input id="'+ id +'" type="checkbox" ' + check + ' onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\', this);">';
                     }
                     return data["reported"] ? "Reported" : "Not Reported";
                 },
@@ -911,7 +911,7 @@ $(document).ready(function() {
                         class_variant = data.class_variant ? data.class_variant : 0;
                         dropdown = ""
                         for (c in class_variant_html) {
-                            dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +')" class="w3-bar-item w3-button" style="width:inherit">'+
+                            dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +', this)" class="w3-bar-item w3-button" style="width:inherit">'+
                                     class_variant_html[c]+
                                 '</a>'
                         }
@@ -1959,7 +1959,7 @@ function edit_name() {
     })
 }
 
-function toggle_class(id_var, sample_id, class_variant) {
+function toggle_class(id_var, sample_id, class_variant, self) {
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -1977,7 +1977,10 @@ function toggle_class(id_var, sample_id, class_variant) {
         },
         success: function() {
             id_button = 'button-class-' + id_var;
-            $("#"+id_button).html(class_variant_html[class_variant]);
+            var cell = $('#variants').DataTable().cell(self.closest('td'))
+            var data = cell.data();
+            data["class_variant"]=class_variant;
+            cell.data(data).draw();
             // CREATE SWEET ALERT
         }
     })
@@ -2021,7 +2024,7 @@ function toggle_on_off(div) {
       })
 }
 
-function toggle_var2sample_status(id, id_var, sample_id, type) {
+function toggle_var2sample_status(id, id_var, sample_id, type, self) {
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -2037,7 +2040,10 @@ function toggle_var2sample_status(id, id_var, sample_id, type) {
         },
         success: function() {
             $('#tableHistorySample').DataTable().ajax.reload();
-            $('#variants').DataTable().ajax.reload();
+            var cell = $('#variants').DataTable().cell(self.closest('td'))
+            var data = cell.data();
+            data["reported"]=!cell.data()["reported"];
+            cell.data(data).draw();
         }
     })
 }
