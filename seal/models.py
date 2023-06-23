@@ -1,10 +1,13 @@
-from seal import db, login_manager, bcrypt
-from flask_login import UserMixin
-from sqlalchemy.ext.hybrid import hybrid_property
+from datetime import datetime
 
-from sqlalchemy import case, select, func
+from seal import db, login_manager, bcrypt
+
+from flask_login import UserMixin
+
+from sqlalchemy import select, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import Mutable
+from sqlalchemy.ext.hybrid import hybrid_property
 
 
 ################################################################################
@@ -122,7 +125,7 @@ class History(db.Model):
     user = relationship("User", back_populates="historics")
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
     sample = relationship("Sample", back_populates="historics")
-    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, primary_key=True)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, primary_key=True, default=datetime.now())
 
     action = db.Column(db.Text, nullable=False)
 
@@ -216,7 +219,7 @@ class Variant(db.Model):
 class Comment_variant(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.Text, nullable=False)
-    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
 
     variantid = db.Column(db.Text, db.ForeignKey('variant.id'), nullable=False)
     variant = relationship("Variant", back_populates="comments")
@@ -234,7 +237,7 @@ class Comment_variant(db.Model):
 class Comment_sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     comment = db.Column(db.Text, nullable=False)
-    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
 
     sampleid = db.Column(db.Integer, db.ForeignKey('sample.id'), nullable=False)
     sample = relationship("Sample", back_populates="comments")
