@@ -1,11 +1,13 @@
+import os
 import re
 import json
 import numpy
 import random
 import subprocess
 from pathlib import Path
-from anacore import annotVcf
 from datetime import datetime
+
+from anacore import annotVcf, vcf
 
 from seal import app, scheduler, db
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
@@ -437,6 +439,15 @@ def importvcf():
                     continue
                 variant = Variant.query.get(f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if not variant:
+                    variant = Variant(
+                        id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", 
+                        chr=v.chrom, 
+                        pos=v.pos, 
+                        ref=v.ref, 
+                        alt=v.alt[0])
+                    db.session.add(variant)
+
+                if not variant.annotations:
                     annotations = [{
                         "date": current_date,
                         "ANN": list()
@@ -518,16 +529,7 @@ def importvcf():
                             annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
 
                         annotations[-1]["ANN"].append(annot)
-
-                    # app.logger.debug(f"       - Create Variant : {sample}")
-                    variant = Variant(
-                        id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", 
-                        chr=v.chrom, 
-                        pos=v.pos, 
-                        ref=v.ref, 
-                        alt=v.alt[0], 
-                        annotations=annotations)
-                    db.session.add(variant)
+                    variant.annotation = annotations
 
                 # If duplicate variant for sample :
                 #   - catch exception
