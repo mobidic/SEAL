@@ -464,6 +464,7 @@
         var sample_bed_id = "{{ sample.bed_id }}";
         var current_user_bed_id = "{{ current_user.bed_id }}";
         var sample_variants_length = "{{ sample.variants | length  }}";
+        var count_hide = "{{ count_hide }}";
         var json_variants = '/json/variants/sample/{{ sample.id }}{% if sample.bed_id %}/bed/{{ sample.bed_id }}{% endif %}';
         var sample_id = "{{ sample.id }}";
         var current_user_api_key_md = "{{ current_user.api_key_md }}";

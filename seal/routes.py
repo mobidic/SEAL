@@ -565,9 +565,16 @@ def sample(id):
     saveFilterForm.teams.choices = choices
     saveFilterForm.teams.data = [team.id for team in current_user.teams]
 
+    count_hide=0
+
+    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == 36, Var2Sample.hide == True):
+        if v.inBed():
+            count_hide+=1
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
+        count_hide = count_hide,
         form=commentForm,
         saveFilterForm=saveFilterForm
     )
@@ -932,7 +939,7 @@ def json_variants(id, idbed=False, version=-1):
     # Get all canonical trancripts
 
     ##################################################
-
+    
     for var2sample in sample.variants:
         variant = var2sample.variant
         try:
@@ -940,6 +947,8 @@ def json_variants(id, idbed=False, version=-1):
                 continue
         except NameError:
             pass
+        if var2sample.hide:
+            continue
         annotations = variant.annotations
         main_annot = None
         consequence_score = -999
@@ -1501,6 +1510,65 @@ def toggle_varStatus():
     return f"{return_value}"
 
 
+@app.route("/toggle/samples/variant/hide", methods=['POST'])
+@login_required
+def toggle_varhide():
+    """
+    Toggles the hide status of a variant to a sample.
+
+    Returns:
+        str: The new hide status of the variant.
+    """
+    id_var = request.form["id_var"]
+    sample_id = request.form["sample_id"]
+    v2s = Var2Sample.query.get((id_var, sample_id))
+    v2s.hide = not v2s.hide
+    return_value = v2s.hide
+    db.session.commit()
+
+    report = "Hide" if v2s.hide else "Show"
+    history = History(
+        sample_ID=sample_id, 
+        user_ID=current_user.id, 
+        date=datetime.now(), 
+        action=f"{report} variant : {id_var}")
+    db.session.add(history)
+    db.session.commit()
+
+    return f"{return_value}"
+
+
+@app.route("/toggle/samples/variant/hide/all", methods=['POST'])
+@login_required
+def toggle_varhideall():
+    """
+    Toggles the hide status of all variant to a sample.
+
+    Returns:
+        str: The array of unhide variants
+    """
+    var_hide=list()
+    sample_id = request.form["sample_id"]
+    for v2s in Sample.query.get(sample_id).variants:
+        if not v2s.hide:
+            continue
+        v2s.hide = not v2s.hide
+        return_value = v2s.hide
+        var_hide.append(str(v2s))
+        db.session.commit()
+
+        report = "Hide" if v2s.hide else "Show"
+        history = History(
+            sample_ID=sample_id, 
+            user_ID=current_user.id, 
+            date=datetime.now(), 
+            action=f"{report} variant : {v2s.variant_ID}")
+        db.session.add(history)
+        db.session.commit()
+
+    return f"{str(return_value)}"
+
+
 @app.route("/toggle/sample/index", methods=['POST'])
 @login_required
 def toggle_sampleIndex():
@@ -1603,7 +1671,13 @@ def toggle_samplePanel():
         db.session.add(history)
         db.session.commit()
 
-    return escape(f"{sample.bed_id}")
+    count_hide=0
+
+    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == 36, Var2Sample.hide == True):
+        if v.inBed():
+            count_hide+=1
+
+    return escape(count_hide)
 
 
 @app.route("/toggle/samples/variant/class", methods=['POST'])

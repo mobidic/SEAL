@@ -365,11 +365,10 @@ $(document).ready(function() {
                 data: "annotations.SYMBOL",
                 render: {
                     _: function ( data, type, row ) {
-                        hide = '<i onclick="hideRow(this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i> ';
                         if (data == null) {
-                            return hide + "<i>NA</i>";
+                            return "<i>NA</i>";
                         }
-                        return hide + data;
+                        return data;
                     },
                     sort: function ( data, type, row ) {
                         if (data == null) {
@@ -934,8 +933,9 @@ $(document).ready(function() {
                         return data;
                     },
                     display: function ( data, type, row ) {
-                        details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>'
-                        return details;
+                        details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>';
+                        hide = '<i onclick="hideRow(\'' + data + '\', ' + sample_id + ', this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i> ';
+                        return details + " " + hide;
                     },
                 },
             },
@@ -1127,31 +1127,55 @@ $(document).ready(function() {
                     },
                 ]
             });
-            table.button().add( 2, {
-                text: 'Reload table',
-                attr: { id: 'reload-button' },
-                action: function ( e, dt, node, config ) {
-                    $('#variants').DataTable()
-                        .clear()
-                        .draw();
-                    $('td.dataTables_empty', $('#variants')).html('<div class="animation-bar-1"><span style="width:100%"></span></div>');
-                    $('#variants').DataTable().ajax.reload();
-                    $('#reload-button').html("<span>Reload table</span>");
-                    $('.toolbar-variants').html('');
-                }
-            });
+            hide_message(count_hide);
         }
     });
 } );
 
-function hideRow(item) {
+function hide_message(count_hide) {
+    if (count_hide > 0) {
+        $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> <span id="cpt-hide-row">' + count_hide + '</span> row(s) hidden (<b class="w3-hover-text-blue" onclick="showAllRows()" style="cursor:pointer">click here to show all</b>)<span>');
+    } else {
+        $('.toolbar-variants').html('');
+    }
+}
+
+function hideRow(id_var, sample_id, item) {
     $('#variants').DataTable()
         .row($(item).parents('tr'))
         .remove()
         .draw();
     var cpt = parseInt($('#cpt-hide-row').text()) || 0;
-    $('#reload-button span').html("<span>Reload table (<span id='cpt-hide-row'>"+ (cpt+1) +"</span>  rows hidden)</span>");
-    $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> '+ (cpt+1) +' row(s) hidden (reload table to show all)<span>');
+    hide_message(cpt+1);
+    $.ajax({
+        type: "POST",
+        url: "/toggle/samples/variant/hide",
+        data: {
+            id_var: id_var,
+            sample_id: sample_id
+        },
+        success: function() {
+            $('#tableHistorySample').DataTable().ajax.reload();
+        }
+    })
+}
+
+function showAllRows() {
+    $('#variants').DataTable()
+        .clear()
+        .draw();
+    $.ajax({
+        type: "POST",
+        url: "/toggle/samples/variant/hide/all",
+        data: {
+            sample_id: sample_id
+        },
+        success: function() {
+            $('#tableHistorySample').DataTable().ajax.reload();
+            $('#variants').DataTable().ajax.reload();
+        }
+    })
+    hide_message(0);
 }
 
 function save_filters() {
@@ -2119,8 +2143,9 @@ function applied_panel(id, sample_id) {
             "id_sample": sample_id,
             "id_panel": id
         },
-        success: function() {
+        success: function(count_hide) {
             $('#tableHistorySample').DataTable().ajax.reload();
+            hide_message(count_hide);
         }
     });
     table = $('#variants').DataTable();
