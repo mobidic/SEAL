@@ -74,13 +74,6 @@ $(document).ready(function() {
 });
 
 function add_transcript(transcript) {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
     $.ajax({
         type: "POST",
         url: "/add/preferred",

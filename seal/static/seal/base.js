@@ -1,3 +1,10 @@
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrf_token);
+        }
+    }
+});
 
 $(document).on("mouseenter", ".showTitle", function() {
     $(this).attr('title', this.innerText);
@@ -21,13 +28,6 @@ function updateSideBar(){
 // Script to open and close sidebar
 async function w3_toggle_menu() {
     if ($(window).width() > 992) {
-        $.ajaxSetup({
-            beforeSend: function(xhr, settings) {
-                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                }
-            }
-        });
         $.ajax({
             type: "POST",
             url: "/toggle/user/sidebar"

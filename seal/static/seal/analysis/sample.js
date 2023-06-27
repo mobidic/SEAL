@@ -1,12 +1,4 @@
 function toggle_status(id, status) {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
-
     $.ajax({
         type: "POST",
         url: "/toggle/sample/status",
@@ -1196,13 +1188,6 @@ function update_filter() {
                     "The filter '" + t + "' has been updated.",
                     'success'
                 )
-                $.ajaxSetup({
-                    beforeSend: function(xhr, settings) {
-                        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                            xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                        }
-                    }
-                });
                 $.ajax({
                     type: "POST",
                     url: "/add/filter",
@@ -1869,13 +1854,6 @@ function changeFilter(id, sample_id) {
             document.getElementById("variants_processing").style.zIndex = "0";
             $("#variants_processing").toggle();
             document.getElementById("variants").style.opacity = "1";
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                    }
-                }
-            });
             $.ajax({
                 type: "POST",
                 url: "/toggle/sample/filter",
@@ -1890,7 +1868,6 @@ function changeFilter(id, sample_id) {
         }, 30);
     });
 }
-
 
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
@@ -1930,13 +1907,6 @@ function edit_name() {
                 'The sample will be renamed.',
                 'success'
             )
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                    }
-                }
-            });
             $.ajax({
                 type: "POST",
                 url: "/edit/sample/name",
@@ -1960,13 +1930,6 @@ function edit_name() {
 }
 
 function toggle_class(id_var, sample_id, class_variant, self) {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
     $.ajax({
         type: "POST",
         url: "/toggle/samples/variant/class",
@@ -2002,13 +1965,6 @@ function toggle_on_off(div) {
                 "The sample status '" + div + "' switched.",
                 'success'
             )
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                    }
-                }
-            });
             $.ajax({
                 type: "POST",
                 url: "/toggle/sample/" + div,
@@ -2025,13 +1981,6 @@ function toggle_on_off(div) {
 }
 
 function toggle_var2sample_status(id, id_var, sample_id, type, self) {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
     $.ajax({
         type: "POST",
         url: "/toggle/samples/variant/status",
@@ -2049,13 +1998,6 @@ function toggle_var2sample_status(id, id_var, sample_id, type, self) {
 }
 
 function send_comment(type="sample") {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
     if( type == "var") {
         var comment = $("#commentVar").val();
         var id = $("#variant-id").text();
@@ -2121,13 +2063,6 @@ function send_comment(type="sample") {
 }
 
 function saveFilter() {
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
     var name = $("#filterName").val();
     var filter = JSON.parse($("#filterText").text());
     var teams = [];
@@ -2177,13 +2112,6 @@ function applied_panel(id, sample_id) {
         .draw();
     $('td.dataTables_empty', $('#variants')).html('<div class="animation-bar-1"><span style="width:100%"></span></div>');
     
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrf_token);
-            }
-        }
-    });
     $.ajax({
         type: "POST",
         url: "/toggle/sample/panel",
