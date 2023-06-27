@@ -1128,21 +1128,33 @@ function hide_message(count_hide) {
 }
 
 function hideRow(id_var, sample_id, item) {
-    $('#variants').DataTable()
-        .row($(item).parents('tr'))
-        .remove()
-        .draw();
-    var cpt = parseInt($('#cpt-hide-row').text()) || 0;
-    hide_message(cpt+1);
-    $.ajax({
-        type: "POST",
-        url: "/toggle/samples/variant/hide",
-        data: {
-            id_var: id_var,
-            sample_id: sample_id
-        },
-        success: function() {
-            $('#tableHistorySample').DataTable().ajax.reload();
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will hide a variant",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, hide it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $('#variants').DataTable()
+                .row($(item).parents('tr'))
+                .remove()
+                .draw();
+            var cpt = parseInt($('#cpt-hide-row').text()) || 0;
+            hide_message(cpt+1);
+            $.ajax({
+                type: "POST",
+                url: "/toggle/samples/variant/hide",
+                data: {
+                    id_var: id_var,
+                    sample_id: sample_id
+                },
+                success: function() {
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                }
+            })
         }
     })
 }
