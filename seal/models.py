@@ -259,6 +259,7 @@ class Var2Sample(db.Model):
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
     filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     reported = db.Column(db.Boolean, nullable=False, unique=False, default=False)
+    hide = db.Column(db.Boolean, nullable=False, unique=False, default=False)
 
     sample = db.relationship(Sample, backref="variants")
     variant = db.relationship(Variant, backref="samples")
@@ -268,6 +269,12 @@ class Var2Sample(db.Model):
 
     def __str__(self):
         return f"{self.sample} - {self.variant}"
+
+    def inBed(self):
+        if self.sample.bed:
+            return self.sample.bed.varInBed(self.variant) 
+        else:
+            return True
 
 
 team2filter = db.Table(
