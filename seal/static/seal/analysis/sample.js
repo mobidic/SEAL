@@ -606,23 +606,10 @@ $(document).ready(function() {
                 data: "inseal",
                 render : {
                     _: function ( data, type, row, meta ) {
-                        if (data["total_samples"] > 0 && data["occurrences"] > 0) {
-                            freq =  parseFloat((data["occurrences"]/data["total_samples"]));
-                            if (freq > 0.01) {
-                                return freq.toFixed(4) + "(" + data["occurrences"] + ")";
-                            } else {
-                                return freq.toExponential(2) + " (" + data["occurrences"] + ")";
-                            }
-                        } else {
-                            return "<i>NA</i>"
-                        }
+                        return (data["occurrences"] > 0) ? data["occurrences"] : "NA";
                     },
                     sort: function ( data, type, row, meta ) {
-                        if (data["total_samples"] > 0) {
-                                return data["occurrences"]/data["total_samples"];
-                        } else {
-                            return -1
-                        }
+                        return (data["occurrences"] > 0) ? data["occurrences"] : 0;
                     }
                 },
             },
@@ -1522,6 +1509,7 @@ function openDetailsVariantModal(id, sample_id) {
         inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
             '<th class="w3-flat-silver control-size-100">Sample</th>'+
             '<th class="w3-flat-silver control-size-100">Family</th>'+
+            '<th class="w3-flat-silver control-size-100">Teams</th>'+
             '<th class="w3-flat-silver control-size-75 w3-center">Affected</th>'+
             '<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
             '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
@@ -1554,9 +1542,15 @@ function openDetailsVariantModal(id, sample_id) {
                 sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
                 style =  "style='background-color:#85b3d5'"
             }
+            teams=""
+            for (i in data["samples"][x]["teams"]) {
+                console.log(i);
+                teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data["samples"][x]["teams"][i]["color"] + '">' + data["samples"][x]["teams"][i]["teamname"] + '</span> ';
+            };
             inSeal = inSeal + '<tr>'+
                 '<td class="control-size-100" ' + style + '>' + sample + '</td>'+
                 '<td class="control-size-100" ' + style + '>' + family+ '</td>'+
+                '<td class="control-size-100" ' + style + '>' + teams + '</td>'+
                 '<td class="control-size-75 w3-center" ' + style + '>' + affected + '</td>'+
                 '<td class="control-size-75 w3-center" ' + style + '>' + data["samples"][x]["depth"] + '</td>'+
                 '<td class="control-size-100 w3-center" ' + style + '>' + data["samples"][x]["allelic_depth"] + '</td>'+
