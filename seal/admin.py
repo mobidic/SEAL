@@ -1,7 +1,7 @@
 import re
 
 from flask import redirect, url_for, request, flash
-from flask_admin import Admin, AdminIndexView
+from flask_admin import expose, AdminIndexView, Admin
 from flask_admin.menu import MenuLink
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
@@ -11,11 +11,20 @@ from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
                          Region, Bed, Phenotype, Omim, History)
 
-
-BCRYPT_PATTERN = re.compile("^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
+###############################################################################
 
 
 class MyAdminIndexView(AdminIndexView):
+    @expose('/')
+    def index(self):
+        cnt = {
+            "user": User.query.count(),
+            "sample": Sample.query.count(),
+            "variant": Variant.query.count(),
+            "family": Family.query.count(),
+            "bed": Bed.query.count(),
+        }
+        return self.render('admin/index.html', cnt=cnt)
     """
     Custom class for Flask-Admin index view.
 
@@ -99,6 +108,8 @@ class CustomView(ModelView):
             self.column_searchable_list = kwargs.pop('column_searchable_list')
         if 'column_editable_list' in kwargs:
             self.column_editable_list = kwargs.pop('column_editable_list')
+        if 'column_orderable_list' in kwargs:
+            self.column_orderable_list = kwargs.pop('column_orderable_list')
         if 'form_excluded_columns' in kwargs:
             self.form_excluded_columns = kwargs.pop('form_excluded_columns')
         super(CustomView, self).__init__(*args, **kwargs)
@@ -225,7 +236,18 @@ class UserView(CustomView):
         return super(UserView, self).validate_form(form)
 
 
-admin = Admin(app, index_view=MyAdminIndexView())
+###############################################################################
+
+
+admin = Admin(app, index_view = MyAdminIndexView(), template_mode='bootstrap3')
+BCRYPT_PATTERN = re.compile("^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
+
+
+###############################################################################
+
+
+admin.add_category(name="Authentication")
+
 admin.add_view(
     UserView(
         User,
@@ -233,7 +255,9 @@ admin.add_view(
         category = "Authentication",
         column_exclude_list = ['password', 'transcripts'],
         column_searchable_list = ['username', 'mail', 'api_key_md'],
-        column_editable_list = ['username', 'mail', 'filter', "api_key_md"],
+        column_editable_list = ['username', 'mail', 'filter', 'api_key_md',
+                                'logged', 'admin', 'bioinfo', 'technician',
+                                'biologist', 'sidebar'],
         form_excluded_columns = ['comments_variants', 'comments_samples', 
                                  'historics', 'transcripts']
     )
@@ -248,30 +272,35 @@ admin.add_view(
         form_excluded_columns = ['members', 'samples']
     )
 )
+
+
+###############################################################################
+
+
+admin.add_category(name="Analysis")
+
+admin.add_sub_category(name="Sample", parent_name="Analysis")
+admin.add_sub_category(name="Run", parent_name="Analysis")
+admin.add_sub_category(name="Variant", parent_name="Analysis")
+
 admin.add_view(
     SampleView(
         Sample,
         db.session,
-        category="Analysis",
-        column_searchable_list = ["samplename"],
-        column_editable_list = ['samplename', 'status'],
+        category="Sample",
+        column_searchable_list = ['filter.filtername', 'bed.name',
+                                  'family.family', 'run.name', 'samplename'],
+        column_editable_list = ['filter', 'bed', 'family', 'run', 'samplename',
+                                'status', 'affected', 'index'],
         form_excluded_columns = ['variants', 'historics']
-    )
-)
-admin.add_view(
-    CustomView(
-        History,
-        db.session,
-        category="Analysis",
-        column_searchable_list = ["action"]
     )
 )
 admin.add_view(
     CustomView(
         Family,
         db.session,
-        category="Analysis",
-        column_searchable_list = ["family"],
+        category="Sample",
+        column_searchable_list = ['family'],
         column_editable_list = ['family']
     )
 )
@@ -279,18 +308,18 @@ admin.add_view(
     CustomView(
         Run,
         db.session,
-        category="Analysis",
-        column_searchable_list = ["name", "alias"],
-        column_editable_list = ["name", "alias"]
+        category="Run",
+        column_searchable_list = ['name', 'alias'],
+        column_editable_list = ['name', 'alias']
     )
 )
 admin.add_view(
     CustomView(
         Variant,
         db.session,
-        category="Analysis",
-        column_searchable_list = ["chr", "pos", "ref", "alt", "annotations"],
-        column_editable_list = ["chr", "pos", "ref", "alt", "class_variant"],
+        category="Variant",
+        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'annotations'],
+        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant'],
         form_excluded_columns = ['samples']
     )
 )
@@ -298,52 +327,72 @@ admin.add_view(
     CustomView(
         Comment_variant,
         db.session,
-        category="Analysis",
-        column_searchable_list = ["comment"],
-        column_editable_list = ["comment"]
+        category="Variant",
+        column_searchable_list = ['variant.id', 'user.username', 'comment', 'date'],
+        column_editable_list = ['user', 'comment'],
+        form_excluded_columns = ['variant']
     )
 )
 admin.add_view(
     CustomView(
         Comment_sample,
         db.session,
-        category="Analysis",
-        column_searchable_list = ["comment"],
-        column_editable_list = ["comment"]
+        category="Sample",
+        column_searchable_list = ['sample.samplename', 'user.username', 'comment', 'date'],
+        column_editable_list = ['sample', 'user', 'comment']
     )
 )
 admin.add_view(
     CustomView(
         Var2Sample,
         db.session,
+        category="Variant",
+        column_searchable_list = ['filter', 'variant.id', 'sample.samplename',
+                                  'sample.family.family'],
+        column_editable_list = ['depth', 'allelic_depth', 'reported', 'hide']
+    )
+)
+admin.add_view(
+    CustomView(
+        History,
+        db.session,
         category="Analysis",
-        column_searchable_list = ["filter", "variant.id", "sample.samplename",
-                                  "sample.family.family"],
-        column_editable_list = ["depth", "allelic_depth"]
+        column_searchable_list = ['user.username', 'sample.samplename', 'date',
+                                  'action'],
+        column_editable_list = ['user', 'sample', 'action'],
     )
 )
 admin.add_view(
     CustomView(
         Filter,
         db.session,
-        category="Filter",
-        column_searchable_list = ["filtername", "filter"],
-        column_editable_list = ["filtername"],
-        form_excluded_columns = ['users','samples']
+        category="Analysis",
+        column_searchable_list = ['filtername', 'filter'],
+        column_editable_list = ['filtername'],
+        form_excluded_columns = ['users', 'samples']
     )
 )
+
+
+###############################################################################
+
+
+admin.add_category(name="Genes")
+
+admin.add_sub_category(name="Bed", parent_name="Genes")
+admin.add_sub_category(name="OMIM", parent_name="Genes")
 
 admin.add_view(
     CustomView(
         Transcript,
         db.session,
         category="Genes",
-        column_searchable_list = ["feature", "biotype", "feature_type",
-                                  "symbol", "symbol_source", "gene", "source",
-                                  "protein", "canonical", "hgnc"],
-        column_editable_list = ["biotype", "feature_type", "symbol",
-                                "symbol_source", "gene", "source", "protein",
-                                "canonical", "hgnc"]
+        column_searchable_list = ['feature', 'biotype', 'feature_type',
+                                  'symbol', 'symbol_source', 'gene', 'source',
+                                  'protein', 'canonical', 'hgnc'],
+        column_editable_list = ['biotype', 'feature_type', 'symbol',
+                                'symbol_source', 'gene', 'source', 'protein',
+                                'canonical', 'hgnc']
     )
 )
 
@@ -352,8 +401,8 @@ admin.add_view(
         Region,
         db.session,
         category="Bed",
-        column_searchable_list = ["name", "chr", "start", "stop"],
-        column_editable_list = ["name", "chr", "start", "stop"]
+        column_searchable_list = ['name', 'chr', 'start', 'stop'],
+        column_editable_list = ['name', 'chr', 'start', 'stop']
     )
 )
 
@@ -362,8 +411,8 @@ admin.add_view(
         Bed,
         db.session,
         category="Bed",
-        column_searchable_list = ["name"],
-        column_editable_list = ["name"],
+        column_searchable_list = ['name'],
+        column_editable_list = ['name'],
         form_excluded_columns = ['regions','samples']
     )
 )
@@ -373,9 +422,11 @@ admin.add_view(
     CustomView(
         Phenotype,
         db.session,
-        category="Phenotypes",
-        column_searchable_list = ["phenotypeMimNumber", "phenotype",
-                                  "inheritances", "phenotypeMappingKey"],
+        category="OMIM",
+        column_searchable_list = ['phenotypeMimNumber', 'phenotype',
+                                  'inheritances', 'phenotypeMappingKey'],
+        column_editable_list = ['phenotypeMimNumber', 'phenotype',
+                                'phenotypeMappingKey']
     )
 )
 
@@ -384,11 +435,15 @@ admin.add_view(
     CustomView(
         Omim,
         db.session,
-        category="Phenotypes",
-        column_searchable_list = ["mimNumber", "approvedGeneSymbol",
-                                  "comments", "computedCytoLocation",
-                                  "cytoLocation", "ensemblGeneID",
-                                  "entrezGeneID", "geneSymbols"],
+        category="OMIM",
+        column_searchable_list = ['mimNumber', 'approvedGeneSymbol',
+                                  'comments', 'computedCytoLocation',
+                                  'cytoLocation', 'ensemblGeneID',
+                                  'entrezGeneID', 'geneSymbols'],
+        column_editable_list = ['approvedGeneSymbol',
+                                  'comments', 'computedCytoLocation',
+                                  'cytoLocation', 'ensemblGeneID',
+                                  'entrezGeneID']
     )
 )
 

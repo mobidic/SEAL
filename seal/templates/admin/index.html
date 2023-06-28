@@ -1,0 +1,79 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+    {{ super() }}
+    <h1>Welcome <i>{{ current_user.username }}</i> to the Administration portal</h1>
+    
+    <div class="row">
+        <div class="col-lg-4">
+            <nav>
+                <ul>
+                    <li>Authentication</li>
+                    <ul>
+                        <li><a href="/admin/user">Users</a></li>
+                        <li><a href="/admin/team">Teams</a></li>
+                    </ul>
+                    <li>Analysis</li>
+                    <ul>
+                        <li>Samples</li>
+                        <ul>
+                            <li><a href="/admin/sample">Samples</a></li>
+                            <li><a href="/admin/family">Families</a></li>
+                            <li><a href="/admin/comment_sample">Comments</a></li>
+                        </ul>
+                        <li>Variants</li>
+                        <ul>
+                            <li><a href="/admin/variant">Variants</a></li>
+                            <li><a href="/admin/var2sample">Variant on samples</a></li>
+                            <li><a href="/admin/comment_variant">Comments</a></li>
+                        </ul>
+                        <li><a href="/admin/history">History</a></li>
+                        <li><a href="/admin/filter">Filters</a></li>
+                    </ul>
+                    <li>Genes</li>
+                    <ul>
+                        <li>BED</li>
+                        <ul>
+                            <li><a href="/admin/region">Regions</a></li>
+                            <li><a href="/admin/bed">BED</a></li>
+                        </ul>
+                        <li>OMIM</li>
+                        <ul>
+                            <li><a href="/admin/phenotype">Phenotypes</a></li>
+                            <li><a href="/admin/omim">OMIM</a></li>
+                        </ul>
+                        <li><a href="/admin/transcript">Transcripts</a></li>
+                    </ul>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-lg-4">
+            <div class="list-group">
+                <a href="/admin/user" class="list-group-item">
+                    <span class="badge">{{ cnt['user'] }}</span>
+                    Users
+                </a>
+                <a href="/admin/sample" class="list-group-item">
+                    <span class="badge">{{ cnt['sample'] }}</span>
+                    Samples
+                </a>
+                <a href="/admin/family" class="list-group-item">
+                    <span class="badge">{{ cnt['family'] }}</span>
+                    Families
+                </a>
+                <a href="/admin/variant" class="list-group-item">
+                    <span class="badge">{{ cnt['variant'] }}</span>
+                    Variants
+                </a>
+                <a href="/admin/bed" class="list-group-item">
+                    <span class="badge">{{ cnt['bed'] }}</span>
+                    Bed
+                </a>
+              </div>
+        </div>
+    </div>
+
+
+
+
+{% endblock %}
