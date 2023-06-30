@@ -348,7 +348,6 @@ $(document).ready(function() {
         scrollX:        true,
         scrollCollapse: true,
         scroller:         true,
-        fixedHeader:  true,
         order: [[ 2, "asc" ]],
         fixedColumns: {
             left:2,
