@@ -1532,7 +1532,7 @@ function openDetailsVariantModal(id, sample_id) {
             '<th class="w3-flat-silver control-size-75 w3-center">Affected</th>'+
             '<th class="w3-flat-silver control-size-75 w3-center">Depth</th>'+
             '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
-            '<th class="w3-flat-silver control-size-100 w3-center">Allelic Depth</th>'+
+            '<th class="w3-flat-silver control-size-100 w3-center">Allelic frequencie</th>'+
             '<th class="w3-flat-silver control-size-100 w3-center">Reported</th>'+
         '</tr></thead>';
         inSeal = inSeal + '<tbody>';
