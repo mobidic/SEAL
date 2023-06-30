@@ -1279,8 +1279,9 @@ def json_bed(id):
 
 
 @app.route("/json/history/<string:type>/<int:id>")
+@app.route("/json/history/")
 @login_required
-def json_history(type, id):
+def json_history(type=None, id=None):
     """
     Endpoint for retrieving the history of either a sample or a user.
 
@@ -1304,6 +1305,8 @@ def json_history(type, id):
         historics = History.query.filter_by(sample_ID= id)
     elif type == "user":
         historics = History.query.filter_by(user_ID= id)
+    else:
+        historics = History.query.all()
     historics_list = list()
     for history in historics:
         historics_list.append({
