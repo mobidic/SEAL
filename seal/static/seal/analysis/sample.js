@@ -1225,11 +1225,14 @@ function update_filter() {
     }
 }
 
-function openHelpModal(title="Some help", content='Some Content', footer='footer') {
-    $('#help-modal-title').html(title);
-    $('#help-modal-content').html(content);
-    $('#help-modal-footer').html(footer);
-    $('#help-modal').toggle();
+function openHelp(title="Some help", content='Some Content', footer='') {
+    Swal.fire({
+        icon: 'question',
+        title: title,
+        html: '<div class="w3-left-align">'+ content + '</div>',
+        footer: '<div class="w3-left-align">'+ footer + '</div>',
+        width: 'max(50%, 400px)'
+    })
 }
 
 function htmlLink(data) {
@@ -1237,28 +1240,33 @@ function htmlLink(data) {
 }
 
 function openMD(id) {
-    $('#message-mobidetails').html('<span><i class="fas fa-cog fa-spin"></i> Checking availability in MobiDetails...</span>');
-    $('#MD-modal-header').addClass('w3-flat-turquoise');
-    $('#MD-modal-header').removeClass('w3-flat-alizarin');
-    $('#MD-message-modal').toggle();
-    $.ajax({
-        type: 'POST',
-        url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
-        data: {
-            variant_chgvs: encodeURIComponent(id),
-            caller: 'cli',
-            api_key: current_user_api_key_md
+    Swal.fire({
+        title: 'Go to MobiDetails!',
+        html: 'Please wait.<br/><b>This page will be clos automatically.</b>',
+        didOpen: () => {
+            Swal.showLoading()
+            $.ajax({
+                type: 'POST',
+                url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
+                data: {
+                    variant_chgvs: encodeURIComponent(id),
+                    caller: 'cli',
+                    api_key: current_user_api_key_md
+                }
+            })
+            .done(function(data) {
+                const b = Swal.getHtmlContainer().querySelector('b');
+                if (! data.url) {
+                    const b = Swal.getHtmlContainer().querySelector('b')
+                    b.textContent = '<i class="fas fa-times-circle w3-text-flat-alizarin"></i> ' + data.mobidetails_error;
+                } else {
+                    b.textContent = 'Redirection to <a href="' + data.url + '" target="_blank" style="text-decoration:underline">' + data.url + '</a>';
+                    window.open(data.url);
+                    Swal.close()
+                }
+            });
         }
-    })
-    .done(function(data) {
-        if (! data.url) {
-            $('#message-mobidetails').html('<i class="fas fa-times-circle w3-text-flat-alizarin"></i> ' + data.mobidetails_error);
-            $('#MD-modal-header').addClass('w3-flat-alizarin');
-        } else {
-            $('#message-mobidetails').html('Redirection to <a href="' + data.url + '" target="_blank" style="text-decoration:underline">' + data.url + '</a>');
-            window.open(data.url);
-        }
-    });
+      })
 }
 
 function openDetailsVariantModal(id, sample_id) {
