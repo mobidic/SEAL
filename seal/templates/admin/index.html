@@ -1,11 +1,17 @@
 {% extends 'admin/master.html' %}
 
+{% block head_css %}
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
+{% endblock %}
+
 {% block body %}
     {{ super() }}
     <h1>Welcome <i>{{ current_user.username }}</i> to the Administration portal</h1>
     
     <div class="row">
         <div class="col-lg-4">
+            <h3>Tree</h3>
             <nav>
                 <ul>
                     <li>Authentication</li>
@@ -48,6 +54,7 @@
             </nav>
         </div>
         <div class="col-lg-4">
+            <h3>Main tables</h3>
             <div class="list-group">
                 <a href="/admin/user" class="list-group-item">
                     <span class="badge">{{ cnt['user'] }}</span>
@@ -69,11 +76,55 @@
                     <span class="badge">{{ cnt['bed'] }}</span>
                     Bed
                 </a>
-              </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h3>Last actions</h3>
+            <table id="tableHistorySample" class="table">
+                <thead>
+                    <tr>
+                        <th class="no-sort">User</th>
+                        <th class="no-sort">Action</th>
+                        <th class="">Date</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
     </div>
 
+{% endblock %}
 
+{% block tail %}
+    {{ super() }}
 
-
+    <script type="text/javascript" src="{{ url_for('static', filename='DataTables/datatables.min.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#tableHistorySample').DataTable({
+                searching:true,
+                processing: true,
+                lengthMenu: [ 10 ],
+                dom: 'tip',
+                order: [[ 2, "desc" ]],
+                columnDefs: [
+                    {
+                        orderable: false,
+                        targets:  "no-sort"
+                    }
+                ],
+                ajax: '/json/history',
+                columns: [
+                    {
+                        data: "user",
+                    },
+                    {
+                        data: "action",
+                    },
+                    {
+                        data: "date",
+                    }
+                ]
+            });
+        });
+    </script>
 {% endblock %}

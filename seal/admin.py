@@ -63,6 +63,10 @@ class MyAdminIndexView(AdminIndexView):
         """
         return redirect(url_for('login', next=request.url))
 
+    def is_visible(self):
+        # This view won't appear in the menu structure
+        return False
+
 
 class CustomView(ModelView):
     """
@@ -446,5 +450,3 @@ admin.add_view(
                                   'entrezGeneID']
     )
 )
-
-admin.add_link(MenuLink(name='Home Page', url='/', category='Links'))

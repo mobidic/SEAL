@@ -1,0 +1,15 @@
+{% extends admin_base_template %}
+
+{% block head_css %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
+{% endblock %}
+
+{% block brand %}
+    <a class="navbar-brand" href="{{ url_for('index') }}"><span class="icon-seal"></span> SEAL</a>
+    <ul class="nav navbar-nav navbar-left">
+        <li>
+            <a class="nav navbar-nav navbar-left" href="{{ admin_view.admin.url }}">{{ admin_view.admin.name }}</a>
+        </li>
+    </ul>
+{% endblock %}
