@@ -26,3 +26,6 @@ div.dataTables_processing span{
     background-color: rgb(255,255,255,0.5);
     border-radius: 10px;
 }
+#barPopulation > div > div > svg:nth-child(1) > g.cartesianlayer > g > g.plot > g > g > g > g > path {
+    clip-path: inset(0% 0% round 50px 50px 0% 0%);
+}

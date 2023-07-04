@@ -350,10 +350,7 @@
             <div id="population" class="w3-container detail">
                 <h3>Population</h3>
                 <div class="w3-row">
-                    <div id='radarPopulation' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
-                    <div class="w3-col l6 m12 s12">
-                        <div id="tableScoresPopulation"></div>
-                    </div>
+                    <div id='barPopulation' class=""><!-- Plotly chart will be drawn inside this DIV --></div>
                 </div>
             </div>
 
@@ -422,6 +419,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='sweetalert/sweetalert2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='select2/js/select2.full.min.js') }}"></script>
     <script src="{{ url_for('static', filename='DOMPurify/purify.min.js') }}"></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
 
     <script type="text/javascript">
         var sample_filter_id = "{{ sample.filter_id }}";

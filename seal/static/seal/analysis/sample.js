@@ -390,7 +390,6 @@ $(document).ready(function() {
                         franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
                         gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">G</span></span> GnomAD</a> ';
                         return "<div class='w3-tiny'>" + mobidetails + franklin + "<br />" + gnomad + "</div>";
-                        return mobidetails + franklin + gnomad;
                     }
                 }
             },
@@ -1339,6 +1338,7 @@ function openDetailsVariantModal(id, sample_id) {
         }
 
         var allScoresPopulation = {
+            "gnomADg_AF": null,
             "gnomADg_AF_AFR": null,
             "gnomADg_AF_AMR": null,
             "gnomADg_AF_ASJ": null,
@@ -1563,7 +1563,6 @@ function openDetailsVariantModal(id, sample_id) {
             }
             teams=""
             for (i in data["samples"][x]["teams"]) {
-                console.log(i);
                 teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data["samples"][x]["teams"][i]["color"] + '">' + data["samples"][x]["teams"][i]["teamname"] + '</span> ';
             };
             inSeal = inSeal + '<tr>'+
@@ -1621,21 +1620,6 @@ function openDetailsVariantModal(id, sample_id) {
         tableScoresConservation = tableScoresConservation + '</table>';
         $("#tableScoresConservation").html(tableScoresConservation);
 
-        tableScoresPopulation = '<table class="table-modal w3-table-all w3-tiny w3-card" cellpadding="5" cellspacing="0" border="0">';
-        tableScoresPopulation = tableScoresPopulation + '<thead class="w3-flat-silver"><tr>'+
-            '<th class="w3-flat-silver">Name</th>'+
-            '<th class="w3-flat-silver">Score</th>'+
-        '</tr></thead>';
-        tableScoresPopulation = tableScoresPopulation + '<tbody>';
-        for (nameScore in allScoresPopulation) {
-            tableScoresPopulation = tableScoresPopulation + '<tr>'+
-                '<td class="w3-text-black showTitle">'+nameScore+'</td>'+
-                '<td class="w3-text-black showTitle">'+allScoresPopulation[nameScore]+'</td>'+
-            '</tr>';
-        };
-        tableScoresPopulation = tableScoresPopulation + '</tbody>';
-        tableScoresPopulation = tableScoresPopulation + '</table>';
-        $("#tableScoresPopulation").html(tableScoresPopulation);
         $('.table-modal').DataTable();
 
         wi1 = window.screen.width;
@@ -1647,8 +1631,8 @@ function openDetailsVariantModal(id, sample_id) {
         }
 
 
-        radarData = [];
-        radarLabels = [];
+        var radarData = [];
+        var radarLabels = [];
         for (nameScore in allScoresPredictions) {
             if (allScoresPredictions[nameScore] != null) {
                 radarData.push(allScoresPredictions[nameScore]);
@@ -1657,7 +1641,7 @@ function openDetailsVariantModal(id, sample_id) {
         };
         radarData.push(radarData[0]);
         radarLabels.push(radarLabels[0]);
-        data1 = [{
+        var data_missense = [{
             type: 'scatterpolar',
             r: [
                 Math.max(allScoresPredictions["CADD_raw_rankscore"], 0),
@@ -1688,7 +1672,7 @@ function openDetailsVariantModal(id, sample_id) {
             fill: 'toself'
         }]
 
-        layout = {
+        var layout_radar = {
             width: apply,
             polar: {
                 radialaxis: {
@@ -1699,8 +1683,8 @@ function openDetailsVariantModal(id, sample_id) {
             showlegend: false
         }
 
-        radarData = [];
-        radarLabels = [];
+        var radarData = [];
+        var radarLabels = [];
         for (nameScore in allScoresConservation) {
             radarData.push(Math.max(allScoresConservation[nameScore], 0));
             radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
@@ -1708,54 +1692,56 @@ function openDetailsVariantModal(id, sample_id) {
         radarData.push(radarData[0]);
         radarLabels.push(radarLabels[0]);
 
-        data2 = [{
+        var data_cons = [{
             type: 'scatterpolar',
             r: radarData,
             theta: radarLabels,
             fill: 'toself'
         }]
+        var config = {responsive: true}
+        
+        Plotly.newPlot("radarMissense", data_missense, layout_radar, config)
+        Plotly.newPlot("radarConservation", data_cons, layout_radar, config)
 
-        layout2 = {
-            width: apply,
-            polar: {
-                radialaxis: {
-                    visible: true,
-                    range: [0, 1]
-                }
-            },
-            showlegend: false
-        }
+        gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + id + '" class="w3-text-blue w3-hover-text-indigo" style="cursor: pointer;">GnomAD</a> ';
+        $("#population h3").html("Population (" + gnomad + ")");
 
-        radarData = [];
-        radarLabels = [];
+        var gnomad_data = [];
+        var gnomad_labels = [];
         for (nameScore in allScoresPopulation) {
-            radarData.push(Math.max(allScoresPopulation[nameScore], 0));
-            radarLabels.push(nameScore.replace(/_rankscore$/gm,''));
+            gnomad_data.push(Math.max(allScoresPopulation[nameScore], 0));
+            gnomad_labels.push(nameScore.replace(/_rankscore$|^gnomADg_|AF_/gm,'').replace(/^AF$/gm,'ALL'));
         };
-        radarData.push(radarData[0]);
-        radarLabels.push(radarLabels[0]);
 
-        data3 = [{
-            type: 'scatterpolar',
-            r: radarData,
-            theta: radarLabels,
-            fill: 'toself'
-        }]
+        var data_gnomad = [
+            {
+                x: gnomad_labels,
+                y: gnomad_data,
+                type: 'bar',
+                text: gnomad_data.map(function (k) { if (k && k< 0.01) { return k.toExponential(2); } else if(k){return k.toFixed(4);} else {return 'NA'}}),
+                textposition:'outside',
+                textfont: {
+                    size: 14, 
+                },
+                width: 0.15,
+                constraintext: 'none',
+            }
+        ];
 
-        layout3 = {
-            width: apply,
-            polar: {
-                radialaxis: {
-                    visible: true,
-                    range: [0, 1]
-                }
+        layout_bar = {
+            hovermode: false,
+            width: $("#modal-details-variant div header").width(),
+            margin: {
+              l: 50,
+              r: 0,
+              b: 50,
+              t: 0,
+              pad: 4
             },
-            showlegend: false
+            yaxis: {fixedrange: true},
+            xaxis : {fixedrange: true}
         }
-
-        Plotly.newPlot("radarMissense", data1, layout)
-        Plotly.newPlot("radarConservation", data2, layout2)
-        Plotly.newPlot("radarPopulation", data3, layout3)
+        Plotly.newPlot('barPopulation', data_gnomad, layout_bar, config); 
 
         var traceMES = {
             x: ['Ref', 'Alt'],
