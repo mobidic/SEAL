@@ -1029,35 +1029,28 @@ def json_variants(id, idbed=False, version=-1):
                 annot["preferred"] = preferred_transcript
                 main_annot = annot
                 continue
-
-        omims = Omim.query.filter_by(approvedGeneSymbol=main_annot["SYMBOL"])
+        omims = Omim.query.filter_by(approvedGeneSymbol=main_annot["SYMBOL"]).all()
         phenotypes = list()
-        if omims.count():
-            for omim in omims.all():
-                for pheno in omim.phenotypes:
-                    phenotypes.append({
-                        "id": pheno.id,
-                        "phenotypeMimNumber": pheno.phenotypeMimNumber,
-                        "phenotype": pheno.phenotype,
-                        "inheritances": str(pheno.inheritances),
-                        "phenotypeMappingKey": pheno.phenotypeMappingKey
-                    })
+        for omim in omims:
+            for pheno in omim.phenotypes:
+                phenotypes.append({
+                    "id": pheno.id,
+                    "phenotypeMimNumber": pheno.phenotypeMimNumber,
+                    "phenotype": pheno.phenotype,
+                    "inheritances": str(pheno.inheritances),
+                    "phenotypeMappingKey": pheno.phenotypeMappingKey
+                })
         members = []
-        if sample.familyid is None:
-            cnt_family = None
-        else:
-            request_family = Sample.query.outerjoin(Var2Sample).filter(
+        if sample.familyid is not None:
+            request_family = Sample.query.filter(
                 and_(
                     Sample.familyid == sample.familyid,
-                    Sample.status >= 1,
-                    Sample.id != sample.id,
-                    Var2Sample.variant_ID == var2sample.variant_ID
+                    Sample.status >= 1,Sample.id != sample.id
                 )
-            )
-            cnt_family = request_family.count()
-            if cnt_family >= 0:
-                for member in request_family:
-                    members.append(member.samplename)
+            ).outerjoin(Var2Sample)\
+                .filter(Var2Sample.variant_ID == var2sample.variant_ID)
+            for member in request_family:
+                members.append(member.samplename)
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
 
@@ -1076,12 +1069,11 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
                 "occurrences": len(variant.samples),
-                "occurences_family": cnt_family,
+                "occurences_family": len(members),
                 "family_members": members
             },
             "phenotypes": phenotypes
         })
-
     return jsonify(variants)
 
 
