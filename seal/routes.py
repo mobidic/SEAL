@@ -1366,11 +1366,8 @@ def json_variant(id, version=-1, sample=None):
             - user: The username of the user that have done the action.
     """
     variant = Variant.query.get(id)
-    if sample is None:
-        s_teams = None
-    else:
+    if sample is not None:
         sample = Sample.query.get(sample)
-        s_teams = sample.teams
 
     samples = list()
     for v2s in variant.samples:
@@ -1383,7 +1380,6 @@ def json_variant(id, version=-1, sample=None):
             if sample and v2s.sample.id == sample.id:
                 current = True
             allelic_frequency = v2s.allelic_depth / v2s.depth
-            print(v2s.sample.teams)
             samples.append({
                 "samplename": v2s.sample.samplename,
                 "affected": v2s.sample.affected,
