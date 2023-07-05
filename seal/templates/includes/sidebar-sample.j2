@@ -26,21 +26,22 @@
             <hr style="display: block; height: 1px;
     border: 0; border-top: 1px solid #ccc;
     margin: 1em 0; padding: 0; ">
-            {% if sample.family %}
             <h6>
-                <div class="w3-cell-row">
+                <div id="sample-family-sidebar" class="w3-cell-row">
                     <div class="w3-center w3-container w3-cell" style="width:40px;padding: 0px !important;">
                         <i class="fas fa-users"></i>
                     </div>
-                    <div class="w3-container w3-cell">
-                        <i>{{ sample.family.family }}</i>
+                    <div class="w3-container w3-cell" id="edit-samplename">
+                        <input id="edit-family" class="w3-input w3-border" minlength="2" maxlength="20" type="text"  style="width:210px!important;" placeholder="No family" value="{{ sample.family.family }}">
+                    </div>
+                    <div class="w3-center w3-container w3-cell" style="width:20px;padding: 0px !important;">
+                        <i class="fas fa-check-square w3-text-flat-green-sea w3-hover-text-flat-turquoise" style="cursor: pointer;" onclick="edit_family()"></i>
                     </div>
                 </div>
             </h6>
             <hr style="display: block; height: 1px;
     border: 0; border-top: 1px solid #ccc;
     margin: 1em 0; padding: 0; ">
-            {% endif %}
             {% if sample.run %}
             <h6>
                 <div class="w3-cell-row">
