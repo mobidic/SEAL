@@ -8,6 +8,8 @@ from sqlalchemy import select, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.dialects import postgresql
+
 
 
 ################################################################################
@@ -518,7 +520,7 @@ class Omim(db.Model):
     cytoLocation = db.Column(db.String(50))
     ensemblGeneID = db.Column(db.String(50))
     entrezGeneID = db.Column(db.String(50))
-    geneSymbols = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
+    geneSymbols = db.Column(postgresql.ARRAY(db.String(30)), default=list())
 
     phenotypes = db.relationship(
         'Phenotype', secondary=phenotype2OMIM, lazy='subquery',

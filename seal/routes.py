@@ -12,7 +12,7 @@ from flask import (flash, jsonify, redirect, render_template, request, url_for,
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_
+from sqlalchemy import and_, or_, exists
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
@@ -1029,7 +1029,7 @@ def json_variants(id, idbed=False, version=-1):
                 annot["preferred"] = preferred_transcript
                 main_annot = annot
                 continue
-        omims = Omim.query.filter_by(approvedGeneSymbol=main_annot["SYMBOL"]).all()
+        omims = Omim.query.filter(or_(Omim.geneSymbols.contains([main_annot["SYMBOL"]]), Omim.approvedGeneSymbol==main_annot["SYMBOL"])).all()
         phenotypes = list()
         for omim in omims:
             for pheno in omim.phenotypes:
@@ -1068,7 +1068,7 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_depth": f"{var2sample.allelic_depth}",
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
-                "occurrences": len(variant.samples),
+                "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
                 "occurences_family": len(members),
                 "family_members": members
             },
