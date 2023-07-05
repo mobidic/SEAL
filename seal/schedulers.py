@@ -549,7 +549,7 @@ def importvcf():
                             annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
 
                         annotations[-1]["ANN"].append(annot)
-                    variant.annotation = annotations
+                    variant.annotations = annotations
 
                 # If duplicate variant for sample :
                 #   - catch exception
