@@ -1699,7 +1699,7 @@ function openDetailsVariantModal(id, sample_id) {
             fill: 'toself'
         }]
         var config = {responsive: true}
-        
+
         Plotly.newPlot("radarMissense", data_missense, layout_radar, config)
         Plotly.newPlot("radarConservation", data_cons, layout_radar, config)
 
@@ -1721,7 +1721,7 @@ function openDetailsVariantModal(id, sample_id) {
                 text: gnomad_data.map(function (k) { if (k && k< 0.01) { return k.toExponential(2); } else if(k){return k.toFixed(4);} else {return 'NA'}}),
                 textposition:'outside',
                 textfont: {
-                    size: 14, 
+                    size: 14,
                 },
                 width: 0.15,
                 constraintext: 'none',
@@ -1741,7 +1741,7 @@ function openDetailsVariantModal(id, sample_id) {
             yaxis: {fixedrange: true},
             xaxis : {fixedrange: true}
         }
-        Plotly.newPlot('barPopulation', data_gnomad, layout_bar, config); 
+        Plotly.newPlot('barPopulation', data_gnomad, layout_bar, config);
 
         var traceMES = {
             x: ['Ref', 'Alt'],
@@ -1946,7 +1946,7 @@ function edit_name() {
                     $( "#error-message-edit-name" ).remove();
                     msg = "<p id='error-message-edit-name' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
                     $( "#sample-name-sidebar" ).after( msg );
-                }  
+                }
             })
         }
     })
@@ -2134,7 +2134,7 @@ function applied_panel(id, sample_id) {
         .clear()
         .draw();
     $('td.dataTables_empty', $('#variants')).html('<div class="animation-bar-1"><span style="width:100%"></span></div>');
-    
+
     $.ajax({
         type: "POST",
         url: "/toggle/sample/panel",
