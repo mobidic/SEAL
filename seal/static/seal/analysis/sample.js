@@ -458,6 +458,12 @@ $(document).ready(function() {
                 render: {
                     _: function ( data, type, row ) {
                         if (data == null) {
+                            return "NA";
+                        }
+                        return data;
+                    },
+                    display: function ( data, type, row ) {
+                        if (data == null) {
                             return "<i>NA</i>";
                         }
                         return data;
@@ -475,6 +481,15 @@ $(document).ready(function() {
                 data: "annotations",
                 render: {
                     _: function ( data, type, row ) {
+                        if (data["EXON"] == null) {
+                            if(data["INTRON"] == null) {
+                                return "NA";
+                            }
+                            return data["INTRON"];
+                        }
+                        return data["EXON"];
+                    },
+                    display: function ( data, type, row ) {
                         if (data["EXON"] == null) {
                             if(data["INTRON"] == null) {
                                 return "<i>NA</i>";
@@ -690,7 +705,8 @@ $(document).ready(function() {
                     _: function ( data, type, row, meta ) {
                         inheritances = ""
                         for (d in data) {
-                            inheritances = inheritances + data[d]["inheritances"] + ' | ';
+                            title=data[d]["phenotype"];
+                            inheritances = inheritances + data[d]["inheritances"] + ' (' + title + ') | ';
                         }
                         return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
                     },
