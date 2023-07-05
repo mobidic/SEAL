@@ -146,3 +146,9 @@ flask --app seal --debug db upgrade
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```
+
+# License
+
+GNU General Public License v3.0 or later
+
+See [COPYING](COPYING) to see the full text.
