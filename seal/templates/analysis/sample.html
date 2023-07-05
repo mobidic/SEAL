@@ -3,6 +3,7 @@
 {% block static %}
     <link href="{{ url_for('static', filename='select2/css/select2.min.css') }}" rel="stylesheet" />
     <link href="{{ url_for('static', filename='sweetalert/sweetalert2.min.css') }}" rel="stylesheet" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
     {% include 'includes/loading_bar.dt.j2' %}
 
     <link href="{{ url_for('static', filename='seal/analysis/sample.css') }}" rel="stylesheet" type="text/css">
@@ -415,6 +416,7 @@
 
 
 {% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='plotly-2.3.1.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='sweetalert/sweetalert2.min.js') }}"></script>
     <script src="{{ url_for('static', filename='select2/js/select2.full.min.js') }}"></script>
