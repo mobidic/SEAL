@@ -101,7 +101,7 @@ $(document).ready(function() {
                                     "text": '<i><b>Archived</b></i>',
                                 },
                             }
-                            if (!data.status || !(data.status in status_sample)) {
+                            if (!(data.status in status_sample)) {
                                 data.status = -1
                             }
 
