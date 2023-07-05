@@ -1463,6 +1463,52 @@ def edit_name():
     return "ok"
 
 
+@app.route("/edit/sample/family", methods=['POST'])
+@login_required
+def edit_family():
+    """
+    Edits the family associated to a sample.
+
+    This function handles a POST request to edit the family associated to a
+    sample. It gets the new name family from the request's form data and
+    updates the `family` field of the sample in the database. It also creates a
+    new `History` record in the database to log the action.
+
+    Returns:
+        str: "No Changes" if the new name is the same as the old name, "ok" if
+             the update was successful.
+
+    Raises:
+        InvalidAPIUsage: If the family name is less than 2 or more than 20
+                         characters long.
+    """
+    sample_id = request.form["sample_id"]
+    new_family = request.form["new_family"]
+    sample = Sample.query.get(sample_id)
+
+    if not new_family and sample.familyid:
+        history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.family.family}' (id: {sample.familyid})")
+        sample.familyid = None
+    else:
+        family = Family.query.filter(Family.family == new_family).first()
+        if not family:
+            family = Family(family=new_family)
+            db.session.add(family)
+            db.session.commit()
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"New Family created : '{family.family}' (id: {family.id})")
+            db.session.add(history)
+        if sample.family:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family edited : '{sample.family.family}' (id: {sample.familyid}) -> '{family.family}' (id: {family.id})")
+        else:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family added : '{family.family}' (id: {family.id})")
+        sample.familyid = family.id
+
+    db.session.add(history)
+    db.session.commit()
+
+    return "ok"
+
+
 ###############################################################################
 
 
