@@ -587,7 +587,7 @@ def sample(id):
 
     count_hide=0
 
-    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == 36, Var2Sample.hide == True):
+    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == id, Var2Sample.hide == True):
         if v.inBed():
             count_hide+=1
 
