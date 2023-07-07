@@ -477,7 +477,7 @@ $(document).ready(function() {
                 }
             },
             {
-                className: 'showTitle w3-border-right ',
+                className: 'w3-border-right ',
                 data: "annotations",
                 render: {
                     _: function ( data, type, row ) {
@@ -494,9 +494,9 @@ $(document).ready(function() {
                             if(data["INTRON"] == null) {
                                 return "<i>NA</i>";
                             }
-                            return data["INTRON"];
+                            return "<i title='Intron " + data["INTRON"] + "'>" + data["INTRON"] + "</i>";
                         }
-                        return data["EXON"];
+                        return "<b title='Exon " + data["EXON"] + "'>" + data["EXON"] + "</b>";
                     },
                     sort: function ( data, type, row ) {
                         prefix = data
@@ -1134,6 +1134,7 @@ $(document).ready(function() {
 } );
 
 function hide_message(count_hide) {
+    console.log(count_hide)
     if (count_hide > 0) {
         $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> <span id="cpt-hide-row">' + count_hide + '</span> row(s) hidden (<b class="w3-hover-text-blue" onclick="showAllRows()" style="cursor:pointer">click here to show all</b>)<span>');
     } else {
