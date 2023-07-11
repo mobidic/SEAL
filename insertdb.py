@@ -25,7 +25,7 @@ from seal.models import User, Filter
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--password-admin', help='Password for admin user', default="password")
+parser.add_argument('-p', '--password', help='Password for admin user', default="password")
 args = parser.parse_args()
 
 db.create_all()
