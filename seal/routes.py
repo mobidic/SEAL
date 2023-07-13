@@ -1633,14 +1633,14 @@ def toggle_sampleIndex():
     """
     sample_id = request.form["sample_id"]
     sample = Sample.query.get(sample_id)
-    old = sample.index
-    sample.index = False if sample.index else True
+    old = sample.patient.index
+    sample.patient.index = False if sample.patient.index else True
 
     history = History(
         sample_ID=sample.id, 
         user_ID=current_user.id, 
         date=datetime.now(), 
-        action=f"Toggle index : '{str(old)}' -> '{str(sample.index)}'")
+        action=f"Toggle index : '{str(old)}' -> '{str(sample.patient.index)}'")
     db.session.add(history)
     db.session.commit()
 
