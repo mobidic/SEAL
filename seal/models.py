@@ -152,12 +152,39 @@ class History(db.Model):
     action = db.Column(db.Text, nullable=False)
 
 
+class Family(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    family = db.Column(db.String(20), unique=True, nullable=False)
+    patients = relationship("Patient")
+
+    def __repr__(self):
+        return f"Family('{self.family}')"
+
+    def __str__(self):
+        return self.family
+
+
+class Patient(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    alias = db.Column(db.String(30), unique=False, nullable=True)
+    samples = relationship("Sample")
+    affected = db.Column(db.Boolean(), default=False)
+    index = db.Column(db.Boolean(), default=False)
+
+    familyid = db.Column(db.Integer, db.ForeignKey('family.id'))
+    family = relationship("Family", back_populates="patients")
+
+    def __repr__(self):
+        return f"Patient('{self.id}','{self.alias}')"
+
+    def __str__(self):
+        return f"{self.id}" if not self.alias else f"{self.id} - {self.alias}"
+
+
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(120), unique=False, nullable=False)
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
-    affected = db.Column(db.Boolean(), default=False)
-    index = db.Column(db.Boolean(), default=False)
 
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=True)
     filter = relationship("Filter", back_populates="samples")
@@ -165,8 +192,8 @@ class Sample(db.Model):
     bed_id = db.Column(db.Integer, db.ForeignKey('bed.id'), nullable=True)
     bed = relationship("Bed", back_populates="samples")
 
-    familyid = db.Column(db.Integer, db.ForeignKey('family.id'))
-    family = relationship("Family", back_populates="samples")
+    patient_id = db.Column(db.Integer, db.ForeignKey('patient.id'))
+    patient = relationship("Patient", back_populates="samples")
 
     runid = db.Column(db.Integer, db.ForeignKey('run.id'))
     run = relationship("Run", back_populates="samples")
@@ -179,7 +206,7 @@ class Sample(db.Model):
     comments = relationship("Comment_sample")
 
     def __repr__(self):
-        return f"Sample('{self.samplename}','{self.family}','{self.run}','{self.status}','{self.affected}','{self.index}')"
+        return f"Sample('{self.samplename}','{self.patient}','{self.run}','{self.status}','{self.affected}','{self.index}')"
 
     def __str__(self):
         return self.samplename
@@ -192,18 +219,6 @@ class Sample(db.Model):
     def lastAction(cls):
         return select(func.max(History.date)).\
             where(History.sample_ID==cls.id).scalar_subquery()
-
-
-class Family(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    family = db.Column(db.String(20), unique=True, nullable=False)
-    samples = relationship("Sample")
-
-    def __repr__(self):
-        return f"Family('{self.family}')"
-
-    def __str__(self):
-        return self.family
 
 
 class Run(db.Model):
