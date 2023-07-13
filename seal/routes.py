@@ -1658,14 +1658,14 @@ def toggle_sampleAffected():
     """
     sample_id = request.form["sample_id"]
     sample = Sample.query.get(sample_id)
-    old = sample.affected
-    sample.affected = False if sample.affected else True
+    old = sample.patient.affected
+    sample.patient.affected = False if sample.patient.affected else True
 
     history = History(
         sample_ID=sample.id, 
         user_ID=current_user.id, 
         date=datetime.now(), 
-        action=f"Toggle affected : '{str(old)}' -> '{str(sample.affected)}'")
+        action=f"Toggle affected : '{str(old)}' -> '{str(sample.patient.affected)}'")
     db.session.add(history)
     db.session.commit()
 
