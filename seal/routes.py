@@ -1504,9 +1504,11 @@ def edit_family():
     new_family = request.form["new_family"]
     sample = Sample.query.get(sample_id)
 
-    if not new_family and sample.familyid:
-        history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.family.family}' (id: {sample.familyid})")
-        sample.familyid = None
+    if not new_family and sample.patient and sample.patient.familyid:
+        history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.patient.family.family}' (id: {sample.patient.familyid})")
+        sample.patient.familyid = None
+    elif (not new_family and not sample.patient.family) or (sample.patient.family and sample.patient.family.family == new_family):
+        return "ok"
     else:
         family = Family.query.filter(Family.family == new_family).first()
         if not family:
@@ -1515,11 +1517,11 @@ def edit_family():
             db.session.commit()
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"New Family created : '{family.family}' (id: {family.id})")
             db.session.add(history)
-        if sample.family:
-            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family edited : '{sample.family.family}' (id: {sample.familyid}) -> '{family.family}' (id: {family.id})")
+        if sample.patient and sample.patient.family:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family linked : '{sample.patient.family.family}' (id: {sample.patient.familyid}) -> '{family.family}' (id: {family.id})")
         else:
-            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family added : '{family.family}' (id: {family.id})")
-        sample.familyid = family.id
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family linked : '{family.family}' (id: {family.id})")
+        sample.patient.familyid = family.id
 
     db.session.add(history)
     db.session.commit()
