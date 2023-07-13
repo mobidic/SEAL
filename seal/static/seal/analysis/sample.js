@@ -1543,6 +1543,8 @@ function openDetailsVariantModal(id, sample_id) {
 
         inSeal = '<table class="table-modal-large w3-table-all w3-small w3-card" cellpadding="5" cellspacing="0" border="0">';
         inSeal = inSeal + '<thead class="w3-flat-silver"><tr>'+
+            '<th class="w3-flat-silver control-size-100">Patient ID</th>'+
+            '<th class="w3-flat-silver control-size-100">Patient Alias</th>'+
             '<th class="w3-flat-silver control-size-100">Sample</th>'+
             '<th class="w3-flat-silver control-size-100">Family</th>'+
             '<th class="w3-flat-silver control-size-100">Teams</th>'+
@@ -1568,12 +1570,19 @@ function openDetailsVariantModal(id, sample_id) {
             }
             if (data["samples"][x]["current_family"]) {
                 family = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["family"] + '</span></b>';
-                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
             } else {
                 family = data["samples"][x]["family"];
-                sample = data["samples"][x]["samplename"];
             }
-            style=""
+            if (data["samples"][x]["current_patient"]) {
+                patient_id = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["patient"]["id"] + '</span></b>';
+                patient_alias = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["patient"]["alias"] + '</span></b>';
+            } else {
+                patient_id = data["samples"][x]["patient"]["id"];
+                patient_alias = data["samples"][x]["patient"]["alias"];
+            }
+            sample = data["samples"][x]["samplename"];
+            console.log(patient_id);
+            style="";
             if (data["samples"][x]["current"]) {
                 sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
                 style =  "style='background-color:#85b3d5'"
@@ -1583,6 +1592,8 @@ function openDetailsVariantModal(id, sample_id) {
                 teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data["samples"][x]["teams"][i]["color"] + '">' + data["samples"][x]["teams"][i]["teamname"] + '</span> ';
             };
             inSeal = inSeal + '<tr>'+
+                '<td class="control-size-100" ' + style + '>' + patient_id + '</td>'+
+                '<td class="control-size-100" ' + style + '>' + patient_alias+ '</td>'+
                 '<td class="control-size-100" ' + style + '>' + sample + '</td>'+
                 '<td class="control-size-100" ' + style + '>' + family+ '</td>'+
                 '<td class="control-size-100" ' + style + '>' + teams + '</td>'+

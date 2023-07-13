@@ -1394,19 +1394,27 @@ def json_variant(id, version=-1, sample=None):
     samples = list()
     for v2s in variant.samples:
         current_family = False
+        current_patient = False
         current = False
         if v2s.sample.status >= 1:
-            if (sample and v2s.sample.familyid == sample.familyid 
-                    and sample.familyid is not None):
+            if (sample and sample.patient and v2s.sample.patient and v2s.sample.patient.familyid == sample.patient.familyid 
+                    and sample.patient.familyid is not None):
                 current_family = True
+            if (sample and sample.patient and v2s.sample.patient and v2s.sample.patient_id == sample.patient_id):
+                current_patient = True
             if sample and v2s.sample.id == sample.id:
                 current = True
             allelic_frequency = v2s.allelic_depth / v2s.depth
             samples.append({
+                "patient": {
+                    "id": v2s.sample.patient_id,
+                    "alias": v2s.sample.patient.alias if v2s.sample.patient else None
+                },
                 "samplename": v2s.sample.samplename,
-                "affected": v2s.sample.affected,
-                "family": v2s.sample.family.family if v2s.sample.family else "",
+                "affected": v2s.sample.patient.affected,
+                "family": v2s.sample.patient.family.family if (v2s.sample.patient and v2s.sample.patient.family) else "",
                 "current_family": current_family,
+                "current_patient": current_patient,
                 "teams": [{"teamname": t.teamname, "color": t.color} for t in v2s.sample.teams],
                 "current": current,
                 "depth": v2s.depth,
