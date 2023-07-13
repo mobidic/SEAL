@@ -1071,19 +1071,18 @@ def json_variants(id, idbed=False, version=-1):
                     "inheritances": str(pheno.inheritances),
                     "phenotypeMappingKey": pheno.phenotypeMappingKey
                 })
+
         members = []
-        if sample.familyid is not None:
-            request_family = Sample.query.filter(
-                and_(
-                    Sample.familyid == sample.familyid,
-                    Sample.status >= 1,Sample.id != sample.id
-                )
-            ).outerjoin(Var2Sample)\
-                .filter(Var2Sample.variant_ID == var2sample.variant_ID)
-            for member in request_family:
-                members.append(member.samplename)
+        if sample.patient and sample.patient.familyid:
+            request_family = Patient.query.outerjoin(Sample).outerjoin(Var2Sample)\
+                            .filter(and_(Var2Sample.variant_ID == variant.id, Patient.id != sample.patient.id))
+            for member in request_family.all():
+                members.append(str(member))
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
+
+        null = Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(and_(Var2Sample.variant == variant, Sample.patient_id == None)).count()
+        not_null = Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(and_(Var2Sample.variant == variant, Sample.patient_id != None, Sample.patient_id != sample.patient_id)).distinct(Sample.patient_id).count()
 
         variants["data"].append({
             "annotations": main_annot,
@@ -1099,7 +1098,7 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_depth": f"{var2sample.allelic_depth}",
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
-                "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
+                "occurrences": null+not_null,
                 "occurences_family": len(members),
                 "family_members": members
             },
