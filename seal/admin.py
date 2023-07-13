@@ -29,7 +29,7 @@ from flask_login import current_user
 from seal import app, db, bcrypt
 from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
-                         Region, Bed, Phenotype, Omim, History)
+                         Region, Bed, Phenotype, Omim, History, Patient)
 
 ###############################################################################
 
@@ -308,14 +308,24 @@ admin.add_sub_category(name="Run", parent_name="Analysis")
 admin.add_sub_category(name="Variant", parent_name="Analysis")
 
 admin.add_view(
+    CustomView(
+        Patient,
+        db.session,
+        category="Analysis",
+        column_searchable_list = ['id', 'alias', 'family.family'],
+        column_editable_list = ['id', 'alias', 'affected', 'index', 'family'],
+    )
+)
+
+admin.add_view(
     SampleView(
         Sample,
         db.session,
         category="Sample",
         column_searchable_list = ['filter.filtername', 'bed.name',
-                                  'family.family', 'run.name', 'samplename'],
-        column_editable_list = ['filter', 'bed', 'family', 'run', 'samplename',
-                                'status', 'affected', 'index'],
+                                  'patient.id', 'run.name', 'samplename'],
+        column_editable_list = ['filter', 'bed', 'patient', 'run', 'samplename',
+                                'status'],
         form_excluded_columns = ['variants', 'historics']
     )
 )
@@ -372,7 +382,7 @@ admin.add_view(
         db.session,
         category="Variant",
         column_searchable_list = ['filter', 'variant.id', 'sample.samplename',
-                                  'sample.family.family'],
+                                  'sample.patient.id'],
         column_editable_list = ['depth', 'allelic_depth', 'reported', 'hide']
     )
 )
