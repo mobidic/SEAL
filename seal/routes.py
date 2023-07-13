@@ -32,7 +32,7 @@ from flask import (flash, jsonify, redirect, render_template, request, url_for,
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_, exists
+from sqlalchemy import and_, or_, exists, cast, String
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
@@ -42,7 +42,7 @@ from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UpdateAccountForm, UpdatePasswordForm)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample)
+                         Transcript, User, Variant, Var2Sample, Patient)
 
 
 ###############################################################################
@@ -793,6 +793,8 @@ def json_samples():
     """
     key_list = {
         "asc": [
+            Patient.id.asc(),
+            Patient.alias.asc(),
             Sample.samplename.asc(),
             Family.family.asc(),
             Run.name.asc(),
@@ -801,6 +803,8 @@ def json_samples():
             Sample.lastAction.asc()
         ],
         "desc": [
+            Patient.id.desc(),
+            Patient.alias.desc(),
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.name.desc(),
@@ -810,6 +814,8 @@ def json_samples():
         ]
     }
     filters = or_(
+        cast(Patient.id, String).op('~')(request.form['search[value]']),
+        Patient.alias.op('~')(request.form['search[value]']),
         Sample.samplename.op('~')(request.form['search[value]']),
         Family.family.op('~')(request.form['search[value]']),
         Run.name.op('~')(request.form['search[value]']),
@@ -824,8 +830,9 @@ def json_samples():
         )
         samples = samples.filter(filter_samples_teams)
     recordsTotal = samples.count()
-    samples_filter = samples.outerjoin(Family, Sample.family)\
-                            .outerjoin(Run, Sample.run).filter(filters)
+    samples_filter = samples.outerjoin(Run, Sample.run)\
+                            .outerjoin(Patient, Sample.patient).outerjoin(Family, Patient.family)\
+                                .filter(filters)
     recordsFiltered = samples_filter.count()
     samples = samples_filter\
         .order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])])\
@@ -845,10 +852,14 @@ def json_samples():
         samples_json["data"].append({
             "id": sample.id,
             "samplename": sample.samplename,
-            "family": sample.family.family if sample.familyid else None,
+            "family": sample.patient.family.family if (sample.patient and sample.patient.familyid) else None,
+            "patient": {
+                "id": sample.patient_id,
+                "alias": sample.patient.alias if sample.patient else None,
+            },
             "run": {
                 "name": sample.run.name if sample.runid else None,
-                "alias": sample.run.alias if sample.runid else None
+                "alias": sample.run.alias if sample.runid else None 
             },
             "status": sample.status,
             "lastAction": {

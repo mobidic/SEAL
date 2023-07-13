@@ -33,7 +33,7 @@ $(document).ready(function() {
         scrollX: true,
         proccessing: true,
         serverSide: true,
-        order: [[5, 'desc']],
+        order: [[7, 'desc']],
         ajax: {
             url: '/json/samples',
             type: 'POST',
@@ -42,6 +42,8 @@ $(document).ready(function() {
             },
         },
         columns: [
+            { className: 'showTitle', data: "patient.id" },
+            { className: 'showTitle', data: "patient.alias" },
             {
                 className: 'showTitle',
                 data: {
