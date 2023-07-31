@@ -313,7 +313,7 @@ admin.add_view(
         db.session,
         category="Analysis",
         column_searchable_list = ['id', 'alias', 'family.family'],
-        column_editable_list = ['id', 'alias', 'affected', 'index', 'family'],
+        column_editable_list = ['alias', 'affected', 'index', 'family'],
     )
 )
 
