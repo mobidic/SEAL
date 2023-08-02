@@ -31,7 +31,7 @@ from anacore import annotVcf, vcf
 
 from seal import app, scheduler, db
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
-                         Team, Bed, Filter, History, Comment_sample)
+                         Team, Bed, Filter, History, Comment_sample, Patient)
 
 from sqlalchemy import exc
 
@@ -234,10 +234,17 @@ def create_sample(data):
     samplename = data["samplename"]
     sample = Sample(samplename=samplename)
 
-    if "affected" in data:
-        sample.affected = bool(data["affected"])
-    if "index" in data:
-        sample.index = bool(data["index"])
+
+    if "patient" in data:
+        p = Patient.query.get(data["patient"]["id"])
+        if not p:
+            p = Patient(
+                id=data["patient"]["id"],
+                alias=data["patient"]["alias"],
+                affected=data["patient"]["affected"],
+                index=data["patient"]["index"]
+                )
+        sample.patient = p
 
     if "family" in data:
         id = data["family"]["id"] if "id" in data["family"] else None
