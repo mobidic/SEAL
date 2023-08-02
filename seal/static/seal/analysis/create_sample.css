@@ -2,3 +2,12 @@ label[required]:after {
     content: " *";
     color: #e74c3c;
 }
+/* Firefox utilise un préfixe */
+input:-moz-read-only {
+    background-color: #f1f1f1;
+  }
+  
+  /* Blink/WebKit/Edge n'ont pas de préfixe */
+  input:read-only {
+    background-color: #f1f1f1;
+  }

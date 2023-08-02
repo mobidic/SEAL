@@ -20,7 +20,9 @@
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectMultipleField
+from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
+                     ValidationError, TextAreaField, SelectMultipleField,
+                     IntegerField, SelectField)
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
 from seal.models import User, Sample, Run, Team, Bed, Region
@@ -112,34 +114,52 @@ class UpdatePasswordForm(FlaskForm):
 
 
 class UploadVariantForm(FlaskForm):
-    samplename = StringField(
-        'Sample Name',
-        validators=[DataRequired(), Length(min=2, max=20)]
+    title= "Create New Sample"
+    patientID = IntegerField(
+        'Patient ID',
+        validators=[DataRequired()]
     )
+    patient_alias = StringField(
+        'Patient Alias',
+        validators=[Optional(), Length(min=2, max=30)]
+    )
+    affected = BooleanField('Affected')
+    index = BooleanField('Index')
     family = StringField(
         'Family',
         validators=[Optional(), Length(min=2, max=20)]
+    )
+
+    samplename = StringField(
+        'Sample Name',
+        validators=[DataRequired(), Length(min=2, max=20)]
     )
     run = StringField(
         'Run',
         validators=[Optional(), Length(min=2, max=50)]
     )
-    bed = StringField(
+    run_alias = StringField(
+        'Run Alias',
+        validators=[Optional(), Length(min=2, max=50)]
+    )
+
+    bed = SelectField(
         'Bed',
-        validators=[Optional(), Length(min=2, max=50)]
+        coerce=int,
+        validators=[Optional()]
     )
-    filter = StringField(
+    filter = SelectField(
         'Filter',
-        validators=[Optional(), Length(min=2, max=50)]
+        coerce=int,
+        validators=[Optional()]
     )
+    teams = SelectMultipleField('Teams', coerce=int)
+
+
     vcf_file = FileField(
         'Upload VCF file',
         validators=[DataRequired(), FileAllowed(['vcf', 'vcf.gz'])]
     )
-    affected = BooleanField('Affected')
-    index = BooleanField('Index')
-
-    teams = SelectMultipleField('Teams', coerce=int)
 
     submit = SubmitField('Create New Sample')
 

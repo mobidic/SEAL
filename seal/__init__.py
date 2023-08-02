@@ -29,6 +29,7 @@ from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import CSRFProtect
+from wtforms.fields import HiddenField
 
 
 app = Flask(__name__)
@@ -52,6 +53,15 @@ scheduler.init_app(app)
 scheduler.start()
 csrf.init_app(app)
 migrate = Migrate(app, db, compare_type=True)
+
+
+################################################################
+# from https://github.com/mbr/flask-bootstrap
+def is_hidden_field_filter(field):
+    return isinstance(field, HiddenField)
+
+app.jinja_env.globals['is_hidden_field'] = is_hidden_field_filter
+################################################################
 
 
 app.logger.info(app.config)

@@ -28,11 +28,11 @@ import urllib
 
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
-                   send_file, escape)
+                   escape)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_, exists, cast, String
+from sqlalchemy import and_, or_, cast, String
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
@@ -600,73 +600,70 @@ def sample(id):
     )
 
 
-@app.route("/create/sample", methods=['GET', 'POST'])
+@app.route('/create/sample', methods=['GET', 'POST'])
 @login_required
 def create_variant():
-    """
-    View function for creating a new sample variant.
+    form = UploadVariantForm()
 
-    If the form is submitted, adds the variant information and uploaded VCF to
-    the database and returns to the index page.
-    If the form is not submitted, displays the upload form.
+    # Add choices for bed
+    form.bed.choices=[('0', 'Choose a bed')] + [(b.id, b.name) for b in Bed.query.filter(Bed.teams == None).all()]
+    for t in current_user.teams:
+        for b in t.beds:
+            form.bed.choices.append((b.id, b.name))
 
-    Returns:
-        A rendered template of the upload variant form.
-    """
-    uploadSampleForm = UploadVariantForm()
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    if "submit" in request.form and uploadSampleForm.is_submitted():
-        run = Run.query.filter_by(name=uploadSampleForm.run.data).first()
-        samplename = uploadSampleForm.samplename.data
-        if run:
-            sample = Sample.query.filter_by(samplename=samplename,
-                                            runid=run.id).first()
-        else:
-            sample = Sample.query.filter_by(samplename=samplename,
-                                            runid=None).first()
-        if sample:
-            flash("This Sample Name is already in database!", "error")
-            return redirect(url_for('index'))
+    # Add choices for filter
+    form.filter.choices=[(f.id, f.filtername) for f in Filter.query.filter(Filter.teams == None).order_by(Filter.id.asc()).all()]
+    for t in current_user.teams:
+        for f in t.filters:
+            form.filter.choices.append((f.id, f.filtername))
+
+    # Add choices for teams
+    choices = [(team.id, team.teamname) for team in Team.query.all()]
+    form.teams.choices = choices
+    form.teams.data = [team.id for team in current_user.teams]
+    
+    if form.validate_on_submit():
+        print(request.form)
 
         info = {
-            "samplename": uploadSampleForm.samplename.data,
-            "affected": uploadSampleForm.affected.data,
-            "index": uploadSampleForm.index.data,
+            "patient": {
+                "id": form.patientID.data,
+                "alias": form.patient_alias.data,
+                "affected": form.affected.data,
+                "index": form.index.data
+            },
+            "family": {
+                "name": form.family.data
+            },
+            "samplename": form.samplename.data,
             "userid": current_user.id,
             "date": str(datetime.now()),
-            "family": {
-                "name": uploadSampleForm.family.data
-            },
             "run": {
-                "name": uploadSampleForm.run.data,
+                "name": form.run.data,
+                "alias": form.run_alias.data,
             },
             "filter": {
-                "name": uploadSampleForm.filter.data,
+                "id": form.filter.data,
             },
             "bed": {
-                "name": uploadSampleForm.bed.data,
+                "id": form.bed.data,
             },
             "teams": [
-                {"name": Team.query.get(id).teamname} for id in uploadSampleForm.teams.data
+                {"name": Team.query.get(id).teamname} for id in form.teams.data
             ],
             "interface": True
         }
-        add_vcf(info, uploadSampleForm.vcf_file.data)
+        print(info)
+        add_vcf(info, form.vcf_file.data)
 
-        flash(f'Sample {uploadSampleForm.samplename.data} will be added soon!',
+        flash(f'Sample {form.samplename.data} will be added soon!',
               'info')
         return redirect(url_for('index'))
 
-    choices = [(team.id, team.teamname) for team in Team.query.all()]
-    uploadSampleForm.teams.choices = choices
-    uploadSampleForm.teams.data = [team.id for team in current_user.teams]
-
-    return render_template(
-        'analysis/create_sample.html', title="Add Sample",
-        form=uploadSampleForm,
-        user_teams=[team.teamname for team in current_user.teams]
-    )
+    content = {
+        'form': form,
+    }
+    return render_template('analysis/create_sample.html', **content)
 
 
 @app.route("/create/panel", methods=['GET', 'POST'])
@@ -738,6 +735,33 @@ def json_families():
             "family": family.family
         })
     return jsonify(families_json)
+
+@app.route("/json/patients", methods=['GET', 'POST'])
+@login_required
+def json_patients():
+    """
+    Endpoint for retrieving a list of all patients in the database.
+
+    Returns:
+        A JSON object with the following keys:
+        - data: A list of dictionaries, each representing a family in the
+                database.
+            Each dictionary has the following keys:
+            - id: The unique identifier of the family.
+            - family: The name of the family.
+    """
+    patients = Patient.query.all()
+    patients_json = {"data": list()}
+    for patient in patients:
+        patients_json["data"].append({
+            "id": patient.id,
+            "alias":patient.alias,
+            "affected":patient.affected,
+            "index":patient.index,
+            "family": patient.family.family if patient.family else None
+        })
+        
+    return jsonify(patients_json)
 
 
 @app.route("/json/runs", methods=['GET', 'POST'])

@@ -1,5 +1,151 @@
 {% extends 'base.html' %}
 
+{################################################################}
+{# from https://github.com/mbr/flask-bootstrap #}
+
+{% macro form_errors(form, hiddens=True) %}
+    {%- if form.errors %}
+        {%- for fieldname, errors in form.errors.items() %}
+            {%- if is_hidden_field(form[fieldname]) and hiddens or
+                not is_hidden_field(form[fieldname]) and hiddens != 'only' %}
+                {%- for error in errors %}
+                    <p class="error">{{error}}</p>
+                {%- endfor %}
+            {%- endif %}
+        {%- endfor %}
+    {%- endif %}
+{%- endmacro %}
+            
+{% macro _hz_form_wrap(horizontal_columns, form_type, add_group=False, required=False) %}
+    {% if form_type == "horizontal" %}
+        {% if add_group %}<div class="form-group{% if required %} required{% endif %}">{% endif %}
+        <div class="col-{{horizontal_columns[0]}}-offset-{{horizontal_columns[1]}}
+            col-{{horizontal_columns[0]}}-{{horizontal_columns[2]}}">
+    {% endif %}
+        {{ caller() }}
+                
+    {% if form_type == "horizontal" %}
+        {% if add_group %}</div>{% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}
+        
+{% macro form_field(field,
+    form_type="basic",
+    horizontal_columns=('lg', 2, 10),
+    button_map={}) %}
+
+    {% set required = False %}
+    {% if field.flags.required %}
+        {% set required = True %}
+    {% endif %}
+    
+    {% if field.widget.input_type == 'checkbox' %}
+        {% call _hz_form_wrap(horizontal_columns, form_type, True, required=required) %}
+            <div class="checkbox w3-padding">
+                <label class="w3-text-flat-green-sea" style="font-weight: bold;">
+                    {{field()|safe}} {{field.label.text|safe}}
+                </label>
+            </div>
+        {% endcall %}
+    {%- elif field.type == 'RadioField' -%}
+        {% call _hz_form_wrap(horizontal_columns, form_type, True, required=required) %}
+            {% for item in field -%}
+                <div class="radio w3-padding">
+                    <label class="w3-text-flat-green-sea" style="font-weight: bold;">
+                        {{item|safe}} {{item.label.text|safe}}
+                    </label>
+                </div>
+            {% endfor %}
+        {% endcall %}
+    {%- elif field.type == 'SubmitField' -%}
+        {% set field_kwargs = kwargs %}
+        {% call _hz_form_wrap(horizontal_columns, form_type, True, required=required) %}
+            {{field(class='w3-button w3-flat-green-sea w3-hover-flat-turquoise', **field_kwargs)}}
+        {% endcall %}
+    {%- elif field.type == 'FormField' -%}
+        <fieldset>
+            <legend>{{field.label}}</legend>
+            {%- for subfield in field %}
+                {% if not is_hidden_field(subfield) -%}
+                    {{ form_field(subfield, form_type=form_type, horizontal_columns=horizontal_columns, button_map=button_map) }}
+                {%- endif %}
+            {%- endfor %}
+        </fieldset>
+    {% else -%}
+        <div class="form-group w3-padding">
+        {{field.label(required=required,class="w3-text-flat-green-sea", style="font-weight: bold;")|safe}}
+        {%- if field.errors %}
+            {%- for error in field.errors %}
+                <div class="w3-small w3-text-flat-alizarin"><i class="fas fa-exclamation-circle"></i> {{error}}</div>
+            {%- endfor %}
+        {%- elif field.description -%}
+            <p class="help-block">{{field.description|safe}}</p>
+        {%- endif %}
+        {% if field.type == 'FileField' %}
+            {{field(**kwargs)|safe}}
+        {% else %}
+            {{field(class="w3-input w3-border w3-round", **kwargs)|safe}}
+        {% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro quick_form(form,
+    action="",
+    method="post",
+    extra_classes=None,
+    role="form",
+    form_type="basic",
+    horizontal_columns=('lg', 2, 10),
+    enctype=None,
+    button_map={},
+    id="",
+    novalidate=False,
+    render_kw={}) %}
+
+    {%- set _enctype = [] %}
+    {%- if enctype is none -%}
+        {%- for field in form %}
+            {%- if field.type == 'FileField' %}
+                {%- set _ = _enctype.append('multipart/form-data') -%}
+            {%- endif %}
+        {%- endfor %}
+    {%- else %}
+        {% set _ = _enctype.append(enctype) %}
+    {%- endif %}
+    <form
+        {%- if action != None %} action="{{action}}"{% endif -%}
+        {%- if id %} id="{{id}}"{% endif -%}
+        {%- if method %} method="{{method}}"{% endif %}
+        class="form
+        {%- if extra_classes %} {{extra_classes}}{% endif -%}
+        {%- if form_type == "horizontal" %} form-horizontal
+        {%- elif form_type == "inline" %} form-inline
+        {%- endif -%}
+        "
+        {%- if _enctype[0] %} enctype="{{_enctype[0]}}"{% endif -%}
+        {%- if role %} role="{{role}}"{% endif -%}
+        {%- if novalidate %} novalidate{% endif -%}
+        {%- if render_kw %} {{render_kw|xmlattr}}{% endif -%}
+        >
+        
+        {{ form.hidden_tag() }}
+        {{ form_errors(form, hiddens='only') }}
+
+        {%- for field in form %}
+            {% if not is_hidden_field(field) -%}
+                {{ form_field(field,
+                    form_type=form_type,
+                    horizontal_columns=horizontal_columns,
+                    button_map=button_map) }}
+            {%- endif %}
+        {%- endfor %}
+    </form>
+{%- endmacro %}
+    
+{################################################################}
+
 {% block static %}
     <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
     <link href="{{ url_for('static', filename='select2/css/select2.min.css') }}" rel="stylesheet" />
@@ -13,132 +159,16 @@
     <div class="w3-main">
         <div class="w3-padding w3-mobile">
             <div class="w3-card w3-padding w3-mobile">
-                <div class="w3-container w3-border-bottom">
-                    <h3>Upload A New Sample</h3>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-8 offset-md-2">
+                            <h3>{{ form.title.upper() }}</h3>
+                            <hr>
+                            {{ quick_form(form, id="form-new-sample") }}
+                            <br>
+                        </div>
+                    </div>
                 </div>
-
-                <form class="w3-container"  action="" method="post" enctype="multipart/form-data">
-                    {{ form.hidden_tag() }}
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px">
-                            <i class="w3-xxlarge fas fa-user-tag"></i> {{ form.samplename.label(required=form.samplename.flags.required, class="w3-display-right", style="font-weight: bold;") }}
-                        </div>
-                        <div class="w3-rest">
-                            {% if form.samplename.errors %}
-                                {{ form.samplename(class="w3-input w3-border w3-border-red") }}
-                                <div class="w3-small w3-text-flat-alizarin">
-                                    {% for error in form.samplename.errors %}
-                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.samplename(class="w3-input w3-border") }}
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin" style="width:80px">
-                            {{ form.index(class="w3-check w3-display-left") }} {{ form.index.label(class="w3-display-right", style="font-weight: bold;") }}
-                        </div>
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin" style="width:100px">
-                            {{ form.affected(class="w3-check w3-display-left") }} {{ form.affected.label(class="w3-display-right", style="font-weight: bold;") }}
-                        </div>
-                    </div>
-
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.family.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-                        <div class="w3-rest">
-                            {% if form.family.errors %}
-                                {{ form.family(class="w3-input w3-border w3-border-red") }}
-                                <div class="w3-small w3-text-flat-alizarin">
-                                    {% for error in form.family.errors %}
-                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.family(class="w3-input w3-border") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-digital-tachograph"></i> {{ form.run.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-                        <div class="w3-rest">
-                            {% if form.run.errors %}
-                                {{ form.run(class="w3-input w3-border w3-border-red") }}
-                                <div class="w3-small w3-text-flat-alizarin">
-                                    {% for error in form.run.errors %}
-                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.run(class="w3-input w3-border") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-filter"></i> {{ form.filter.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-                        <div class="w3-rest">
-                            {% if form.filter.errors %}
-                                {{ form.filter(class="w3-input w3-border w3-border-red") }}
-                                <div class="w3-small w3-text-flat-alizarin">
-                                    {% for error in form.filter.errors %}
-                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.filter(class="w3-input w3-border") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-th-list"></i> {{ form.bed.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-                        <div class="w3-rest">
-                            {% if form.bed.errors %}
-                                {{ form.bed(class="w3-input w3-border w3-border-red") }}
-                                <div class="w3-small w3-text-flat-alizarin">
-                                    {% for error in form.bed.errors %}
-                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.bed(class="w3-input w3-border") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="w3-row w3-section w3-display-container">
-                        <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-users"></i> {{ form.teams.label(class="w3-display-right", style="font-weight: bold;")}}</div>
-                        <div class="w3-rest">
-                            {{ form.teams(class="js-example-basic-multiple", multiple="multiple", style="width:100%") }}
-                        </div>
-                    </div>
-
-                    <div class="w3-row w3-section">
-                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:190px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(required=form.vcf_file.flags.required, class="w3-display-right", style="font-weight: bold;")}}</div>
-                        <div class="w3-rest">
-                            {% if form.vcf_file.errors %}
-                                {{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}
-                                <div class="w3-small w3-text-flat-alizarin">
-                                    {% for error in form.vcf_file.errors %}
-                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% else %}
-                                {{ form.vcf_file(class="w3-input w3-border-0") }}
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="w3-section w3-center">
-                        {{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
-                    </div>
-                </form>
-                <div id="result"></div>
             </div>
         </div>
     </div>
