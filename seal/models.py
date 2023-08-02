@@ -206,7 +206,7 @@ class Sample(db.Model):
     comments = relationship("Comment_sample")
 
     def __repr__(self):
-        return f"Sample('{self.samplename}','{self.patient}','{self.run}','{self.status}','{self.affected}','{self.index}')"
+        return f"Sample('{self.samplename}','{self.patient}','{self.run}','{self.status}')"
 
     def __str__(self):
         return self.samplename
