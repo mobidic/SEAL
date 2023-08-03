@@ -940,6 +940,106 @@ $(document).ready(function() {
                     },
                 },
             },
+            // Hiden column for DEFGEN file generation
+            {
+                data: "annotations.HGVSp",
+                render: {
+                    _:function ( data, type, row ) {
+                        psplit = String(data).split(":");
+                        if (psplit.length > 1) {
+                            return psplit[1].replace("p.", "p.(") + ")";
+                        }
+                        return ""
+                    },
+                },
+                searchable: false , visible: false
+            },
+            {
+                data: "annotations.HGVSc",
+                render: {
+                    _:function ( data, type, row ) {
+                        psplit = String(data).split(":");
+                        if (psplit.length > 1) {
+                            return psplit[1];
+                        }
+                        return ""
+                    },
+                },
+                searchable: false , visible: false
+            },
+            {
+                data: "annotations.NEAREST",
+                searchable: false , visible: false
+            },
+            {
+                data: "annotations.Feature",
+                searchable: false , visible: false
+            },
+            {
+                data: "annotations.Existing_variation",
+                render: {
+                    _:function ( data, type, row ) {
+                        if (data.length > 0) {
+                            for (idx_var in data) {
+                                id_var = data[idx_var]
+                                if (RegExp("^COS[MV][0-9]+").test(id_var)) {
+                                    return id_var;
+                                }
+                            }
+                        }
+                        return "";
+                    },
+                },
+                searchable: false , visible: false
+            },
+            {
+                data: "annotations.Existing_variation",
+                render: {
+                    _:function ( data, type, row ) {
+                        if (data.length > 0) {
+                            for (idx_var in data) {
+                                id_var = data[idx_var]
+                                if (RegExp("^rs[0-9]+").test(id_var)) {
+                                    return id_var;
+                                }
+                            }
+                        }
+                        return "";
+                    },
+                },
+                searchable: false , visible: false
+            },
+            {
+                data: "pos",
+                searchable: false , visible: false
+            },
+            {
+                data: "chr",
+                searchable: false , visible: false
+            },
+            {
+                data: null, "defaultContent": "hg19",
+                searchable: false , visible: false
+            },
+            {
+                data: "annotations",
+                render: {
+                    _: function ( data, type, row ) {
+                        if (data["EXON"] == null) {
+                            if(data["INTRON"] == null) {
+                                return "NA";
+                            }
+                            return "Inton " + data["INTRON"].split("/")[0];
+                        }
+                        return "Exon " + data["EXON"].split("/")[0];
+                    },
+                },
+                searchable: false , visible: false
+            },
+            {
+                data: "allelic_frequency",
+                searchable: false , visible: false
+            },
         ],
         initComplete: function(settings, json) {
             changeFilter(sample_filter_id, sample_id);
@@ -984,7 +1084,36 @@ $(document).ready(function() {
                     return data;
                 }
             };
+            var format_defGene = {
+                body: function(data, row, column, node) {
+                    return column === 15 ? data + "\r" :data;
+                },
+                header: function ( data, columnIdx ) {
+                    dict = {
+                        0 : "GENE",
+                        3 : "VARIANT",
+                        23: "VARIANT_P",
+                        24: "VARIANT_C",
+                        25: "ENST",
+                        26: "NM",
+                        27: "COSMIC",
+                        28: "RS",
+                        29: "POSITION_GENOMIQUE",
+                        16: "CONSEQUENCES",
+                        30: "CHROMOSOME",
+                        31: "GENOME_REFERENCE",
+                        2: "NOMENCLATURE_HGVS",
+                        32: "LOCALISATION",
+                        33: "FREQUENCE_ALLELIQUE\r",
+                    }
+                    if (columnIdx in dict) {
+                        return dict[columnIdx]
+                    } 
+                    return data;
+                }
+            };
             var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+            var columns_defGene = [0,3,23,24,25,26,27,28,29,16,30,31,2,32,33];
             table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
@@ -1027,6 +1156,23 @@ $(document).ready(function() {
                             },
                             columns: columns_base
                         }
+                    },
+                    {
+                        extend: 'csv',
+                        text: 'DefGene',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_defGene,
+                            modifier: {
+                                selected: null
+                            },
+                            columns: columns_defGene
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
                     },
                     '<h3>Reported</h3>',
                     {
@@ -1089,6 +1235,28 @@ $(document).ready(function() {
                             columns: columns_base
                         }
                     },
+                    {
+                        extend: 'csv',
+                        text: 'DefGene',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_defGene,
+                            modifier: {
+                                selected: null
+                            },
+                            rows: [function(data, row, column, node) {
+                                if(row.reported) {
+                                    return data+1;
+                                }
+                            }],
+                            columns: columns_defGene
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
+                    },
                     '<h3>Selected</h3>',
                     {
                         extend: 'copy',
@@ -1125,6 +1293,23 @@ $(document).ready(function() {
                             },
                             columns: columns_base
                         }
+                    },
+                    {
+                        extend: 'csv',
+                        text: 'DefGene',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_defGene,
+                            modifier: {
+                                selected: true
+                            },
+                            columns: columns_defGene
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
                     },
                 ]
             });
