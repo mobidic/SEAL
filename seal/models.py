@@ -166,7 +166,8 @@ class Family(db.Model):
 
 class Patient(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    alias = db.Column(db.String(30), unique=False, nullable=True)
+    name = db.Column(db.String(120), unique=True, nullable=True)
+    alias = db.Column(db.String(120), unique=False, nullable=True)
     samples = relationship("Sample")
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
@@ -184,6 +185,7 @@ class Patient(db.Model):
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(120), unique=False, nullable=False)
+    alias = db.Column(db.String(120), unique=False, nullable=True)
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
 
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=True)
