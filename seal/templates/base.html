@@ -70,7 +70,7 @@
 
         <div id="page-container">
             <section id="content-wrap" class="w3-text-dark-gray" style="padding-top:51px;">
-                    {% block content %}{% endblock %}
+                {% block content %}{% endblock %}
             </section>
 
         <!-- Footer -->
@@ -86,6 +86,15 @@
         </div>
         <script type="text/javascript">
             var csrf_token = "{{ csrf_token() }}";
+            {% if (current_user.logged and not current_user.api_key_md ) %}
+                var new_div = "<div class='w3-panel w3-padding w3-margin \
+                    w3-warning w3-leftbar'><b>WARNING</b> : You do not have a \
+                    link to a <a class='w3-hover-text-flat-belize-hole w3-text-flat-peter-river' style='font-style: italic;' href='https://mobidetails.iurc.montp.inserm.fr/MD/' \
+                    target='_blank'>MobiDetails</a> account. Please <a class='w3-hover-text-flat-belize-hole w3-text-flat-peter-river' style='font-style: italic;' href={{ url_for('account') }} \
+                    target='_blank'>edit your \
+                    profile</a> to enjoy all features ! </div>"
+                $( ".w3-main" ).prepend( new_div );
+            {% endif %}
         </script>
 
         <script type="text/javascript" src="{{ url_for('static', filename='seal/base.js') }}"></script>
