@@ -28,11 +28,11 @@ import urllib
 
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
-                   send_file, escape)
+                   escape)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_, exists
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
