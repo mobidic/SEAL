@@ -1134,7 +1134,6 @@ $(document).ready(function() {
 } );
 
 function hide_message(count_hide) {
-    console.log(count_hide)
     if (count_hide > 0) {
         $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> <span id="cpt-hide-row">' + count_hide + '</span> row(s) hidden (<b class="w3-hover-text-blue" onclick="showAllRows()" style="cursor:pointer">click here to show all</b>)<span>');
     } else {
@@ -1257,7 +1256,7 @@ function htmlLink(data) {
 function openMD(id) {
     Swal.fire({
         title: 'Go to MobiDetails!',
-        html: 'Please wait.<br/><b>This page will be clos automatically.</b>',
+        html: 'Please wait.<br/><b>This page will be close automatically.</b>',
         didOpen: () => {
             Swal.showLoading()
             $.ajax({
