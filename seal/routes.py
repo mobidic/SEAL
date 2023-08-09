@@ -591,10 +591,16 @@ def sample(id):
         if v.inBed():
             count_hide+=1
 
+    family_members = []
+    for s in sample.family.samples:
+        if s != sample and s.status > 0:
+            family_members.append(s)
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
         count_hide = count_hide,
+        family_members = family_members,
         form=commentForm,
         saveFilterForm=saveFilterForm
     )
@@ -962,6 +968,7 @@ def json_variants(id, idbed=False, version=-1):
     
     for var2sample in sample.variants:
         variant = var2sample.variant
+        print(sample.variants)
         try:
             if bed and not bed.varInBed(variant):
                 continue
@@ -1061,7 +1068,26 @@ def json_variants(id, idbed=False, version=-1):
                     "phenotypeMappingKey": pheno.phenotypeMappingKey
                 })
         members = []
+        t = dict()
         if sample.familyid is not None:
+            for s in sample.family.samples:
+                if s == sample:
+                    continue
+                t[str(s)]= dict()
+                req = Var2Sample.query.get((var2sample.variant_ID, s.id))
+                if req:
+                    t[str(s)] = {
+                        "depth": f"{req.depth}",
+                        "allelic_depth": f"{req.allelic_depth}",
+                        "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
+                    }
+                else:
+                    t[str(s)] = {
+                        "depth": f"NA",
+                        "allelic_depth": f"NA",
+                        "allelic_frequency": f"NA",
+                    }
+
             request_family = Sample.query.filter(
                 and_(
                     Sample.familyid == sample.familyid,
@@ -1092,7 +1118,8 @@ def json_variants(id, idbed=False, version=-1):
                 "occurences_family": len(members),
                 "family_members": members
             },
-            "phenotypes": phenotypes
+            "phenotypes": phenotypes,
+            "family": t
         })
     return jsonify(variants)
 
