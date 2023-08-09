@@ -968,7 +968,6 @@ def json_variants(id, idbed=False, version=-1):
     
     for var2sample in sample.variants:
         variant = var2sample.variant
-        print(sample.variants)
         try:
             if bed and not bed.varInBed(variant):
                 continue

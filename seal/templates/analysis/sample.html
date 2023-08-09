@@ -130,7 +130,7 @@
                             </th>
                             {% for s in family_members %}
                                 <th>
-                                    <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <span title="Help" onclick="openHelp(title='{{ s }}', content='Frequence of the observed allele for the sample, and  Allelic depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                         <i class="fas fa-question-circle w3-tiny"></i>
                                     </span>
                                     {{ s }}
