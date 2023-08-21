@@ -53,7 +53,7 @@ from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
 SAFE_HOST = []
 
 
-def redirect_dest(fallback):
+def redirect_dest(fallback='/home'):
     """
     Redirects the user to a given URL after validating it's safe.
 
@@ -66,13 +66,15 @@ def redirect_dest(fallback):
         fallback URL.
     """
     dest = request.args.get('next')
+    if not dest:
+        return redirect(fallback)
     url = urlparse(dest)
-    if url.path and not url.netloc:
+    if url.path and (not url.netloc or url.netloc == request.host):
         return redirect(url.path)
     if url.hostname and url.hostname in SAFE_HOST:
         return redirect(url.geturl())
     else:
-        flash(f"Redirection to '{url.hostname}' forbidden !", "error")
+        flash(f"Redirection to '{url.path}' forbidden !", "error")
         return redirect(fallback)
 
 
@@ -183,7 +185,9 @@ def handle_csrf_error(e):
         A redirect to the index page with a flash message.
     """
     flash(f"{e.name} : {e.description} Please Retry.", 'warning')
-    return redirect(url_for('index'))
+
+    next_page = request.args.get('next')
+    return redirect(next_page)
 
 
 @app.errorhandler(400)
@@ -444,7 +448,7 @@ def login():
                 return redirect(url_for('first_connexion', next=next_page))
 
             flash(f'You are logged in as: {user.username}!', 'success')
-            return redirect_dest(fallback=url_for('index'))
+            return redirect_dest()
         else:
             flash('Login unsuccessful. Please check username and/or password!',
                   'error')
@@ -525,7 +529,7 @@ def first_connexion():
     update_password_form = UpdatePasswordForm()
     next_page = request.args.get('next')
     if current_user.logged:
-        return redirect_dest(fallback=url_for('index'))
+        return redirect_dest()
     if ("submit_password" in request.form 
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
@@ -533,7 +537,7 @@ def first_connexion():
         current_user.logged = True
         db.session.commit()
         flash('Your password has been changed!', 'success')
-        return redirect_dest(fallback=url_for('index'))
+        return redirect_dest()
 
     return render_template(
         'authentication/first_connexion.html', title='First Connexion',
