@@ -592,9 +592,10 @@ def sample(id):
             count_hide+=1
 
     family_members = []
-    for s in sample.family.samples:
-        if s != sample and s.status > 0:
-            family_members.append(s)
+    if sample.family:
+        for s in sample.family.samples:
+            if s != sample and s.status > 0:
+                family_members.append(s)
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
