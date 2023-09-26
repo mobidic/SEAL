@@ -41,10 +41,11 @@ from psycopg2.errors import UniqueViolation
 from seal import app, bcrypt, db
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
-                        UpdateAccountForm, UpdatePasswordForm)
+                        UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
                          Transcript, User, Variant, Var2Sample)
+from seal.schedulers import update_clinvar_thread
 
 
 ###############################################################################
@@ -758,6 +759,30 @@ def create_panel():
     return render_template(
         'analysis/panel.html', title="Add Panel",
         form=uploadPanelForm
+    )
+
+
+@app.route("/update/clinvar", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_clinvar():
+    UploadClinvarForm = UploadClinvar()
+
+    if "submit" in request.form and UploadClinvarForm.validate_on_submit():
+        version = UploadClinvarForm.version.data.strftime("%Y%m%d")
+        genome = UploadClinvarForm.genome_version.data
+
+        vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
+        vcf_path = vcf_path.joinpath(UploadClinvarForm.vcf_file.data.filename)
+        UploadClinvarForm.vcf_file.data.save(vcf_path)
+
+        Thread(target=update_clinvar_thread, args=(vcf_path, version, genome, )).start()
+
+        return redirect(url_for('index'))
+
+    return render_template(
+        'admin/updateclinvar.html', title="Update ClinVar",
+        form=UploadClinvarForm
     )
 
 
