@@ -18,17 +18,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import datetime
-from pathlib import Path
-from urllib.parse import urlparse
 import functools
 import json
 import secrets
 import urllib
 
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import urlparse
+from threading import Thread
+
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
-                   escape)
+                   escape, abort)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
@@ -124,6 +126,41 @@ def login_required(func):
     return decorated_view
 
 
+def admin_required(func):
+    """
+    A decorator that ensures that the user is admin before accessing the
+    decorated view. If the user is not admin, they will beredirected to the
+    index page.
+
+    Usage:
+    ------
+    @admin_required
+    def my_view():
+        # Do something here
+
+    """
+    @functools.wraps(func)
+    def decorated_view(*args, **kwargs):
+        """
+        A decorator function for enforcing user login.
+
+        If the user is not admin, they will be redirected to the index page.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            The decorated view function.
+        """
+        if request.method in EXEMPT_METHODS:
+            return func(*args, **kwargs)
+        elif not current_user.admin:
+            abort(403)
+        return func(*args, **kwargs)
+    return decorated_view
+
+
 # https://flask.palletsprojects.com/en/2.2.x/errorhandling/
 class InvalidAPIUsage(Exception):
     """
@@ -191,9 +228,11 @@ def handle_csrf_error(e):
 
 
 @app.errorhandler(400)
-@app.errorhandler(404)
+@app.errorhandler(401)
 @app.errorhandler(403)
+@app.errorhandler(404)
 @app.errorhandler(405)
+@app.errorhandler(406)
 @app.errorhandler(408)
 @app.errorhandler(410)
 @app.errorhandler(500)
@@ -395,6 +434,7 @@ def maintenance():
         return redirect(url_for("index"))
     return render_template(
         "essentials/maintenance.html",
+        reason=app.config["MAINTENANCE_REASON"]
     )
 
 
