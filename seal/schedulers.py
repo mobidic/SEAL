@@ -21,14 +21,13 @@
 import re
 import json
 import time
-import errno
 import numpy
 import random
 import subprocess
 from pathlib import Path
 from datetime import datetime
 
-from anacore import annotVcf, vcf
+from anacore import annotVcf
 
 from seal import app, scheduler, db
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,

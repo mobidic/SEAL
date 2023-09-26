@@ -19,8 +19,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-from datetime import timedelta
 import yaml
+from pathlib import Path
+from datetime import timedelta
 
 from flask import Flask, session, g, request, redirect, url_for
 from flask_apscheduler import APScheduler
@@ -33,7 +34,7 @@ from flask_wtf import CSRFProtect
 
 app = Flask(__name__)
 
-with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "config.yaml"), "r") as config_file:
+with open(Path(app.root_path).joinpath("config.yaml"), "r") as config_file:
     config = yaml.safe_load(config_file)
 
 app.config.update(config['FLASK'])
