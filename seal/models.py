@@ -141,10 +141,10 @@ class Clinvar(db.Model):
     current = db.Column(db.Boolean(), default=True, nullable=False)
 
     def __repr__(self):
-        return f"Team('{self.version}','{self.date}')"
+        return f"Clinvar('{self.version}','{self.date}')"
 
     def __str__(self):
-        return self.version
+        return str(self.version)
 
 
 ################################################################################
