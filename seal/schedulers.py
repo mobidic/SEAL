@@ -609,7 +609,7 @@ def importvcf():
         db.session.commit()
 
 
-def update_clinvar_scheduler(vcf, version, genome="grch37"):
+def update_clinvar_thread(vcf, version, genome="grch37"):
     # Check and create locker
     path_locker = Path(app.root_path).joinpath('static/temp/vcf/.lock')
     while path_locker.exists():
