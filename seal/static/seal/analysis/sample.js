@@ -26,65 +26,6 @@ function toggle_status(id, status) {
     });
 }
 
-const clinsig_dict = {
-    "uncertain_significance": {
-        "color": "orange",
-        "score": 4
-    },
-    "conflicting_interpretations_of_pathogenicity": {
-        "color": "orange",
-        "score": 4
-    },
-    "pathogenic": {
-        "color": "alizarin",
-        "score": 10
-    },
-    "likely_pathogenic": {
-        "color": "alizarin",
-        "score": 7
-    },
-    "pathogenic/likely_pathogenic": {
-        "color": "alizarin",
-        "score": 6
-    },
-    "benign": {
-        "color": "turquoise",
-        "score": -1.5
-    },
-    "likely_benign": {
-        "color": "turquoise",
-        "score": -0.25
-    },
-    "benign/likely_benign": {
-        "color": "turquoise",
-        "score": -1
-    },
-    "not_provided": {
-        "color": "peter-river",
-        "score": -0.1
-    },
-    "_other": {
-        "color": "peter-river",
-        "score": 0
-    },
-    "protective": {
-        "color": "peter-river",
-        "score": -0.1
-    },
-    "association": {
-        "color": "peter-river",
-        "score": 0.1
-    },
-    "risk_factor": {
-        "color": "peter-river",
-        "score": 0.2
-    },
-    "affects": {
-        "color": "peter-river",
-        "score": 0.15
-    }
-};
-
 const impact_dict = {
     "MODERATE": {
         "color": "orange",
@@ -328,6 +269,254 @@ $(document).ready(function() {
         }
         $('#selectBed').html(options);
     });
+    
+    $.fn.dataTable.ext.searchBuilder.conditions.clinvar = {
+        "=": {
+            // This function decides whether to include the criteria in the search
+            isInputValid: function (el, that) {
+                // If no options have been selected, or one has but it has no value then do not include the criteria
+                if (
+                    $(el[0]).has('option:selected').length < 1 ||
+                    (
+                        $(el[0]).has('option:selected').length === 1 &&
+                        $($(el[0]).children('option:selected')[0]).text().length === 0
+                    )
+                ) {
+                    return false;
+                }
+
+                return true;
+            },
+            // This is the string displayed in the condition select
+            conditionName: 'Is',
+            // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
+            inputValue: function (el) {
+                let values = [];
+
+                for (let element of el) {
+                    if ($(element).is('select')) {
+                        values.push($(element).children('option:selected').val());
+                    }
+                }
+
+                // return the selected values
+                return values;
+            },
+            // This function initialises the criteria, specifically any dom elements that are required for its use
+            init: function(that, fn, preDefined = null) {
+                // Declare select element to be used with all of the default classes and listeners.
+                let el = $('<select/>')
+                    .addClass($.fn.dataTable.Criteria.classes.value)
+                    .addClass($.fn.dataTable.Criteria.classes.dropDown)
+                    .addClass($.fn.dataTable.Criteria.classes.italic)
+                    .addClass($.fn.dataTable.Criteria.classes.select)
+                    .append(that.dom.valueTitle)
+                    .on('change.dtsb', function() {
+                        $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
+                        fn(that, this);
+                    });
+
+                if (that.c.greyscale) {
+                    el.addClass($.fn.dataTable.Criteria.classes.greyscale);
+                }
+
+                let added = [];
+                let options = [];
+            
+                // Function to add an option to the select element
+                let addOption = (filt, text) => {
+                    if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
+                        filt.replace(/(<([^>]+)>)/ig, '');
+                    }
+
+                    // Add text and value, stripping out any html if that is the column type
+                    let opt = $('<option>', {
+                        type: Array.isArray(filt) ? 'Array' : 'String',
+                        value: filt
+                    })
+                    .data('sbv', filt)
+                    .addClass(that.classes.option)
+                    .addClass(that.classes.notItalic)
+                    // Have to add the text this way so that special html characters are not escaped - &amp; etc.
+                    .html(
+                        typeof text === 'string' ?
+                        text.replace(/(<([^>]+)>)/ig, '') :
+                        text
+                    );
+
+                    let val = opt.val();
+                    
+                    // Check that this value has not already been added
+                    if (added.indexOf(val) === -1) {
+                        added.push(val);
+                        options.push(opt);
+                        
+                        if (preDefined !== null && Array.isArray(preDefined[0])) {
+                        preDefined[0] = preDefined[0].sort().join(',');
+                        }
+
+                        // If this value was previously selected as indicated by preDefined, then select it again
+                        if (preDefined !== null && opt.val() === preDefined[0]) {
+                        opt.prop('selected', true);
+                        el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                        that.dom.valueTitle.removeProp('selected');
+                        }
+                    }
+                };
+
+                addOption("0 - Benign/Likely Benign", "0 - Benign/Likely Benign");
+                addOption("1 - Conflicting (without Pathogenic)", "1 - Conflicting (without Pathogenic)");
+                addOption("2 - NA", "2 - NA");
+                addOption("3 - Uncertain significance", "3 - Uncertain significance");
+                addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
+                addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
+                
+                options.sort((a, b) => {
+                    if (a.val() < b.val()) {
+                        return -1;
+                    } else if (a.val() > b.val()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                for (let opt of options) {
+                    el.append(opt);
+                }
+
+                return el;
+            },
+            // Straightforward search function comparing value from table and comparison from the select2 element
+            // These values are retrieved in `inputValue`
+            search: function ( value, comparison) {
+                return value === comparison[0];
+            }
+        }, "!=": {
+            // This function decides whether to include the criteria in the search
+            isInputValid: function (el, that) {
+                // If no options have been selected, or one has but it has no value then do not include the criteria
+                if (
+                    $(el[0]).has('option:selected').length < 1 ||
+                    (
+                        $(el[0]).has('option:selected').length === 1 &&
+                        $($(el[0]).children('option:selected')[0]).text().length === 0
+                    )
+                ) {
+                    return false;
+                }
+ 
+                return true;
+            },
+            // This is the string displayed in the condition select
+            conditionName: 'Is Not',
+            // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
+            inputValue: function (el) {
+                let values = [];
+ 
+                for (let element of el) {
+                    if ($(element).is('select')) {
+                        values.push($(element).children('option:selected').val());
+                    }
+                }
+ 
+                // return the selected values
+                return values;
+            },
+            // This function initialises the criteria, specifically any dom elements that are required for its use
+            init: function(that, fn, preDefined = null) {
+                that.dom.valueTitle.prop('selected', true);
+
+                // Declare select element to be used with all of the default classes and listeners.
+                let el = $('<select/>')
+                    .addClass($.fn.dataTable.Criteria.classes.value)
+                    .addClass($.fn.dataTable.Criteria.classes.dropDown)
+                    .addClass($.fn.dataTable.Criteria.classes.italic)
+                    .addClass($.fn.dataTable.Criteria.classes.select)
+                    .append(that.dom.valueTitle)
+                    .on('change.dtsb', function() {
+                        $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
+                        fn(that, this);
+                    });
+
+                if (that.c.greyscale) {
+                    el.addClass($.fn.dataTable.Criteria.classes.greyscale);
+                }
+
+                let added = [];
+                let options = [];
+              
+                // Function to add an option to the select element
+                let addOption = (filt, text) => {
+                  if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
+                    filt.replace(/(<([^>]+)>)/ig, '');
+                  }
+
+                  // Add text and value, stripping out any html if that is the column type
+                  let opt = $('<option>', {
+                    type: Array.isArray(filt) ? 'Array' : 'String',
+                    value: filt
+                  })
+                  .data('sbv', filt)
+                  .addClass(that.classes.option)
+                  .addClass(that.classes.notItalic)
+                  // Have to add the text this way so that special html characters are not escaped - &amp; etc.
+                  .html(
+                    typeof text === 'string' ?
+                    text.replace(/(<([^>]+)>)/ig, '') :
+                    text
+                  );
+
+                  let val = opt.val();
+                  
+                  // Check that this value has not already been added
+                  if (added.indexOf(val) === -1) {
+                    added.push(val);
+                    options.push(opt);
+                    
+                    if (preDefined !== null && Array.isArray(preDefined[0])) {
+                      preDefined[0] = preDefined[0].sort().join(',');
+                    }
+
+                    // If this value was previously selected as indicated by preDefined, then select it again
+                    if (preDefined !== null && opt.val() === preDefined[0]) {
+                      opt.prop('selected', true);
+                      el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                      that.dom.valueTitle.removeProp('selected');
+                    }
+                  }
+                };
+
+                addOption("0 - Benign/Likely Benign", "0 - Benign/Likely Benign");
+                addOption("1 - Conflicting (without Pathogenic)", "1 - Conflicting (without Pathogenic)");
+                addOption("2 - NA", "2 - NA");
+                addOption("3 - Uncertain significance", "3 - Uncertain significance");
+                addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
+                addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
+                
+                options.sort((a, b) => {
+                    if (a.val() < b.val()) {
+                        return -1;
+                    } else if (a.val() > b.val()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                for (let opt of options) {
+                    el.append(opt);
+                }
+
+                return el;
+            },
+            // Straightforward search function comparing value from table and comparison from the select2 element
+            // These values are retrieved in `inputValue`
+            search: function ( value, comparison) {
+                return value != comparison[0];
+            }
+        }
+    }
 
     table = $('#variants').DataTable({
         buttons:[],
@@ -353,9 +542,13 @@ $(document).ready(function() {
             left:2,
             right:1
         },
+        columnDefs: [{
+            type:"clinvar",
+            targets: 12+number_family
+        }],
         select: {
             style:    'os',
-            selector: 'td:not(:nth-child(2), :nth-child(16), :nth-last-child(-n+3))'//td:not(:nth-last-child(-n+3))'
+            selector: 'td:not(:nth-child(2), :nth-child(' + (14 + number_family) + '), :nth-last-child(-n+3))'
         },
         ajax: json_variants,
         columns: dt_table,
@@ -1363,7 +1556,7 @@ function openDetailsVariantModal(id, sample_id) {
             columnDefs: [
                     {
                         orderable: false,
-                    targets:  "no-sort"
+                        targets:  "no-sort"
                     }
                 ],
         });

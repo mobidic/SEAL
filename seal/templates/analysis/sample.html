@@ -62,7 +62,7 @@
                             {% endfor %}
                             <th class='min-size-75'>GnomAD</th>
                             <th class='min-size-75'>SEAL</th>
-                            <th class='min-size-75'>ClinSig</th>
+                            <th class='min-size-75'>ClinVar</th>
                             <th class='min-size-75'>Transmission</th>
                             <th class='min-size-75'>Impact</th>
                             <th class='min-size-75'>Consequence</th>
@@ -149,10 +149,10 @@
                                 SEAL
                             </th>
                             <th>
-                                <span title="Help" onclick="openHelp(title='ClinSig', content='ClinVar clinical significance of the dbSNP variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help" onclick="openHelp(title='ClinVar', content='ClinVar clinical significance of the variant.', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                ClinSig
+                                ClinVar
                             </th>
                             <th>
                                 <span title="Help" onclick="openHelp(title='Transmission', content='This column represent the transmission mode following OMIM data.<br /><ul><li><b>AD</b>: Autosomal dominant</li><li><b>AR</b>: Autosomal recessive</li><li><b>DD</b>: Digenic dominant</li><li><b>DR</b>: Digenic recessive</li><li><b>IC</b>: Isolated cases</li><li><b>Mito</b>: Mitochondrial</li><li><b>MF</b>: Multifactorial</li><li><b>PAD</b>: Pseudoautosomal dominant</li><li><b>PAR</b>: Pseudoautosomal recessive</li><li><b>SMos</b>: Somatic mosaicism</li><li><b>SMut</b>: Somatic mutation</li><li><b>XL</b>: X-linked</li><li><b>XLD</b>: X-linked dominant</li><li><b>XLR</b>: X-linked recessive</li><li><b>YL</b>: Y-linked</li></ul><br /><i class=\'fas fa-question-circle w3-tiny\'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional', footer='For more information see : <a  href=\'https://www.omim.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>OMIM</i></a>' )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
@@ -441,6 +441,17 @@
         var current_user_transcripts = "{{ current_user.transcripts | safe }}";
         var sample_status = "{{ sample.status }}";
         var disabled_class = "{% if sample.status == 4 %}w3-disabled {% endif %}";
+        var clinvar_stars = {
+            'no_assertion_criteria_provided' : 0,
+            'no_assertion_provided' : 0,
+            'no_interpretation_for_the_single_variant' : 0,
+            'criteria_provided_single_submitter' : 1,
+            'criteria_provided_conflicting_interpretations' : 1,
+            'criteria_provided_multiple_submitters_no_conflicts' : 2,
+            'reviewed_by_expert_panel' : 3,
+            'practice_guideline' : 4
+        };
+        
         var dt_table = [
             {
                 className: 'showTitle ',
@@ -485,14 +496,27 @@
                     },
                     sort: function ( data, type, row, meta ) {
                         if(data != null) {
-                            var regExp = /(chr)?([0-9XYM]+):g\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|[ACGT]+)?/;
+                            var regExp = /(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/;
                             var matches = regExp.exec(data);
                             var zero = "000000000"
                             var chr;
                             if (Number.isInteger(parseInt(matches[2]))) {
                                 chr = (zero + matches[2]).slice(-2);
                             } else {
-                                chr = (matches[2])
+                                regExp2 = /^[Mm](t)?$/;
+                                if(regExp2.test(matches[2])) {
+                                    chr = 25;
+                                }
+                                regExp2 = /^[Yy]$/;
+                                if(regExp2.test(matches[2])) {
+                                    chr = 24;
+                                }
+                                regExp2 = /^[Xx]$/;
+                                if(regExp2.test(matches[2])) {
+                                    chr = 23;
+                                }else {
+                                    chr = (matches[2])
+                                }
                             }
                             return chr + "_" + (zero + matches[3]).slice(-9) + "_" + matches[6];
                         } else {
@@ -737,47 +761,131 @@
             },
             {
                 className: 'showTitle ',
-                data: "annotations.CLIN_SIG",
+                data: "clinvar",
                 render: {
                     _: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in data) {
-                            cell += "|" + data[idx] + "|"
+                        color = 'silver';
+                        colorHover = 'concrete';
+                        if (data.CLNSIG) {
+                            if (data.VARID) {
+                                href='https://www.ncbi.nlm.nih.gov/clinvar/variation/' + data.VARID
+                            }
+                            pattern = /benign/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                color = "turquoise";
+                                colorHover = "green-sea";
+                            }
+                            pattern = /uncertain/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                color = "sun-flower";
+                                colorHover = "orange";
+                            }
+                            pattern = /pathogenic/i;
+                            pattern2 = /establish/i;
+                            if (pattern.test(data.CLNSIG) || pattern2.test(data.CLNSIG)) {
+                                color = "alizarin";
+                                colorHover = "pomegranate";
+                            }
+                            pattern = /conflicting/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                color = "amethyst";
+                                colorHover = "wisteria";
+                                pattern2 = /pathogenic/i;
+                                pattern3 = /establish/i;
+                                if (pattern2.test(data.CLNSIGCONF) || pattern3.test(data.CLNSIG)) {
+                                    color = "carrot";
+                                    colorHover = "pumpkin";
+                                }
+                            }
+                            title = data.CLNSIG;
+                            if (data.CLNSIGCONF) {
+                                title = data.CLNSIGCONF;
+                            }
+                            n = 0
+                            if (data.CLNREVSTAT) {
+                                n  = clinvar_stars[data.CLNREVSTAT];
+                                s = ""
+                                for (const x of Array(4).keys()) {
+                                    if (x<n) {
+                                        s = s + '<i class="fa-solid fa-star fa-2xs"></i>';
+                                    } else {
+                                        s = s + '<i class="fa-regular fa-star fa-2xs"></i>';
+                                    }
+                                }
+                            }
+                            return "<a href='" + href + "' title='" + title + "' class='w3-tag w3-flat-" + color + " w3-hover-flat-" + colorHover + "' target='_blank' >" + s + " " +  data.CLNSIG + "</a>";
                         }
-                        return cell;
+                        return data.CLNSIG;
                     },
-                    display: function ( data, type, row, meta ) {
-                        cell = {
-                            "orange": "",
-                            "alizarin": "",
-                            "turquoise": "",
-                            "peter-river": "",
-                            "asbestos": ""
+                    sb: function ( data, type, row, meta ) {
+                        value = "2 - NA";
+                        if (data.CLNSIG) {
+                            pattern = /benign/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                value = "0 - Benign/Likely Benign"
+                            }
+                            pattern = /uncertain/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                value = "3 - Uncertain significance"
+                            }
+                            pattern = /pathogenic/i;
+                            pattern2 = /establish/i;
+                            if (pattern.test(data.CLNSIG) || pattern2.test(data.CLNSIG)) {
+                                value = "5 - Pathogenic/Likely Pathogenic"
+                            }
+                            pattern = /conflicting/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                value = "1 - Conflicting (without Pathogenic)"
+                                pattern2 = /pathogenic/i;
+                                pattern3 = /establish/i;
+                                if (pattern2.test(data.CLNSIGCONF) || pattern3.test(data.CLNSIG)) {
+                                    value = "4 - Conflicting (with Pathogenic)"
+                                }
+                            }
                         }
-                        style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-
-                        for (idx in data) {
-                            color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
-                            cell[color] += " <span style='display:inline-table;' class='w3-tag w3-flat-" + color + "' " + style + ">|" + data[idx] + "|</span>"
-                        }
-                        return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in data) {
-                            cell += "|" + data[idx] + "|"
-                        }
-                        return cell;
+                        return value;
                     },
                     sort: function ( data, type, row, meta ) {
-                        score = 0;
-                        for (idx in data) {
-                            score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
+                        value = 2;
+                        if (data.CLNSIG) {
+                            pattern = /benign/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                value = 0;
+                                pattern2 = /likely/i;
+                                if (pattern2.test(data.CLNSIGCONF)) {
+                                    value += 0.2;
+                                }
+                            }
+                            pattern = /uncertain/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                value = 3;
+                            }
+                            pattern = /pathogenic/i;
+                            pattern2 = /establish/i;
+                            if (pattern.test(data.CLNSIG) || pattern2.test(data.CLNSIG)) {
+                                value = 5;
+                                pattern3 = /likely/i;
+                                if (pattern3.test(data.CLNSIGCONF)) {
+                                    value -= 0.2;
+                                }
+                            }
+                            pattern = /conflicting/i;
+                            if (pattern.test(data.CLNSIG)) {
+                                value = 1;
+                                pattern2 = /pathogenic/i;
+                                pattern3 = /establish/i;
+                                if (pattern2.test(data.CLNSIGCONF) || pattern3.test(data.CLNSIG)) {
+                                    value = 4;
+                                }
+                            }
+                            return value;
                         }
-                        return score;
+                        return value;
                     },
                 },
-                sType: "numeric"
+                searchBuilder: {
+                    orthogonal:'sb'
+                },
             },
             {
                 className: ' w3-border-right ',
