@@ -1172,6 +1172,12 @@ def json_variants(id, idbed=False, version=-1):
         variants["data"].append({
             "annotations": main_annot,
             "chr": f"{variant.chr}",
+            "clinvar": {
+                "VARID" : variant.clinvar_VARID,
+                "CLNSIG" : variant.clinvar_CLNSIG,
+                "CLNSIGCONF" : variant.clinvar_CLNSIGCONF,
+                "CLNREVSTAT" : variant.clinvar_CLNREVSTAT
+            },
             "id": f"{variant.id}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
