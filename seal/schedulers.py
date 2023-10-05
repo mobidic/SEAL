@@ -633,15 +633,20 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
 
     # Try to update
     try:
+        cpt = 0
         execute_shell_command(["tabix", "-p", "vcf", new_clinvar])
         with annotVcf.AnnotVCFIO(new_clinvar) as vcf_io:
             for v in vcf_io:
+                cpt += 1
                 variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if variant:
                     variant.clinvar_VARID = v.id
-                    variant.clinvar_CLNSIG = v.info["CLNSIG"][0] if "CLNSIG" in v.info else None
-                    variant.clinvar_CLNSIGCONF = v.info["CLNSIGCONF"] if "CLNSIGCONF" in v.info else None
-                    variant.clinvar_CLNREVSTAT = list(v.info["CLNREVSTAT"]) if "CLNREVSTAT" in v.info else None
+                    variant.clinvar_CLNSIG = ''.join(v.info["CLNSIG"]) if "CLNSIG" in v.info else None
+                    variant.clinvar_CLNSIGCONF = ''.join(v.info["CLNSIGCONF"]) if "CLNSIGCONF" in v.info else None
+                    variant.clinvar_CLNREVSTAT = ''.join(v.info["CLNREVSTAT"]) if "CLNREVSTAT" in v.info else None
+                    db.session.commit()
+                if (cpt%10000 == 0):
+                    print(cpt)
     except Exception as e:
         db.session.rollback()
         path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')

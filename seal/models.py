@@ -247,8 +247,8 @@ class Variant(db.Model):
 
     clinvar_VARID = db.Column(db.Integer, unique=False, nullable=True)
     clinvar_CLNSIG = db.Column(db.String(500), unique=False, nullable=True)
-    clinvar_CLNSIGCONF = db.Column(MutableList.as_mutable(db.ARRAY(db.String(100))), default=list())
-    clinvar_CLNREVSTAT = db.Column(MutableList.as_mutable(db.ARRAY(db.String(100))), default=list())
+    clinvar_CLNSIGCONF = db.Column(db.String(500), unique=False, nullable=True)
+    clinvar_CLNREVSTAT = db.Column(db.String(500), unique=False, nullable=True)
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
