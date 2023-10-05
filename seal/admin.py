@@ -342,8 +342,9 @@ admin.add_view(
         Variant,
         db.session,
         category="Variant",
-        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'annotations'],
-        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant'],
+        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant', 'clinvar_VARID', 'clinvar_CLNSIG', 'clinvar_CLNSIGCONF', 'clinvar_CLNREVSTAT'],
+        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant', 'clinvar_VARID', 'clinvar_CLNSIG', 'clinvar_CLNSIGCONF', 'clinvar_CLNREVSTAT'],
+        column_exclude_list = ['annotations'],
         form_excluded_columns = ['samples']
     )
 )
