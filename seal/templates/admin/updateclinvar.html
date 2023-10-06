@@ -3,8 +3,6 @@
 {% block static %}
     <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
     <link href="{{ url_for('static', filename='select2/css/select2.min.css') }}" rel="stylesheet" />
-
-    <link href="{{ url_for('static', filename='seal/analysis/panel.css') }}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block content %}
@@ -31,7 +29,7 @@
                                     {% endfor %}
                                 </div>
                             {% else %}
-                                {{ form.version(class="w3-input w3-border") }}
+                                {{ form.version(class="w3-input w3-border", type="date") }}
                             {% endif %}
                         </div>
                     </div>
