@@ -823,9 +823,21 @@ $(document).ready(function() {
                     },
                 ]
             });
+            display();
             hide_message(count_hide);
         }
     });
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function display() {
+        for (let i = 0; i < 1; i++) {
+            await sleep(i * 10);
+        }
+        console.log('Done');
+        table.order([2, "asc"]).draw();
+    }
+    
 } );
 
 function hide_message(count_hide) {
