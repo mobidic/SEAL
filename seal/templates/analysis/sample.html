@@ -558,10 +558,10 @@
                         return response + data["HGVSc"];
                     },
                     sort: function ( data, type, row ) {
-                        if (data == null) {
+                        if (data["HGVSc"] == null) {
                             return -1;
                         }
-                        return data;
+                        return data["HGVSc"];
                     }
                 }
             },
