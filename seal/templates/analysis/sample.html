@@ -21,13 +21,19 @@
         </div>
         <div class="w3-padding w3-small">
             <div class="seal-form-report w3-row w3-padding {% if sample.status == 4 %}w3-disabled {% endif %}">
-                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-large fa fa-filter"></i> <b>Choose a filter</b></div>
-                <select id="selectFilter" class="w3-select w3-border w3-col m3 l2 s6" onchange="changeFilter(value, '{{ sample.id }}');">
-                </select>
-
-                <div class="w3-col w3-padding w3-text-flat-green-sea" style="width:200px"><i class="w3-large fas fa-th-list"></i> <b>Choose a panel</b></div>
-                <select id="selectBed" class="w3-select w3-border w3-col m3 l2 s6" onchange="applied_panel(value, '{{ sample.id }}');">
-                </select>
+                <div class="w3-col l4 m6 s12 w3-row w3-padding">
+                    <div class="w3-col w3-text-flat-green-sea l6 m6 s6"><p><i class="fa fa-filter fa-xl"></i> <b>Choose a filter</b></p></div>
+                    <select id="selectFilter" class="w3-select w3-col l6 m6 s6 w3-border" onchange="changeFilter(value, '{{ sample.id }}');">
+                    </select>
+                </div>
+                <div class="w3-col l4 m6 s12 w3-row w3-padding">
+                    <div class="w3-col w3-text-flat-green-sea l6 m6 s6"><p><i class="fas fa-th-list fa-xl"></i> <b>Choose a panel</b></p></div>
+                    <select id="selectBed" class="w3-select w3-col l6 m6 s6 w3-border" onchange="applied_panel(value, '{{ sample.id }}');">
+                    </select>
+                </div>
+                <div class="w3-col l4 m6 s12 w3-row w3-padding">
+                    <p class="w3-text-flat-green-sea"><i class="fa fa-circle-info fa-xl"></i> <b>Clinvar Version : <i>{{ clinvar.version }}</i></b></p>
+                </div>
             </div>
             <div class="w3-padding">
                 <table id="variants" class="w3-table display" style="width:100%">
