@@ -449,7 +449,7 @@ def importvcf():
         current_date = datetime.now().isoformat()
         try:
             app.logger.info("------ Variant Annotation with VEP ------")
-            create_and_execute_shell_command(Path(app.root_path).joinpath('static/vep.config.back.json'), values)
+            create_and_execute_shell_command(Path(app.root_path).joinpath('static/vep.config.json'), values)
             app.logger.info("------ END VEP ------")
         except CommandFailedError as e:
             app.logger.info(f"{type(e).__name__} : {e}")
@@ -644,9 +644,6 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
                     variant.clinvar_CLNSIG = ''.join(v.info["CLNSIG"]) if "CLNSIG" in v.info else None
                     variant.clinvar_CLNSIGCONF = ''.join(v.info["CLNSIGCONF"]) if "CLNSIGCONF" in v.info else None
                     variant.clinvar_CLNREVSTAT = ''.join(v.info["CLNREVSTAT"]) if "CLNREVSTAT" in v.info else None
-                    db.session.commit()
-                if (cpt%10000 == 0):
-                    print(cpt)
     except Exception as e:
         db.session.rollback()
         path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')

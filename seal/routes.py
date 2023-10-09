@@ -44,7 +44,7 @@ from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample)
+                         Transcript, User, Variant, Var2Sample, Clinvar)
 from seal.schedulers import update_clinvar_thread
 
 
@@ -641,6 +641,8 @@ def sample(id):
         for s in sample.family.samples:
             if s != sample and s.status > 0:
                 family_members.append(s)
+    
+    clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
@@ -648,7 +650,8 @@ def sample(id):
         count_hide = count_hide,
         family_members = family_members,
         form=commentForm,
-        saveFilterForm=saveFilterForm
+        saveFilterForm=saveFilterForm,
+        clinvar = clinvar
     )
 
 
@@ -769,7 +772,7 @@ def update_clinvar():
     UploadClinvarForm = UploadClinvar()
 
     if "submit" in request.form and UploadClinvarForm.validate_on_submit():
-        version = UploadClinvarForm.version.data.strftime("%Y%m%d")
+        version = int(UploadClinvarForm.version.data.strftime("%Y%m%d"))
         genome = UploadClinvarForm.genome_version.data
 
         vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
