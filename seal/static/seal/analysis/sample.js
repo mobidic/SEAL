@@ -1926,6 +1926,59 @@ $('#tableCommentsSample').DataTable({
     ]
 
 });
+var families=[];
+$.getJSON('/json/families', function(data, status, xhr){
+    for (var i = 0; i < data['data'].length; i++ ) {
+        families.push(data["data"][i]["family"]);
+    }
+});
+
+$('#edit-family').autocomplete({
+    source: families,
+});
+
+$("#edit-family").keyup(function(event) {
+    if (event.keyCode === 13) {
+        edit_family()
+    }
+});
+
+function edit_family() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You change the family associated to the sample.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Changed!',
+                'The family will be changed.',
+                'success'
+            )
+            $.ajax({
+                type: "POST",
+                url: "/edit/sample/family",
+                data: {
+                    "sample_id": sample_id,
+                    "new_family": $('#edit-family').val()
+                },
+                success: function() {
+                    $( "#error-message-edit-family" ).remove();
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                },
+                error: function(XMLHttpRequest) {
+                    $( "#error-message-edit-family" ).remove();
+                    msg = "<p id='error-message-edit-family' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
+                    $( "#sample-family-sidebar" ).after( msg );
+                }
+            })
+        }
+    })
+}
 
 
 $(document).ready(function() {
@@ -1954,58 +2007,4 @@ $(document).ready(function() {
             }
         ]
     });
-    var families=[];
-    $.getJSON('/json/families', function(data, status, xhr){
-        for (var i = 0; i < data['data'].length; i++ ) {
-            families.push(data["data"][i]["family"]);
-        }
-    });
-
-    $('#edit-family').autocomplete({
-        source: families,
-    });
-
-    $("#edit-family").keyup(function(event) {
-        if (event.keyCode === 13) {
-            edit_family()
-        }
-    });
-
-    function edit_family() {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You change the family associated to the sample.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, change it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Changed!',
-                    'The family will be changed.',
-                    'success'
-                )
-                $.ajax({
-                    type: "POST",
-                    url: "/edit/sample/family",
-                    data: {
-                        "sample_id": sample_id,
-                        "new_family": $('#edit-family').val()
-                    },
-                    success: function() {
-                        $( "#error-message-edit-family" ).remove();
-                        $("h1").html(DOMPurify.sanitize($('#edit-family').val()));
-                        $('#tableHistorySample').DataTable().ajax.reload();
-                    },
-                    error: function(XMLHttpRequest) {
-                        $( "#error-message-edit-family" ).remove();
-                        msg = "<p id='error-message-edit-family' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
-                        $( "#sample-family-sidebar" ).after( msg );
-                    }
-                })
-            }
-        })
-    }
 });

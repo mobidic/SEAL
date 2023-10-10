@@ -1591,9 +1591,12 @@ def edit_family():
     new_family = request.form["new_family"]
     sample = Sample.query.get(sample_id)
 
-    if not new_family and sample.familyid:
-        history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.family.family}' (id: {sample.familyid})")
-        sample.familyid = None
+    if not new_family:
+        if sample.familyid:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.family.family}' (id: {sample.familyid})")
+            sample.familyid = None
+        else:
+            return "ok"
     else:
         family = Family.query.filter(Family.family == new_family).first()
         if not family:
