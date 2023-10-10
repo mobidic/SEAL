@@ -49,6 +49,9 @@
                                     <a href="{{ url_for('admin.index') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                         <i class="fas fa-tools fa-fw w3-margin-right"></i> Admin tools
                                     </a>
+                                    <a href="{{ url_for('update_clinvar') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                        <i class="fa-solid fa-download fa-fw w3-margin-right"></i></i> Update ClinVar
+                                    </a>
                                 {% endif %}
                                 <a href="{{ url_for('logout') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                     <i class="fas fa-sign-out-alt fa-fw w3-margin-right"></i> Logout
