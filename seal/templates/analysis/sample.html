@@ -42,7 +42,7 @@
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle">Gene</span></th>
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle"></span></th>
                             <th colspan="4" class="w3-border-right">Nomenclature</th>
-                            <th colspan="4" class="w3-border-right">Variant Quality</th>
+                            <th colspan="2" class="w3-border-right">Variant</th>
                             {% if family_members|length > 0 %}
                                 <th colspan="{{ family_members|length }}" class="w3-border-right">Family</th>
                             {% endif %}
@@ -60,9 +60,10 @@
                             <th class='min-size-75'>HGVSp</th>
                             <th class='min-size-50'>E|I</th>
                             <th class='min-size-75'>Filter</th>
-                            <th class='min-size-75'>AF</th>
+                            <th class='min-size-75'>{{ sample.samplename }}</th>
+                            <!-- <th class='min-size-75'>AF</th>
                             <th class='min-size-75'>DP</th>
-                            <th class='min-size-75'>AD</th>
+                            <th class='min-size-75'>AD</th> -->
                             {% for s in family_members %}
                                 <th class='min-size-100'>{{ s }}</th>
                             {% endfor %}
@@ -122,6 +123,12 @@
                                 </span>
                                 AF
                             </th>
+                            <!-- <th>
+                                <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <i class="fas fa-question-circle w3-tiny"></i>
+                                </span>
+                                AF
+                            </th>
                             <th>
                                 <span title="Help" onclick="openHelp(title='Depth', content='Depth in DNA sequencing is the number of unique reads that include a given nucleotide in the reconstructed sequence.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
@@ -133,7 +140,7 @@
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 AD
-                            </th>
+                            </th> -->
                             {% for s in family_members %}
                                 <th>
                                     <span title="Help" onclick="openHelp(title='{{ s }}', content='Frequence of the observed allele for the sample, and  Allelic depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
@@ -665,29 +672,54 @@
                 sType: "numeric"
             },
             {
-                className: 'showTitle',
-                data: "allelic_frequency",
+                className: 'w3-tiny showTitle w3-border-right',
+                data: {},
                 render: {
                     _: function ( data, type, row, meta ) {
-                        return data;
+                        return data["allelic_frequency"];
                     },
                     display: function ( data, type, row, meta ) {
-                        if (data >=0 && data < 0.25) {
-                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
-                        } else if (data < 0.75) {
-                            return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data*100) + "%";
-                        } else if (data <= 1)  {
-                            return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
+                        if (data["allelic_frequency"] >=0 && data["allelic_frequency"] < 0.25) {
+                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + data["allelic_depth"] + '/' + data["depth"];
+                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + data["allelic_depth"] + '/' + data["depth"];
+                        } else if (data["allelic_frequency"] < 0.75) {
+                            return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + data["allelic_depth"] + '/' + data["depth"];
+                        } else if (data["allelic_frequency"] <= 1)  {
+                            return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + data["allelic_depth"] + '/' + data["depth"];
                         }
-                        return '<i class="far fa-question-circle w3-tiny"></i> ' + data;
+                        return '<i>' + data["allelic_frequency"] + '</i>';
                     },
                 }
             },
-            { className: 'showTitle ', data: "depth"},
-            { className: 'showTitle  w3-border-right', data: "allelic_depth"},
+            // },
+            // {
+            //     className: 'showTitle',
+            //     data: "allelic_frequency",
+            //     render: {
+            //         _: function ( data, type, row, meta ) {
+            //             return data;
+            //         },
+            //         display: function ( data, type, row, meta ) {
+            //             if (data >=0 && data < 0.25) {
+            //                 return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
+            //             } else if (data < 0.75) {
+            //                 return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data*100) + "%";
+            //             } else if (data <= 1)  {
+            //                 return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
+            //             }
+            //             return '<i class="far fa-question-circle w3-tiny"></i> ' + data;
+            //         },
+            //     }
+            // },
+            // { className: 'showTitle ', data: "depth"},
+            // { className: 'showTitle  w3-border-right', data: "allelic_depth"},
             {% for s in family_members %}
             {
-                className: 'w3-tiny showTitle',
+                className: 'w3-tiny showTitle{% if loop.last  %} w3-border-right{% endif %}',
                 data: "family.{{ s }}",
                 render: {
                     _: function ( data, type, row, meta ) {
@@ -712,7 +744,7 @@
             },
             {% endfor %}
             {
-                className: ' w3-border-left',
+                className: 'showTitle',
                 data: "annotations.gnomADg_AF",
                 render : {
                     _: function ( data, type, row, meta ) {
@@ -1235,17 +1267,19 @@
                 data: "allelic_frequency",
                 searchable: false , visible: false
             },
+            { data: "depth", searchable: true , visible: false},
+            { data: "allelic_depth",searchable: true , visible: false},
         ];
         var number_family = {{ family_members|length }};
 
-        var columns_filter= [0,2,3,4,5,6,7,8,9];
-        var columns_base = [number_family + 22-1, 0, 2, 3, 4, 5, 6, 7, 8, 9];
+        var columns_filter= [0,2,3,4,5,6,7,31,32];
+        var columns_base = [number_family + 20-1, 0, 2, 3, 4, 5, 6, 7];
         
         for (i in [...Array(number_family).keys()]) {
-            columns_filter.push(parseInt(i)+10);
-            columns_base.push(parseInt(i)+10);
+            columns_filter.push(parseInt(i)+8);
+            columns_base.push(parseInt(i)+8);
         }
-        for (const i of [10,11,12,13,14,15,16,17,18,19,20]) {
+        for (const i of [10,11,12,13,14,15,16,17,18]) {
             columns_filter.push(parseInt(i)+number_family);
             columns_base.push(parseInt(i)+number_family);
         }

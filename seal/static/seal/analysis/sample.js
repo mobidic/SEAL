@@ -544,11 +544,17 @@ $(document).ready(function() {
         },
         columnDefs: [{
             type:"clinvar",
-            targets: 12+number_family
+            targets: 10+number_family
+        },{
+            searchBuilderTitle: 'Depth',
+            targets: [31]
+        },{
+            searchBuilderTitle: 'Allelic Depth',
+            targets: [32]
         }],
         select: {
             style:    'os',
-            selector: 'td:not(:nth-child(2), :nth-child(' + (14 + number_family) + '), :nth-last-child(-n+3))'
+            selector: 'td:not(:nth-child(2), :nth-child(' + (11 + number_family) + '), :nth-child(' + (12 + number_family) + '), :nth-last-child(-n+3))'
         },
         ajax: json_variants,
         columns: dt_table,
@@ -585,10 +591,10 @@ $(document).ready(function() {
             } );
             var format_base = {
                 body: function(data, row, column, node) {
-                    if (column === (number_family + 20-1)) {
+                    if (column === (number_family + 18-1)) {
                         data = $(node).children().prop("checked")===true?"Yes":"No";
                     }
-                    if (column === (number_family + 21-1)) {
+                    if (column === (number_family + 19-1)) {
                         value = $(node).children('div').children('button').text();
                         data = $.trim(value);
                     }
@@ -597,25 +603,25 @@ $(document).ready(function() {
             };
             var format_defGene = {
                 body: function(data, row, column, node) {
-                    return column === 14 ? data + "\r" :data;
+                    return column === 12 ? data + "\r" :data;
                 },
                 header: function ( data, columnIdx ) {
                     dict = {};
                     dict['0'] = "GENE";
                     dict['3'] = "VARIANT";
-                    dict[parseInt(number_family)-1+23] = "VARIANT_P";
-                    dict[parseInt(number_family)-1+24] = "VARIANT_C";
-                    dict[parseInt(number_family)-1+25] = "ENST";
-                    dict[parseInt(number_family)-1+26] = "NM";
-                    dict[parseInt(number_family)-1+27] = "COSMIC";
-                    dict[parseInt(number_family)-1+28] = "RS";
-                    dict[parseInt(number_family)-1+29] = "POSITION_GENOMIQUE";
-                    dict[parseInt(number_family)-1+16] = "CONSEQUENCES";
-                    dict[parseInt(number_family)-1+30] = "CHROMOSOME";
-                    dict[parseInt(number_family)-1+31] = "GENOME_REFERENCE";
+                    dict[parseInt(number_family)-1+21] = "VARIANT_P";
+                    dict[parseInt(number_family)-1+22] = "VARIANT_C";
+                    dict[parseInt(number_family)-1+23] = "ENST";
+                    dict[parseInt(number_family)-1+24] = "NM";
+                    dict[parseInt(number_family)-1+25] = "COSMIC";
+                    dict[parseInt(number_family)-1+26] = "RS";
+                    dict[parseInt(number_family)-1+27] = "POSITION_GENOMIQUE";
+                    dict[parseInt(number_family)-1+14] = "CONSEQUENCES";
+                    dict[parseInt(number_family)-1+28] = "CHROMOSOME";
+                    dict[parseInt(number_family)-1+29] = "GENOME_REFERENCE";
                     dict['2'] = "NOMENCLATURE_HGVS";
-                    dict[parseInt(number_family)-1+32] = "LOCALISATION";
-                    dict[parseInt(number_family)-1+33] = "FREQUENCE_ALLELIQUE\r";
+                    dict[parseInt(number_family)-1+30] = "LOCALISATION";
+                    dict[parseInt(number_family)-1+31] = "FREQUENCE_ALLELIQUE\r";
                     if (columnIdx in dict) {
                         return dict[parseInt(columnIdx)]
                     } 
@@ -623,7 +629,7 @@ $(document).ready(function() {
                 }
             };
             // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-            var columns_defGene = [0,3,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+28,parseInt(number_family)-1+29,parseInt(number_family)-1+16,parseInt(number_family)-1+30,parseInt(number_family)-1+31,2,parseInt(number_family)-1+32,parseInt(number_family)-1+33];
+            var columns_defGene = [0,3,parseInt(number_family)-1+21,parseInt(number_family)-1+22,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+14,parseInt(number_family)-1+28,parseInt(number_family)-1+29,2,parseInt(number_family)-1+30,parseInt(number_family)-1+31];
             table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
@@ -834,7 +840,6 @@ $(document).ready(function() {
         for (let i = 0; i < 1; i++) {
             await sleep(i * 10);
         }
-        console.log('Done');
         table.order([2, "asc"]).draw();
     }
     
