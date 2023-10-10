@@ -1178,9 +1178,9 @@ function openDetailsVariantModal(id, sample_id) {
                     cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
                 }
             }
-            color = "w3-text-flat-peter-river";
+            color = "";
             if (current_user_transcripts.includes(data["annotations"]["ANN"][x]["Feature"])) {
-                color = "w3-text-flat-alizarin";
+                color = "w3-text-flat-peter-river";
             }
             if (data["annotations"]["ANN"][x]["canonical"]) {
                 response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
