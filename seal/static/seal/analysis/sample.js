@@ -537,7 +537,6 @@ $(document).ready(function() {
         scrollX:        true,
         scrollCollapse: true,
         scroller:         true,
-        order: [[ 2, "asc" ]],
         fixedColumns: {
             left:2,
             right:1
@@ -829,20 +828,9 @@ $(document).ready(function() {
                     },
                 ]
             });
-            display();
             hide_message(count_hide);
         }
     });
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    async function display() {
-        for (let i = 0; i < 1; i++) {
-            await sleep(i * 10);
-        }
-        table.order([2, "asc"]).draw();
-    }
-    
 } );
 
 function hide_message(count_hide) {
@@ -1614,6 +1602,7 @@ function changeFilter(id, sample_id) {
                 },
                 success: function() {
                     $('#tableHistorySample').DataTable().ajax.reload();
+                    table.order([2, "asc"]).draw();
                 }
             });
         }, 30);
