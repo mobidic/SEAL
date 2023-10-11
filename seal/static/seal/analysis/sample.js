@@ -26,65 +26,6 @@ function toggle_status(id, status) {
     });
 }
 
-const clinsig_dict = {
-    "uncertain_significance": {
-        "color": "orange",
-        "score": 4
-    },
-    "conflicting_interpretations_of_pathogenicity": {
-        "color": "orange",
-        "score": 4
-    },
-    "pathogenic": {
-        "color": "alizarin",
-        "score": 10
-    },
-    "likely_pathogenic": {
-        "color": "alizarin",
-        "score": 7
-    },
-    "pathogenic/likely_pathogenic": {
-        "color": "alizarin",
-        "score": 6
-    },
-    "benign": {
-        "color": "turquoise",
-        "score": -1.5
-    },
-    "likely_benign": {
-        "color": "turquoise",
-        "score": -0.25
-    },
-    "benign/likely_benign": {
-        "color": "turquoise",
-        "score": -1
-    },
-    "not_provided": {
-        "color": "peter-river",
-        "score": -0.1
-    },
-    "_other": {
-        "color": "peter-river",
-        "score": 0
-    },
-    "protective": {
-        "color": "peter-river",
-        "score": -0.1
-    },
-    "association": {
-        "color": "peter-river",
-        "score": 0.1
-    },
-    "risk_factor": {
-        "color": "peter-river",
-        "score": 0.2
-    },
-    "affects": {
-        "color": "peter-river",
-        "score": 0.15
-    }
-};
-
 const impact_dict = {
     "MODERATE": {
         "color": "orange",
@@ -328,6 +269,254 @@ $(document).ready(function() {
         }
         $('#selectBed').html(options);
     });
+    
+    $.fn.dataTable.ext.searchBuilder.conditions.clinvar = {
+        "=": {
+            // This function decides whether to include the criteria in the search
+            isInputValid: function (el, that) {
+                // If no options have been selected, or one has but it has no value then do not include the criteria
+                if (
+                    $(el[0]).has('option:selected').length < 1 ||
+                    (
+                        $(el[0]).has('option:selected').length === 1 &&
+                        $($(el[0]).children('option:selected')[0]).text().length === 0
+                    )
+                ) {
+                    return false;
+                }
+
+                return true;
+            },
+            // This is the string displayed in the condition select
+            conditionName: 'Is',
+            // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
+            inputValue: function (el) {
+                let values = [];
+
+                for (let element of el) {
+                    if ($(element).is('select')) {
+                        values.push($(element).children('option:selected').val());
+                    }
+                }
+
+                // return the selected values
+                return values;
+            },
+            // This function initialises the criteria, specifically any dom elements that are required for its use
+            init: function(that, fn, preDefined = null) {
+                // Declare select element to be used with all of the default classes and listeners.
+                let el = $('<select/>')
+                    .addClass($.fn.dataTable.Criteria.classes.value)
+                    .addClass($.fn.dataTable.Criteria.classes.dropDown)
+                    .addClass($.fn.dataTable.Criteria.classes.italic)
+                    .addClass($.fn.dataTable.Criteria.classes.select)
+                    .append(that.dom.valueTitle)
+                    .on('change.dtsb', function() {
+                        $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
+                        fn(that, this);
+                    });
+
+                if (that.c.greyscale) {
+                    el.addClass($.fn.dataTable.Criteria.classes.greyscale);
+                }
+
+                let added = [];
+                let options = [];
+            
+                // Function to add an option to the select element
+                let addOption = (filt, text) => {
+                    if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
+                        filt.replace(/(<([^>]+)>)/ig, '');
+                    }
+
+                    // Add text and value, stripping out any html if that is the column type
+                    let opt = $('<option>', {
+                        type: Array.isArray(filt) ? 'Array' : 'String',
+                        value: filt
+                    })
+                    .data('sbv', filt)
+                    .addClass(that.classes.option)
+                    .addClass(that.classes.notItalic)
+                    // Have to add the text this way so that special html characters are not escaped - &amp; etc.
+                    .html(
+                        typeof text === 'string' ?
+                        text.replace(/(<([^>]+)>)/ig, '') :
+                        text
+                    );
+
+                    let val = opt.val();
+                    
+                    // Check that this value has not already been added
+                    if (added.indexOf(val) === -1) {
+                        added.push(val);
+                        options.push(opt);
+                        
+                        if (preDefined !== null && Array.isArray(preDefined[0])) {
+                        preDefined[0] = preDefined[0].sort().join(',');
+                        }
+
+                        // If this value was previously selected as indicated by preDefined, then select it again
+                        if (preDefined !== null && opt.val() === preDefined[0]) {
+                        opt.prop('selected', true);
+                        el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                        that.dom.valueTitle.removeProp('selected');
+                        }
+                    }
+                };
+
+                addOption("0 - Benign/Likely Benign", "0 - Benign/Likely Benign");
+                addOption("1 - Conflicting (without Pathogenic)", "1 - Conflicting (without Pathogenic)");
+                addOption("2 - NA", "2 - NA");
+                addOption("3 - Uncertain significance", "3 - Uncertain significance");
+                addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
+                addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
+                
+                options.sort((a, b) => {
+                    if (a.val() < b.val()) {
+                        return -1;
+                    } else if (a.val() > b.val()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                for (let opt of options) {
+                    el.append(opt);
+                }
+
+                return el;
+            },
+            // Straightforward search function comparing value from table and comparison from the select2 element
+            // These values are retrieved in `inputValue`
+            search: function ( value, comparison) {
+                return value === comparison[0];
+            }
+        }, "!=": {
+            // This function decides whether to include the criteria in the search
+            isInputValid: function (el, that) {
+                // If no options have been selected, or one has but it has no value then do not include the criteria
+                if (
+                    $(el[0]).has('option:selected').length < 1 ||
+                    (
+                        $(el[0]).has('option:selected').length === 1 &&
+                        $($(el[0]).children('option:selected')[0]).text().length === 0
+                    )
+                ) {
+                    return false;
+                }
+ 
+                return true;
+            },
+            // This is the string displayed in the condition select
+            conditionName: 'Is Not',
+            // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
+            inputValue: function (el) {
+                let values = [];
+ 
+                for (let element of el) {
+                    if ($(element).is('select')) {
+                        values.push($(element).children('option:selected').val());
+                    }
+                }
+ 
+                // return the selected values
+                return values;
+            },
+            // This function initialises the criteria, specifically any dom elements that are required for its use
+            init: function(that, fn, preDefined = null) {
+                that.dom.valueTitle.prop('selected', true);
+
+                // Declare select element to be used with all of the default classes and listeners.
+                let el = $('<select/>')
+                    .addClass($.fn.dataTable.Criteria.classes.value)
+                    .addClass($.fn.dataTable.Criteria.classes.dropDown)
+                    .addClass($.fn.dataTable.Criteria.classes.italic)
+                    .addClass($.fn.dataTable.Criteria.classes.select)
+                    .append(that.dom.valueTitle)
+                    .on('change.dtsb', function() {
+                        $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
+                        fn(that, this);
+                    });
+
+                if (that.c.greyscale) {
+                    el.addClass($.fn.dataTable.Criteria.classes.greyscale);
+                }
+
+                let added = [];
+                let options = [];
+              
+                // Function to add an option to the select element
+                let addOption = (filt, text) => {
+                  if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
+                    filt.replace(/(<([^>]+)>)/ig, '');
+                  }
+
+                  // Add text and value, stripping out any html if that is the column type
+                  let opt = $('<option>', {
+                    type: Array.isArray(filt) ? 'Array' : 'String',
+                    value: filt
+                  })
+                  .data('sbv', filt)
+                  .addClass(that.classes.option)
+                  .addClass(that.classes.notItalic)
+                  // Have to add the text this way so that special html characters are not escaped - &amp; etc.
+                  .html(
+                    typeof text === 'string' ?
+                    text.replace(/(<([^>]+)>)/ig, '') :
+                    text
+                  );
+
+                  let val = opt.val();
+                  
+                  // Check that this value has not already been added
+                  if (added.indexOf(val) === -1) {
+                    added.push(val);
+                    options.push(opt);
+                    
+                    if (preDefined !== null && Array.isArray(preDefined[0])) {
+                      preDefined[0] = preDefined[0].sort().join(',');
+                    }
+
+                    // If this value was previously selected as indicated by preDefined, then select it again
+                    if (preDefined !== null && opt.val() === preDefined[0]) {
+                      opt.prop('selected', true);
+                      el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                      that.dom.valueTitle.removeProp('selected');
+                    }
+                  }
+                };
+
+                addOption("0 - Benign/Likely Benign", "0 - Benign/Likely Benign");
+                addOption("1 - Conflicting (without Pathogenic)", "1 - Conflicting (without Pathogenic)");
+                addOption("2 - NA", "2 - NA");
+                addOption("3 - Uncertain significance", "3 - Uncertain significance");
+                addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
+                addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
+                
+                options.sort((a, b) => {
+                    if (a.val() < b.val()) {
+                        return -1;
+                    } else if (a.val() > b.val()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+
+                for (let opt of options) {
+                    el.append(opt);
+                }
+
+                return el;
+            },
+            // Straightforward search function comparing value from table and comparison from the select2 element
+            // These values are retrieved in `inputValue`
+            search: function ( value, comparison) {
+                return value != comparison[0];
+            }
+        }
+    }
 
     table = $('#variants').DataTable({
         buttons:[],
@@ -348,599 +537,26 @@ $(document).ready(function() {
         scrollX:        true,
         scrollCollapse: true,
         scroller:         true,
-        order: [[ 2, "asc" ]],
         fixedColumns: {
             left:2,
             right:1
         },
+        columnDefs: [{
+            type:"clinvar",
+            targets: 10+number_family
+        },{
+            searchBuilderTitle: 'Depth',
+            targets: [31]
+        },{
+            searchBuilderTitle: 'Allelic Depth',
+            targets: [32]
+        }],
         select: {
             style:    'os',
-            selector: 'td:not(:nth-child(2), :nth-child(16), :nth-last-child(-n+3))'//td:not(:nth-last-child(-n+3))'
+            selector: 'td:not(:nth-child(2), :nth-child(' + (11 + number_family) + '), :nth-child(' + (12 + number_family) + '), :nth-last-child(-n+3))'
         },
         ajax: json_variants,
-        columns: [
-            {
-                className: 'showTitle ',
-                data: "annotations.SYMBOL",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return -1;
-                        }
-                        return data;
-                    }
-                }
-            },
-            {
-                className: 'w3-border-right no-padding',
-                data: null,
-                orderable: false,
-                render: {
-                    _: function ( data, type, row ) {
-                        mobidetails="";
-                        if (current_user_api_key_md !== "None") {
-                            mobidetails = '<span onclick="openMD(\'' + data["annotations"]["HGVSc"] + '\')" class="fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> MobiDetails</span> <br />'
-                        }
-                        franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
-                        gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">G</span></span> GnomAD</a> ';
-                        return "<div class='w3-tiny'>" + mobidetails + franklin + "<br />" + gnomad + "</div>";
-                    }
-                }
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.HGVSg",
-                render : {
-                    _: function ( data, type, row, meta ) {
-                        return data;
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            var regExp = /(chr)?([0-9XYM]+):g\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|[ACGT]+)?/;
-                            var matches = regExp.exec(data);
-                            var zero = "000000000"
-                            var chr;
-                            if (Number.isInteger(parseInt(matches[2]))) {
-                                chr = (zero + matches[2]).slice(-2);
-                            } else {
-                                chr = (matches[2])
-                            }
-                            return chr + "_" + (zero + matches[3]).slice(-9) + "_" + matches[6];
-                        } else {
-                            num = -1
-                            return num.toFixed(6);
-                        }
-                    },
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data["HGVSc"] == null) {
-                            return "NA";
-                        }
-                        return data["HGVSc"];
-                    },
-                    display: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        color = "";
-                        if (data["preferred"]) {
-                            color = "w3-text-flat-peter-river";
-                        }
-                        if (data["canonical"]) {
-                            response = '<i title="CANONICAL" class="' + color + ' fas fa-star w3-tiny"></i> ';
-                        } else {
-                            response = '<i title="" class="' + color + ' far fa-star w3-tiny"></i> ';
-                        }
-                        return response + data["HGVSc"];
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return -1;
-                        }
-                        return data;
-                    }
-                }
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.HGVSp",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data == null) {
-                            return "NA";
-                        }
-                        return data;
-                    },
-                    display: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return -1;
-                        }
-                        return data;
-                    }
-                }
-            },
-            {
-                className: 'w3-border-right ',
-                data: "annotations",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "NA";
-                            }
-                            return data["INTRON"];
-                        }
-                        return data["EXON"];
-                    },
-                    display: function ( data, type, row ) {
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "<i>NA</i>";
-                            }
-                            return "<i title='Intron " + data["INTRON"] + "'>" + data["INTRON"] + "</i>";
-                        }
-                        return "<b title='Exon " + data["EXON"] + "'>" + data["EXON"] + "</b>";
-                    },
-                    sort: function ( data, type, row ) {
-                        prefix = data
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "NA";
-                            }
-                            ei = data["INTRON"];
-                        } else {
-                            ei = data["EXON"];
-                        }
-                        pos_split = ei.split(/\//);
-                        return pos_split[0];
-                    },
-                }
-            },
-            {
-                className: 'showTitle ',
-                data: "filter",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        cell = ""
-                        for (idx in data) {
-                            cell += data[idx] + " | ";
-                        }
-                        return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    },
-                    display: function ( data, type, row, meta ) {
-                        cell = ""
-                        style = "style='display:inline-table;max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-
-                        for (idx in data) {
-                            color = "asbestos";
-                            cell += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
-                        }
-                        return cell;
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        return data.toString();
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        var val = 0;
-                        var zero = "000000000";
-                        for (idx in data) {
-                            if (data[idx] == "PASS") {
-                                val = 2;
-                            }
-                            val += -1;
-                        }
-                        return val
-                    }
-                },
-                sType: "numeric"
-            },
-            {
-                className: 'showTitle',
-                data: "allelic_frequency",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        return data;
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data >=0 && data < 0.25) {
-                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
-                        } else if (data < 0.75) {
-                            return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data*100) + "%";
-                        } else if (data <= 1)  {
-                            return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
-                        }
-                        return '<i class="far fa-question-circle w3-tiny"></i> ' + data;
-                    },
-                }
-            },
-            { className: 'showTitle ', data: "depth"},
-            { className: 'showTitle  w3-border-right ', data: "allelic_depth"},
-            {
-                className: ' ',
-                data: "annotations.gnomADg_AF",
-                render : {
-                    _: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            if (isNaN(parseFloat(data).toFixed(6))) {
-                                return null
-                            }
-                            return parseFloat(data).toFixed(6);
-                        } else {
-                            return null;
-                        }
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            if (isNaN(parseFloat(data).toFixed(6))) {
-                                return "<i>NA</i>"
-                            }
-                            gnomad = parseFloat(data);
-                            if (gnomad > 0.01) {
-                                response = parseFloat(data).toFixed(4)
-                            } else {
-                                response = parseFloat(data).toExponential(2)
-                            }
-                            return "<span title='"+ gnomad +"'>" + response + "</span>";
-                        } else {
-                            return "<i>NA</i>";
-                        }
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            if (isNaN(parseFloat(data).toFixed(6))) {
-                                return -0.5
-                            }
-                            return parseFloat(data).toFixed(6);
-                        } else {
-                            return -1
-                        }
-                    }
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "inseal",
-                render : {
-                    _: function ( data, type, row, meta ) {
-                        return (data["occurrences"] > 0) ? data["occurrences"] : "NA";
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        return (data["occurrences"] > 0) ? data["occurrences"] : 0;
-                    }
-                },
-            },
-            {
-                className: 'showTitle w3-border-right ',
-                data: "inseal",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        return data["occurences_family"];
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if(data["occurences_family"] != null) {
-                            val = data["occurences_family"];
-                            members = ""
-                            if (data["occurences_family"] >= 1) {
-                                members = " (" + data["family_members"] +")"
-                            }
-                            return val + members;
-                        } else {
-                            return "<i>NA</i>";
-                        }
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data["occurences_family"] != null) {
-                            return data["occurences_family"];
-                        } else {
-                            return 0;
-                        }
-                    }
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.CLIN_SIG",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in data) {
-                            cell += "|" + data[idx] + "|"
-                        }
-                        return cell;
-                    },
-                    display: function ( data, type, row, meta ) {
-                        cell = {
-                            "orange": "",
-                            "alizarin": "",
-                            "turquoise": "",
-                            "peter-river": "",
-                            "asbestos": ""
-                        }
-                        style = "style='max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-
-                        for (idx in data) {
-                            color = data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["color"] : "asbestos"
-                            cell[color] += " <span style='display:inline-table;' class='w3-tag w3-flat-" + color + "' " + style + ">|" + data[idx] + "|</span>"
-                        }
-                        return cell["orange"] + cell["alizarin"] + cell["turquoise"] + cell["peter-river"] + cell["asbestos"];
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in data) {
-                            cell += "|" + data[idx] + "|"
-                        }
-                        return cell;
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        score = 0;
-                        for (idx in data) {
-                            score += data[idx] in clinsig_dict ? clinsig_dict[data[idx]]["score"] : 0
-                        }
-                        return score;
-                    },
-                },
-                sType: "numeric"
-            },
-            {
-                className: ' w3-border-right ',
-                data: "phenotypes",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        inheritances = ""
-                        for (d in data) {
-                            title=data[d]["phenotype"];
-                            inheritances = inheritances + data[d]["inheritances"] + ' (' + title + ') | ';
-                        }
-                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    },
-                    display: function ( data, type, row, meta ) {
-                        inheritances = ""
-                        for (d in data) {
-                            if (data[d]["inheritance"] != "[]") {
-                                link = "https://www.omim.org/entry/" + data[d]["phenotypeMimNumber"];
-                                title=data[d]["phenotype"];
-                                inheritances = inheritances + '<a class="w3-text-flat-peter-river  w3-hover-flat-belize-hole" href="'+link+'" target="_blank" title="' + title + '">' + data[d]["inheritances"] + '</a> | ';
-                            }
-                        }
-                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    }
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.IMPACT",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        return data;
-                    },
-                    display: function ( data, type, row, meta ) {
-                        style = "style='display:inline-table;max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-                        cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
-                        return cell;
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        return data.toString();
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        return impact_dict[data]["score"];
-                    },
-                },
-                sType: "numeric"
-            },
-            {
-                className: 'showTitle w3-border-right ',
-                data: "annotations.Consequence",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in consequences_dict) {
-                            if (data.includes(idx)){
-                                cell += idx + " | "
-                            }
-                        }
-                        return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    },
-                    display: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in consequences_dict) {
-                            if (data.includes(idx)){
-                                color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
-                                style = "style='display:inline-table;max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
-                                cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
-                            }
-                        }
-                        return cell;
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        return data.toString();
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        var sort = 0;
-                        for (idx in data) {
-                            sort += consequences_dict[data[idx]]["score"];
-                        }
-                        return Math.log10(sort);
-                    }
-                },
-                sType: "numeric"
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.MES_var",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return null;
-                        }
-                        return Math.abs(parseFloat(data).toFixed(3));
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return "<i>NA</i>";
-                        }
-                        value = parseFloat(data).toFixed(2)
-                        classw3css = "";
-                        if (Math.abs(value) >= 15) {
-                            classw3css = "w3-text-flat-pomegranate";
-                        }
-                        return "<span class='" + classw3css + "'>" + value + "</span>";
-                    },
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.spliceAI",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return null;
-                        }
-                        return parseFloat(data).toFixed(3);
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return "<i>NA</i>";
-                        }
-                        value = parseFloat(data).toFixed(2)
-                        classw3css = "";
-                        if (value >= 0.8) {
-                            classw3css = "w3-text-flat-pomegranate";
-                        } else if (value >= 0.5) {
-                            classw3css = "w3-text-flat-orange";
-                        } else if (value >= 0.2) {
-                            classw3css = "w3-text-flat-sun-flower";
-                        }
-                        return "<span class='" + classw3css + "'>" + value + "</span>";
-                    },
-                },
-            },
-            {
-                className: 'showTitle w3-border-right ',
-                data: "annotations.missensesMean",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            return data.toFixed(4);
-                        } else {
-                            return null;
-                        }
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return "<i>NA</i>";
-                        }
-                        value = parseFloat(data).toFixed(3)
-                        classw3css = "";
-                        if (value >= 0.95) {
-                            classw3css = "w3-tag w3-flat-pomegranate";
-                        } else if (value >= 0.9) {
-                            classw3css = "w3-text-flat-pomegranate";
-                        } else if (value >= 0.75) {
-                            classw3css = "w3-text-flat-orange";
-                        } else if (value >= 0.5) {
-                            classw3css = "w3-text-flat-sun-flower";
-                        }
-                        return "<span style='display:inline-table;' class='" + classw3css + "'>" + value + "</span>";
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            return data.toFixed(4);
-                        } else {
-                            num = -1
-                            return num.toFixed(4);
-                        }
-                    }
-                },
-            },
-            {
-                className: disabled_class + "seal-form-report showTitle  w3-center w3-border-right ",
-                data: {
-                    "data": "reported",
-                },
-                render: function ( data, type, row, meta ) {
-                    if(type === 'display') {
-                        const id_var=data["id"];
-                        const id=data["id"] + "reported";
-                        var check="";
-                        if (data["reported"]) {
-                            check='checked="checked"';
-                        }
-                        return '<input id="'+ id +'" type="checkbox" ' + check + ' onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\', this);">';
-                    }
-                    return data["reported"] ? "Reported" : "Not Reported";
-                },
-                searchBuilder: {
-                    orthogonal: {
-                        display: 'filter'
-                    }
-                }
-            },
-            {
-                className: disabled_class + "no-padding seal-form-report showTitle  w3-center w3-border-right ",
-                data: {
-                    "data": "class_variant"
-                },
-                render:function ( data, type, row ) {
-                    if(type === 'display') {
-                        id_var = data.id
-                        class_variant = data.class_variant ? data.class_variant : 0;
-                        dropdown = ""
-                        for (c in class_variant_html) {
-                            dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +', this)" class="w3-bar-item w3-button" style="width:inherit">'+
-                                    class_variant_html[c]+
-                                '</a>'
-                        }
-                        response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
-                            <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
-                                ` + class_variant_html[class_variant] + `
-                            </button>
-                            <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
-                                `+ dropdown +`
-                            </div>
-                        </div>`
-                        return response;
-                    }
-                    return class_variant_html[data.class_variant ? data.class_variant : 0];
-                },
-                searchBuilder: {
-                    orthogonal: {
-                        display: 'filter'
-                    }
-                }
-            },
-            {
-                className: 'w3-border-left details-control w3-center',
-                orderable: false,
-                data: "id",
-                render: {
-                    _: function ( data, type, row ) {
-                        return data;
-                    },
-                    display: function ( data, type, row ) {
-                        details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>';
-                        hide = '<i onclick="hideRow(\'' + data + '\', ' + sample_id + ', this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i> ';
-                        return details + " " + hide;
-                    },
-                },
-            },
-        ],
+        columns: dt_table,
         initComplete: function(settings, json) {
             changeFilter(sample_filter_id, sample_id);
             if (sample_status != 4) {
@@ -956,7 +572,7 @@ $(document).ready(function() {
                     {
                         extend: 'searchBuilder',
                         config: {
-                            columns: [0,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+                            columns: columns_filter
                         }
                     },
                     {
@@ -974,17 +590,45 @@ $(document).ready(function() {
             } );
             var format_base = {
                 body: function(data, row, column, node) {
-                    if (column === 20) {
+                    if (column === (number_family + 18-1)) {
                         data = $(node).children().prop("checked")===true?"Yes":"No";
                     }
-                    if (column === 21) {
+                    if (column === (number_family + 19-1)) {
                         value = $(node).children('div').children('button').text();
                         data = $.trim(value);
                     }
                     return data;
                 }
             };
-            var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+            var format_defGene = {
+                body: function(data, row, column, node) {
+                    return column === 16 ? data + "\r" :data;
+                },
+                header: function ( data, columnIdx ) {
+                    dict = {};
+                    dict['0'] = "GENE";
+                    dict['3'] = "VARIANT";
+                    dict[parseInt(number_family)-1+21] = "VARIANT_P";
+                    dict[parseInt(number_family)-1+22] = "VARIANT_C";
+                    dict[parseInt(number_family)-1+23] = "ENST";
+                    dict[parseInt(number_family)-1+24] = "NM";
+                    dict[parseInt(number_family)-1+25] = "COSMIC";
+                    dict[parseInt(number_family)-1+26] = "RS";
+                    dict[parseInt(number_family)-1+27] = "POSITION_GENOMIQUE";
+                    dict[parseInt(number_family)-1+14] = "CONSEQUENCES";
+                    dict[parseInt(number_family)-1+28] = "CHROMOSOME";
+                    dict[parseInt(number_family)-1+29] = "GENOME_REFERENCE";
+                    dict['2'] = "NOMENCLATURE_HGVS";
+                    dict[parseInt(number_family)-1+30] = "LOCALISATION";
+                    dict[parseInt(number_family)-1+31] = "FREQUENCE_ALLELIQUE\r";
+                    if (columnIdx in dict) {
+                        return dict[parseInt(columnIdx)]
+                    } 
+                    return data;
+                }
+            };
+            // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+            var columns_defGene = [0,3,parseInt(number_family)-1+21,parseInt(number_family)-1+22,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+14,parseInt(number_family)-1+28,parseInt(number_family)-1+29,2,parseInt(number_family)-1+30,parseInt(number_family)-1+31];
             table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
@@ -1027,6 +671,23 @@ $(document).ready(function() {
                             },
                             columns: columns_base
                         }
+                    },
+                    {
+                        extend: 'csv',
+                        text: 'DefGene',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_defGene,
+                            modifier: {
+                                selected: null
+                            },
+                            columns: columns_defGene
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
                     },
                     '<h3>Reported</h3>',
                     {
@@ -1089,6 +750,28 @@ $(document).ready(function() {
                             columns: columns_base
                         }
                     },
+                    {
+                        extend: 'csv',
+                        text: 'DefGene',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_defGene,
+                            modifier: {
+                                selected: null
+                            },
+                            rows: [function(data, row, column, node) {
+                                if(row.reported) {
+                                    return data+1;
+                                }
+                            }],
+                            columns: columns_defGene
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
+                    },
                     '<h3>Selected</h3>',
                     {
                         extend: 'copy',
@@ -1126,6 +809,23 @@ $(document).ready(function() {
                             columns: columns_base
                         }
                     },
+                    {
+                        extend: 'csv',
+                        text: 'DefGene',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_defGene,
+                            modifier: {
+                                selected: true
+                            },
+                            columns: columns_defGene
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
+                    },
                 ]
             });
             hide_message(count_hide);
@@ -1134,7 +834,6 @@ $(document).ready(function() {
 } );
 
 function hide_message(count_hide) {
-    console.log(count_hide)
     if (count_hide > 0) {
         $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> <span id="cpt-hide-row">' + count_hide + '</span> row(s) hidden (<b class="w3-hover-text-blue" onclick="showAllRows()" style="cursor:pointer">click here to show all</b>)<span>');
     } else {
@@ -1257,7 +956,7 @@ function htmlLink(data) {
 function openMD(id) {
     Swal.fire({
         title: 'Go to MobiDetails!',
-        html: 'Please wait.<br/><b>This page will be clos automatically.</b>',
+        html: 'Please wait.<br/><b>This page will be close automatically.</b>',
         didOpen: () => {
             Swal.showLoading()
             $.ajax({
@@ -1467,9 +1166,9 @@ function openDetailsVariantModal(id, sample_id) {
                     cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
                 }
             }
-            color = "w3-text-flat-peter-river";
+            color = "";
             if (current_user_transcripts.includes(data["annotations"]["ANN"][x]["Feature"])) {
-                color = "w3-text-flat-alizarin";
+                color = "w3-text-flat-peter-river";
             }
             if (data["annotations"]["ANN"][x]["canonical"]) {
                 response = '<i title="CANONICAL" class="' + color + ' fas fa-star"></i>';
@@ -1862,7 +1561,7 @@ function openDetailsVariantModal(id, sample_id) {
             columnDefs: [
                     {
                         orderable: false,
-                    targets:  "no-sort"
+                        targets:  "no-sort"
                     }
                 ],
         });
@@ -1903,6 +1602,7 @@ function changeFilter(id, sample_id) {
                 },
                 success: function() {
                     $('#tableHistorySample').DataTable().ajax.reload();
+                    table.order([2, "asc"]).draw();
                 }
             });
         }, 30);
@@ -2215,6 +1915,59 @@ $('#tableCommentsSample').DataTable({
     ]
 
 });
+var families=[];
+$.getJSON('/json/families', function(data, status, xhr){
+    for (var i = 0; i < data['data'].length; i++ ) {
+        families.push(data["data"][i]["family"]);
+    }
+});
+
+$('#edit-family').autocomplete({
+    source: families,
+});
+
+$("#edit-family").keyup(function(event) {
+    if (event.keyCode === 13) {
+        edit_family()
+    }
+});
+
+function edit_family() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You change the family associated to the sample.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Changed!',
+                'The family will be changed.',
+                'success'
+            )
+            $.ajax({
+                type: "POST",
+                url: "/edit/sample/family",
+                data: {
+                    "sample_id": sample_id,
+                    "new_family": $('#edit-family').val()
+                },
+                success: function() {
+                    $( "#error-message-edit-family" ).remove();
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                },
+                error: function(XMLHttpRequest) {
+                    $( "#error-message-edit-family" ).remove();
+                    msg = "<p id='error-message-edit-family' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
+                    $( "#sample-family-sidebar" ).after( msg );
+                }
+            })
+        }
+    })
+}
 
 
 $(document).ready(function() {
@@ -2243,58 +1996,4 @@ $(document).ready(function() {
             }
         ]
     });
-    var families=[];
-    $.getJSON('/json/families', function(data, status, xhr){
-        for (var i = 0; i < data['data'].length; i++ ) {
-            families.push(data["data"][i]["family"]);
-        }
-    });
-
-    $('#edit-family').autocomplete({
-        source: families,
-    });
-
-    $("#edit-family").keyup(function(event) {
-        if (event.keyCode === 13) {
-            edit_family()
-        }
-    });
-
-    function edit_family() {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "You change the family associated to the sample.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, change it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire(
-                    'Changed!',
-                    'The family will be changed.',
-                    'success'
-                )
-                $.ajax({
-                    type: "POST",
-                    url: "/edit/sample/family",
-                    data: {
-                        "sample_id": sample_id,
-                        "new_family": $('#edit-family').val()
-                    },
-                    success: function() {
-                        $( "#error-message-edit-family" ).remove();
-                        $("h1").html(DOMPurify.sanitize($('#edit-family').val()));
-                        $('#tableHistorySample').DataTable().ajax.reload();
-                    },
-                    error: function(XMLHttpRequest) {
-                        $( "#error-message-edit-family" ).remove();
-                        msg = "<p id='error-message-edit-family' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
-                        $( "#sample-family-sidebar" ).after( msg );
-                    }
-                })
-            }
-        })
-    }
 });

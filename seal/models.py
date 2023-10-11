@@ -30,8 +30,6 @@ from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects import postgresql
 
-
-
 ################################################################################
 # Authentication
 
@@ -136,6 +134,19 @@ class Team(db.Model):
         return self.teamname
 
 
+class Clinvar(db.Model):
+    version = db.Column(db.Integer, primary_key=True)
+    genome = db.Column(db.String(20), unique=False, nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
+    current = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __repr__(self):
+        return f"Clinvar('{self.version}','{self.date}')"
+
+    def __str__(self):
+        return str(self.version)
+
+
 ################################################################################
 
 
@@ -155,6 +166,7 @@ class History(db.Model):
 class Sample(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     samplename = db.Column(db.String(120), unique=False, nullable=False)
+    alias = db.Column(db.String(120), unique=False, nullable=True)
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
@@ -211,6 +223,8 @@ class Run(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False)
     alias = db.Column(db.String(50), unique=False, nullable=True)
 
+    summary = db.Column(db.Text, unique=False, nullable=True)
+
     samples = relationship("Sample")
     reads = relationship("Read")
 
@@ -230,6 +244,11 @@ class Variant(db.Model):
     class_variant = db.Column(db.Integer, unique=False, default=None)
     annotations = db.Column(db.JSON, nullable=True)
     comments = relationship("Comment_variant")
+
+    clinvar_VARID = db.Column(db.Integer, unique=False, nullable=True)
+    clinvar_CLNSIG = db.Column(db.String(500), unique=False, nullable=True)
+    clinvar_CLNSIGCONF = db.Column(db.String(500), unique=False, nullable=True)
+    clinvar_CLNREVSTAT = db.Column(db.String(500), unique=False, nullable=True)
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"

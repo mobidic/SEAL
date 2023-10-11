@@ -18,15 +18,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import requests
+import pandas as pd
+
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, ValidationError, TextAreaField, SelectMultipleField
-from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
-from seal.models import User, Sample, Run, Team, Bed, Region
+from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
+                     ValidationError, TextAreaField, SelectMultipleField,
+                     SelectField, DateField)
+from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
+
 from seal import bcrypt
-import pandas as pd
-import requests
+from seal.models import User, Sample, Run, Team, Bed, Region
 
 ################################################################################
 # Authentication
@@ -206,6 +210,23 @@ class SaveFilterForm(FlaskForm):
     )
 
     submit = SubmitField('Add A New Filter')
+
+
+class UploadClinvar(FlaskForm):
+    version = DateField(
+        'Version',
+        validators=[DataRequired()], format='%Y-%m-%d'
+    )
+    genome_version = SelectField(
+        'Genome',
+        choices=[('grch37', 'grch37'), ('grch38', 'grch38')],
+        validators=[DataRequired()]
+    )
+    vcf_file = FileField(
+        'VCF',
+        validators=[DataRequired(), FileAllowed(['vcf', 'vcf.gz'])]
+    )
+    submit = SubmitField('Update Clinvar')
 
 
 ################################################################################

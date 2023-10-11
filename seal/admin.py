@@ -29,7 +29,7 @@ from flask_login import current_user
 from seal import app, db, bcrypt
 from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
-                         Region, Bed, Phenotype, Omim, History)
+                         Region, Bed, Phenotype, Omim, History, Clinvar)
 
 ###############################################################################
 
@@ -342,8 +342,9 @@ admin.add_view(
         Variant,
         db.session,
         category="Variant",
-        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'annotations'],
-        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant'],
+        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant', 'clinvar_VARID', 'clinvar_CLNSIG', 'clinvar_CLNSIGCONF', 'clinvar_CLNREVSTAT'],
+        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant', 'clinvar_VARID', 'clinvar_CLNSIG', 'clinvar_CLNSIGCONF', 'clinvar_CLNREVSTAT'],
+        column_exclude_list = ['annotations'],
         form_excluded_columns = ['samples']
     )
 )
@@ -394,6 +395,14 @@ admin.add_view(
         column_searchable_list = ['filtername', 'filter'],
         column_editable_list = ['filtername'],
         form_excluded_columns = ['users', 'samples']
+    )
+)
+
+admin.add_view(
+    CustomView(
+        Clinvar,
+        db.session,
+        category="Analysis"
     )
 )
 

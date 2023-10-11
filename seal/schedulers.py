@@ -18,20 +18,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
 import re
 import json
+import time
 import numpy
 import random
 import subprocess
 from pathlib import Path
 from datetime import datetime
 
-from anacore import annotVcf, vcf
+from anacore import annotVcf
 
 from seal import app, scheduler, db
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
-                         Team, Bed, Filter, History, Comment_sample)
+                         Team, Bed, Filter, History, Comment_sample, Clinvar)
 
 from sqlalchemy import exc
 
@@ -414,6 +414,11 @@ def importvcf():
         except KeyError:
             date_import = datetime.now()
 
+        try:
+            genome = data["genome"]
+        except KeyError:
+            genome = "grch37"
+
         # Come from interface
         try:
             interface = data["interface"]
@@ -432,11 +437,13 @@ def importvcf():
 
         vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
         stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
+        clinvar_vcf = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/current.vcf.gz')
 
         values = {
             "vcf_path": vcf_path,
             "vcf_vep": vcf_vep,
-            "stats_vep": stats_vep
+            "stats_vep": stats_vep,
+            "ClinVar_vcf": clinvar_vcf
         }
 
         current_date = datetime.now().isoformat()
@@ -457,11 +464,11 @@ def importvcf():
             for v in vcf_io:
                 if v.alt[0] == "*":
                     continue
-                variant = Variant.query.get(f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}")
+                variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if not variant:
                     variant = Variant(
-                        id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", 
-                        chr=v.chrom, 
+                        id=f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}", 
+                        chr=f"chr{v.chrom.replace('chr','')}", 
                         pos=v.pos, 
                         ref=v.ref, 
                         alt=v.alt[0])
@@ -474,6 +481,10 @@ def importvcf():
                     }]
 
                     for annot in v.info["ANN"]:
+                        variant.clinvar_VARID = annot["ClinVar"]
+                        variant.clinvar_CLNSIG = annot["ClinVar_CLNSIG"]
+                        variant.clinvar_CLNSIGCONF = annot["ClinVar_CLNREVSTAT"].split("&") if annot["ClinVar_CLNREVSTAT"] else list()
+                        variant.clinvar_CLNREVSTAT = annot["ClinVar_CLNSIGCONF"].split("&") if annot["ClinVar_CLNSIGCONF"] else list()
                         # Split annotations
                         for splitAnn in ANNOT_TO_SPLIT:
                             if splitAnn == 'VAR_SYNONYMS':
@@ -595,3 +606,64 @@ def importvcf():
         db.session.add(history)
         sample.status = 1
         db.session.commit()
+
+
+def update_clinvar_thread(vcf, version, genome="grch37"):
+    # Check and create locker
+    path_locker = Path(app.root_path).joinpath('static/temp/vcf/.lock')
+    while path_locker.exists():
+        time.sleep(1)
+    lockFile = open(path_locker, 'x')
+    lockFile.close()
+
+    # Switch on maintenance mode
+    app.config["MAINTENANCE"] = True
+    app.config["MAINTENANCE_REASON"] = "Update ClinVar"
+
+    # Define paths
+    new_clinvar = Path(vcf)
+    new_clinvar_index = Path(f"{new_clinvar}.tbi")
+    current = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/current.vcf.gz')
+    current_index = Path(f"{current}.tbi")
+
+    # Create new clinvar entry
+    clinvar = Clinvar(version=version, genome=genome, current=False)
+    db.session.add(clinvar)
+    db.session.commit()
+
+    # Try to update
+    try:
+        cpt = 0
+        execute_shell_command(["tabix", "-p", "vcf", new_clinvar])
+        with annotVcf.AnnotVCFIO(new_clinvar) as vcf_io:
+            for v in vcf_io:
+                cpt += 1
+                variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
+                if variant:
+                    variant.clinvar_VARID = v.id
+                    variant.clinvar_CLNSIG = ''.join(v.info["CLNSIG"]) if "CLNSIG" in v.info else None
+                    variant.clinvar_CLNSIGCONF = ''.join(v.info["CLNSIGCONF"]) if "CLNSIGCONF" in v.info else None
+                    variant.clinvar_CLNREVSTAT = ''.join(v.info["CLNREVSTAT"]) if "CLNREVSTAT" in v.info else None
+    except Exception as e:
+        db.session.rollback()
+        path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')
+        with open(path_log, "w") as log:
+            log.write(f"Error on file: {new_clinvar}")
+            log.write(e)
+        app.config["MAINTENANCE"] = False
+        del app.config["MAINTENANCE_REASON"]
+        path_locker.unlink()
+        return
+    
+    # Update Clinvar
+    for c in Clinvar.query.filter_by(genome=genome, current=True).all():
+        c.current = False
+    clinvar.current = True
+    db.session.commit()
+    new_clinvar.rename(current)
+    new_clinvar_index.rename(current_index)    
+
+    # Switch off maintenance mode
+    app.config["MAINTENANCE"] = False
+    del app.config["MAINTENANCE_REASON"]
+    path_locker.unlink()

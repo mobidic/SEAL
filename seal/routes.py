@@ -18,31 +18,34 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import datetime
-from pathlib import Path
-from urllib.parse import urlparse
 import functools
 import json
 import secrets
 import urllib
 
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import urlparse
+from threading import Thread
+
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
-                   send_file, escape)
+                   escape, abort)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_, exists
+from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
 from seal import app, bcrypt, db
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
-                        UpdateAccountForm, UpdatePasswordForm)
+                        UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample)
+                         Transcript, User, Variant, Var2Sample, Clinvar)
+from seal.schedulers import update_clinvar_thread
 
 
 ###############################################################################
@@ -53,7 +56,7 @@ from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
 SAFE_HOST = []
 
 
-def redirect_dest(fallback):
+def redirect_dest(fallback='/home'):
     """
     Redirects the user to a given URL after validating it's safe.
 
@@ -66,13 +69,15 @@ def redirect_dest(fallback):
         fallback URL.
     """
     dest = request.args.get('next')
+    if not dest:
+        return redirect(fallback)
     url = urlparse(dest)
-    if url.path and not url.netloc:
+    if url.path and (not url.netloc or url.netloc == request.host):
         return redirect(url.path)
     if url.hostname and url.hostname in SAFE_HOST:
         return redirect(url.geturl())
     else:
-        flash(f"Redirection to '{url.hostname}' forbidden !", "error")
+        flash(f"Redirection to '{url.path}' forbidden !", "error")
         return redirect(fallback)
 
 
@@ -118,6 +123,41 @@ def login_required(func):
             pass
         elif not current_user.logged:
             return redirect(url_for('first_connexion', next=request.url))
+        return func(*args, **kwargs)
+    return decorated_view
+
+
+def admin_required(func):
+    """
+    A decorator that ensures that the user is admin before accessing the
+    decorated view. If the user is not admin, they will beredirected to the
+    index page.
+
+    Usage:
+    ------
+    @admin_required
+    def my_view():
+        # Do something here
+
+    """
+    @functools.wraps(func)
+    def decorated_view(*args, **kwargs):
+        """
+        A decorator function for enforcing user login.
+
+        If the user is not admin, they will be redirected to the index page.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            The decorated view function.
+        """
+        if request.method in EXEMPT_METHODS:
+            return func(*args, **kwargs)
+        elif not current_user.admin:
+            abort(403)
         return func(*args, **kwargs)
     return decorated_view
 
@@ -183,13 +223,17 @@ def handle_csrf_error(e):
         A redirect to the index page with a flash message.
     """
     flash(f"{e.name} : {e.description} Please Retry.", 'warning')
-    return redirect(url_for('index'))
+
+    next_page = request.args.get('next')
+    return redirect(next_page)
 
 
 @app.errorhandler(400)
-@app.errorhandler(404)
+@app.errorhandler(401)
 @app.errorhandler(403)
+@app.errorhandler(404)
 @app.errorhandler(405)
+@app.errorhandler(406)
 @app.errorhandler(408)
 @app.errorhandler(410)
 @app.errorhandler(500)
@@ -391,6 +435,7 @@ def maintenance():
         return redirect(url_for("index"))
     return render_template(
         "essentials/maintenance.html",
+        reason=app.config["MAINTENANCE_REASON"]
     )
 
 
@@ -444,7 +489,7 @@ def login():
                 return redirect(url_for('first_connexion', next=next_page))
 
             flash(f'You are logged in as: {user.username}!', 'success')
-            return redirect_dest(fallback=url_for('index'))
+            return redirect_dest()
         else:
             flash('Login unsuccessful. Please check username and/or password!',
                   'error')
@@ -525,7 +570,7 @@ def first_connexion():
     update_password_form = UpdatePasswordForm()
     next_page = request.args.get('next')
     if current_user.logged:
-        return redirect_dest(fallback=url_for('index'))
+        return redirect_dest()
     if ("submit_password" in request.form 
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
@@ -533,7 +578,7 @@ def first_connexion():
         current_user.logged = True
         db.session.commit()
         flash('Your password has been changed!', 'success')
-        return redirect_dest(fallback=url_for('index'))
+        return redirect_dest()
 
     return render_template(
         'authentication/first_connexion.html', title='First Connexion',
@@ -591,12 +636,22 @@ def sample(id):
         if v.inBed():
             count_hide+=1
 
+    family_members = []
+    if sample.family:
+        for s in sample.family.samples:
+            if s != sample and s.status > 0:
+                family_members.append(s)
+    
+    clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
         count_hide = count_hide,
+        family_members = family_members,
         form=commentForm,
-        saveFilterForm=saveFilterForm
+        saveFilterForm=saveFilterForm,
+        clinvar = clinvar
     )
 
 
@@ -707,6 +762,30 @@ def create_panel():
     return render_template(
         'analysis/panel.html', title="Add Panel",
         form=uploadPanelForm
+    )
+
+
+@app.route("/update/clinvar", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_clinvar():
+    UploadClinvarForm = UploadClinvar()
+
+    if "submit" in request.form and UploadClinvarForm.validate_on_submit():
+        version = int(UploadClinvarForm.version.data.strftime("%Y%m%d"))
+        genome = UploadClinvarForm.genome_version.data
+
+        vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
+        vcf_path = vcf_path.joinpath(UploadClinvarForm.vcf_file.data.filename)
+        UploadClinvarForm.vcf_file.data.save(vcf_path)
+
+        Thread(target=update_clinvar_thread, args=(vcf_path, version, genome, )).start()
+
+        return redirect(url_for('index'))
+
+    return render_template(
+        'admin/updateclinvar.html', title="Update ClinVar",
+        form=UploadClinvarForm
     )
 
 
@@ -1061,7 +1140,26 @@ def json_variants(id, idbed=False, version=-1):
                     "phenotypeMappingKey": pheno.phenotypeMappingKey
                 })
         members = []
+        t = dict()
         if sample.familyid is not None:
+            for s in sample.family.samples:
+                if s == sample:
+                    continue
+                t[str(s)]= dict()
+                req = Var2Sample.query.get((var2sample.variant_ID, s.id))
+                if req:
+                    t[str(s)] = {
+                        "depth": f"{req.depth}",
+                        "allelic_depth": f"{req.allelic_depth}",
+                        "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
+                    }
+                else:
+                    t[str(s)] = {
+                        "depth": f"NA",
+                        "allelic_depth": f"NA",
+                        "allelic_frequency": f"NA",
+                    }
+
             request_family = Sample.query.filter(
                 and_(
                     Sample.familyid == sample.familyid,
@@ -1077,6 +1175,12 @@ def json_variants(id, idbed=False, version=-1):
         variants["data"].append({
             "annotations": main_annot,
             "chr": f"{variant.chr}",
+            "clinvar": {
+                "VARID" : variant.clinvar_VARID,
+                "CLNSIG" : variant.clinvar_CLNSIG,
+                "CLNSIGCONF" : variant.clinvar_CLNSIGCONF,
+                "CLNREVSTAT" : variant.clinvar_CLNREVSTAT
+            },
             "id": f"{variant.id}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
@@ -1092,7 +1196,8 @@ def json_variants(id, idbed=False, version=-1):
                 "occurences_family": len(members),
                 "family_members": members
             },
-            "phenotypes": phenotypes
+            "phenotypes": phenotypes,
+            "family": t
         })
     return jsonify(variants)
 
@@ -1486,9 +1591,12 @@ def edit_family():
     new_family = request.form["new_family"]
     sample = Sample.query.get(sample_id)
 
-    if not new_family and sample.familyid:
-        history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.family.family}' (id: {sample.familyid})")
-        sample.familyid = None
+    if not new_family:
+        if sample.familyid:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family removed : '{sample.family.family}' (id: {sample.familyid})")
+            sample.familyid = None
+        else:
+            return "ok"
     else:
         family = Family.query.filter(Family.family == new_family).first()
         if not family:
@@ -1706,7 +1814,7 @@ def toggle_samplePanel():
 
     count_hide=0
 
-    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == 36, Var2Sample.hide == True):
+    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == sample.id, Var2Sample.hide == True):
         if v.inBed():
             count_hide+=1
 
