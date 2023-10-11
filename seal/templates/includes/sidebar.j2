@@ -16,7 +16,7 @@
 			</a>
 			<p>
 				{% if current_user.admin %}<span class="w3-badge w3-flat-sun-flower" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Admin" data-balloon-pos="down"><i class="fas fa-shield-alt"></i></span>{% endif %}
-				{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Bioinfo" data-balloon-pos="down"><i class="fas fa-user-secret"></i></span>{% endif %}
+				{% if current_user.bioinfo %}<span class="w3-badge w3-flat-emerald" style="height:30px;width:30px;padding-top:4px;padding-left:6px;cursor:default" aria-label="Bioinfo" data-balloon-pos="down"><i class="fa-solid fa-chalkboard-user"></i></span>{% endif %}
 				{% if current_user.technician %}<span class="w3-badge w3-flat-peter-river" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Technician" data-balloon-pos="down"><i class="fas fa-vial"></i></span>{% endif %}
 				{% if current_user.biologist %}<span class="w3-badge w3-flat-alizarin" style="height:30px;width:30px;padding-top:4px;cursor:default" aria-label="Biologist" data-balloon-pos="down"><i class="fas fa-user-md"></i></span>{% endif %}
 			</p>
