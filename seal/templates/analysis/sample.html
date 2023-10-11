@@ -61,9 +61,6 @@
                             <th class='min-size-50'>E|I</th>
                             <th class='min-size-75'>Filter</th>
                             <th class='min-size-75'>{{ sample.samplename }}</th>
-                            <!-- <th class='min-size-75'>AF</th>
-                            <th class='min-size-75'>DP</th>
-                            <th class='min-size-75'>AD</th> -->
                             {% for s in family_members %}
                                 <th class='min-size-100'>{{ s }}</th>
                             {% endfor %}
@@ -118,32 +115,14 @@
                                 Filter
                             </th>
                             <th>
-                                <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                AF
+                                {{ sample }}
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample (ie: Allelic depth/Depth)<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                AF
-                            </th>
-                            <th>
-                                <span title="Help" onclick="openHelp(title='Depth', content='Depth in DNA sequencing is the number of unique reads that include a given nucleotide in the reconstructed sequence.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                DP
-                            </th>
-                            <th>
-                                <span title="Help" onclick="openHelp(title='Allelic depth', content='Depth of the observed allele.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                AD
-                            </th> -->
                             {% for s in family_members %}
                                 <th>
-                                    <span title="Help" onclick="openHelp(title='{{ s }}', content='Frequence of the observed allele for the sample, and  Allelic depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <span title="Help" onclick="openHelp(title='{{ s }}', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                         <i class="fas fa-question-circle w3-tiny"></i>
                                     </span>
                                     {{ s }}
@@ -695,28 +674,6 @@
                     },
                 }
             },
-            // },
-            // {
-            //     className: 'showTitle',
-            //     data: "allelic_frequency",
-            //     render: {
-            //         _: function ( data, type, row, meta ) {
-            //             return data;
-            //         },
-            //         display: function ( data, type, row, meta ) {
-            //             if (data >=0 && data < 0.25) {
-            //                 return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
-            //             } else if (data < 0.75) {
-            //                 return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data*100) + "%";
-            //             } else if (data <= 1)  {
-            //                 return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data*100) + "%";
-            //             }
-            //             return '<i class="far fa-question-circle w3-tiny"></i> ' + data;
-            //         },
-            //     }
-            // },
-            // { className: 'showTitle ', data: "depth"},
-            // { className: 'showTitle  w3-border-right', data: "allelic_depth"},
             {% for s in family_members %}
             {
                 className: 'w3-tiny showTitle{% if loop.last  %} w3-border-right{% endif %}',
