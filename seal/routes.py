@@ -225,7 +225,7 @@ def handle_csrf_error(e):
     flash(f"{e.name} : {e.description} Please Retry.", 'warning')
 
     next_page = request.args.get('next')
-    return redirect(next_page)
+    return redirect_dest(next_page)
 
 
 @app.errorhandler(400)
