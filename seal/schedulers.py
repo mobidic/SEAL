@@ -24,8 +24,10 @@ import time
 import numpy
 import random
 import subprocess
+from ftplib import FTP
 from pathlib import Path
 from datetime import datetime
+from threading import Thread
 
 from anacore import annotVcf
 
@@ -139,9 +141,6 @@ def is_valid_color(color):
     match_hex = bool(re.search(r'^(\#(([a-fA-F0-9]){3}){1,2})$', str(color), re.IGNORECASE))
     match_rgb = bool(re.search(r'^((rgb)?\s*?\(\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?\))$', str(color), re.IGNORECASE))
     match_rgba = bool(re.search(r'^((rgba)?\s*?\(\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(0|0\.\d*|1|1.0*)\s*?\))$', str(color), re.IGNORECASE))
-    print(match_hex)
-    print(match_rgb)
-    print(match_rgba)
     return bool(match_hex | match_rgb | match_rgba)
 
 
@@ -666,4 +665,56 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
     # Switch off maintenance mode
     app.config["MAINTENANCE"] = False
     del app.config["MAINTENANCE_REASON"]
+    path_locker.unlink()
+
+
+@scheduler.task('cron', id='import vcf', day_of_week="mon")
+def check_clinvar(genome="GRCh37"):
+    path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
+    path_locker = path_inout.joinpath('.lock')
+    app.logger.info("START CLINVAR UPDATE")
+
+    while path_locker.exists():
+        time.sleep(1)
+    
+    app.logger.info("  - No locker")
+    lockFile = open(path_locker, 'x')
+    lockFile.close()
+
+    ftp=FTP('ftp.ncbi.nlm.nih.gov')
+    ftp.login()
+    ftp.cwd(f'pub/clinvar/vcf_{genome}')
+
+    ls = ftp.nlst()
+    for i in ls:
+        r = re.compile("clinvar_([0-9]+).vcf.gz$")
+        match = r.search(i)
+        app.logger.info(f"  - file : {i}")
+        if match:
+            app.logger.info(f"    - match : {match.group(1)}")
+            version = match.group(1)
+            file = match.group(0)
+            
+            if not Clinvar.query.filter_by(version=version, genome=genome.lower()).one_or_none():
+                app.logger.info(f"    - new clinvar")
+                vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
+                vcf_path = vcf_path.joinpath(file)
+                t = 0
+                while t < 10:
+                    try:
+                        app.logger.info(f"    - download attempt : {t}")
+                        with open(f'{vcf_path}', 'wb') as fp:
+                            ftp.retrbinary(f'RETR {file}', fp.write)
+                        Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower(), )).start()
+                        app.logger.info(f"    - thread launched")
+                        t=10
+                    except Exception as e:
+                        app.logger.info(f"    - download filed retry")
+                        app.logger.error(e)
+                        ftp.close()
+                        ftp=FTP('ftp.ncbi.nlm.nih.gov')
+                        ftp.login()
+                        ftp.cwd(f'pub/clinvar/vcf_{genome}')
+                        t+=1
+    app.logger.info("END CLINVAR UPDATE")
     path_locker.unlink()
