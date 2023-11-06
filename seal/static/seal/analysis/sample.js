@@ -602,7 +602,7 @@ $(document).ready(function() {
             };
             var format_defGene = {
                 body: function(data, row, column, node) {
-                    return column === 16 ? data + "\r" :data;
+                    return column === 14 ? data + "\r" :data;
                 },
                 header: function ( data, columnIdx ) {
                     dict = {};
