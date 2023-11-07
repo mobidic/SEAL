@@ -81,7 +81,7 @@ class MyAdminIndexView(AdminIndexView):
         Returns:
             redirect: A Flask redirect to the login page.
         """
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('login', next=request.full_path))
 
     def is_visible(self):
         # This view won't appear in the menu structure
@@ -162,7 +162,7 @@ class CustomView(ModelView):
         Returns:
             redirect: A Flask redirect to the login page.
         """
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('login', next=request.full_path))
 
 
 class SampleView(CustomView):
