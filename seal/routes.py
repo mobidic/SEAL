@@ -225,7 +225,7 @@ def handle_csrf_error(e):
     flash(f"{e.name} : {e.description} Please Retry.", 'warning')
 
     next_page = request.args.get('next')
-    return redirect(next_page)
+    return redirect_dest(next_page)
 
 
 @app.errorhandler(400)
@@ -343,12 +343,12 @@ def save_picture(form_picture):
 def add_vcf(info, vcf_file):
     """
     Save uploaded VCF file and corresponding sample information to disk.
-    
+
     Parameters:
     info (dict): Sample information, including samplename, affected, index,
                  userid, date, family, run, filter, bed, teams.
     vcf_file (FileStorage): Uploaded VCF file.
-    
+
     Returns:
         str: Filename of saved VCF file.
     """
@@ -641,7 +641,7 @@ def sample(id):
         for s in sample.family.samples:
             if s != sample and s.status > 0:
                 family_members.append(s)
-    
+
     clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
 
     return render_template(
@@ -1038,7 +1038,7 @@ def json_variants(id, idbed=False, version=-1):
     # Get all canonical trancripts
 
     ##################################################
-    
+
     for var2sample in sample.variants:
         variant = var2sample.variant
         try:
@@ -1559,7 +1559,7 @@ def edit_name():
     old_name = sample.samplename
     if len(new_name) < 2 or len(new_name) > 20:
         raise InvalidAPIUsage("The samplename must be between 2 and 20 characters long.")
-    
+
     sample.samplename = new_name
     history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Sample rename : '{old_name}' -> '{sample.samplename}")
     db.session.add(history)
@@ -1859,7 +1859,7 @@ def toggle_sampleStatus():
     elif sample.status == 1:
         sample.status = 2
         db.session.commit()
-    
+
     status_dict = {
         -1: "Error",
         0: "Importing",
@@ -1926,7 +1926,7 @@ def add_filter():
     Returns:
         str: A message indicating the filter was added.
     """
-    
+
     if request.form["edit"] == "true":
         filter = Filter.query.get(request.form["id"])
         filter.filter = json.loads(request.form["filter"])

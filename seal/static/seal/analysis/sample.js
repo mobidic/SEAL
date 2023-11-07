@@ -600,9 +600,9 @@ $(document).ready(function() {
                     return data;
                 }
             };
-            var format_defGene = {
+            var format_defGen = {
                 body: function(data, row, column, node) {
-                    return column === 16 ? data + "\r" :data;
+                    return column === 14 ? data + "\r" :data;
                 },
                 header: function ( data, columnIdx ) {
                     dict = {};
@@ -628,7 +628,7 @@ $(document).ready(function() {
                 }
             };
             // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-            var columns_defGene = [0,3,parseInt(number_family)-1+21,parseInt(number_family)-1+22,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+14,parseInt(number_family)-1+28,parseInt(number_family)-1+29,2,parseInt(number_family)-1+30,parseInt(number_family)-1+31];
+            var columns_defGen = [0,3,parseInt(number_family)-1+21,parseInt(number_family)-1+22,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+14,parseInt(number_family)-1+28,parseInt(number_family)-1+29,2,parseInt(number_family)-1+30,parseInt(number_family)-1+31];
             table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
@@ -674,17 +674,17 @@ $(document).ready(function() {
                     },
                     {
                         extend: 'csv',
-                        text: 'DefGene',
+                        text: 'defGen',
                         title: '',
                         bom: false,
                         createEmptyCells: true,
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_defGene,
+                            format: format_defGen,
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_defGene
+                            columns: columns_defGen
                         },
                         fieldSeparator: ";",
                         fieldBoundary: ''
@@ -752,13 +752,13 @@ $(document).ready(function() {
                     },
                     {
                         extend: 'csv',
-                        text: 'DefGene',
+                        text: 'defGen',
                         title: '',
                         bom: false,
                         createEmptyCells: true,
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_defGene,
+                            format: format_defGen,
                             modifier: {
                                 selected: null
                             },
@@ -767,7 +767,7 @@ $(document).ready(function() {
                                     return data+1;
                                 }
                             }],
-                            columns: columns_defGene
+                            columns: columns_defGen
                         },
                         fieldSeparator: ";",
                         fieldBoundary: ''
@@ -811,17 +811,17 @@ $(document).ready(function() {
                     },
                     {
                         extend: 'csv',
-                        text: 'DefGene',
+                        text: 'defGen',
                         title: '',
                         bom: false,
                         createEmptyCells: true,
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_defGene,
+                            format: format_defGen,
                             modifier: {
                                 selected: true
                             },
-                            columns: columns_defGene
+                            columns: columns_defGen
                         },
                         fieldSeparator: ";",
                         fieldBoundary: ''

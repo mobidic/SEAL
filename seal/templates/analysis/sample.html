@@ -759,6 +759,13 @@
                 data: "clinvar",
                 render: {
                     _: function ( data, type, row, meta ) {
+                        stat = ''
+                        if (data.CLNREVSTAT) {
+                            stat = ' (' + clinvar_stars[data.CLNREVSTAT] + '/4)';
+                        }
+                        return data.CLNSIG + stat;
+                    },
+                    display: function ( data, type, row, meta ) {
                         color = 'silver';
                         colorHover = 'concrete';
                         if (data.CLNSIG) {
