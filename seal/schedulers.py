@@ -423,7 +423,7 @@ def importvcf():
             interface = data["interface"]
         except KeyError:
             interface = False
-        
+
         vcf_path = Path(data["vcf_path"])
         if not vcf_path.exists():
             app.logger.error(f'Path does not exist for : {vcf_path}')
@@ -458,7 +458,7 @@ def importvcf():
             error_file = current_file.with_suffix('.error')
             current_file.rename(error_file)
             return
-        
+
         with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
             for v in vcf_io:
                 if v.alt[0] == "*":
@@ -589,7 +589,7 @@ def importvcf():
                         userid=user_id)
                     db.session.add(comment)
                     db.session.commit
-                        
+
         path_locker.unlink()
         db.session.commit()
         current_file.unlink()
@@ -653,7 +653,7 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
         del app.config["MAINTENANCE_REASON"]
         path_locker.unlink()
         return
-    
+
     # Update Clinvar
     for c in Clinvar.query.filter_by(genome=genome, current=True).all():
         c.current = False
@@ -676,7 +676,7 @@ def check_clinvar(genome="GRCh37"):
 
     while path_locker.exists():
         time.sleep(1)
-    
+
     app.logger.info("  - No locker")
     lockFile = open(path_locker, 'x')
     lockFile.close()
@@ -694,7 +694,7 @@ def check_clinvar(genome="GRCh37"):
             app.logger.info(f"    - match : {match.group(1)}")
             version = match.group(1)
             file = match.group(0)
-            
+
             if not Clinvar.query.filter_by(version=version, genome=genome.lower()).one_or_none():
                 app.logger.info(f"    - new clinvar")
                 vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')

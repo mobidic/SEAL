@@ -228,7 +228,7 @@ class UserView(CustomView):
         """
         Called when a user object is created or modified. Hashes the user's
         password before storing it in the database.
-        
+
         Args:
             form: The form object.
             model: The User model object.
@@ -242,10 +242,10 @@ class UserView(CustomView):
         """
         Custom validation code that checks the user's password for length and
         correct hashing format.
-        
+
         Args:
             form: The form object.
-        
+
         Returns:
             Boolean indicating whether the form is valid or not.
         """

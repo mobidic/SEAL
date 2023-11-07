@@ -195,11 +195,11 @@ class Sample(db.Model):
 
     def __str__(self):
         return self.samplename
-    
+
     @hybrid_property
     def lastAction(self):
         return History.query.filter_by(sample_ID = self.id).order_by(History.date.desc()).first()
-    
+
     @lastAction.expression
     def lastAction(cls):
         return select(func.max(History.date)).\
