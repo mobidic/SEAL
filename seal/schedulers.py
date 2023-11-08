@@ -1,20 +1,20 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -38,7 +38,7 @@ from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
 from sqlalchemy import exc
 
 CONSEQUENCES_DICT = {
-    "stop_gained": 20,  
+    "stop_gained": 20,
     "stop_lost": 20,
     "splice_acceptor_variant": 10,
     "splice_donor_variant": 10,
@@ -466,10 +466,10 @@ def importvcf():
                 variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if not variant:
                     variant = Variant(
-                        id=f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}", 
-                        chr=f"chr{v.chrom.replace('chr','')}", 
-                        pos=v.pos, 
-                        ref=v.ref, 
+                        id=f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}",
+                        chr=f"chr{v.chrom.replace('chr','')}",
+                        pos=v.pos,
+                        ref=v.ref,
                         alt=v.alt[0])
                     db.session.add(variant)
 
@@ -566,9 +566,9 @@ def importvcf():
                 #   - add to history & comments
                 try:
                     v2s = Var2Sample(
-                        variant_ID=variant.id, 
-                        sample_ID=sample.id, 
-                        depth=v.getPopDP(), 
+                        variant_ID=variant.id,
+                        sample_ID=sample.id,
+                        depth=v.getPopDP(),
                         allelic_depth=v.getPopAltAD()[0],
                         filter=v.filter)
                     db.session.add(v2s)
@@ -583,9 +583,9 @@ def importvcf():
                         action=f"{type(e).__name__}")
                     db.session.add(history)
                     comment = Comment_sample(
-                        comment=f"{type(e).__name__} : {e}", 
-                        sampleid=sample.id, 
-                        date=datetime.now(), 
+                        comment=f"{type(e).__name__} : {e}",
+                        sampleid=sample.id,
+                        date=datetime.now(),
                         userid=user_id)
                     db.session.add(comment)
                     db.session.commit
@@ -598,9 +598,9 @@ def importvcf():
         if interface:
             vcf_path.unlink()
         history = History(
-            sample_ID=sample.id, 
-            user_ID=user_id, 
-            date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=user_id,
+            date=datetime.now(),
             action=f"Sample Imported")
         db.session.add(history)
         sample.status = 1
@@ -660,7 +660,7 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
     clinvar.current = True
     db.session.commit()
     new_clinvar.rename(current)
-    new_clinvar_index.rename(current_index)    
+    new_clinvar_index.rename(current_index)
 
     # Switch off maintenance mode
     app.config["MAINTENANCE"] = False

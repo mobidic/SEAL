@@ -1,20 +1,20 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -516,7 +516,7 @@ def account():
     """
     update_account_form = UpdateAccountForm()
     update_password_form = UpdatePasswordForm()
-    if ("submit_update" in request.form 
+    if ("submit_update" in request.form
             and update_account_form.validate_on_submit()):
         if update_account_form.image_file.data:
             picture_file = save_picture(update_account_form.image_file.data)
@@ -528,7 +528,7 @@ def account():
             current_user.mail = None
 
         if update_account_form.api_key_md.data != '':
-            current_user.api_key_md = update_account_form.api_key_md.data 
+            current_user.api_key_md = update_account_form.api_key_md.data
         else:
             current_user.api_key_md = None
 
@@ -536,7 +536,7 @@ def account():
         db.session.commit()
 
         flash('Your account has been updated!', 'success')
-    elif ("submit_password" in request.form 
+    elif ("submit_password" in request.form
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
         current_user.password = bcrypt.generate_password_hash(pwd).decode('utf-8')
@@ -570,7 +570,7 @@ def first_connexion():
     next_page = request.args.get('next')
     if current_user.logged:
         return redirect_dest()
-    if ("submit_password" in request.form 
+    if ("submit_password" in request.form
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
         current_user.password = bcrypt.generate_password_hash(pwd).decode('utf-8')
@@ -897,7 +897,7 @@ def json_samples():
     samples = Sample.query
     if not current_user.admin:
         filter_samples_teams = or_(
-            Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])), 
+            Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])),
             Sample.teams == None
         )
         samples = samples.filter(filter_samples_teams)
@@ -1222,7 +1222,7 @@ def json_transcripts():
           - gene: the gene name.
           - source: the source of the feature.
           - protein: the protein product of the transcript.
-          - canonical: a flag indicating whether this transcript is the 
+          - canonical: a flag indicating whether this transcript is the
                        canonical transcript of its gene.
           - hgnc: the HGNC identifier for the gene.
           - val: a boolean indicating whether the current user has this
@@ -1490,7 +1490,7 @@ def json_variant(id, version=-1, sample=None):
         current_family = False
         current = False
         if v2s.sample.status >= 1:
-            if (sample and v2s.sample.familyid == sample.familyid 
+            if (sample and v2s.sample.familyid == sample.familyid
                     and sample.familyid is not None):
                 current_family = True
             if sample and v2s.sample.id == sample.id:
@@ -1640,9 +1640,9 @@ def toggle_varStatus():
 
     report = "Report" if v2s.reported else "Unreport"
     history = History(
-        sample_ID=sample_id, 
-        user_ID=current_user.id, 
-        date=datetime.now(), 
+        sample_ID=sample_id,
+        user_ID=current_user.id,
+        date=datetime.now(),
         action=f"{report} variant : {id_var}")
     db.session.add(history)
     db.session.commit()
@@ -1668,9 +1668,9 @@ def toggle_varhide():
 
     report = "Hide" if v2s.hide else "Show"
     history = History(
-        sample_ID=sample_id, 
-        user_ID=current_user.id, 
-        date=datetime.now(), 
+        sample_ID=sample_id,
+        user_ID=current_user.id,
+        date=datetime.now(),
         action=f"{report} variant : {id_var}")
     db.session.add(history)
     db.session.commit()
@@ -1699,9 +1699,9 @@ def toggle_varhideall():
 
         report = "Hide" if v2s.hide else "Show"
         history = History(
-            sample_ID=sample_id, 
-            user_ID=current_user.id, 
-            date=datetime.now(), 
+            sample_ID=sample_id,
+            user_ID=current_user.id,
+            date=datetime.now(),
             action=f"{report} variant : {v2s.variant_ID}")
         db.session.add(history)
         db.session.commit()
@@ -1724,9 +1724,9 @@ def toggle_sampleIndex():
     sample.index = False if sample.index else True
 
     history = History(
-        sample_ID=sample.id, 
-        user_ID=current_user.id, 
-        date=datetime.now(), 
+        sample_ID=sample.id,
+        user_ID=current_user.id,
+        date=datetime.now(),
         action=f"Toggle index : '{str(old)}' -> '{str(sample.index)}'")
     db.session.add(history)
     db.session.commit()
@@ -1749,9 +1749,9 @@ def toggle_sampleAffected():
     sample.affected = False if sample.affected else True
 
     history = History(
-        sample_ID=sample.id, 
-        user_ID=current_user.id, 
-        date=datetime.now(), 
+        sample_ID=sample.id,
+        user_ID=current_user.id,
+        date=datetime.now(),
         action=f"Toggle affected : '{str(old)}' -> '{str(sample.affected)}'")
     db.session.add(history)
     db.session.commit()
@@ -1777,9 +1777,9 @@ def toggle_sampleFilter():
 
     if sample.filter != old_filter:
         history = History(
-            sample_ID=sample.id, 
-            user_ID=current_user.id, 
-            date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=current_user.id,
+            date=datetime.now(),
             action=f"Change filter : '{str(old_filter)}' -> '{str(sample.filter)}'")
         db.session.add(history)
         db.session.commit()
@@ -1804,9 +1804,9 @@ def toggle_samplePanel():
 
     if sample.bed != old_bed:
         history = History(
-            sample_ID=sample.id, 
-            user_ID=current_user.id, 
-            date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=current_user.id,
+            date=datetime.now(),
             action=f"Change panel : '{str(old_bed)}' -> '{str(sample.bed)}'")
         db.session.add(history)
         db.session.commit()
@@ -1870,8 +1870,8 @@ def toggle_sampleStatus():
 
     if sample.status != old_status:
         history = History(
-            sample_ID=sample.id, 
-            user_ID=current_user.id, date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=current_user.id, date=datetime.now(),
             action=f"Status : '{status_dict[old_status]}' -> '{status_dict[sample.status]}'")
         db.session.add(history)
         db.session.commit()
@@ -1888,9 +1888,9 @@ def add_comment_variant():
         str: A message indicating the comment was added.
     """
     comment = Comment_variant(
-        comment=urllib.parse.unquote(request.form["comment"]), 
-        variantid=request.form["id"], 
-        date=datetime.now(), 
+        comment=urllib.parse.unquote(request.form["comment"]),
+        variantid=request.form["id"],
+        date=datetime.now(),
         userid=current_user.id)
     db.session.add(comment)
     db.session.commit()
@@ -1907,9 +1907,9 @@ def add_comment_sample():
         str: A message indicating the comment was added.
     """
     comment = Comment_sample(
-        comment=urllib.parse.unquote(request.form["comment"]), 
-        sampleid=request.form["id"], 
-        date=datetime.now(), 
+        comment=urllib.parse.unquote(request.form["comment"]),
+        sampleid=request.form["id"],
+        date=datetime.now(),
         userid=current_user.id)
     db.session.add(comment)
     db.session.commit()
