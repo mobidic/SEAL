@@ -668,7 +668,7 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
     path_locker.unlink()
 
 
-@scheduler.task('cron', id='import vcf', day_of_week="mon")
+@scheduler.task('cron', id='update clinvar', day_of_week="mon")
 def check_clinvar(genome="GRCh37"):
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     path_locker = path_inout.joinpath('.lock')
