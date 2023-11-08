@@ -214,7 +214,7 @@ def get_bed(id=None, name=None):
     return False
 
 
-def get_filter(id=None, name=None):
+def get_filter(id=1, name=None):
     if id:
         filter = Filter.query.get(id)
         if filter:

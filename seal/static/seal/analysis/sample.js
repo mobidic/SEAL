@@ -269,7 +269,7 @@ $(document).ready(function() {
         }
         $('#selectBed').html(options);
     });
-    
+
     $.fn.dataTable.ext.searchBuilder.conditions.clinvar = {
         "=": {
             // This function decides whether to include the criteria in the search
@@ -322,7 +322,7 @@ $(document).ready(function() {
 
                 let added = [];
                 let options = [];
-            
+
                 // Function to add an option to the select element
                 let addOption = (filt, text) => {
                     if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
@@ -345,12 +345,12 @@ $(document).ready(function() {
                     );
 
                     let val = opt.val();
-                    
+
                     // Check that this value has not already been added
                     if (added.indexOf(val) === -1) {
                         added.push(val);
                         options.push(opt);
-                        
+
                         if (preDefined !== null && Array.isArray(preDefined[0])) {
                         preDefined[0] = preDefined[0].sort().join(',');
                         }
@@ -370,7 +370,7 @@ $(document).ready(function() {
                 addOption("3 - Uncertain significance", "3 - Uncertain significance");
                 addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
                 addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
-                
+
                 options.sort((a, b) => {
                     if (a.val() < b.val()) {
                         return -1;
@@ -405,7 +405,7 @@ $(document).ready(function() {
                 ) {
                     return false;
                 }
- 
+
                 return true;
             },
             // This is the string displayed in the condition select
@@ -413,13 +413,13 @@ $(document).ready(function() {
             // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
             inputValue: function (el) {
                 let values = [];
- 
+
                 for (let element of el) {
                     if ($(element).is('select')) {
                         values.push($(element).children('option:selected').val());
                     }
                 }
- 
+
                 // return the selected values
                 return values;
             },
@@ -445,7 +445,7 @@ $(document).ready(function() {
 
                 let added = [];
                 let options = [];
-              
+
                 // Function to add an option to the select element
                 let addOption = (filt, text) => {
                   if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
@@ -468,12 +468,12 @@ $(document).ready(function() {
                   );
 
                   let val = opt.val();
-                  
+
                   // Check that this value has not already been added
                   if (added.indexOf(val) === -1) {
                     added.push(val);
                     options.push(opt);
-                    
+
                     if (preDefined !== null && Array.isArray(preDefined[0])) {
                       preDefined[0] = preDefined[0].sort().join(',');
                     }
@@ -493,7 +493,7 @@ $(document).ready(function() {
                 addOption("3 - Uncertain significance", "3 - Uncertain significance");
                 addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
                 addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
-                
+
                 options.sort((a, b) => {
                     if (a.val() < b.val()) {
                         return -1;
@@ -536,7 +536,7 @@ $(document).ready(function() {
         scrollY:        "40vh",
         scrollX:        true,
         scrollCollapse: true,
-        scroller:         true,
+        scroller:       true,
         fixedColumns: {
             left:2,
             right:1
@@ -1581,14 +1581,15 @@ function openDetails(evt, detailName) {
     evt.currentTarget.classList.add("w3-flat-turquoise");
 }
 
-function changeFilter(id, sample_id) {
+function changeFilter(id=1, sample_id) {
+    id = id != "None" ? id : 1;
     $.getJSON("/json/filter/" + id, function(data) {
         document.getElementById("variants_processing").style.visibility = "visible";
         document.getElementById("variants_processing").style.zIndex = "10";
         $("#variants_processing").toggle();
         document.getElementById("variants").style.opacity = "0.5";
         setTimeout(function () {
-            $('#variants').DataTable().searchBuilder.rebuild(data);
+            table.searchBuilder.rebuild(data);
             document.getElementById("variants_processing").style.visibility = "hidden";
             document.getElementById("variants_processing").style.zIndex = "0";
             $("#variants_processing").toggle();
