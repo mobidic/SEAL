@@ -5,7 +5,7 @@ FLASK:
   SQLALCHEMY_TRACK_MODIFICATIONS: true
   SCHEDULER_API_ENABLED: true
   SCHEDULER_TIMEZONE: 'Europe/Paris'
-  SCHEDULER_JOB_DEFAULTS: 
+  SCHEDULER_JOB_DEFAULTS:
     coalesce: false
     max_instances: 1
   MAINTENANCE: false # Set to true or false

@@ -1,20 +1,20 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -282,7 +282,7 @@ admin.add_view(
         column_editable_list = ['username', 'mail', 'filter', 'api_key_md',
                                 'logged', 'admin', 'bioinfo', 'technician',
                                 'biologist', 'sidebar'],
-        form_excluded_columns = ['comments_variants', 'comments_samples', 
+        form_excluded_columns = ['comments_variants', 'comments_samples',
                                  'historics', 'transcripts']
     )
 )
