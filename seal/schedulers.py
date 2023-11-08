@@ -482,8 +482,8 @@ def importvcf():
                     for annot in v.info["ANN"]:
                         variant.clinvar_VARID = annot["ClinVar"]
                         variant.clinvar_CLNSIG = annot["ClinVar_CLNSIG"]
-                        variant.clinvar_CLNSIGCONF = annot["ClinVar_CLNREVSTAT"].split("&") if annot["ClinVar_CLNREVSTAT"] else list()
-                        variant.clinvar_CLNREVSTAT = annot["ClinVar_CLNSIGCONF"].split("&") if annot["ClinVar_CLNSIGCONF"] else list()
+                        variant.clinvar_CLNSIGCONF = ''.join(annot["ClinVar_CLNSIGCONF"].split("&")) if annot["ClinVar_CLNSIGCONF"] else None
+                        variant.clinvar_CLNREVSTAT = ''.join(annot["ClinVar_CLNREVSTAT"].split("&")) if annot["ClinVar_CLNREVSTAT"] else None
                         # Split annotations
                         for splitAnn in ANNOT_TO_SPLIT:
                             if splitAnn == 'VAR_SYNONYMS':
