@@ -2,7 +2,10 @@
 
 {% block head_css %}
   {{ super() }}
+  <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6/all.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
+  <script defer src="{{ url_for('static', filename='fontawesome-free-6/all.min.js') }}"></script>
+
 {% endblock %}
 
 {% block brand %}

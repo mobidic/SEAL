@@ -4,9 +4,6 @@ function view_sample(id) {
         url: "/toggle/sample/status",
         data: {
             "sample_id": id
-        },
-        success: function() {
-            document.location.href = "/sample/" + id;
         }
     });
 }
@@ -50,7 +47,7 @@ $(document).ready(function() {
                     _: "samplename",
                     display: function ( data, type, row ) {
                         if(data) {
-                            return '<button onclick="view_sample(' + data.id + ')" class="w3-button w3-hover-flat-green-sea">' + data.samplename + '</button>';
+                            return '<a onclick="view_sample(' + data.id + ')" href="/sample/' + data.id  + '" class="w3-button w3-hover-flat-green-sea">' + data.samplename + '</a>';
                         }
                         return data
                     }

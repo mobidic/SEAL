@@ -1,26 +1,27 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-from datetime import timedelta
 import yaml
+from pathlib import Path
+from datetime import timedelta
 
 from flask import Flask, session, g, request, redirect, url_for
 from flask_apscheduler import APScheduler
@@ -34,7 +35,7 @@ from wtforms.fields import HiddenField
 
 app = Flask(__name__)
 
-with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), "config.yaml"), "r") as config_file:
+with open(Path(app.root_path).joinpath("config.yaml"), "r") as config_file:
     config = yaml.safe_load(config_file)
 
 app.config.update(config['FLASK'])
@@ -80,7 +81,7 @@ def before_request():
     session.permanent = True
     session.modified = True
     g.user = current_user
-    if app.config["MAINTENANCE"] and request.path != url_for('maintenance'): 
+    if app.config["MAINTENANCE"] and request.path != url_for('maintenance'):
         return redirect(url_for('maintenance'))
 
 

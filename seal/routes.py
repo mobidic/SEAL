@@ -1,34 +1,36 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from datetime import datetime
-from pathlib import Path
-from urllib.parse import urlparse
 import functools
 import json
 import secrets
 import urllib
 
+from datetime import datetime
+from pathlib import Path
+from urllib.parse import urlparse
+from threading import Thread
+
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
-                   escape)
+                   escape, abort)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
@@ -39,10 +41,12 @@ from psycopg2.errors import UniqueViolation
 from seal import app, bcrypt, db
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
-                        UpdateAccountForm, UpdatePasswordForm)
+                        UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample, Patient)
+                         Transcript, User, Variant, Var2Sample, Patient,
+                         Clinvar)
+from seal.schedulers import update_clinvar_thread
 
 
 ###############################################################################
@@ -53,7 +57,7 @@ from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
 SAFE_HOST = []
 
 
-def redirect_dest(fallback):
+def redirect_dest(fallback='/home'):
     """
     Redirects the user to a given URL after validating it's safe.
 
@@ -66,13 +70,15 @@ def redirect_dest(fallback):
         fallback URL.
     """
     dest = request.args.get('next')
+    if not dest:
+        return redirect(fallback)
     url = urlparse(dest)
-    if url.path and not url.netloc:
+    if url.path and (not url.netloc or url.netloc == request.host):
         return redirect(url.path)
     if url.hostname and url.hostname in SAFE_HOST:
         return redirect(url.geturl())
     else:
-        flash(f"Redirection to '{url.hostname}' forbidden !", "error")
+        flash(f"Redirection to '{url.path}' forbidden !", "error")
         return redirect(fallback)
 
 
@@ -118,6 +124,41 @@ def login_required(func):
             pass
         elif not current_user.logged:
             return redirect(url_for('first_connexion', next=request.url))
+        return func(*args, **kwargs)
+    return decorated_view
+
+
+def admin_required(func):
+    """
+    A decorator that ensures that the user is admin before accessing the
+    decorated view. If the user is not admin, they will beredirected to the
+    index page.
+
+    Usage:
+    ------
+    @admin_required
+    def my_view():
+        # Do something here
+
+    """
+    @functools.wraps(func)
+    def decorated_view(*args, **kwargs):
+        """
+        A decorator function for enforcing user login.
+
+        If the user is not admin, they will be redirected to the index page.
+
+        Args:
+            *args: Variable length argument list.
+            **kwargs: Arbitrary keyword arguments.
+
+        Returns:
+            The decorated view function.
+        """
+        if request.method in EXEMPT_METHODS:
+            return func(*args, **kwargs)
+        elif not current_user.admin:
+            abort(403)
         return func(*args, **kwargs)
     return decorated_view
 
@@ -183,13 +224,16 @@ def handle_csrf_error(e):
         A redirect to the index page with a flash message.
     """
     flash(f"{e.name} : {e.description} Please Retry.", 'warning')
-    return redirect(url_for('index'))
+
+    return redirect_dest()
 
 
 @app.errorhandler(400)
-@app.errorhandler(404)
+@app.errorhandler(401)
 @app.errorhandler(403)
+@app.errorhandler(404)
 @app.errorhandler(405)
+@app.errorhandler(406)
 @app.errorhandler(408)
 @app.errorhandler(410)
 @app.errorhandler(500)
@@ -299,12 +343,12 @@ def save_picture(form_picture):
 def add_vcf(info, vcf_file):
     """
     Save uploaded VCF file and corresponding sample information to disk.
-    
+
     Parameters:
     info (dict): Sample information, including samplename, affected, index,
                  userid, date, family, run, filter, bed, teams.
     vcf_file (FileStorage): Uploaded VCF file.
-    
+
     Returns:
         str: Filename of saved VCF file.
     """
@@ -391,6 +435,7 @@ def maintenance():
         return redirect(url_for("index"))
     return render_template(
         "essentials/maintenance.html",
+        reason=app.config["MAINTENANCE_REASON"]
     )
 
 
@@ -444,7 +489,7 @@ def login():
                 return redirect(url_for('first_connexion', next=next_page))
 
             flash(f'You are logged in as: {user.username}!', 'success')
-            return redirect_dest(fallback=url_for('index'))
+            return redirect_dest()
         else:
             flash('Login unsuccessful. Please check username and/or password!',
                   'error')
@@ -472,7 +517,7 @@ def account():
     """
     update_account_form = UpdateAccountForm()
     update_password_form = UpdatePasswordForm()
-    if ("submit_update" in request.form 
+    if ("submit_update" in request.form
             and update_account_form.validate_on_submit()):
         if update_account_form.image_file.data:
             picture_file = save_picture(update_account_form.image_file.data)
@@ -484,7 +529,7 @@ def account():
             current_user.mail = None
 
         if update_account_form.api_key_md.data != '':
-            current_user.api_key_md = update_account_form.api_key_md.data 
+            current_user.api_key_md = update_account_form.api_key_md.data
         else:
             current_user.api_key_md = None
 
@@ -492,7 +537,7 @@ def account():
         db.session.commit()
 
         flash('Your account has been updated!', 'success')
-    elif ("submit_password" in request.form 
+    elif ("submit_password" in request.form
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
         current_user.password = bcrypt.generate_password_hash(pwd).decode('utf-8')
@@ -525,15 +570,15 @@ def first_connexion():
     update_password_form = UpdatePasswordForm()
     next_page = request.args.get('next')
     if current_user.logged:
-        return redirect_dest(fallback=url_for('index'))
-    if ("submit_password" in request.form 
+        return redirect_dest()
+    if ("submit_password" in request.form
             and update_password_form.validate_on_submit()):
         pwd = update_password_form.new_password.data
         current_user.password = bcrypt.generate_password_hash(pwd).decode('utf-8')
         current_user.logged = True
         db.session.commit()
         flash('Your password has been changed!', 'success')
-        return redirect_dest(fallback=url_for('index'))
+        return redirect_dest()
 
     return render_template(
         'authentication/first_connexion.html', title='First Connexion',
@@ -591,12 +636,26 @@ def sample(id):
         if v.inBed():
             count_hide+=1
 
+    family_members = []
+    if sample.patient.family:
+        for p in sample.patient.family.patients:
+            for s in p.samples:
+                if s != sample and s.status > 0:
+                    family_members.append(s)
+    # for s in sample.patient.samples:
+    #     if s != sample and s.status > 0:
+    #         family_members.append(s)
+
+    clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
         count_hide = count_hide,
+        family_members = family_members,
         form=commentForm,
-        saveFilterForm=saveFilterForm
+        saveFilterForm=saveFilterForm,
+        clinvar = clinvar
     )
 
 
@@ -704,6 +763,30 @@ def create_panel():
     return render_template(
         'analysis/panel.html', title="Add Panel",
         form=uploadPanelForm
+    )
+
+
+@app.route("/update/clinvar", methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_clinvar():
+    UploadClinvarForm = UploadClinvar()
+
+    if "submit" in request.form and UploadClinvarForm.validate_on_submit():
+        version = int(UploadClinvarForm.version.data.strftime("%Y%m%d"))
+        genome = UploadClinvarForm.genome_version.data
+
+        vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
+        vcf_path = vcf_path.joinpath(UploadClinvarForm.vcf_file.data.filename)
+        UploadClinvarForm.vcf_file.data.save(vcf_path)
+
+        Thread(target=update_clinvar_thread, args=(vcf_path, version, genome, )).start()
+
+        return redirect(url_for('index'))
+
+    return render_template(
+        'admin/updateclinvar.html', title="Update ClinVar",
+        form=UploadClinvarForm
     )
 
 
@@ -849,7 +932,7 @@ def json_samples():
     samples = Sample.query
     if not current_user.admin:
         filter_samples_teams = or_(
-            Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])), 
+            Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])),
             Sample.teams == None
         )
         samples = samples.filter(filter_samples_teams)
@@ -994,7 +1077,7 @@ def json_variants(id, idbed=False, version=-1):
     # Get all canonical trancripts
 
     ##################################################
-    
+
     for var2sample in sample.variants:
         variant = var2sample.variant
         try:
@@ -1097,11 +1180,53 @@ def json_variants(id, idbed=False, version=-1):
                 })
 
         members = []
+        for s in sample.patient.samples:
+            if s != sample:
+                members.append(str(s))
         if sample.patient and sample.patient.familyid:
             request_family = Patient.query.outerjoin(Sample).outerjoin(Var2Sample)\
                             .filter(and_(Var2Sample.variant_ID == variant.id, Patient.id != sample.patient.id))
             for member in request_family.all():
                 members.append(str(member))
+        t={}
+        for s in sample.patient.samples:
+            if s.status > 0 and s != sample:
+                t[str(s)]= dict()
+                req = Var2Sample.query.get((var2sample.variant_ID, s.id))
+                if req:
+                    t[str(s)] = {
+                        "depth": f"{req.depth}",
+                        "allelic_depth": f"{req.allelic_depth}",
+                        "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
+                    }
+                else:
+                    t[str(s)] = {
+                        "depth": f"NA",
+                        "allelic_depth": f"NA",
+                        "allelic_frequency": f"NA",
+                    }
+            
+        if sample.patient.familyid is not None:
+            for p in sample.patient.family.patients:
+                if p == sample.patient:
+                    continue
+                for s in p.samples:
+                    if s.status < 1:
+                        continue
+                    t[str(s)]= dict()
+                    req = Var2Sample.query.get((var2sample.variant_ID, s.id))
+                    if req:
+                        t[str(s)] = {
+                            "depth": f"{req.depth}",
+                            "allelic_depth": f"{req.allelic_depth}",
+                            "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
+                        }
+                    else:
+                        t[str(s)] = {
+                            "depth": f"NA",
+                            "allelic_depth": f"NA",
+                            "allelic_frequency": f"NA",
+                        }
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
 
@@ -1111,6 +1236,12 @@ def json_variants(id, idbed=False, version=-1):
         variants["data"].append({
             "annotations": main_annot,
             "chr": f"{variant.chr}",
+            "clinvar": {
+                "VARID" : variant.clinvar_VARID,
+                "CLNSIG" : variant.clinvar_CLNSIG,
+                "CLNSIGCONF" : variant.clinvar_CLNSIGCONF,
+                "CLNREVSTAT" : variant.clinvar_CLNREVSTAT
+            },
             "id": f"{variant.id}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",
@@ -1123,11 +1254,11 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
                 "occurrences": null+not_null,
-                "occurences_family": len(members),
-                "family_members": members
             },
-            "phenotypes": phenotypes
+            "phenotypes": phenotypes,
+            "family": t
         })
+    # print(variants)
     return jsonify(variants)
 
 
@@ -1152,7 +1283,7 @@ def json_transcripts():
           - gene: the gene name.
           - source: the source of the feature.
           - protein: the protein product of the transcript.
-          - canonical: a flag indicating whether this transcript is the 
+          - canonical: a flag indicating whether this transcript is the
                        canonical transcript of its gene.
           - hgnc: the HGNC identifier for the gene.
           - val: a boolean indicating whether the current user has this
@@ -1496,7 +1627,7 @@ def edit_name():
     old_name = sample.samplename
     if len(new_name) < 2 or len(new_name) > 20:
         raise InvalidAPIUsage("The samplename must be between 2 and 20 characters long.")
-    
+
     sample.samplename = new_name
     history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Sample rename : '{old_name}' -> '{sample.samplename}")
     db.session.add(history)
@@ -1577,9 +1708,9 @@ def toggle_varStatus():
 
     report = "Report" if v2s.reported else "Unreport"
     history = History(
-        sample_ID=sample_id, 
-        user_ID=current_user.id, 
-        date=datetime.now(), 
+        sample_ID=sample_id,
+        user_ID=current_user.id,
+        date=datetime.now(),
         action=f"{report} variant : {id_var}")
     db.session.add(history)
     db.session.commit()
@@ -1605,9 +1736,9 @@ def toggle_varhide():
 
     report = "Hide" if v2s.hide else "Show"
     history = History(
-        sample_ID=sample_id, 
-        user_ID=current_user.id, 
-        date=datetime.now(), 
+        sample_ID=sample_id,
+        user_ID=current_user.id,
+        date=datetime.now(),
         action=f"{report} variant : {id_var}")
     db.session.add(history)
     db.session.commit()
@@ -1636,9 +1767,9 @@ def toggle_varhideall():
 
         report = "Hide" if v2s.hide else "Show"
         history = History(
-            sample_ID=sample_id, 
-            user_ID=current_user.id, 
-            date=datetime.now(), 
+            sample_ID=sample_id,
+            user_ID=current_user.id,
+            date=datetime.now(),
             action=f"{report} variant : {v2s.variant_ID}")
         db.session.add(history)
         db.session.commit()
@@ -1714,9 +1845,9 @@ def toggle_sampleFilter():
 
     if sample.filter != old_filter:
         history = History(
-            sample_ID=sample.id, 
-            user_ID=current_user.id, 
-            date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=current_user.id,
+            date=datetime.now(),
             action=f"Change filter : '{str(old_filter)}' -> '{str(sample.filter)}'")
         db.session.add(history)
         db.session.commit()
@@ -1741,16 +1872,16 @@ def toggle_samplePanel():
 
     if sample.bed != old_bed:
         history = History(
-            sample_ID=sample.id, 
-            user_ID=current_user.id, 
-            date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=current_user.id,
+            date=datetime.now(),
             action=f"Change panel : '{str(old_bed)}' -> '{str(sample.bed)}'")
         db.session.add(history)
         db.session.commit()
 
     count_hide=0
 
-    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == 36, Var2Sample.hide == True):
+    for v in  Var2Sample.query.filter(Var2Sample.sample_ID == sample.id, Var2Sample.hide == True):
         if v.inBed():
             count_hide+=1
 
@@ -1795,7 +1926,7 @@ def toggle_sampleStatus():
     elif sample.status == 1:
         sample.status = 2
         db.session.commit()
-    
+
     status_dict = {
         -1: "Error",
         0: "Importing",
@@ -1807,8 +1938,8 @@ def toggle_sampleStatus():
 
     if sample.status != old_status:
         history = History(
-            sample_ID=sample.id, 
-            user_ID=current_user.id, date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=current_user.id, date=datetime.now(),
             action=f"Status : '{status_dict[old_status]}' -> '{status_dict[sample.status]}'")
         db.session.add(history)
         db.session.commit()
@@ -1825,9 +1956,9 @@ def add_comment_variant():
         str: A message indicating the comment was added.
     """
     comment = Comment_variant(
-        comment=urllib.parse.unquote(request.form["comment"]), 
-        variantid=request.form["id"], 
-        date=datetime.now(), 
+        comment=urllib.parse.unquote(request.form["comment"]),
+        variantid=request.form["id"],
+        date=datetime.now(),
         userid=current_user.id)
     db.session.add(comment)
     db.session.commit()
@@ -1844,9 +1975,9 @@ def add_comment_sample():
         str: A message indicating the comment was added.
     """
     comment = Comment_sample(
-        comment=urllib.parse.unquote(request.form["comment"]), 
-        sampleid=request.form["id"], 
-        date=datetime.now(), 
+        comment=urllib.parse.unquote(request.form["comment"]),
+        sampleid=request.form["id"],
+        date=datetime.now(),
         userid=current_user.id)
     db.session.add(comment)
     db.session.commit()
@@ -1862,7 +1993,7 @@ def add_filter():
     Returns:
         str: A message indicating the filter was added.
     """
-    
+
     if request.form["edit"] == "true":
         filter = Filter.query.get(request.form["id"])
         filter.filter = json.loads(request.form["filter"])

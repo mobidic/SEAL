@@ -94,8 +94,6 @@ $('#family').autocomplete({
 ///////////////////////////////////////////////////////////////////////////////
 
 function autocomplete_run(data, value) {
-    console.log(data);
-    console.log(value)
     if(value in data) {
         $("#run_alias").prop('readonly', true);
         $("#run_alias").val(data[value]["alias"]);

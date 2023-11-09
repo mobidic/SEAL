@@ -7,13 +7,13 @@
 
         <link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='balloon.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-5/css/all.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6/all.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
 
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
         <script type="text/javascript" src="{{ url_for('static', filename='DataTables/datatables.min.js') }}"></script>
 
-        <script defer src="{{ url_for('static', filename='fontawesome-free-5/js/all.js') }}"></script>
+        <script defer src="{{ url_for('static', filename='fontawesome-free-6/all.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='seal.css') }}">
 
         {% if current_user.sidebar %}<style>.w3-main {margin-left:350px}</style>{% endif %}
@@ -49,6 +49,9 @@
                                     <a href="{{ url_for('admin.index') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                         <i class="fas fa-tools fa-fw w3-margin-right"></i> Admin tools
                                     </a>
+                                    <a href="{{ url_for('update_clinvar') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
+                                        <i class="fa-solid fa-download fa-fw w3-margin-right"></i></i> Update ClinVar
+                                    </a>
                                 {% endif %}
                                 <a href="{{ url_for('logout') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                     <i class="fas fa-sign-out-alt fa-fw w3-margin-right"></i> Logout
@@ -70,7 +73,7 @@
 
         <div id="page-container">
             <section id="content-wrap" class="w3-text-dark-gray" style="padding-top:51px;">
-                    {% block content %}{% endblock %}
+                {% block content %}{% endblock %}
             </section>
 
         <!-- Footer -->
@@ -86,6 +89,15 @@
         </div>
         <script type="text/javascript">
             var csrf_token = "{{ csrf_token() }}";
+            {% if (current_user.logged and not current_user.api_key_md ) %}
+                var new_div = "<div class='w3-panel w3-padding w3-margin \
+                    w3-warning w3-leftbar'><b>WARNING</b> : You do not have a \
+                    link to a <a class='w3-hover-text-flat-belize-hole w3-text-flat-peter-river' style='font-style: italic;' href='https://mobidetails.iurc.montp.inserm.fr/MD/' \
+                    target='_blank'>MobiDetails</a> account. Please <a class='w3-hover-text-flat-belize-hole w3-text-flat-peter-river' style='font-style: italic;' href={{ url_for('account') }} \
+                    target='_blank'>edit your \
+                    profile</a> to enjoy all features ! </div>"
+                $( ".w3-main" ).prepend( new_div );
+            {% endif %}
         </script>
 
         <script type="text/javascript" src="{{ url_for('static', filename='seal/base.js') }}"></script>

@@ -1,20 +1,20 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -29,8 +29,6 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.dialects import postgresql
-
-
 
 ################################################################################
 # Authentication
@@ -136,6 +134,19 @@ class Team(db.Model):
         return self.teamname
 
 
+class Clinvar(db.Model):
+    version = db.Column(db.Integer, primary_key=True)
+    genome = db.Column(db.String(20), unique=False, nullable=False)
+    date = db.Column(db.TIMESTAMP(timezone=False), nullable=False, default=datetime.now())
+    current = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __repr__(self):
+        return f"Clinvar('{self.version}','{self.date}')"
+
+    def __str__(self):
+        return str(self.version)
+
+
 ################################################################################
 
 
@@ -212,11 +223,11 @@ class Sample(db.Model):
 
     def __str__(self):
         return self.samplename
-    
+
     @hybrid_property
     def lastAction(self):
         return History.query.filter_by(sample_ID = self.id).order_by(History.date.desc()).first()
-    
+
     @lastAction.expression
     def lastAction(cls):
         return select(func.max(History.date)).\
@@ -227,6 +238,8 @@ class Run(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True, nullable=False)
     alias = db.Column(db.String(50), unique=False, nullable=True)
+
+    summary = db.Column(db.Text, unique=False, nullable=True)
 
     samples = relationship("Sample")
     reads = relationship("Read")
@@ -247,6 +260,11 @@ class Variant(db.Model):
     class_variant = db.Column(db.Integer, unique=False, default=None)
     annotations = db.Column(db.JSON, nullable=True)
     comments = relationship("Comment_variant")
+
+    clinvar_VARID = db.Column(db.Integer, unique=False, nullable=True)
+    clinvar_CLNSIG = db.Column(db.String(500), unique=False, nullable=True)
+    clinvar_CLNSIGCONF = db.Column(db.String(500), unique=False, nullable=True)
+    clinvar_CLNREVSTAT = db.Column(db.String(500), unique=False, nullable=True)
 
     def __repr__(self):
         return f"Variant('{self.chr}','{self.pos}','{self.ref}','{self.alt}')"
@@ -311,7 +329,7 @@ class Var2Sample(db.Model):
 
     def inBed(self):
         if self.sample.bed:
-            return self.sample.bed.varInBed(self.variant) 
+            return self.sample.bed.varInBed(self.variant)
         else:
             return True
 

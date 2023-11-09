@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block static %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='jquery-ui/jquery-ui.css') }}">
+    <link href="{{ url_for('static', filename='select2/css/select2.min.css') }}" rel="stylesheet" />
+{% endblock %}
+
+{% block content %}
+    {% include 'includes/sidebar.j2' %}
+    <div class="w3-main">
+        <div class="w3-padding w3-mobile">
+            <div class="w3-card w3-padding w3-mobile">
+                <div class="w3-container w3-border-bottom">
+                    <h3>Upload A New ClinVar Version</h3>
+                </div>
+
+                <form class="w3-container"  action="" method="post" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:150px">
+                            <i class="w3-xxlarge fas fa-tag"></i> {{ form.version.label(class="w3-display-right", style="font-weight: bold;")}}
+                        </div>
+                        <div class="w3-rest">
+                            {% if form.version.errors %}
+                                {{ form.version(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.version.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.version(class="w3-input w3-border", type="date") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="w3-row w3-section w3-display-container">
+                        <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:150px">
+                            <span class="w3-xxlarge fa-layers fa-fw">
+                                <i class="fa-solid fa-tags" data-fa-transform=""></i>
+                                <i class="fa-inverse fa-solid fa-dna" data-fa-transform="shrink-9 rotate--45 left-1"></i>
+                            </span>
+                            {{ form.genome_version.label(class="w3-display-right", style="font-weight: bold;")}}
+                        </div>
+                        <div class="w3-rest">
+                            {% if form.genome_version.errors %}
+                                {{ form.genome_version(class="w3-input w3-border w3-border-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.genome_version.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.genome_version(class="js-example-basic-multiple", style="width:100%") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="w3-row w3-section">
+                        <div class="w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:150px"><i class="w3-xxlarge fas fa-file-alt"></i> {{ form.vcf_file.label(class="w3-display-right", style="font-weight: bold;")}}</div>
+                        <div class="w3-rest">
+                            {% if form.vcf_file.errors %}
+                                {{ form.vcf_file(class="w3-input w3-border-0 w3-text-red") }}
+                                <div class="w3-small w3-text-flat-alizarin">
+                                    {% for error in form.vcf_file.errors %}
+                                        <i class="fas fa-exclamation-circle"></i> {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.vcf_file(class="w3-input w3-border-0") }}
+                            {% endif %}
+                        </div>
+                    </div>
+
+
+                    <div class="w3-section w3-center">
+                        {{ form.submit(class="w3-button w3-flat-green-sea w3-hover-flat-turquoise") }}
+                    </div>
+                </form>
+                <div id="result"></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery-ui/jquery-ui.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='select2/js/select2.full.min.js') }}"></script>
+{% endblock %}

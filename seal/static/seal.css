@@ -118,6 +118,14 @@
     white-space: nowrap;
 }
 
+.size-25 {
+    max-width: 25px;
+    min-width: 25px;
+}
+.size-50 {
+    max-width: 50px;
+    min-width: 50px;
+}
 .size-100 {
     max-width: 100px;
     min-width: 100px;
@@ -175,7 +183,10 @@
     min-width: 250px;
 }
 .min-size-300 {
-    min-width: 250px;
+    min-width: 300px;
+}
+.min-size-350 {
+    min-width: 350px;
 }
 .min-size-550 {
     min-width: 550px;

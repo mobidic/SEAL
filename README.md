@@ -128,7 +128,7 @@ python insert_OMIM.py
 ### Launching the App
 
 Finally, to launch the app, run the following command:
-```
+```bash
 flask --app seal --debug run
 ```
 
@@ -145,6 +145,11 @@ flask --app seal --debug db upgrade
 ```bash
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
+```
+- Dump/Restore the database
+```bash
+pg_dump -O -C --if-exists --clean --inserts -d seal -x -F t -f seal.tar
+pg_restore -x -f seal.tar
 ```
 
 # License

@@ -1,20 +1,20 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
@@ -29,7 +29,8 @@ from flask_login import current_user
 from seal import app, db, bcrypt
 from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
-                         Region, Bed, Phenotype, Omim, History, Patient)
+                         Region, Bed, Phenotype, Omim, History, Patient,
+                         Clinvar)
 
 ###############################################################################
 
@@ -81,7 +82,7 @@ class MyAdminIndexView(AdminIndexView):
         Returns:
             redirect: A Flask redirect to the login page.
         """
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('login', next=request.full_path))
 
     def is_visible(self):
         # This view won't appear in the menu structure
@@ -162,7 +163,7 @@ class CustomView(ModelView):
         Returns:
             redirect: A Flask redirect to the login page.
         """
-        return redirect(url_for('login', next=request.url))
+        return redirect(url_for('login', next=request.full_path))
 
 
 class SampleView(CustomView):
@@ -228,7 +229,7 @@ class UserView(CustomView):
         """
         Called when a user object is created or modified. Hashes the user's
         password before storing it in the database.
-        
+
         Args:
             form: The form object.
             model: The User model object.
@@ -242,10 +243,10 @@ class UserView(CustomView):
         """
         Custom validation code that checks the user's password for length and
         correct hashing format.
-        
+
         Args:
             form: The form object.
-        
+
         Returns:
             Boolean indicating whether the form is valid or not.
         """
@@ -282,7 +283,7 @@ admin.add_view(
         column_editable_list = ['username', 'mail', 'filter', 'api_key_md',
                                 'logged', 'admin', 'bioinfo', 'technician',
                                 'biologist', 'sidebar'],
-        form_excluded_columns = ['comments_variants', 'comments_samples', 
+        form_excluded_columns = ['comments_variants', 'comments_samples',
                                  'historics', 'transcripts']
     )
 )
@@ -352,8 +353,9 @@ admin.add_view(
         Variant,
         db.session,
         category="Variant",
-        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'annotations'],
-        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant'],
+        column_searchable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant', 'clinvar_VARID', 'clinvar_CLNSIG', 'clinvar_CLNSIGCONF', 'clinvar_CLNREVSTAT'],
+        column_editable_list = ['chr', 'pos', 'ref', 'alt', 'class_variant', 'clinvar_VARID', 'clinvar_CLNSIG', 'clinvar_CLNSIGCONF', 'clinvar_CLNREVSTAT'],
+        column_exclude_list = ['annotations'],
         form_excluded_columns = ['samples']
     )
 )
@@ -404,6 +406,14 @@ admin.add_view(
         column_searchable_list = ['filtername', 'filter'],
         column_editable_list = ['filtername'],
         form_excluded_columns = ['users', 'samples']
+    )
+)
+
+admin.add_view(
+    CustomView(
+        Clinvar,
+        db.session,
+        category="Analysis"
     )
 )
 

@@ -12,7 +12,8 @@
             "dbscSNV,{dir_vep_plugins}/dbscSNV/dbscSNV1.1_GRCh37.txt.gz"
         ],
         "--custom": [
-            "{GnomAD_vcf}/gnomad.genomes.r2.0.1.sites.noVEP.vcf.gz,gnomADg,vcf,exact,0,AF_AFR,AF_AMR,AF_ASJ,AF_EAS,AF_FIN,AF_NFE,AF_OTH,AF"
+            "{GnomAD_vcf}/gnomad.genomes.r2.0.1.sites.noVEP.vcf.gz,gnomADg,vcf,exact,0,AF_AFR,AF_AMR,AF_ASJ,AF_EAS,AF_FIN,AF_NFE,AF_OTH,AF",
+            "{ClinVar_vcf},ClinVar,vcf,exact,0,CLNSIG,CLNREVSTAT,CLNSIGCONF"
         ],
         "--fasta": "{fasta}",
         "--fork": 1,

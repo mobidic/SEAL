@@ -1,42 +1,45 @@
 # (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
-# 
+#
 # SEAL db - Simple, Efficient And Lite database for NGS
 # Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import os
 import re
 import json
+import time
 import numpy
 import random
 import subprocess
+from ftplib import FTP
 from pathlib import Path
 from datetime import datetime
+from threading import Thread
 
-from anacore import annotVcf, vcf
+from anacore import annotVcf
 
 from seal import app, scheduler, db
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
-                         Team, Bed, Filter, History, Comment_sample, Patient)
+                         Team, Bed, Filter, History, Comment_sample, Patient,
+                         Clinvar)
 
 from sqlalchemy import exc
 
 CONSEQUENCES_DICT = {
-    "stop_gained": 20,  
+    "stop_gained": 20,
     "stop_lost": 20,
     "splice_acceptor_variant": 10,
     "splice_donor_variant": 10,
@@ -139,9 +142,6 @@ def is_valid_color(color):
     match_hex = bool(re.search(r'^(\#(([a-fA-F0-9]){3}){1,2})$', str(color), re.IGNORECASE))
     match_rgb = bool(re.search(r'^((rgb)?\s*?\(\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?\))$', str(color), re.IGNORECASE))
     match_rgba = bool(re.search(r'^((rgba)?\s*?\(\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(000|0?\d{1,2}|1\d\d|2[0-4]\d|25[0-5])\s*?,\s*?(0|0\.\d*|1|1.0*)\s*?\))$', str(color), re.IGNORECASE))
-    print(match_hex)
-    print(match_rgb)
-    print(match_rgba)
     return bool(match_hex | match_rgb | match_rgba)
 
 
@@ -215,7 +215,7 @@ def get_bed(id=None, name=None):
     return False
 
 
-def get_filter(id=None, name=None):
+def get_filter(id=1, name=None):
     if id:
         filter = Filter.query.get(id)
         if filter:
@@ -421,12 +421,17 @@ def importvcf():
         except KeyError:
             date_import = datetime.now()
 
+        try:
+            genome = data["genome"]
+        except KeyError:
+            genome = "grch37"
+
         # Come from interface
         try:
             interface = data["interface"]
         except KeyError:
             interface = False
-        
+
         vcf_path = Path(data["vcf_path"])
         if not vcf_path.exists():
             app.logger.error(f'Path does not exist for : {vcf_path}')
@@ -439,11 +444,13 @@ def importvcf():
 
         vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
         stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
+        clinvar_vcf = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/current.vcf.gz')
 
         values = {
             "vcf_path": vcf_path,
             "vcf_vep": vcf_vep,
-            "stats_vep": stats_vep
+            "stats_vep": stats_vep,
+            "ClinVar_vcf": clinvar_vcf
         }
 
         current_date = datetime.now().isoformat()
@@ -459,18 +466,18 @@ def importvcf():
             error_file = current_file.with_suffix('.error')
             current_file.rename(error_file)
             return
-        
+
         with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
             for v in vcf_io:
                 if v.alt[0] == "*":
                     continue
-                variant = Variant.query.get(f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}")
+                variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if not variant:
                     variant = Variant(
-                        id=f"{v.chrom}-{v.pos}-{v.ref}-{v.alt[0]}", 
-                        chr=v.chrom, 
-                        pos=v.pos, 
-                        ref=v.ref, 
+                        id=f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}",
+                        chr=f"chr{v.chrom.replace('chr','')}",
+                        pos=v.pos,
+                        ref=v.ref,
                         alt=v.alt[0])
                     db.session.add(variant)
 
@@ -481,6 +488,10 @@ def importvcf():
                     }]
 
                     for annot in v.info["ANN"]:
+                        variant.clinvar_VARID = annot["ClinVar"]
+                        variant.clinvar_CLNSIG = annot["ClinVar_CLNSIG"]
+                        variant.clinvar_CLNSIGCONF = ''.join(annot["ClinVar_CLNSIGCONF"].split("&")) if annot["ClinVar_CLNSIGCONF"] else None
+                        variant.clinvar_CLNREVSTAT = ''.join(annot["ClinVar_CLNREVSTAT"].split("&")) if annot["ClinVar_CLNREVSTAT"] else None
                         # Split annotations
                         for splitAnn in ANNOT_TO_SPLIT:
                             if splitAnn == 'VAR_SYNONYMS':
@@ -563,9 +574,9 @@ def importvcf():
                 #   - add to history & comments
                 try:
                     v2s = Var2Sample(
-                        variant_ID=variant.id, 
-                        sample_ID=sample.id, 
-                        depth=v.getPopDP(), 
+                        variant_ID=variant.id,
+                        sample_ID=sample.id,
+                        depth=v.getPopDP(),
                         allelic_depth=v.getPopAltAD()[0],
                         filter=v.filter)
                     db.session.add(v2s)
@@ -580,13 +591,13 @@ def importvcf():
                         action=f"{type(e).__name__}")
                     db.session.add(history)
                     comment = Comment_sample(
-                        comment=f"{type(e).__name__} : {e}", 
-                        sampleid=sample.id, 
-                        date=datetime.now(), 
+                        comment=f"{type(e).__name__} : {e}",
+                        sampleid=sample.id,
+                        date=datetime.now(),
                         userid=user_id)
                     db.session.add(comment)
                     db.session.commit
-                        
+
         path_locker.unlink()
         db.session.commit()
         current_file.unlink()
@@ -595,10 +606,123 @@ def importvcf():
         if interface:
             vcf_path.unlink()
         history = History(
-            sample_ID=sample.id, 
-            user_ID=user_id, 
-            date=datetime.now(), 
+            sample_ID=sample.id,
+            user_ID=user_id,
+            date=datetime.now(),
             action=f"Sample Imported")
         db.session.add(history)
         sample.status = 1
         db.session.commit()
+
+
+def update_clinvar_thread(vcf, version, genome="grch37"):
+    # Check and create locker
+    path_locker = Path(app.root_path).joinpath('static/temp/vcf/.lock')
+    while path_locker.exists():
+        time.sleep(1)
+    lockFile = open(path_locker, 'x')
+    lockFile.close()
+
+    # Switch on maintenance mode
+    app.config["MAINTENANCE"] = True
+    app.config["MAINTENANCE_REASON"] = "Update ClinVar"
+
+    # Define paths
+    new_clinvar = Path(vcf)
+    new_clinvar_index = Path(f"{new_clinvar}.tbi")
+    current = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/current.vcf.gz')
+    current_index = Path(f"{current}.tbi")
+
+    # Create new clinvar entry
+    clinvar = Clinvar(version=version, genome=genome, current=False)
+    db.session.add(clinvar)
+    db.session.commit()
+
+    # Try to update
+    try:
+        cpt = 0
+        execute_shell_command(["tabix", "-p", "vcf", new_clinvar])
+        # with annotVcf.AnnotVCFIO(new_clinvar) as vcf_io:
+        #     for v in vcf_io:
+        #         cpt += 1
+        #         variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
+        #         if variant:
+        #             variant.clinvar_VARID = v.id
+        #             variant.clinvar_CLNSIG = ''.join(v.info["CLNSIG"]) if "CLNSIG" in v.info else None
+        #             variant.clinvar_CLNSIGCONF = ''.join(v.info["CLNSIGCONF"]) if "CLNSIGCONF" in v.info else None
+        #             variant.clinvar_CLNREVSTAT = ''.join(v.info["CLNREVSTAT"]) if "CLNREVSTAT" in v.info else None
+    except Exception as e:
+        db.session.rollback()
+        path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')
+        with open(path_log, "w") as log:
+            log.write(f"Error on file: {new_clinvar}")
+            log.write(e)
+        app.config["MAINTENANCE"] = False
+        del app.config["MAINTENANCE_REASON"]
+        path_locker.unlink()
+        return
+
+    # Update Clinvar
+    for c in Clinvar.query.filter_by(genome=genome, current=True).all():
+        c.current = False
+    clinvar.current = True
+    db.session.commit()
+    new_clinvar.rename(current)
+    new_clinvar_index.rename(current_index)
+
+    # Switch off maintenance mode
+    app.config["MAINTENANCE"] = False
+    del app.config["MAINTENANCE_REASON"]
+    path_locker.unlink()
+
+
+@scheduler.task('cron', id='update clinvar', day_of_week="mon")
+def check_clinvar(genome="GRCh37"):
+    path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
+    path_locker = path_inout.joinpath('.lock')
+    app.logger.info("START CLINVAR UPDATE")
+
+    while path_locker.exists():
+        time.sleep(1)
+
+    app.logger.info("  - No locker")
+    lockFile = open(path_locker, 'x')
+    lockFile.close()
+
+    ftp=FTP('ftp.ncbi.nlm.nih.gov')
+    ftp.login()
+    ftp.cwd(f'pub/clinvar/vcf_{genome}')
+
+    ls = ftp.nlst()
+    for i in ls:
+        r = re.compile("clinvar_([0-9]+).vcf.gz$")
+        match = r.search(i)
+        app.logger.info(f"  - file : {i}")
+        if match:
+            app.logger.info(f"    - match : {match.group(1)}")
+            version = match.group(1)
+            file = match.group(0)
+
+            if not Clinvar.query.filter_by(version=version, genome=genome.lower()).one_or_none():
+                app.logger.info(f"    - new clinvar")
+                vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
+                vcf_path = vcf_path.joinpath(file)
+                t = 0
+                while t < 10:
+                    try:
+                        app.logger.info(f"    - download attempt : {t}")
+                        with open(f'{vcf_path}', 'wb') as fp:
+                            ftp.retrbinary(f'RETR {file}', fp.write)
+                        Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower(), )).start()
+                        app.logger.info(f"    - thread launched")
+                        t=10
+                    except Exception as e:
+                        app.logger.info(f"    - download filed retry")
+                        app.logger.error(e)
+                        ftp.close()
+                        ftp=FTP('ftp.ncbi.nlm.nih.gov')
+                        ftp.login()
+                        ftp.cwd(f'pub/clinvar/vcf_{genome}')
+                        t+=1
+    app.logger.info("END CLINVAR UPDATE")
+    path_locker.unlink()
