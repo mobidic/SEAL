@@ -239,3 +239,9 @@ table.dataTable.display>tbody>tr.selected:hover>* {
 }
 
 /* --------------------------------------------------------------------------------------------------------------- */
+
+table thead tr th {
+    display: flex!important;
+    display: table-cell!important;
+    vertical-align:middle!important;
+}
