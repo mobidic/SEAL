@@ -636,15 +636,16 @@ def sample(id):
         if v.inBed():
             count_hide+=1
 
-    family_members = []
+    samples = {
+        "family": [],
+        "same": []
+    }
     if sample.patient.family:
         for p in sample.patient.family.patients:
+            t = "same" if p == sample.patient else "family"
             for s in p.samples:
                 if s != sample and s.status > 0:
-                    family_members.append(s)
-    # for s in sample.patient.samples:
-    #     if s != sample and s.status > 0:
-    #         family_members.append(s)
+                    samples[t].append(s)
 
     clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
 
@@ -652,7 +653,8 @@ def sample(id):
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
         count_hide = count_hide,
-        family_members = family_members,
+        family_members = samples["family"],
+        other_samples = samples["same"],
         form=commentForm,
         saveFilterForm=saveFilterForm,
         clinvar = clinvar
@@ -1188,24 +1190,24 @@ def json_variants(id, idbed=False, version=-1):
                             .filter(and_(Var2Sample.variant_ID == variant.id, Patient.id != sample.patient.id))
             for member in request_family.all():
                 members.append(str(member))
-        t={}
+        os={}
         for s in sample.patient.samples:
             if s.status > 0 and s != sample:
-                t[str(s)]= dict()
+                os[str(s)]= dict()
                 req = Var2Sample.query.get((var2sample.variant_ID, s.id))
                 if req:
-                    t[str(s)] = {
+                    os[str(s)] = {
                         "depth": f"{req.depth}",
                         "allelic_depth": f"{req.allelic_depth}",
                         "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
                     }
                 else:
-                    t[str(s)] = {
+                    os[str(s)] = {
                         "depth": f"NA",
                         "allelic_depth": f"NA",
                         "allelic_frequency": f"NA",
                     }
-            
+        t={}
         if sample.patient.familyid is not None:
             for p in sample.patient.family.patients:
                 if p == sample.patient:
@@ -1256,7 +1258,8 @@ def json_variants(id, idbed=False, version=-1):
                 "occurrences": null+not_null,
             },
             "phenotypes": phenotypes,
-            "family": t
+            "family": t,
+            "os": os,
         })
     # print(variants)
     return jsonify(variants)
