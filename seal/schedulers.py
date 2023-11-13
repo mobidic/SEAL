@@ -689,11 +689,19 @@ def check_clinvar(genome="GRCh37"):
     lockFile = open(path_locker, 'x')
     lockFile.close()
 
-    ftp=FTP('ftp.ncbi.nlm.nih.gov')
-    ftp.login()
-    ftp.cwd(f'pub/clinvar/vcf_{genome}')
+    try:
+        ftp=FTP('ftp.ncbi.nlm.nih.gov')
+        ftp.login()
+        ftp.cwd(f'pub/clinvar/vcf_{genome}')
+        ls = ftp.nlst()
 
-    ls = ftp.nlst()
+    except Exception as e:
+        app.logger.error("  - No connection")
+        app.logger.error(e)
+        app.logger.info("END CLINVAR UPDATE")
+        path_locker.unlink()
+        return
+
     for i in ls:
         r = re.compile("clinvar_([0-9]+).vcf.gz$")
         match = r.search(i)
