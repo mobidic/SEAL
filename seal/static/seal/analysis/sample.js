@@ -532,7 +532,7 @@ $(document).ready(function() {
             },
             infoPostFix: " [Total variants: " + sample_variants_length + "]",
         },
-        dom: 'Blfrti<"toolbar-variants">',
+        dom: 'B<"toolbar-samples">lfrti<"toolbar-variants">',
         scrollY:        "40vh",
         scrollX:        true,
         scrollCollapse: true,
@@ -829,6 +829,35 @@ $(document).ready(function() {
                 ]
             });
             hide_message(count_hide);
+            if (Object.keys(other_samples).length  + Object.keys(family_members).length  > 0) {
+                $('.toolbar-samples').css("display", "inline-block")
+                $('.toolbar-samples').html('Other samples : <select class="select2-other-samples" name="states[]" multiple="multiple" style="width:163px"></select>');
+                if (Object.keys(other_samples).length) {
+                    $(".select2-other-samples").append('<optgroup label="Patient" class="Patient"></optgroup>');
+                    for( i in other_samples) {
+                        $(".Patient").append('<option value="' + other_samples[i] + '" onclick="hide_column(' + other_samples[i] + ')">' + i + '</option>');
+                    }
+                }
+                if (Object.keys(family_members).length) {
+                    $(".select2-other-samples").append('<optgroup label="Family" class="Family"></optgroup>');
+                    for( i in family_members) {
+                        $(".Family").append('<option value="' + family_members[i] + '" onclick="hide_column(' + family_members[i] + ')">' + i + '</option>');
+                    }
+                }
+                $('.select2-other-samples').select2();
+                $('.select2-other-samples').on('select2:unselect', function (e) {
+                    var data = e.params.data;
+                    hide_column(data.id);
+                });
+                $('.select2-other-samples').on('select2:select', function (e) {
+                    var data = e.params.data;
+                    hide_column(data.id);
+                });
+            
+            } else {
+                $('.toolbar-samples').html('');
+            }
+            
         }
     });
 } );
@@ -840,7 +869,6 @@ function hide_message(count_hide) {
         $('.toolbar-variants').html('');
     }
 }
-
 function hideRow(id_var, sample_id, item) {
     Swal.fire({
         title: 'Are you sure?',
@@ -1880,7 +1908,7 @@ function applied_panel(id, sample_id) {
     $('#reload-button').html("<span>Reload table</span>");
     table.ajax.url( '/json/variants/sample/' + sample_id + '/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
 }
-$('.js-example-basic-multiple').select2();
+$('.select2-other-samples').select2();
 
 
 $(document).on("click", function(event){
@@ -2009,3 +2037,8 @@ $(document).ready(function() {
         ]
     });
 });
+
+function hide_column(idx) {
+    let column = table.column(idx);
+    column.visible(!column.visible());
+}

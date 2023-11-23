@@ -60,12 +60,12 @@
                             <th class='min-size-75'>HGVSp</th>
                             <th class='min-size-50'>E|I</th>
                             <th class='min-size-75'>Filter</th>
-                            <th class='min-size-75'>{{ sample.samplename }}</th>
+                            <th class='min-size-100 w3-flat-clouds'>{{ sample }} ({{sample.patient}})<br ><span style="font-weight: normal;font-size:9px">{{ sample.run }}</span></th>
                             {% for s in other_samples %}
-                                <th class='min-size-100'>{{s.patient}} <i onclick="hide_column(7 + {{ loop.index }})" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i><br > {{ s }}<br > <span style="font-weight: normal;font-size:9px">{{ s.run }}</span></th>
+                                <th class='min-size-100'>{{ s }} ({{s.patient}})<br ><span style="font-weight: normal;font-size:9px">{{ s.run }}</span></th>
                             {% endfor %}
                             {% for s in family_members %}
-                                <th class='min-size-100'>{{s.patient}} <i onclick="hide_column(7 + {{ other_samples|length }} + {{ loop.index }})" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i><br > {{ s }}<br > <span style="font-weight: normal;font-size:9px">{{ s.run }}</span></th>
+                                <th class='min-size-100'>{{ s }} ({{s.patient}})<br ><span style="font-weight: normal;font-size:9px">{{ s.run }}</span></th>
                             {% endfor %}
                             <th class='min-size-75'>GnomAD</th>
                             <th class='min-size-75'>SEAL</th>
@@ -283,7 +283,7 @@
                 <div class="w3-row w3-section w3-display-container">
                     <div class="w3-middle w3-col w3-display-container w3-text-flat-green-sea w3-margin-right" style="width:50px"><i class="w3-xxlarge fas fa-users"></i></div>
                     <div class="w3-rest" id="create-filter">
-                        {{ saveFilterForm.teams(class="js-example-basic-multiple", multiple="multiple", style="width:100%") }}
+                        {{ saveFilterForm.teams(class="select2-other-samples", multiple="multiple", style="width:100%") }}
                     </div>
                 </div>
                 <div class="w3-row w3-section">
@@ -454,6 +454,17 @@
             'reviewed_by_expert_panel' : 3,
             'practice_guideline' : 4
         };
+        var other_samples = {};
+        var family_members = {};
+
+        {% for s in other_samples %}
+            other_samples["{{ s }}"] =  {{ 7 + loop.index }};
+        {% endfor %}
+            
+        {% for s in family_members %}
+            family_members["{{ s }}"] =  {{ 7 + other_samples|length + loop.index }};
+        {% endfor %}
+        
 
         var dt_table = [
             {
@@ -485,7 +496,7 @@
                             mobidetails = '<span onclick="openMD(\'' + data["annotations"]["HGVSc"] + '\')" class="fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> MobiDetails</span> <br />'
                         }
                         franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
-                        gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">G</span></span> GnomAD</a> ';
+                        gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">G</span></span> GnomAD</a> ';
                         return "<div class='w3-tiny'>" + mobidetails + franklin + "<br />" + gnomad + "</div>";
                     }
                 }
@@ -704,7 +715,8 @@
                         }
                         return '<i>' + data["allelic_frequency"] + '</i>';
                     },
-                }
+                },
+                visible: false
             },
             {% endfor %}
             {% for s in family_members %}
@@ -728,7 +740,8 @@
                         }
                         return '<i>' + data["allelic_frequency"] + '</i>';
                     },
-                }
+                },
+                visible: false
             },
             {% endfor %}
             {
@@ -1277,12 +1290,6 @@
         for (const i of [8,9,10,11,12,13,14,15,16,17,18]) {
             columns_filter.push(parseInt(i)+number_family);
             columns_base.push(parseInt(i)+number_family);
-        }
-        function hide_column(idx) {
-            let column = table.column(idx);
- 
-            // Toggle the visibility
-            column.visible(!column.visible());
         }
     </script>
 

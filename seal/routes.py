@@ -640,7 +640,7 @@ def sample(id):
         "family": [],
         "same": []
     }
-    if sample.patient.family:
+    if sample.patient and sample.patient.family:
         for p in sample.patient.family.patients:
             t = "same" if p == sample.patient else "family"
             for s in p.samples:
@@ -1097,6 +1097,11 @@ def json_variants(id, idbed=False, version=-1):
         protein_coding = False
         preferred_transcript = False
 
+        # try:
+        #     if float(annotations[version]["ANN"][0]["gnomADg_AF"]) > 0.02:
+        #         continue
+        # except (ValueError, TypeError) as e:
+        #     pass
         for annot in annotations[version]["ANN"]:
             current_consequence_score = annot['consequenceScore']
             current_canonical = annot['canonical']
@@ -1182,53 +1187,54 @@ def json_variants(id, idbed=False, version=-1):
                 })
 
         members = []
-        for s in sample.patient.samples:
-            if s != sample:
-                members.append(str(s))
-        if sample.patient and sample.patient.familyid:
-            request_family = Patient.query.outerjoin(Sample).outerjoin(Var2Sample)\
-                            .filter(and_(Var2Sample.variant_ID == variant.id, Patient.id != sample.patient.id))
-            for member in request_family.all():
-                members.append(str(member))
         os={}
-        for s in sample.patient.samples:
-            if s.status > 0 and s != sample:
-                os[str(s)]= dict()
-                req = Var2Sample.query.get((var2sample.variant_ID, s.id))
-                if req:
-                    os[str(s)] = {
-                        "depth": f"{req.depth}",
-                        "allelic_depth": f"{req.allelic_depth}",
-                        "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
-                    }
-                else:
-                    os[str(s)] = {
-                        "depth": f"NA",
-                        "allelic_depth": f"NA",
-                        "allelic_frequency": f"NA",
-                    }
         t={}
-        if sample.patient.familyid is not None:
-            for p in sample.patient.family.patients:
-                if p == sample.patient:
-                    continue
-                for s in p.samples:
-                    if s.status < 1:
-                        continue
-                    t[str(s)]= dict()
+        if sample.patient:
+            for s in sample.patient.samples:
+                if s != sample:
+                    members.append(str(s))
+            if sample.patient.familyid:
+                request_family = Patient.query.outerjoin(Sample).outerjoin(Var2Sample)\
+                                .filter(and_(Var2Sample.variant_ID == variant.id, Patient.id != sample.patient.id))
+                for member in request_family.all():
+                    members.append(str(member))
+            for s in sample.patient.samples:
+                if s.status > 0 and s != sample:
+                    os[str(s)]= dict()
                     req = Var2Sample.query.get((var2sample.variant_ID, s.id))
                     if req:
-                        t[str(s)] = {
+                        os[str(s)] = {
                             "depth": f"{req.depth}",
                             "allelic_depth": f"{req.allelic_depth}",
                             "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
                         }
                     else:
-                        t[str(s)] = {
+                        os[str(s)] = {
                             "depth": f"NA",
                             "allelic_depth": f"NA",
                             "allelic_frequency": f"NA",
                         }
+            if sample.patient.familyid is not None:
+                for p in sample.patient.family.patients:
+                    if p == sample.patient:
+                        continue
+                    for s in p.samples:
+                        if s.status < 1:
+                            continue
+                        t[str(s)]= dict()
+                        req = Var2Sample.query.get((var2sample.variant_ID, s.id))
+                        if req:
+                            t[str(s)] = {
+                                "depth": f"{req.depth}",
+                                "allelic_depth": f"{req.allelic_depth}",
+                                "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
+                            }
+                        else:
+                            t[str(s)] = {
+                                "depth": f"NA",
+                                "allelic_depth": f"NA",
+                                "allelic_frequency": f"NA",
+                            }
 
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
 
