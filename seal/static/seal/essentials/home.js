@@ -39,8 +39,6 @@ $(document).ready(function() {
             },
         },
         columns: [
-            { className: 'showTitle', data: "patient.id" },
-            { className: 'showTitle', data: "patient.alias" },
             {
                 className: 'showTitle',
                 data: {
@@ -53,6 +51,7 @@ $(document).ready(function() {
                     }
                 }
             },
+            { className: 'showTitle', data: "patient.id" },
             { className: 'showTitle', data: "family" },
             { className: 'showTitle', data: "run.name" },
             { className: 'showTitle', data: "run.alias" },
