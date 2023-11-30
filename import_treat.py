@@ -30,15 +30,6 @@ def determine_file_type(row):
         return 'MAI'
     return 'Unknown'
 
-def determine_file_type(row):
-    if 'MOC' in row['Panel']:
-        return 'MOC'
-    elif 'KAB' in row['Panel']:
-        return 'KAB'
-    elif 'MAI' in row['Panel']:
-        return 'MAI'
-    return 'Unknown'
-
 def generate_test_txt(df, output_filename):
     with open(output_filename, 'w') as file:
         for _, row in df.iterrows():
