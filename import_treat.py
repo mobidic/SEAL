@@ -1,3 +1,25 @@
+# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+#
+# This file is part of SEAL
+# 
+# SEAL db - Simple, Efficient And Lite database for NGS
+# Copyright (C) 2023  Jean-Charles DELMAS - MoBiDiC - CHU Montpellier
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+import argparse
+from pathlib import Path
 import json
 import os
 import sys
@@ -6,13 +28,9 @@ import tempfile
 import pandas as pd
 import re
 
-# File path for the CSV (manually update this)
-csv_path = '/home/jcdelmas/Documents/SampleUMAI.csv'
-output_dir = '/home/jcdelmas/Bureau/SEAL/seal/static/temp/vcf'
-
 # Function to load and validate the CSV file
-def load_and_validate_csv(csv_path):
-    df = pd.read_csv(csv_path)
+def load_and_validate_csv(csv_path, sep=","):
+    df = pd.read_csv(csv_path, sep=";")
 
     # Check for required headers (without asterisks)
     required_headers = ["Sample Name", "Run ID", "Run Alias", "Panel"]
@@ -37,15 +55,15 @@ def generate_test_txt(df, output_filename):
 
             if file_type == 'MOC':
                 run_alias = re.sub(r'([a-zA-Z]{3})(\d+)', r'\1-\2', row['Run Alias'])
-                vcf_path = f"/mnt/chu-ngs/Labos/UMAI/NGS/MOC/ACHAB-MOC/{run_alias}/*/panelCapture/{row['Sample Name']}.vcf"
+                vcf_path = f"/Volumes/NGS/Labos/UMAI/NGS/MOC/ACHAB-MOC/{run_alias}/*/panelCapture/{row['Sample Name']}.vcf"
 
             elif file_type == 'KAB':
                 run_alias = row['Run Alias']
-                vcf_path = f"/mnt/chu-ngs/Labos/UMAI/NGS/KAB/ACHAB-a-partir_KAB42/{run_alias}/*/panelCapture/{row['Sample Name']}.vcf"
+                vcf_path = f"/Volumes/NGS/Labos/UMAI/NGS/KAB/ACHAB-a-partir_KAB42/{run_alias}/*/panelCapture/{row['Sample Name']}.vcf"
 
             elif file_type == 'MAI':
                 run_alias = row['Run Alias']
-                vcf_path = f"/mnt/chu-ngs/Labos/UMAI/NGS/MAI/MobiDL/*//{row['Sample Name']}.vcf"
+                vcf_path = f"/Volumes/NGS/Labos/UMAI/NGS/MAI/MobiDL/*//{row['Sample Name']}.vcf"
 
             else:
                 print(f"Unknown file type for row: {row}")
@@ -109,7 +127,7 @@ def create_treat_files(input_file, output_dir):
 
     return treat_files, temp_dir
 
-def main():
+def main(csv_path, output_dir):
     try:
         dataframe = load_and_validate_csv(csv_path)
         txt_file = generate_test_txt(dataframe, "test.txt")
@@ -138,6 +156,13 @@ def main():
 ############____MAIN____############
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-i', '--input', help='Input CSV', required=True)
+    parser.add_argument('-o', '--output', help='Output', default=Path(os.getcwd()).joinpath("seal/static/temp/vcf"))
+    
+    parser.add_argument('-s', '--separator', help='Separator', default=",")
+    args = parser.parse_args()
+    
+    main(args.input, args.output)
     print("Operation completed.")
     sys.exit(0)
