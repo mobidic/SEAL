@@ -149,7 +149,13 @@ pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 - Dump/Restore the database
 ```bash
 pg_dump -O -C --if-exists --clean --inserts -d seal -x -F t -f seal.tar
-pg_restore -x -f seal.tar
+pg_restore -x -f output.restore seal.tar
+```
+- Edit date of history manually
+```bash
+# connect to database
+psql -d seal -W
+seal=# UPDATE history SET date='2023-12-04 12:31:22.163852' WHERE "user_ID"=4 AND "sample_ID"=256 AND date='2023-10-15 05:05:23.191648';
 ```
 
 # License
