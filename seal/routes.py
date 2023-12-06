@@ -902,9 +902,8 @@ def json_samples():
     """
     key_list = {
         "asc": [
-            Patient.id.asc(),
-            Patient.alias.asc(),
             Sample.samplename.asc(),
+            Patient.id.asc(),
             Family.family.asc(),
             Run.name.asc(),
             Run.alias.asc(),
@@ -912,9 +911,8 @@ def json_samples():
             Sample.lastAction.asc()
         ],
         "desc": [
-            Patient.id.desc(),
-            Patient.alias.desc(),
             Sample.samplename.desc(),
+            Patient.id.desc(),
             Family.family.desc(),
             Run.name.desc(),
             Run.alias.desc(),
@@ -923,9 +921,8 @@ def json_samples():
         ]
     }
     filters = or_(
-        cast(Patient.id, String).op('~')(request.form['search[value]']),
-        Patient.alias.op('~')(request.form['search[value]']),
         Sample.samplename.op('~')(request.form['search[value]']),
+        cast(Patient.id, String).op('~')(request.form['search[value]']),
         Family.family.op('~')(request.form['search[value]']),
         Run.name.op('~')(request.form['search[value]']),
         Run.alias.op('~')(request.form['search[value]'])

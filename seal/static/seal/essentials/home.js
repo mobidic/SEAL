@@ -30,7 +30,7 @@ $(document).ready(function() {
         scrollX: true,
         proccessing: true,
         serverSide: true,
-        order: [[7, 'desc']],
+        order: [[6, 'desc']],
         ajax: {
             url: '/json/samples',
             type: 'POST',
