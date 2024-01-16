@@ -63,8 +63,37 @@ def generate_all_samples_txt(df, output_filename, base_path="/"):
                 vcf_path = f"{base_path}/NGS/KAB/ACHAB-a-partir_KAB42/{run_alias}/{row['Sample Name']}/panelCapture/{row['Sample Name']}.vcf"
 
             elif file_type == 'MAI':
-                run_alias = re.sub(r'([a-zA-Z]{3})(\d+)', r'\1-\2', row['Run Alias'])
-                vcf_path = f"{base_path}/NGS/MAI/Panel_302genes/MAI-95_96_97_Twist/MobiDL/MAI-96b/MobiDL_IURC/{row['Sample Name']}/panelCapture/{row['Sample Name']}.vcf"
+                # Extract the numeric part of the 'Run Alias' (e.g., '151' from 'MAI151')
+                run_alias_num = int(re.search(r'MAI(\d+)', row['Run Alias']).group(1))
+
+                # Determine the correct panel folder based on the alias number range
+                panel_folder = ""
+                if 89 <= run_alias_num <= 112:
+                    panel_folder = "Panel_302genes"
+                elif 113 <= run_alias_num <= 126:
+                    panel_folder = "Panel_302genes_v2"
+                elif 127 <= run_alias_num <= 140:
+                    panel_folder = "Panel_300genes"
+                elif 141 <= run_alias_num <= 152:
+                    panel_folder = "Panel_261genes"
+
+                # Search for the specific folder containing 'MAI' and the number before '_captures'
+                specific_folder = None
+                for d in os.listdir(os.path.join(base_path, "NGS", "MAI", panel_folder)):
+                    """
+                    Check if the folder name contains the 'MAI' alias number before '_captures'.
+                    For example, for MAI151, it checks for 'MAI-151' in 'MAI-151_152_captures_FT-153363'
+                    """
+                    if f"MAI-{run_alias_num}" in d.split('_captures')[0]:
+                        specific_folder = d
+                        break
+
+                # Construct the VCF file path if a specific folder is found
+                if specific_folder:
+                    vcf_path = os.path.join(base_path, "NGS", "MAI", panel_folder, specific_folder, row['Sample Name'], "panelCapture", f"{row['Sample Name']}.vcf")
+                else:
+                    logging.error(f"Specific folder for MAI-{run_alias_num} not found in {panel_folder}")
+                continue
 
             else:
                 logging.warning(f"Unknown file type for row: {row}")
@@ -146,7 +175,7 @@ def main(args):
         txt_file = generate_all_samples_txt(dataframe, "all_samples.txt", args.base_path)
         treat_files, temp_dir = create_treat_files(txt_file, output_dir)
 
-        if treat_files:
+        if treat_files: 
             choice = input("Do you want to import the .treat files into SEAL? (yes/no)")
             if choice.lower() == 'yes':
                 for treat_file in treat_files:
@@ -167,13 +196,12 @@ def main(args):
 ############____MAIN____############
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="SEAL db - Simple, Efficient And Lite database for NGS")
     parser.add_argument('-i', '--input', help='Input CSV', required=True)
     parser.add_argument('-o', '--output', help='Output', default=Path(os.getcwd()).joinpath("seal/static/temp/vcf"))
-
-    parser.add_argument('-b', '--base-path', help='base path', default="/")
+    parser.add_argument('-b', '--base-path', help='Base path', default="/")
     parser.add_argument('-s', '--separator', help='Separator', default=",")
-    parser.add_argument('-l', '--log-level', help='log level ([0-5])', default=0)
+    parser.add_argument('-l', '--log-level', help='Log level ([0-5])', default=0)
     args = parser.parse_args()
 
     main(args)
