@@ -681,40 +681,44 @@ def check_clinvar(genome="GRCh37"):
     lockFile = open(path_locker, 'x')
     lockFile.close()
 
-    ftp=FTP('ftp.ncbi.nlm.nih.gov')
-    ftp.login()
-    ftp.cwd(f'pub/clinvar/vcf_{genome}')
+    try:
+        ftp=FTP('ftp.ncbi.nlm.nih.gov')
+        ftp.login()
+        ftp.cwd(f'pub/clinvar/vcf_{genome}')
+    except Exception as e:
+        app.logger.error(e)
+    else:
+        ls = ftp.nlst()
+        for i in ls:
+            r = re.compile("clinvar_([0-9]+).vcf.gz$")
+            match = r.search(i)
+            app.logger.info(f"  - file : {i}")
+            if match:
+                app.logger.info(f"    - match : {match.group(1)}")
+                version = match.group(1)
+                file = match.group(0)
 
-    ls = ftp.nlst()
-    for i in ls:
-        r = re.compile("clinvar_([0-9]+).vcf.gz$")
-        match = r.search(i)
-        app.logger.info(f"  - file : {i}")
-        if match:
-            app.logger.info(f"    - match : {match.group(1)}")
-            version = match.group(1)
-            file = match.group(0)
-
-            if not Clinvar.query.filter_by(version=version, genome=genome.lower()).one_or_none():
-                app.logger.info(f"    - new clinvar")
-                vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
-                vcf_path = vcf_path.joinpath(file)
-                t = 0
-                while t < 10:
-                    try:
-                        app.logger.info(f"    - download attempt : {t}")
-                        with open(f'{vcf_path}', 'wb') as fp:
-                            ftp.retrbinary(f'RETR {file}', fp.write)
-                        Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower(), )).start()
-                        app.logger.info(f"    - thread launched")
-                        t=10
-                    except Exception as e:
-                        app.logger.info(f"    - download filed retry")
-                        app.logger.error(e)
-                        ftp.close()
-                        ftp=FTP('ftp.ncbi.nlm.nih.gov')
-                        ftp.login()
-                        ftp.cwd(f'pub/clinvar/vcf_{genome}')
-                        t+=1
-    app.logger.info("END CLINVAR UPDATE")
-    path_locker.unlink()
+                if not Clinvar.query.filter_by(version=version, genome=genome.lower()).one_or_none():
+                    app.logger.info(f"    - new clinvar")
+                    vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
+                    vcf_path = vcf_path.joinpath(file)
+                    t = 0
+                    while t < 10:
+                        try:
+                            app.logger.info(f"    - download attempt : {t}")
+                            with open(f'{vcf_path}', 'wb') as fp:
+                                ftp.retrbinary(f'RETR {file}', fp.write)
+                            Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower(), )).start()
+                            app.logger.info(f"    - thread launched")
+                            t=10
+                        except Exception as e:
+                            app.logger.info(f"    - download filed retry")
+                            app.logger.error(e)
+                            ftp.close()
+                            ftp=FTP('ftp.ncbi.nlm.nih.gov')
+                            ftp.login()
+                            ftp.cwd(f'pub/clinvar/vcf_{genome}')
+                            t+=1
+    finally:
+        app.logger.info("END CLINVAR UPDATE")
+        path_locker.unlink()
