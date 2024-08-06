@@ -1,3 +1,4 @@
+
 # SEAL db - Simple, Efficient And Lite database for NGS
 
 ![seal.gif](docs/img/seal.gif)
@@ -141,16 +142,30 @@ Here are some useful *Tips & Tricks* working with SEAL:
 flask --app seal --debug db migrate -m "message"
 flask --app seal --debug db upgrade
 ```
+
 - Start/Stop the datatabase server
 ```bash
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log start
 pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 ```
+
 - Dump/Restore the database
 ```bash
 pg_dump -O -C --if-exists --clean --inserts -d seal -x -F t -f seal.tar
 pg_restore -x -f seal.tar
 ```
+
+- Multiple instances of SEAL (maybe usefull for differents projects, teams, tests, stages...)
+
+*Edit the config.yaml*
+```yaml
+  SQLALCHEMY_DATABASE_URI: 'postgresql:///seal-bis'
+```
+*Follow the [initialization steps](#initialization-of-the-database) with this new database (edit this ommand)*
+```bash
+psql postgres -c "CREATE DATABASE seal-bis;"
+```
+
 
 # License
 
