@@ -641,7 +641,7 @@ def sample(id):
             if s != sample and s.status > 0:
                 family_members.append(s)
 
-    clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
+    clinvar = Clinvar.query.filter(Clinvar.genome == "grch38", Clinvar.current == True).one()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
