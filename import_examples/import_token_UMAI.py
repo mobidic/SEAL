@@ -198,7 +198,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="SEAL db - Simple, Efficient And Lite database for NGS")
     parser.add_argument('-i', '--input', help='Input CSV', required=True)
-    parser.add_argument('-o', '--output', help='Output', default=Path(os.getcwd()).joinpath("seal/static/temp/vcf"))
+    parser.add_argument('-o', '--output', help='Output', default=Path(os.path.abspath(__file__)).parents[1].joinpath("seal/static/temp/vcf"))
     parser.add_argument('-b', '--base-path', help='Base path', default="/")
     parser.add_argument('-s', '--separator', help='Separator', default=",")
     parser.add_argument('-l', '--log-level', help='Log level ([0-5])', default=0)
