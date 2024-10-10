@@ -145,6 +145,29 @@ def is_valid_color(color):
     return bool(match_hex | match_rgb | match_rgba)
 
 
+def get_patient(id=None, name=None, alias=None, affected=None, index=None):
+    if id:
+        patient = Patient.query.get(id)
+        if patient:
+            return patient
+    if name:
+        patient = Patient.query.filter_by(name=name).first()
+        if bool(patient):
+            return patient
+        else:
+            patient = Patient(
+                alias=alias,
+                name=name,
+                affected=affected,
+                index=index
+                )
+            db.session.add(patient)
+            db.session.commit()
+            app.logger.info(f'{patient} added to SEAL !')
+            return patient
+    return False
+
+
 def get_family(id=None, name=None):
     if id:
         family = Family.query.get(id)
@@ -236,22 +259,21 @@ def create_sample(data):
 
 
     if "patient" in data:
-        p = Patient.query.get(data["patient"]["id"])
-        if not p:
-            p = Patient(
-                id=data["patient"]["id"],
-                alias=data["patient"]["alias"],
-                affected=data["patient"]["affected"],
-                index=data["patient"]["index"]
-                )
-        sample.patient = p
+        id = data["patient"]["id"] if "id" in data["patient"] else None
+        alias = data["patient"]["alias"] if "alias" in data["patient"] else None
+        name = data["patient"]["name"] if "name" in data["patient"] else None
+        affected = data["patient"]["affected"] if "affected" in data["patient"] else False
+        index = data["patient"]["index"] if "index" in data["patient"] else False
+        patient = get_patient(id, name, alias, affected, index)
+        if patient:
+            sample.patient = patient
 
     if "family" in data:
         id = data["family"]["id"] if "id" in data["family"] else None
         name = data["family"]["name"] if "name" in data["family"] else None
         family = get_family(id, name)
         if family:
-            sample.family = family
+            sample.patient.family = family
 
     if "run" in data:
         id = data["run"]["id"] if "id" in data["run"] else None
