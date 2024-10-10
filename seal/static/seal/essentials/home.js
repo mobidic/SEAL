@@ -42,6 +42,27 @@ $(document).ready(function() {
             {
                 className: 'showTitle',
                 data: {
+                    _: "patient",
+                    display: function ( data, type, row ) {
+                        if(data && data.patient.id) {
+                            if (data.patient.name) {
+                                patient_name = data.patient.name;
+                            } else {
+                                patient_name = "<i>NA</i>";
+                            }
+                            alias = "";
+                            if (data.patient.alias) {
+                                alias = " <span class='w3-tiny'><i>(" + data.patient.alias + ")</i></span>";
+                            }
+                            return patient_name + alias;
+                        }
+                        return "";
+                    }
+                },
+            },
+            {
+                className: 'showTitle',
+                data: {
                     _: "samplename",
                     display: function ( data, type, row ) {
                         if(data) {
@@ -51,7 +72,6 @@ $(document).ready(function() {
                     }
                 }
             },
-            { className: 'showTitle', data: "patient.id" },
             { className: 'showTitle', data: "family" },
             { className: 'showTitle', data: "run.name" },
             { className: 'showTitle', data: "run.alias" },

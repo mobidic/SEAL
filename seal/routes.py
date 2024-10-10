@@ -922,7 +922,8 @@ def json_samples():
     }
     filters = or_(
         Sample.samplename.op('~')(request.form['search[value]']),
-        cast(Patient.id, String).op('~')(request.form['search[value]']),
+        Patient.name.op('~')(request.form['search[value]']),
+        Patient.alias.op('~')(request.form['search[value]']),
         Family.family.op('~')(request.form['search[value]']),
         Run.name.op('~')(request.form['search[value]']),
         Run.alias.op('~')(request.form['search[value]'])
@@ -961,6 +962,7 @@ def json_samples():
             "family": sample.patient.family.family if (sample.patient and sample.patient.familyid) else None,
             "patient": {
                 "id": sample.patient_id,
+                "name": sample.patient.name if sample.patient else None,
                 "alias": sample.patient.alias if sample.patient else None,
             },
             "run": {
