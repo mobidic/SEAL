@@ -921,12 +921,12 @@ def json_samples():
         ]
     }
     filters = or_(
-        Sample.samplename.op('~')(request.form['search[value]']),
-        Patient.name.op('~')(request.form['search[value]']),
-        Patient.alias.op('~')(request.form['search[value]']),
-        Family.family.op('~')(request.form['search[value]']),
-        Run.name.op('~')(request.form['search[value]']),
-        Run.alias.op('~')(request.form['search[value]'])
+        Sample.samplename.ilike(f"%{request.form['search[value]']}%"),
+        Patient.name.ilike(f"%{request.form['search[value]']}%"),
+        Patient.alias.ilike(f"%{request.form['search[value]']}%"),
+        Family.family.ilike(f"%{request.form['search[value]']}%"),
+        Run.name.ilike(f"%{request.form['search[value]']}%"),
+        Run.alias.ilike(f"%{request.form['search[value]']}%")
     )
 
     samples = Sample.query
