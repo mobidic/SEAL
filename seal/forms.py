@@ -23,14 +23,10 @@ import pandas as pd
 
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
-                     ValidationError, TextAreaField, SelectMultipleField,
-                     IntegerField, SelectField)
-from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 from flask_login import current_user
 from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
                      ValidationError, TextAreaField, SelectMultipleField,
-                     SelectField, DateField)
+                     SelectField, IntegerField, DateField)
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 from seal import bcrypt

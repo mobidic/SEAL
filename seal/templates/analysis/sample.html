@@ -496,8 +496,7 @@
                             mobidetails = '<span onclick="openMD(\'' + data["annotations"]["HGVSc"] + '\')" class="fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> MobiDetails</span> <br />'
                         }
                         franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
-                        gnomad = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">G</span></span> GnomAD</a> ';
-                        return "<div class='w3-tiny'>" + mobidetails + franklin + "<br />" + gnomad + "</div>";
+                        return "<div class='w3-tiny'>" + mobidetails + franklin + "</div>";
                     }
                 }
             },
@@ -745,41 +744,47 @@
             },
             {% endfor %}
             {
-                className: 'showTitle',
-                data: "annotations.gnomADg_AF",
+                className: '',
+                // data: "annotations.gnomADg_AF",
+                data: null,
                 render : {
                     _: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            if (isNaN(parseFloat(data).toFixed(6))) {
+                        if(data["annotations"]["gnomADg_AF"] != null) {
+                            if (isNaN(parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6))) {
                                 return null
                             }
-                            return parseFloat(data).toFixed(6);
+                            return parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6);
                         } else {
                             return null;
                         }
                     },
                     display: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            if (isNaN(parseFloat(data).toFixed(6))) {
+                        if(data["annotations"]["gnomADg_AF"] != null) {
+                            if (isNaN(parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6))) {
                                 return "<i>NA</i>"
                             }
-                            gnomad = parseFloat(data);
+                            gnomad = parseFloat(data["annotations"]["gnomADg_AF"]);
                             if (gnomad > 0.01) {
-                                response = parseFloat(data).toFixed(4)
+                                response = parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(4)
                             } else {
-                                response = parseFloat(data).toExponential(2)
+                                response = parseFloat(data["annotations"]["gnomADg_AF"]).toExponential(2)
                             }
-                            return "<span title='"+ gnomad +"'>" + response + "</span>";
+                            gnomad_r = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"></span> '+ response+'</a> ';
+                            gnomad1 = '<a title="ExAC" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=exac" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">E</span></span></a> ';
+                            gnomad2 = '<a title="GnomAD 2.1" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">2</span></span></a> ';
+                            gnomad3 = '<a title="GnomAD 3" target="_blank" href="https://gnomad.broadinstitute.org/variant/liftover/' + data["id"] + '/gnomad_r2_1/gnomad_r3" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">3</span></span></a> ';
+                            gnomad4 = '<a title="GnomAD 4" target="_blank" href="https://gnomad.broadinstitute.org/variant/liftover/' + data["id"] + '/gnomad_r2_1/gnomad_r4" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">4</span></span></a> ';
+                            return '<i title="' + gnomad + '">' + gnomad_r + '</i> <small>(v2.1)</small><br />' + gnomad1+ gnomad2+ gnomad3+ gnomad4;
                         } else {
                             return "<i>NA</i>";
                         }
                     },
                     sort: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            if (isNaN(parseFloat(data).toFixed(6))) {
+                        if(data["annotations"]["gnomADg_AF"] != null) {
+                            if (isNaN(parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6))) {
                                 return -0.5
                             }
-                            return parseFloat(data).toFixed(6);
+                            return parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6);
                         } else {
                             return -1
                         }
@@ -1264,7 +1269,7 @@
                             if(data["INTRON"] == null) {
                                 return "NA";
                             }
-                            return "Inton " + data["INTRON"].split("/")[0];
+                            return "Intron " + data["INTRON"].split("/")[0];
                         }
                         return "Exon " + data["EXON"].split("/")[0];
                     },

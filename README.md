@@ -149,7 +149,7 @@ pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 - Dump/Restore the database
 ```bash
 pg_dump -O -C --if-exists --clean --inserts -d seal -x -F t -f seal.tar
-pg_restore -x -f output.restore seal.tar
+pg_restore -x -f seal.tar
 ```
 - Edit date of history manually
 ```bash
