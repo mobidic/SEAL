@@ -10,4 +10,5 @@ FLASK:
     max_instances: 1
   MAINTENANCE: false # Set to true or false
   FLASK_ADMIN_SWATCH: 'darkly'
+  SESSION_COOKIE_NAME: "seal38"
   
