@@ -230,7 +230,14 @@ const class_variant_html = [
         '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
     '</span> - Pathogenic</span>',
 ];
-
+const class_variant_export = [
+    'NA',
+    '1 - Benign',
+    '2 - Likely Benign',
+    '3 - VUS',
+    '4 - Likely Pathogenic',
+    '5 - Pathogenic',
+];
 $(document).ready(function() {
     $.getJSON("/json/filters", function(data) {
         var options = "";
@@ -518,6 +525,70 @@ $(document).ready(function() {
         }
     }
 
+
+            var n_col_call_fam = 5+number_caller+number_family;
+            var format_defGen = {
+                header: function ( data, columnIdx ) {
+                    dict = {};
+                    dict['0'] = "GENE";
+                    dict['3'] = "VARIANT";
+                    dict[n_col_call_fam+13] = "VARIANT_P";
+                    dict[n_col_call_fam+14] = "VARIANT_C";
+                    dict[n_col_call_fam+15] = "ENST";
+                    dict[n_col_call_fam+16] = "NM";
+                    dict[n_col_call_fam+17] = "COSMIC";
+                    dict[n_col_call_fam+18] = "RS";
+                    dict[n_col_call_fam+19] = "POSITION_GENOMIQUE";
+                    dict[n_col_call_fam+6] = "CONSEQUENCES";
+                    dict[n_col_call_fam+20] = "CHROMOSOME";
+                    dict[n_col_call_fam+21] = "GENOME_REFERENCE";
+                    dict['2'] = "NOMENCLATURE_HGVS";
+                    dict[n_col_call_fam+22] = "LOCALISATION";
+                    dict[n_col_call_fam+23] = "FREQUENCE_ALLELIQUE";
+                    if (columnIdx in dict) {
+                        return dict[parseInt(columnIdx)]
+                    } 
+                    return data;
+                }
+            };
+            
+            // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
+            var columns_base = [0,2,3,4,5];
+            for (i in [...Array(number_caller).keys()]) {
+                columns_base.push(5+parseInt(i)+1);
+            }
+            for (i in [...Array(number_family).keys()]) {
+                columns_base.push(5+number_caller+parseInt(i)+1);
+            }
+            b = n_col_call_fam
+            columns_base = columns_base.concat([b+1,b+2,b+3,b+4,b+5,b+6,b+7,b+8,b+9,b+10,b+11,b+12,b+13,b+14,b+15]);
+
+
+            var columns_defGen = [0,3,parseInt(number_family)-2+21,parseInt(number_family)-2+22,parseInt(number_family)-2+23,parseInt(number_family)-2+24,parseInt(number_family)-2+25,parseInt(number_family)-2+26,parseInt(number_family)-2+27,parseInt(number_family)-2+14,parseInt(number_family)-2+28,parseInt(number_family)-2+29,2,parseInt(number_family)-2+30,parseInt(number_family)-2+31];
+            columns_defGen = [0,3,n_col_call_fam+13,
+                n_col_call_fam+14,
+                n_col_call_fam+15,
+                n_col_call_fam+16,
+                n_col_call_fam+17,
+                n_col_call_fam+18,
+                n_col_call_fam+19,
+                n_col_call_fam+6,
+                n_col_call_fam+20,
+                n_col_call_fam+21,
+                2,
+                n_col_call_fam+22,
+                n_col_call_fam+23
+            ]
+
+    var columns_filter= [
+        0,2,3,4,5,
+        n_col_call_fam+1,n_col_call_fam+2,n_col_call_fam+3,n_col_call_fam+4,n_col_call_fam+5,n_col_call_fam+6,n_col_call_fam+7,n_col_call_fam+8,n_col_call_fam+9,n_col_call_fam+10,n_col_call_fam+11,
+        n_col_call_fam+23, n_col_call_fam+24, n_col_call_fam+25,
+    ];
+    for (i in [...Array(number_family).keys()]) {
+        columns_filter.push(5+number_caller+parseInt(i)+1);
+    }
+
     table = $('#variants').DataTable({
         buttons:[],
         processing: true,
@@ -541,19 +612,36 @@ $(document).ready(function() {
             left:2,
             right:1
         },
+        'createdRow': function (row, data, rowIndex) {
+            // Per-cell function to do whatever needed with cells
+            $.each($('td', row), function (colIndex) {
+                // For example, adding data-* attributes to the cell
+                if (dt_table[colIndex]["mytitle"]) {
+                    d2 = data;
+                    if (dt_table[colIndex]["data"]) {
+                        d2 = getValueFromHash(data, dt_table[colIndex]["data"]);
+                    }
+                    $(this).attr('title', dt_table[colIndex]["mytitle"](d2));
+                }
+                ;
+            });
+        },
         columnDefs: [{
             type:"clinvar",
-            targets: 10+number_family
+            targets: 8+number_family+number_caller
+        },{
+            searchBuilderTitle: 'AF',
+            targets: [28+number_family+number_caller]
         },{
             searchBuilderTitle: 'Depth',
-            targets: [31]
+            targets: [29+number_family+number_caller]
         },{
             searchBuilderTitle: 'Allelic Depth',
-            targets: [32]
+            targets: [30+number_family+number_caller]
         }],
         select: {
             style:    'os',
-            selector: 'td:not(:nth-child(2), :nth-child(' + (11 + number_family) + '), :nth-child(' + (12 + number_family) + '), :nth-last-child(-n+3))'
+            selector: 'td:not(:nth-child(2), :nth-child(' + (10 + number_family) + '), :nth-child(' + (10 + number_family) + '), :nth-last-child(-n+3))'
         },
         ajax: json_variants,
         columns: dt_table,
@@ -563,6 +651,16 @@ $(document).ready(function() {
                 $('#selectFilter').prop('disabled', false);
                 $('#selectBed').prop('disabled', false);
             }
+            
+            // for (i in [...Array(number_caller).keys()]) {
+            //     columns_filter.push(5+parseInt(i)+1);
+            //     columns_filter.push(5+parseInt(i)+1+number_family+23);
+            // }
+
+            // for (const i of [7,8,9,10,11,12,13,14,15,16,17]) {
+            //     columns_filter.push(parseInt(i)+number_family);
+            // }
+            
             table.button().add( 0, {
                 extend: 'collection',
                 autoClose: true,
@@ -588,47 +686,6 @@ $(document).ready(function() {
                     }
                 ]
             } );
-            var format_base = {
-                body: function(data, row, column, node) {
-                    if (column === (number_family + 18-1)) {
-                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                    }
-                    if (column === (number_family + 19-1)) {
-                        value = $(node).children('div').children('button').text();
-                        data = $.trim(value);
-                    }
-                    return data;
-                }
-            };
-            var format_defGen = {
-                body: function(data, row, column, node) {
-                    return column === 14 ? data + "\r" :data;
-                },
-                header: function ( data, columnIdx ) {
-                    dict = {};
-                    dict['0'] = "GENE";
-                    dict['3'] = "VARIANT";
-                    dict[parseInt(number_family)-1+21] = "VARIANT_P";
-                    dict[parseInt(number_family)-1+22] = "VARIANT_C";
-                    dict[parseInt(number_family)-1+23] = "ENST";
-                    dict[parseInt(number_family)-1+24] = "NM";
-                    dict[parseInt(number_family)-1+25] = "COSMIC";
-                    dict[parseInt(number_family)-1+26] = "RS";
-                    dict[parseInt(number_family)-1+27] = "POSITION_GENOMIQUE";
-                    dict[parseInt(number_family)-1+14] = "CONSEQUENCES";
-                    dict[parseInt(number_family)-1+28] = "CHROMOSOME";
-                    dict[parseInt(number_family)-1+29] = "GENOME_REFERENCE";
-                    dict['2'] = "NOMENCLATURE_HGVS";
-                    dict[parseInt(number_family)-1+30] = "LOCALISATION";
-                    dict[parseInt(number_family)-1+31] = "FREQUENCE_ALLELIQUE\r";
-                    if (columnIdx in dict) {
-                        return dict[parseInt(columnIdx)]
-                    } 
-                    return data;
-                }
-            };
-            // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-            var columns_defGen = [0,3,parseInt(number_family)-1+21,parseInt(number_family)-1+22,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+14,parseInt(number_family)-1+28,parseInt(number_family)-1+29,2,parseInt(number_family)-1+30,parseInt(number_family)-1+31];
             table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
@@ -641,7 +698,6 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: null
                             },
@@ -653,7 +709,6 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: null
                             },
@@ -665,7 +720,6 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: null
                             },
@@ -695,7 +749,6 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: null
                             },
@@ -715,7 +768,6 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: null
                             },
@@ -735,7 +787,6 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: null
                             },
@@ -778,7 +829,6 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: true
                             },
@@ -790,7 +840,6 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: true
                             },
@@ -802,7 +851,6 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
                             modifier: {
                                 selected: true
                             },
@@ -961,7 +1009,7 @@ function openMD(id) {
             Swal.showLoading()
             $.ajax({
                 type: 'POST',
-                url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
+                url: 'https://mobidetails.chu-montpellier.fr/api/variant/create',
                 data: {
                     variant_chgvs: encodeURIComponent(id),
                     caller: 'cli',
