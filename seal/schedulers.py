@@ -455,19 +455,21 @@ def importvcf():
                 app.logger.error(f'Sample does not found')
                 path_locker.unlink()
                 return
-            if not "caller" in data:
-                msg = f'Caller doesnt specified'
-                app.logger.error(msg)
-                history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=msg)
-                db.session.add(history)
-                db.session.commit()
-                path_locker.unlink()
-                return
             msg = "Add new caller"
         else:
             sample = create_sample(data)
             msg = "Import Sample"
-        sample.caller.append(data["caller"])
+        
+        call_name = "default"
+        if "caller" in data:
+            call_name = date["caller"]
+
+        i = 0
+        while call_name in sample.caller:
+            i += 1
+            call_name = f"default_{i}"
+            
+        sample.caller.append(call_name)
         history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=msg)
         db.session.add(history)
         db.session.commit()
@@ -604,7 +606,7 @@ def importvcf():
                 #   - add to history & comments
                 try:
                     caller = {
-                        data["caller"]: {
+                        call_name: {
                             "depth": int(v.getPopDP()),
                             "allelic_depth": int(v.getPopAltAD()[0]),
                             "allelic_freq":  int(v.getPopAltAD()[0])/int(v.getPopDP()),
