@@ -525,61 +525,58 @@ $(document).ready(function() {
         }
     }
 
-
-            var n_col_call_fam = 5+number_caller+number_family;
-            var format_defGen = {
-                header: function ( data, columnIdx ) {
-                    dict = {};
-                    dict['0'] = "GENE";
-                    dict['3'] = "VARIANT";
-                    dict[n_col_call_fam+13] = "VARIANT_P";
-                    dict[n_col_call_fam+14] = "VARIANT_C";
-                    dict[n_col_call_fam+15] = "ENST";
-                    dict[n_col_call_fam+16] = "NM";
-                    dict[n_col_call_fam+17] = "COSMIC";
-                    dict[n_col_call_fam+18] = "RS";
-                    dict[n_col_call_fam+19] = "POSITION_GENOMIQUE";
-                    dict[n_col_call_fam+6] = "CONSEQUENCES";
-                    dict[n_col_call_fam+20] = "CHROMOSOME";
-                    dict[n_col_call_fam+21] = "GENOME_REFERENCE";
-                    dict['2'] = "NOMENCLATURE_HGVS";
-                    dict[n_col_call_fam+22] = "LOCALISATION";
-                    dict[n_col_call_fam+23] = "FREQUENCE_ALLELIQUE";
-                    if (columnIdx in dict) {
-                        return dict[parseInt(columnIdx)]
-                    } 
-                    return data;
-                }
-            };
+    var n_col_call_fam = 5+number_caller+number_family;
+    var format_defGen = {
+        header: function ( data, columnIdx ) {
+            dict = {};
+            dict['0'] = "GENE";
+            dict['3'] = "VARIANT";
+            dict[n_col_call_fam+13] = "VARIANT_P";
+            dict[n_col_call_fam+14] = "VARIANT_C";
+            dict[n_col_call_fam+15] = "ENST";
+            dict[n_col_call_fam+16] = "NM";
+            dict[n_col_call_fam+17] = "COSMIC";
+            dict[n_col_call_fam+18] = "RS";
+            dict[n_col_call_fam+19] = "POSITION_GENOMIQUE";
+            dict[n_col_call_fam+6] = "CONSEQUENCES";
+            dict[n_col_call_fam+20] = "CHROMOSOME";
+            dict[n_col_call_fam+21] = "GENOME_REFERENCE";
+            dict['2'] = "NOMENCLATURE_HGVS";
+            dict[n_col_call_fam+22] = "LOCALISATION";
+            dict[n_col_call_fam+23] = "FREQUENCE_ALLELIQUE";
+            if (columnIdx in dict) {
+                return dict[parseInt(columnIdx)]
+            } 
+            return data;
+        }
+    };
             
-            // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-            var columns_base = [0,2,3,4,5];
-            for (i in [...Array(number_caller).keys()]) {
-                columns_base.push(5+parseInt(i)+1);
-            }
-            for (i in [...Array(number_family).keys()]) {
-                columns_base.push(5+number_caller+parseInt(i)+1);
-            }
-            b = n_col_call_fam
-            columns_base = columns_base.concat([b+1,b+2,b+3,b+4,b+5,b+6,b+7,b+8,b+9,b+10,b+11,b+12,b+13,b+14,b+15]);
+    var columns_base = [0,2,3,4,5];
+    for (i in [...Array(number_caller).keys()]) {
+        columns_base.push(5+parseInt(i)+1);
+    }
+    for (i in [...Array(number_family).keys()]) {
+        columns_base.push(5+number_caller+parseInt(i)+1);
+    }
+    b = n_col_call_fam
+    columns_base = columns_base.concat([b+1,b+2,b+3,b+4,b+5,b+6,b+7,b+8,b+9,b+10,b+11,b+12,b+13,b+14,b+15]);
 
 
-            var columns_defGen = [0,3,parseInt(number_family)-2+21,parseInt(number_family)-2+22,parseInt(number_family)-2+23,parseInt(number_family)-2+24,parseInt(number_family)-2+25,parseInt(number_family)-2+26,parseInt(number_family)-2+27,parseInt(number_family)-2+14,parseInt(number_family)-2+28,parseInt(number_family)-2+29,2,parseInt(number_family)-2+30,parseInt(number_family)-2+31];
-            columns_defGen = [0,3,n_col_call_fam+13,
-                n_col_call_fam+14,
-                n_col_call_fam+15,
-                n_col_call_fam+16,
-                n_col_call_fam+17,
-                n_col_call_fam+18,
-                n_col_call_fam+19,
-                n_col_call_fam+6,
-                n_col_call_fam+20,
-                n_col_call_fam+21,
-                2,
-                n_col_call_fam+22,
-                n_col_call_fam+23
-            ]
-
+    var columns_defGen = [0,3,parseInt(number_family)-2+21,parseInt(number_family)-2+22,parseInt(number_family)-2+23,parseInt(number_family)-2+24,parseInt(number_family)-2+25,parseInt(number_family)-2+26,parseInt(number_family)-2+27,parseInt(number_family)-2+14,parseInt(number_family)-2+28,parseInt(number_family)-2+29,2,parseInt(number_family)-2+30,parseInt(number_family)-2+31];
+    columns_defGen = [0,3,n_col_call_fam+13,
+        n_col_call_fam+14,
+        n_col_call_fam+15,
+        n_col_call_fam+16,
+        n_col_call_fam+17,
+        n_col_call_fam+18,
+        n_col_call_fam+19,
+        n_col_call_fam+6,
+        n_col_call_fam+20,
+        n_col_call_fam+21,
+        2,
+        n_col_call_fam+22,
+        n_col_call_fam+23
+    ]
     var columns_filter= [
         0,2,3,4,5,
         n_col_call_fam+1,n_col_call_fam+2,n_col_call_fam+3,n_col_call_fam+4,n_col_call_fam+5,n_col_call_fam+6,n_col_call_fam+7,n_col_call_fam+8,n_col_call_fam+9,n_col_call_fam+10,n_col_call_fam+11,
