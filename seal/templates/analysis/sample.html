@@ -673,7 +673,7 @@
                         final += JSON.stringify(data["caller"]["{{ c }}"]["filter"]) + "\n";
 
                         if (data["caller"]["{{ c }}"]["allelic_frequency"]) {
-                            final += "Allelic frequencie: " + data["caller"]["{{ c }}"]["allelic_frequency"]*100 + "% \n";
+                            final += "Allelic frequencie: " + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% \n";
                         }
                         if (data["caller"]["{{ c }}"]["allelic_depth"] && data["caller"]["{{ c }}"]["depth"]) {
                             final += "Depth (var/total): " + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"] + "\n";
@@ -701,13 +701,13 @@
                                 filter = '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
                             }
                             if (data["caller"]["{{ c }}"]["allelic_frequency"] >=0 && data["caller"]["{{ c }}"]["allelic_frequency"] < 0.25) {
-                                return '<i class="far fa-dot-circle w3-tiny"></i> ' + data["caller"]["{{ c }}"]["allelic_frequency"]*100 + "% <br />" +
+                                return '<i class="far fa-dot-circle w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
                                 '' + filter + ' ' + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
                             } else if (data["caller"]["{{ c }}"]["allelic_frequency"] < 0.75) {
-                                return '<i class="fas fa-adjust w3-tiny"></i> ' + data["caller"]["{{ c }}"]["allelic_frequency"]*100 + "% <br />" +
+                                return '<i class="fas fa-adjust w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
                                 '' + filter + ' '  + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
                             } else if (data["caller"]["{{ c }}"]["allelic_frequency"] <= 1)  {
-                                return '<i class="fas fa-circle w3-tiny"></i> ' + data["caller"]["{{ c }}"]["allelic_frequency"]*100 + "% <br />" +
+                                return '<i class="fas fa-circle w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
                                 '' + filter + ' '  + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
                             }
                             return '<i>' + data["caller"]["{{ c }}"]["allelic_frequency"] + '</i>';
