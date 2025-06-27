@@ -154,6 +154,8 @@ def get_sample(data=None):
         if "run" in data:
             if "id" in data["run"]:
                 sample = Sample.query.outerjoin(Run, Sample.run).filter(Sample.samplename==data["samplename"], Run.id==data["run"]["id"], Sample.status>0).one_or_none()
+            elif "name" in data["run"]:
+                sample = Sample.query.outerjoin(Run, Sample.run).filter(Sample.samplename==data["samplename"], Run.name==data["run"]["name"], Sample.status>0).one_or_none()
         elif not sample:
             sample = Sample.query.outerjoin(Run, Sample.run).filter(Sample.samplename==data["samplename"], Run.name==data["run"]["name"], Sample.status>0).one_or_none()
         if sample:
@@ -462,7 +464,7 @@ def importvcf():
         
         call_name = "default"
         if "caller" in data:
-            call_name = date["caller"]
+            call_name = data["caller"]
 
         i = 0
         while call_name in sample.caller:
