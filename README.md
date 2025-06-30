@@ -237,7 +237,11 @@ pg_ctl -D ${PWD}/seal/seal.db -l ${PWD}/seal/seal.db.log stop
 - Dump/Restore the database
 ```bash
 pg_dump -O -C --if-exists --clean --inserts -d seal -x -F t -f seal.tar
-pg_restore -x -f seal.tar
+psql postgres
+=# CREATE ROLE "SEAL";
+=# \q
+createdb seal -O "SEAL"
+pg_restore -x -d seal seal.tar
 ```
 
 - Multiple instances of SEAL (maybe usefull for differents projects, teams, tests, stages...)
