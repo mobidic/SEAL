@@ -38,7 +38,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
-from seal import app, bcrypt, db
+from seal import app, bcrypt, db, config
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
                         UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
@@ -641,7 +641,7 @@ def sample(id):
             if s != sample and s.status > 0:
                 family_members.append(s)
 
-    clinvar = Clinvar.query.filter(Clinvar.genome == "grch38", Clinvar.current == True).one()
+    clinvar = Clinvar.query.filter(Clinvar.genome == config["GENOME"], Clinvar.current == True).one()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
@@ -651,7 +651,8 @@ def sample(id):
         callers = sample.caller,
         form=commentForm,
         saveFilterForm=saveFilterForm,
-        clinvar = clinvar
+        clinvar = clinvar,
+        genome_version = config["GENOME"]
     )
 
 

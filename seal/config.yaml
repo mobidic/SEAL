@@ -11,4 +11,4 @@ FLASK:
   MAINTENANCE: false # Set to true or false
   FLASK_ADMIN_SWATCH: 'darkly'
   SESSION_COOKIE_NAME: "seal38"
-  
+GENOME: "grch38" # choices : "grch37", "grch38"

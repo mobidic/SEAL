@@ -111,25 +111,36 @@ bs download dataset -i ds.20a701bc58ab45b59de2576db79ac8d0 --exclude "*" --inclu
 
 <details>
   <summary><b>GnomAD (custom)</b></summary>
+  Please edit "PATH" to the destination path you will use.
+  <ul>
+    <li><details><summary><b>GRCh37</b></summary>
+        ```bash
+        dn="/PATH/gnomad/v2.1/GRCh37/";
+        wget https://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.genomes.r2.0.1.sites.noVEP.vcf.gz
+        wget https://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.exomes.r2.0.1.sites.noVEP.vcf.gz.tbi
+        ```
+    </details></li>
+    <li><details><summary><b>GRCh38</b></summary>
+        You will need to install `gsutil`.
+        ```bash
+        dn="/PATH/gnomad/v4.1/";
+        gsutil -m cp -r   "gs://gcp-public-data--gnomad/release/4.1/vcf/joint" ${dn}
+        for i in $(ls ${dn}/joint/*.vcf.bgz); do
+            bn=$(basename $i);
+            chr=${bn:24:-8};
+            echo "$bn";
+            bcftools view -e "INFO/AC_joint=0" ${i} | bcftools annotate -x "^INFO/AF_joint,INFO/AF_joint_XX,INFO/AF_joint_XY,INFO/AF_joint_afr,INFO/AF_joint_ami,INFO/AF_joint_amr,INFO/AF_joint_asj,INFO/AF_joint_eas,INFO/AF_joint_fin,INFO/AF_joint_mid,INFO/AF_joint_nfe,INFO/AF_joint_raw,INFO/AF_joint_remaining,INFO/AF_joint_sas,INFO/AF_grpmax_joint,INFO/AF_exomes,INFO/AF_genomes,INFO/nhomalt_joint" -O z6 -o ${dn}/light/gnomad.v4.1.${chr}.vcf.gz -;
+            tabix ${dn}/light/gnomad.v4.1.${chr}.vcf.gz
+        done
+        bcftools concat ${dn}/light/gnomad.v4.1.chr*.vcf.gz -O z6 -o ${dn}/light/gnomad.v4.1.vcf.gz
+        tabix ${dn}/light/gnomad.v4.1.vcf.gz
+        printf "INFO/AF_joint AF\nINFO/AF_joint_afr AF_AFR\nINFO/AF_joint_amr AF_AMR\nINFO/AF_joint_asj AF_ASJ\nINFO/AF_joint_eas AF_EAS\nINFO/AF_joint_fin AF_FIN\nINFO/AF_joint_nfe AF_NFE\nINFO/AF_joint_remaining AF_OTH\n" > ${dn}/light/rename
+        bcftools annotate --rename-annots ${dn}/light/rename  ${dn}/light/gnomad.v4.1.vcf.gz -O z6 -o ${dn}/light/gnomad.v4.1.rename.vcf.gz -W
+        bcftools sort -O z6 -o ${dn}/light/gnomad.v4.1.rename.sort.vcf.gz -W ${dn}/light/gnomad.v4.1.rename.vcf.gz
+        ```
+    </details></li>
+  </ul>
 
-```bash
-dn="/PATH/gnomad/v4.1/";
-gsutil -m cp -r   "gs://gcp-public-data--gnomad/release/4.1/vcf/joint" ${dn}
-for i in $(ls ${dn}/joint/*.vcf.bgz); do
-    bn=$(basename $i);
-    chr=${bn:24:-8};
-    echo "$bn";
-    bcftools view -e "INFO/AC_joint=0" ${i} | bcftools annotate -x "^INFO/AF_joint,INFO/AF_joint_XX,INFO/AF_joint_XY,INFO/AF_joint_afr,INFO/AF_joint_ami,INFO/AF_joint_amr,INFO/AF_joint_asj,INFO/AF_joint_eas,INFO/AF_joint_fin,INFO/AF_joint_mid,INFO/AF_joint_nfe,INFO/AF_joint_raw,INFO/AF_joint_remaining,INFO/AF_joint_sas,INFO/AF_grpmax_joint,INFO/AF_exomes,INFO/AF_genomes,INFO/nhomalt_joint" -O z6 -o ${dn}/light/gnomad.v4.1.${chr}.vcf.gz -;
-    tabix ${dn}/light/gnomad.v4.1.${chr}.vcf.gz
-done
-bcftools concat ${dn}/light/gnomad.v4.1.chr*.vcf.gz -O z6 -o ${dn}/light/gnomad.v4.1.vcf.gz
-tabix ${dn}/light/gnomad.v4.1.vcf.gz
-printf "INFO/AF_joint AF\nINFO/AF_joint_afr AF_AFR\nINFO/AF_joint_amr AF_AMR\nINFO/AF_joint_asj AF_ASJ\nINFO/AF_joint_eas AF_EAS\nINFO/AF_joint_fin AF_FIN\nINFO/AF_joint_nfe AF_NFE\nINFO/AF_joint_remaining AF_OTH\n" > ${dn}/light/rename
-bcftools annotate --rename-annots ${dn}/light/rename  ${dn}/light/gnomad.v4.1.vcf.gz -O z6 -o ${dn}/light/gnomad.v4.1.rename.vcf.gz -W
-bcftools sort -O z6 -o ${dn}/light/gnomad.v4.1.rename.sort.vcf.gz -W ${dn}/light/gnomad.v4.1.rename.vcf.gz
-```
-
-</details>
 
 <details>
   <summary><b>Clinvar (custom)</b></summary>

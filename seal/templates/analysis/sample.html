@@ -780,12 +780,33 @@
                             } else {
                                 response = parseFloat(data["annotations"]["gnomADg_AF"]).toExponential(2)
                             }
-                            gnomad_r = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"></span> '+ response+'</a> ';
-                            // gnomad1 = '<a title="ExAC" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=exac" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">E</span></span></a> ';
-                            gnomad2 = '<a title="GnomAD 2.1" target="_blank" href="https://gnomad.broadinstitute.org/variant/liftover/' + data["id"] + '/gnomad_r4/gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">2</span></span></a> ';
-                            gnomad3 = '<a title="GnomAD 3" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r3" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">3</span></span></a> ';
-                            gnomad4 = '<a title="GnomAD 4" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">4</span></span></a> ';
-                            return '<i title="' + gnomad + '">' + gnomad_r + '</i> <small>(v4.1)</small><br />' + gnomad2+ gnomad3+ gnomad4;
+                            {% if genome_version == "grch37" %}
+                                gnomad_version = "r2_1"
+                                ext_exac = "?dataset=exac"
+                                ext_r2_1 = "?dataset=gnomad_r2_1"
+                                ext_r3 = "/gnomad_r2_1/gnomad_r3"
+                                ext_r4 = "/gnomad_r2_1/gnomad_r4"
+                                liftover_exac = ""
+                                liftover_r2_1 = ""
+                                liftover_r3 = "liftover/"
+                                liftover_r4 = "liftover/"
+                            {% else %}
+                                gnomad_version = "r4"
+                                ext_exac = "/gnomad_r4/exac"
+                                ext_r2_1 = "/gnomad_r4/gnomad_r2_1"
+                                ext_r3 = "?dataset=gnomad_r3"
+                                ext_r4 = "?dataset=gnomad_r4"
+                                liftover_exac = "liftover/"
+                                liftover_r2_1 = "liftover/"
+                                liftover_r3 = ""
+                                liftover_r4 = ""
+                            {% endif %}
+                            gnomad_r = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_' + gnomad_version + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"></span> '+ response +'</a> ';
+                            gnomad1 = '<a title="ExAC" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_exac + data["id"] + ext_exac + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">E</span></span></a> ';
+                            gnomad2 = '<a title="GnomAD 2.1" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r2_1 + data["id"] + ext_r2_1 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">2</span></span></a> ';
+                            gnomad3 = '<a title="GnomAD 3" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r3 + data["id"] + ext_r3 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">3</span></span></a> ';
+                            gnomad4 = '<a title="GnomAD 4" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r4 + data["id"] + ext_r4 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">4</span></span></a> ';
+                            return '<i title="' + gnomad + '">' + gnomad_r + '</i> <small>(' + gnomad_version + ')</small><br />' + gnomad1 + gnomad2+ gnomad3+ gnomad4;
                         } else {
                             return "<i>NA</i>";
                         }

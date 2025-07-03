@@ -31,7 +31,7 @@ from threading import Thread
 
 from anacore import annotVcf
 
-from seal import app, scheduler, db
+from seal import app, scheduler, db, config
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
                          Team, Bed, Filter, History, Comment_sample, Clinvar)
 
@@ -436,7 +436,7 @@ def importvcf():
         try:
             genome = data["genome"]
         except KeyError:
-            genome = "grch38"
+            genome = config["GENOME"]
 
         # Come from interface
         try:
@@ -679,7 +679,7 @@ def importvcf():
         db.session.commit()
 
 
-def update_clinvar_thread(vcf, version, genome="grch38"):
+def update_clinvar_thread(vcf, version, genome=config["GENOME"]):
     # Check and create locker
     path_locker = Path(app.root_path).joinpath('static/temp/vcf/.lock')
     while path_locker.exists():
@@ -741,7 +741,7 @@ def update_clinvar_thread(vcf, version, genome="grch38"):
 
 
 @scheduler.task('cron', id='update clinvar', day_of_week="mon")
-def check_clinvar(genome="GRCh37"):
+def check_clinvar(genome=config["GENOME"]):
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     path_locker = path_inout.joinpath('.lock')
     app.logger.info("START CLINVAR UPDATE")
