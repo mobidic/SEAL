@@ -42,9 +42,9 @@
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle">Gene</span></th>
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle"></span></th>
                             <th colspan="4" class="w3-border-right">Nomenclature</th>
-                            <th colspan="2" class="w3-border-right">Variant</th>
+                            <th colspan="{{ sample.caller|length }}" class="w3-border-right">Variant</th>
                             {% if family_members|length > 0 %}
-                                <th colspan="{{ family_members|length }}" class="w3-border-right">Family</th>
+                                <th colspan="{{ family_members|length }}" class="w3-border-right">Family<br /><span class="w3-text-flat-pumpkin w3-tiny"><i class="fa-solid fa-triangle-exclamation"></i> Only max values</span></th>
                             {% endif %}
                             <th colspan="2" class="w3-border-right">Population Frequency</th>
                             <th colspan="2" class="w3-border-right">Clinical Informations</th>
@@ -59,8 +59,10 @@
                             <th class='min-size-75'>HGVSc</th>
                             <th class='min-size-75'>HGVSp</th>
                             <th class='min-size-50'>E|I</th>
-                            <th class='min-size-75'>Filter</th>
-                            <th class='min-size-75'>{{ sample.samplename }}</th>
+                            <!-- <th class='min-size-75'>Filter</th> -->
+                            {% for c in sample.caller %}
+                                <th class='min-size-75'>{{ c }}</th>
+                            {% endfor %}
                             {% for s in family_members %}
                                 <th class='min-size-100'>{{ s }}</th>
                             {% endfor %}
@@ -108,18 +110,20 @@
                                 </span>
                                 E|I
                             </th>
-                            <th>
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 Filter
-                            </th>
-                            <th>
-                                <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                {{ sample }}
-                            </th>
+                            </th> -->
+                            {% for c in sample.caller %}
+                                <th>
+                                    <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                        <i class="fas fa-question-circle w3-tiny"></i>
+                                    </span>
+                                    {{ c }}
+                                </th>
+                            {% endfor %}
                             {% for s in family_members %}
                                 <th>
                                     <span title="Help" onclick="openHelp(title='{{ s }}', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
@@ -446,8 +450,14 @@
 
         var dt_table = [
             {
-                className: 'showTitle ',
+                className: 'showitle ',
                 data: "annotations.SYMBOL",
+                mytitle: function ( data ) {
+                        if (data == null) {
+                            return "<i>NA</i>";
+                        }
+                        return data;
+                },
                 render: {
                     _: function ( data, type, row ) {
                         if (data == null) {
@@ -460,7 +470,7 @@
                             return -1;
                         }
                         return data;
-                    }
+                    },
                 }
             },
             {
@@ -473,7 +483,7 @@
                         if (current_user_api_key_md !== "None") {
                             mobidetails = '<span onclick="openMD(\'' + data["annotations"]["HGVSc"] + '\')" class="fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> MobiDetails</span> <br />'
                         }
-                        franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
+                        franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '-hg38" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
                         return "<div class='w3-tiny'>" + mobidetails + franklin + "</div>";
                     }
                 }
@@ -481,6 +491,12 @@
             {
                 className: 'showTitle ',
                 data: "annotations.HGVSg",
+                mytitle: function ( data ) {
+                        if (data == null) {
+                            return "<i>NA</i>";
+                        }
+                        return data;
+                },
                 render : {
                     _: function ( data, type, row, meta ) {
                         return data;
@@ -520,6 +536,19 @@
             {
                 className: 'showTitle ',
                 data: "annotations",
+                mytitle: function ( data ) {
+                        if (data == null) {
+                            return "<i>NA</i>";
+                        }
+                        response = "";
+                        if (data["canonical"]) {
+                            response = ' (canonical)';
+                        } 
+                        if (data["preferred"]) {
+                            response += " (selected)";
+                        }
+                        return data["HGVSc"] + response;
+                },
                 render: {
                     _: function ( data, type, row ) {
                         if (data["HGVSc"] == null) {
@@ -536,9 +565,9 @@
                             color = "w3-text-flat-peter-river";
                         }
                         if (data["canonical"]) {
-                            response = '<i title="CANONICAL" class="' + color + ' fas fa-star w3-tiny"></i> ';
+                            response = '<i class="' + color + ' fas fa-star w3-tiny"></i> ';
                         } else {
-                            response = '<i title="" class="' + color + ' far fa-star w3-tiny"></i> ';
+                            response = '<i class="' + color + ' far fa-star w3-tiny"></i> ';
                         }
                         return response + data["HGVSc"];
                     },
@@ -553,6 +582,12 @@
             {
                 className: 'showTitle ',
                 data: "annotations.HGVSp",
+                mytitle: function ( data, type, row ) {
+                    if (data == null) {
+                        return "NA";
+                    }
+                    return data;
+                },
                 render: {
                     _: function ( data, type, row ) {
                         if (data == null) {
@@ -577,24 +612,33 @@
             {
                 className: 'w3-border-right ',
                 data: "annotations",
+                mytitle: function ( data, type, row ) {
+                    if (data["EXON"] == null) {
+                        if(data["INTRON"] == null) {
+                            return "NA";
+                        }
+                        return "Intron " + data["INTRON"];
+                    }
+                    return "Exon " + data["EXON"];
+                },
                 render: {
                     _: function ( data, type, row ) {
                         if (data["EXON"] == null) {
                             if(data["INTRON"] == null) {
                                 return "NA";
                             }
-                            return data["INTRON"];
+                            return "Intron " + data["INTRON"];
                         }
-                        return data["EXON"];
+                        return "Exon " + data["EXON"];
                     },
                     display: function ( data, type, row ) {
                         if (data["EXON"] == null) {
                             if(data["INTRON"] == null) {
                                 return "<i>NA</i>";
                             }
-                            return "<i title='Intron " + data["INTRON"] + "'>" + data["INTRON"] + "</i>";
+                            return "<i>" + data["INTRON"] + "</i>";
                         }
-                        return "<b title='Exon " + data["EXON"] + "'>" + data["EXON"] + "</b>";
+                        return "<b>" + data["EXON"] + "</b>";
                     },
                     sort: function ( data, type, row ) {
                         prefix = data
@@ -611,68 +655,76 @@
                     },
                 }
             },
-            {
-                className: 'showTitle ',
-                data: "filter",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        cell = ""
-                        for (idx in data) {
-                            cell += data[idx] + " | ";
-                        }
-                        return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    },
-                    display: function ( data, type, row, meta ) {
-                        cell = ""
-                        style = "style='display:inline-table;max-width:75px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-
-                        for (idx in data) {
-                            color = "asbestos";
-                            cell += " <span class='w3-tag w3-flat-" + color + "' " + style + ">" + data[idx] + "</span>"
-                        }
-                        return cell;
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        return data.toString();
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        var val = 0;
-                        var zero = "000000000";
-                        for (idx in data) {
-                            if (data[idx] == "PASS") {
-                                val = 2;
-                            }
-                            val += -1;
-                        }
-                        return val
-                    }
-                },
-                sType: "numeric"
-            },
+            {% for c in sample.caller %}
             {
                 className: 'w3-tiny showTitle w3-border-right',
                 data: {},
+                mytitle: function ( data, type, row ) {
+                    final = ""
+                    if( "{{ c }}" in data["caller"]) {
+                        if (data["caller"]["{{ c }}"]["allelic_frequency"] >=0 && data["caller"]["{{ c }}"]["allelic_frequency"] < 0.25) {
+                            final += "[MOS]\n";
+                        } else if (data["caller"]["{{ c }}"]["allelic_frequency"] < 0.75) {
+                            final += "[HTZ]\n";
+                        } else if (data["caller"]["{{ c }}"]["allelic_frequency"] <= 1)  {
+                            final += "[HOM]\n";
+                        }
+
+                        final += JSON.stringify(data["caller"]["{{ c }}"]["filter"]) + "\n";
+
+                        if (data["caller"]["{{ c }}"]["allelic_frequency"]) {
+                            final += "Allelic frequencie: " + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% \n";
+                        }
+                        if (data["caller"]["{{ c }}"]["allelic_depth"] && data["caller"]["{{ c }}"]["depth"]) {
+                            final += "Depth (var/total): " + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"] + "\n";
+                        }
+                    } else {
+                        return "NA"
+                    }
+
+                    return final;
+                },
                 render: {
                     _: function ( data, type, row, meta ) {
-                        return data["allelic_frequency"];
+                        if( "{{ c }}" in data["caller"]) {
+                            return data["caller"]["{{ c }}"]["allelic_frequency"];
+                        } else {
+                            return "NA"
+                        }
                     },
                     display: function ( data, type, row, meta ) {
-                        if (data["allelic_frequency"] >=0 && data["allelic_frequency"] < 0.25) {
-                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
-                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
-                        } else if (data["allelic_frequency"] < 0.75) {
-                            return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
-                        } else if (data["allelic_frequency"] <= 1)  {
-                            return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
+                        if( "{{ c }}" in data["caller"]) {
+                            filter = "";
+                            if (JSON.stringify(data["caller"]["{{ c }}"]["filter"]) === JSON.stringify(["PASS"])) {
+                                filter = '<i class="fas fa-flag w3-text-flat-green-sea"></i>';
+                            } else {
+                                filter = '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
+                            }
+                            if (data["caller"]["{{ c }}"]["allelic_frequency"] >=0 && data["caller"]["{{ c }}"]["allelic_frequency"] < 0.25) {
+                                return '<i class="far fa-dot-circle w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
+                                '' + filter + ' ' + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
+                            } else if (data["caller"]["{{ c }}"]["allelic_frequency"] < 0.75) {
+                                return '<i class="fas fa-adjust w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
+                                '' + filter + ' '  + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
+                            } else if (data["caller"]["{{ c }}"]["allelic_frequency"] <= 1)  {
+                                return '<i class="fas fa-circle w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
+                                '' + filter + ' '  + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
+                            }
+                            return '<i>' + data["caller"]["{{ c }}"]["allelic_frequency"] + '</i>';
+                        } else {
+                            return "NA"
                         }
-                        return '<i>' + data["allelic_frequency"] + '</i>';
+                    },
+                    sort: function ( data, type, row, meta ) {
+                        if( "{{ c }}" in data["caller"]) {
+                            return data["caller"]["{{ c }}"]["allelic_frequency"];
+                        } else {
+                            return -1
+                        }
                     },
                 }
             },
+            {% endfor %}
             {% for s in family_members %}
             {
                 className: 'w3-tiny showTitle{% if loop.last  %} w3-border-right{% endif %}',
@@ -682,17 +734,21 @@
                         return data["allelic_frequency"];
                     },
                     display: function ( data, type, row, meta ) {
+                        filter = "";
+                        if (JSON.stringify(data["filter"]) === JSON.stringify(["PASS"])) {
+                            filter = '<i class="fas fa-flag w3-text-flat-green-sea"></i>';
+                        } else {
+                            filter = '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
+                        }
                         if (data["allelic_frequency"] >=0 && data["allelic_frequency"] < 0.25) {
-                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
-                            return '<i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
+                            return '<br /><i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + filter + ' ' + data["allelic_depth"] + '/' + data["depth"];
                         } else if (data["allelic_frequency"] < 0.75) {
-                            return '<i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
+                            return '<br /><i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + filter + ' '  + data["allelic_depth"] + '/' + data["depth"];
                         } else if (data["allelic_frequency"] <= 1)  {
-                            return '<i class="fas fa-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + data["allelic_depth"] + '/' + data["depth"];
+                            return '<br /><i class="fas fa-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
+                            '' + filter + ' '  + data["allelic_depth"] + '/' + data["depth"];
                         }
                         return '<i>' + data["allelic_frequency"] + '</i>';
                     },
@@ -701,7 +757,6 @@
             {% endfor %}
             {
                 className: '',
-                // data: "annotations.gnomADg_AF",
                 data: null,
                 render : {
                     _: function ( data, type, row, meta ) {
@@ -725,12 +780,33 @@
                             } else {
                                 response = parseFloat(data["annotations"]["gnomADg_AF"]).toExponential(2)
                             }
-                            gnomad_r = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"></span> '+ response+'</a> ';
-                            gnomad1 = '<a title="ExAC" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=exac" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">E</span></span></a> ';
-                            gnomad2 = '<a title="GnomAD 2.1" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_r2_1" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">2</span></span></a> ';
-                            gnomad3 = '<a title="GnomAD 3" target="_blank" href="https://gnomad.broadinstitute.org/variant/liftover/' + data["id"] + '/gnomad_r2_1/gnomad_r3" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">3</span></span></a> ';
-                            gnomad4 = '<a title="GnomAD 4" target="_blank" href="https://gnomad.broadinstitute.org/variant/liftover/' + data["id"] + '/gnomad_r2_1/gnomad_r4" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">4</span></span></a> ';
-                            return '<i title="' + gnomad + '">' + gnomad_r + '</i> <small>(v2.1)</small><br />' + gnomad1+ gnomad2+ gnomad3+ gnomad4;
+                            {% if genome_version == "grch37" %}
+                                gnomad_version = "r2_1"
+                                ext_exac = "?dataset=exac"
+                                ext_r2_1 = "?dataset=gnomad_r2_1"
+                                ext_r3 = "/gnomad_r2_1/gnomad_r3"
+                                ext_r4 = "/gnomad_r2_1/gnomad_r4"
+                                liftover_exac = ""
+                                liftover_r2_1 = ""
+                                liftover_r3 = "liftover/"
+                                liftover_r4 = "liftover/"
+                            {% else %}
+                                gnomad_version = "r4"
+                                ext_exac = "/gnomad_r4/exac"
+                                ext_r2_1 = "/gnomad_r4/gnomad_r2_1"
+                                ext_r3 = "?dataset=gnomad_r3"
+                                ext_r4 = "?dataset=gnomad_r4"
+                                liftover_exac = "liftover/"
+                                liftover_r2_1 = "liftover/"
+                                liftover_r3 = ""
+                                liftover_r4 = ""
+                            {% endif %}
+                            gnomad_r = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_' + gnomad_version + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"></span> '+ response +'</a> ';
+                            gnomad1 = '<a title="ExAC" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_exac + data["id"] + ext_exac + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">E</span></span></a> ';
+                            gnomad2 = '<a title="GnomAD 2.1" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r2_1 + data["id"] + ext_r2_1 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">2</span></span></a> ';
+                            gnomad3 = '<a title="GnomAD 3" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r3 + data["id"] + ext_r3 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">3</span></span></a> ';
+                            gnomad4 = '<a title="GnomAD 4" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r4 + data["id"] + ext_r4 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">4</span></span></a> ';
+                            return '<i title="' + gnomad + '">' + gnomad_r + '</i> <small>(' + gnomad_version + ')</small><br />' + gnomad1 + gnomad2+ gnomad3+ gnomad4;
                         } else {
                             return "<i>NA</i>";
                         }
@@ -1093,28 +1169,32 @@
                 data: {
                     "data": "class_variant"
                 },
-                render:function ( data, type, row ) {
-                    if(type === 'display') {
-                        id_var = data.id
-                        class_variant = data.class_variant ? data.class_variant : 0;
-                        dropdown = ""
-                        for (c in class_variant_html) {
-                            dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +', this)" class="w3-bar-item w3-button" style="width:inherit">'+
-                                    class_variant_html[c]+
-                                '</a>'
+                render:
+                    function ( data, type, row ) {
+                        if(type === 'display') {
+                            id_var = data.id
+                            class_variant = data.class_variant ? data.class_variant : 0;
+                            dropdown = ""
+                            for (c in class_variant_html) {
+                                dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +', this)" class="w3-bar-item w3-button" style="width:inherit">'+
+                                        class_variant_html[c]+
+                                    '</a>'
+                            }
+                            response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
+                                <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
+                                    ` + class_variant_html[class_variant] + `
+                                </button>
+                                <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
+                                    `+ dropdown +`
+                                </div>
+                            </div>`
+                            return response;
                         }
-                        response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
-                            <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
-                                ` + class_variant_html[class_variant] + `
-                            </button>
-                            <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
-                                `+ dropdown +`
-                            </div>
-                        </div>`
-                        return response;
-                    }
-                    return class_variant_html[data.class_variant ? data.class_variant : 0];
-                },
+                        if(type === 'export') {
+                            return class_variant_export[data.class_variant ? data.class_variant : 0];
+                        }
+                        return class_variant_html[data.class_variant ? data.class_variant : 0];
+                    },
                 searchBuilder: {
                     orthogonal: {
                         display: 'filter'
@@ -1214,7 +1294,7 @@
                 searchable: false , visible: false
             },
             {
-                data: null, "defaultContent": "hg19",
+                data: null, "defaultContent": "hg38",
                 searchable: false , visible: false
             },
             {
@@ -1234,24 +1314,13 @@
             },
             {
                 data: "allelic_frequency",
-                searchable: false , visible: false
+                searchable: true , visible: false
             },
             { data: "depth", searchable: true , visible: false},
             { data: "allelic_depth",searchable: true , visible: false},
         ];
         var number_family = {{ family_members|length }};
-
-        var columns_filter= [0,2,3,4,5,6,7,31,32];
-        var columns_base = [number_family + 20-1, 0, 2, 3, 4, 5, 6, 7];
-
-        for (i in [...Array(number_family).keys()]) {
-            columns_filter.push(parseInt(i)+8);
-            columns_base.push(parseInt(i)+8);
-        }
-        for (const i of [8,9,10,11,12,13,14,15,16,17,18]) {
-            columns_filter.push(parseInt(i)+number_family);
-            columns_base.push(parseInt(i)+number_family);
-        }
+        var number_caller = {{ sample.caller|length }};
     </script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='seal/analysis/sample.js') }}"></script>

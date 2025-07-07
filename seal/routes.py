@@ -38,7 +38,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
-from seal import app, bcrypt, db
+from seal import app, bcrypt, db, config
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
                         UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
@@ -641,16 +641,18 @@ def sample(id):
             if s != sample and s.status > 0:
                 family_members.append(s)
 
-    clinvar = Clinvar.query.filter(Clinvar.genome == "grch37", Clinvar.current == True).one()
+    clinvar = Clinvar.query.filter(Clinvar.genome == config["GENOME"], Clinvar.current == True).one()
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
         count_hide = count_hide,
         family_members = family_members,
+        callers = sample.caller,
         form=commentForm,
         saveFilterForm=saveFilterForm,
-        clinvar = clinvar
+        clinvar = clinvar,
+        genome_version = config["GENOME"]
     )
 
 
@@ -1142,35 +1144,41 @@ def json_variants(id, idbed=False, version=-1):
         t = dict()
         if sample.familyid is not None:
             for s in sample.family.samples:
-                if s == sample:
+                if s == sample or s.status < 1:
                     continue
-                t[str(s)]= dict()
-                req = Var2Sample.query.get((var2sample.variant_ID, s.id))
+                t[str(s)] = dict()
+                req = Var2Sample.query.filter_by(variant_ID=var2sample.variant_ID, sample_ID=s.id).one_or_none()
                 if req:
+                    members.append(s.samplename)
                     t[str(s)] = {
                         "depth": f"{req.depth}",
                         "allelic_depth": f"{req.allelic_depth}",
-                        "allelic_frequency": f"{(req.allelic_depth / req.depth):.4f}",
+                        "allelic_frequency": f"{req.allelic_freq}",
+                        "filter": req.filter,
                     }
                 else:
                     t[str(s)] = {
                         "depth": f"NA",
                         "allelic_depth": f"NA",
                         "allelic_frequency": f"NA",
+                        "filter": f"NA",
                     }
 
-            request_family = Sample.query.filter(
-                and_(
-                    Sample.familyid == sample.familyid,
-                    Sample.status >= 1,Sample.id != sample.id
-                )
-            ).outerjoin(Var2Sample)\
-                .filter(Var2Sample.variant_ID == var2sample.variant_ID)
-            for member in request_family:
-                members.append(member.samplename)
-
         allelic_frequency = var2sample.allelic_depth / var2sample.depth
-
+        calls = dict()
+        for caller in var2sample.caller:
+            try:
+                c = var2sample.caller[caller]
+                allelic_frequency = c["allelic_depth"] / c["depth"]
+                calls[caller] = dict(
+                    {"filter": c["filter"],
+                    "depth": c["depth"],
+                    "allelic_depth": c["allelic_depth"],
+                    "allelic_frequency": f"{allelic_frequency:.4f}",
+                    "allelic_freq": f"{c['allelic_freq']:.4f}"}
+                )
+            except:
+                 calls[caller] = None
         variants["data"].append({
             "annotations": main_annot,
             "chr": f"{variant.chr}",
@@ -1180,6 +1188,13 @@ def json_variants(id, idbed=False, version=-1):
                 "CLNSIGCONF" : variant.clinvar_CLNSIGCONF,
                 "CLNREVSTAT" : variant.clinvar_CLNREVSTAT
             },
+            # "scores": {
+            #     "MES_var" : variant.MES_var,
+            #     "spliceAI" : variant.spliceAI,
+            #     "missensesMean" : variant.missensesMean,
+            #     "gnomADg_AF" : variant.gnomADg_AF
+            # },
+            "caller": calls,
             "id": f"{variant.id}",
             "pos": f"{variant.pos}",
             "ref": f"{variant.ref}",

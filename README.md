@@ -48,11 +48,104 @@ For conda environment:
 
 ##### Plugins & Customs
 
-*__A more complete guide will be written soon__*
-
 After installing VEP, you need to install several VEP plugins :
-> The installation instructions for VEP plugins can be found ([here](https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html)).
+> __The installation instructions for VEP plugins can be found ([here](https://www.ensembl.org/info/docs/tools/vep/script/vep_plugins.html)).__
 
+> *We are working on an installation script.*
+>
+> *A generic version is currently under development.*
+
+
+<details>
+  <summary><b>GRCh37/hg19</b></summary>
+
+<ul>
+<li>
+<details>
+  <summary><b>dbNSFP (plugins)</b></summary>
+
+```bash
+version=4.8c
+wget https://dbnsfp.s3.amazonaws.com/dbNSFP${version}.zip /PATH/dbNSFP${version}.zip
+unzip dbNSFP${version}.zip
+zcat dbNSFP${version}_variant.chr1.gz | head -n1 > h
+zgrep -h -v ^#chr dbNSFP${version}_variant.chr* | awk '$8 != "." ' | sort -k8,8 -k9,9n - | cat h - | bgzip -c > dbNSFP${version}_grch37.gz
+tabix -s 8 -b 9 -e 9 dbNSFP${version}_grch37.gz
+```
+</details>
+</li>
+
+<li>
+<details>
+  <summary><b>dbscSNV (plugins)</b></summary>
+
+```bash
+wget https://usf.box.com/shared/static/ffwlywsat3q5ijypvunno3rg6steqfs8 /PATH/dbscSNV1.1.zip
+unzip dbscSNV1.1.zip
+head -n1 dbscSNV1.1.chr1 > h
+cat dbscSNV1.1.chr* | grep -v ^chr | cat h - | bgzip -c > dbscSNV1.1_GRCh37.txt.gz
+tabix -s 1 -b 2 -e 2 -c c dbscSNV1.1_GRCh37.txt.gz
+```
+</details>
+</li>
+
+<li>
+<details>
+  <summary><b>MaxEntScan (plugins)</b></summary>
+
+```bash
+wget "http://hollywood.mit.edu/burgelab/maxent/download/fordownload.tar.gz" -O /PATH/maxent
+tar -zxvf /PATH/maxent/fordownload.tar.gz
+```
+</details>
+</li>
+
+<li>
+<details>
+  <summary><b>SpliceAI (plugins)</b></summary>
+
+Edit output path if needed (for example to write it into a conda env).
+__You need to have a basespace account.__
+
+```bash
+wget "https://launch.basespace.illumina.com/CLI/latest/amd64-linux/bs" -O $HOME/bin/bs
+chmod u+x $HOME/bin/bs
+bs authenticate
+bs download dataset -i ds.20a701bc58ab45b59de2576db79ac8d0 --exclude "*" --include "spliceai_scores.masked.snv.hg19.vcf.gz" --include "spliceai_scores.masked.indel.hg19.vcf.gz" --include "spliceai_scores.masked.snv.hg19.vcf.gz.tbi" --include "spliceai_scores.masked.indel.hg19.vcf.gz.tbi" -o /PATH/SpliceAI/
+```
+</details>
+</li>
+
+<li>
+<details>
+  <summary><b>GnomAD (custom)</b></summary>
+  Please edit "PATH" to the destination path you will use.
+
+```bash
+dn="/PATH/gnomad/v2.1/GRCh37/";
+wget https://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.genomes.r2.0.1.sites.noVEP.vcf.gz
+wget https://ftp.ensembl.org/pub/data_files/homo_sapiens/GRCh37/variation_genotype/gnomad.exomes.r2.0.1.sites.noVEP.vcf.gz.tbi
+```
+</details>
+</li>
+
+<li>
+<details>
+  <summary><b>Clinvar (custom)</b></summary>
+
+```bash
+wget https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/clinvar.vcf.gz /PATH/clinvarGRCh37/
+tabix /PATH/clinvarGRCh37/clinvar.vcf.gz
+```
+</details>
+</li>
+</details>
+
+<details>
+  <summary><b>GRCh38/hg38</b></summary>
+
+<ul>
+<li>
 <details>
   <summary><b>dbNSFP (plugins)</b></summary>
 
@@ -63,12 +156,11 @@ unzip dbNSFP${version}.zip
 zcat dbNSFP${version}_variant.chr1.gz | head -n1 > h
 zgrep -h -v ^#chr dbNSFP${version}_variant.chr* | sort -k1,1 -k2,2n - | cat h - | bgzip -c > dbNSFP${version}_grch38.gz
 tabix -s 1 -b 2 -e 2 dbNSFP${version}_grch38.gz
-zgrep -h -v ^#chr dbNSFP${version}_variant.chr* | awk '$8 != "." ' | sort -k8,8 -k9,9n - | cat h - | bgzip -c > dbNSFP${version}_grch37.gz
-tabix -s 8 -b 9 -e 9 dbNSFP${version}_grch37.gz
 ```
-
 </details>
+</li>
 
+<li>
 <details>
   <summary><b>dbscSNV (plugins)</b></summary>
 
@@ -78,12 +170,11 @@ unzip dbscSNV1.1.zip
 head -n1 dbscSNV1.1.chr1 > h
 cat dbscSNV1.1.chr* | grep -v ^chr | sort -k5,5 -k6,6n | cat h - | awk '$5 != "."' | bgzip -c > dbscSNV1.1_GRCh38.txt.gz
 tabix -s 5 -b 6 -e 6 -c c dbscSNV1.1_GRCh38.txt.gz
-cat dbscSNV1.1.chr* | grep -v ^chr | cat h - | bgzip -c > dbscSNV1.1_GRCh37.txt.gz
-tabix -s 1 -b 2 -e 2 -c c dbscSNV1.1_GRCh37.txt.gz
 ```
-
 </details>
+</li>
 
+<li>
 <details>
   <summary><b>MaxEntScan (plugins)</b></summary>
 
@@ -91,14 +182,15 @@ tabix -s 1 -b 2 -e 2 -c c dbscSNV1.1_GRCh37.txt.gz
 wget "http://hollywood.mit.edu/burgelab/maxent/download/fordownload.tar.gz" -O /PATH/maxent
 tar -zxvf /PATH/maxent/fordownload.tar.gz
 ```
-
 </details>
+</li>
 
+<li>
 <details>
   <summary><b>SpliceAI (plugins)</b></summary>
 
 Edit output path if needed (for example to write it into a conda env).
-You need to have a basespace account.
+__You need to have a basespace account.__
 
 ```bash
 wget "https://launch.basespace.illumina.com/CLI/latest/amd64-linux/bs" -O $HOME/bin/bs
@@ -106,11 +198,15 @@ chmod u+x $HOME/bin/bs
 bs authenticate
 bs download dataset -i ds.20a701bc58ab45b59de2576db79ac8d0 --exclude "*" --include "spliceai_scores.masked.snv.hg38.vcf.gz" --include "spliceai_scores.masked.indel.hg38.vcf.gz" --include "spliceai_scores.masked.snv.hg38.vcf.gz.tbi" --include "spliceai_scores.masked.indel.hg38.vcf.gz.tbi" -o /PATH/SpliceAI/
 ```
-
 </details>
+</li>
 
+<li>
 <details>
   <summary><b>GnomAD (custom)</b></summary>
+  Please edit "PATH" to the destination path you will use.
+
+  > __You need to install `gsutil`.__
 
 ```bash
 dn="/PATH/gnomad/v4.1/";
@@ -128,19 +224,20 @@ printf "INFO/AF_joint AF\nINFO/AF_joint_afr AF_AFR\nINFO/AF_joint_amr AF_AMR\nIN
 bcftools annotate --rename-annots ${dn}/light/rename  ${dn}/light/gnomad.v4.1.vcf.gz -O z6 -o ${dn}/light/gnomad.v4.1.rename.vcf.gz -W
 bcftools sort -O z6 -o ${dn}/light/gnomad.v4.1.rename.sort.vcf.gz -W ${dn}/light/gnomad.v4.1.rename.vcf.gz
 ```
-
 </details>
+</li>
 
+<li>
 <details>
   <summary><b>Clinvar (custom)</b></summary>
 
 ```bash
-wget https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh37/clinvar.vcf.gz /PATH/clinvarGRCh37/
 wget https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_GRCh38/clinvar.vcf.gz /PATH/clinvarGRCh38/
-tabix /PATH/clinvarGRCh37/clinvar.vcf.gz
 tabix /PATH/clinvarGRCh38/clinvar.vcf.gz
 ```
-
+</details>
+</li>
+</ul>
 </details>
 
 ### Configuration
@@ -161,18 +258,17 @@ needed.
 
 ### Initialization of the database
 
-> If you install all dependencies with conda make sure to activate the
-> environment :
-> ```bash
-> conda activate seal
-> ```
+If you install all dependencies with conda make sure to activate the environment :
+```bash
+conda activate seal
+```
 
-> comment line on `seal/__init__.py` (see [#26](https://github.com/mobidic/SEAL/issues/26))
-> ```python
-> # from seal import routes
-> # from seal import schedulers
-> # from seal import admin
-> ```
+Comment line on `seal/__init__.py` (see [#26](https://github.com/mobidic/SEAL/issues/26))
+```python
+# from seal import routes
+# from seal import schedulers
+# from seal import admin
+```
 
 To initialise the database, start the database server and run the following
 commands:
@@ -184,12 +280,12 @@ psql postgres -c "CREATE DATABASE seal;"
 python insertdb.py -p password
 ```
 
-> uncomment line on `seal/__init__.py` (see [#26](https://github.com/mobidic/SEAL/issues/26))
-> ```python
-> from seal import routes
-> from seal import schedulers
-> from seal import admin
-> ```
+Uncomment line on `seal/__init__.py` (see [#26](https://github.com/mobidic/SEAL/issues/26))
+```python
+from seal import routes
+from seal import schedulers
+from seal import admin
+```
 
 ```bash
 flask --app seal --debug db init
@@ -250,6 +346,7 @@ pg_restore -x -d seal seal.tar
 ```yaml
   SQLALCHEMY_DATABASE_URI: 'postgresql:///seal-bis'
 ```
+
 *Follow the [initialization steps](#initialization-of-the-database) with this new database (edit this ommand)*
 ```bash
 psql postgres -c "CREATE DATABASE seal-bis;"

@@ -31,7 +31,7 @@ from threading import Thread
 
 from anacore import annotVcf
 
-from seal import app, scheduler, db
+from seal import app, scheduler, db, config
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
                          Team, Bed, Filter, History, Comment_sample, Clinvar)
 
@@ -144,6 +144,25 @@ def is_valid_color(color):
     return bool(match_hex | match_rgb | match_rgba)
 
 
+def get_sample(data=None):
+    sample = False
+    if "sample_id" in data:
+        sample = Sample.query.get(data["sample_id"])
+        if sample:
+            return sample
+    if "samplename" in data:
+        if "run" in data:
+            if "id" in data["run"]:
+                sample = Sample.query.outerjoin(Run, Sample.run).filter(Sample.samplename==data["samplename"], Run.id==data["run"]["id"], Sample.status>0).one_or_none()
+            elif "name" in data["run"]:
+                sample = Sample.query.outerjoin(Run, Sample.run).filter(Sample.samplename==data["samplename"], Run.name==data["run"]["name"], Sample.status>0).one_or_none()
+        elif not sample:
+            sample = Sample.query.outerjoin(Run, Sample.run).filter(Sample.samplename==data["samplename"], Run.name==data["run"]["name"], Sample.status>0).one_or_none()
+        if sample:
+            return sample
+    return False
+
+
 def get_family(id=None, name=None):
     if id:
         family = Family.query.get(id)
@@ -227,6 +246,7 @@ def get_filter(id=1, name=None):
 
 
 def create_sample(data):
+    app.logger.info("---------------- Import Sample ----------------")
     if not "samplename" in data:
         raise KeyError
 
@@ -388,7 +408,7 @@ def importvcf():
     path_locker = path_inout.joinpath('.lock')
 
     if current_token and not path_locker.exists():
-        app.logger.info("---------------- Create A New Sample ----------------")
+        app.logger.info("---------------- Add a VCF ----------------")
 
         # Create lock file
         lockFile = open(path_locker, 'x')
@@ -416,7 +436,7 @@ def importvcf():
         try:
             genome = data["genome"]
         except KeyError:
-            genome = "grch37"
+            genome = config["GENOME"]
 
         # Come from interface
         try:
@@ -427,10 +447,32 @@ def importvcf():
         vcf_path = Path(data["vcf_path"])
         if not vcf_path.exists():
             app.logger.error(f'Path does not exist for : {vcf_path}')
+            path_locker.unlink()
             return
 
-        sample = create_sample(data)
-        history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=f"Import Sample")
+        if "add_caller" in data and data["add_caller"] == True:
+            sample = get_sample(data)
+            msg = ""
+            if not sample:
+                app.logger.error(f'Sample does not found')
+                path_locker.unlink()
+                return
+            msg = "Add new caller"
+        else:
+            sample = create_sample(data)
+            msg = "Import Sample"
+        
+        call_name = "default"
+        if "caller" in data:
+            call_name = data["caller"]
+
+        i = 0
+        while call_name in sample.caller:
+            i += 1
+            call_name = f"default_{i}"
+            
+        sample.caller.append(call_name)
+        history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=msg)
         db.session.add(history)
         db.session.commit()
 
@@ -565,13 +607,43 @@ def importvcf():
                 #   - catch exception
                 #   - add to history & comments
                 try:
-                    v2s = Var2Sample(
-                        variant_ID=variant.id,
-                        sample_ID=sample.id,
-                        depth=v.getPopDP(),
-                        allelic_depth=v.getPopAltAD()[0],
-                        filter=v.filter)
-                    db.session.add(v2s)
+                    caller = {
+                        call_name: {
+                            "depth": int(v.getPopDP()),
+                            "allelic_depth": int(v.getPopAltAD()[0]),
+                            "allelic_freq":  int(v.getPopAltAD()[0])/int(v.getPopDP()),
+                            "filter": v.filter
+                        }
+                    }
+                    print(caller)
+                    v2s = Var2Sample.query.get((variant.id, sample.id))
+                    if not v2s:
+                        v2s = Var2Sample(
+                            variant_ID=variant.id,
+                            sample_ID=sample.id,
+                            depth=v.getPopDP(),
+                            allelic_depth=v.getPopAltAD()[0],
+                            filter=v.filter,
+                            caller=caller)
+                        db.session.add(v2s)
+                    print(v2s)
+                    # BUG : need to do 2 commit (dont know why...)
+                    t = v2s.caller
+                    t.update(caller)
+                    v2s.caller = t
+                    db.session.commit()
+                    v2s.caller = t
+                    db.session.commit()
+                    if v2s.depth is None or v.getPopDP() > v2s.depth:
+                        v2s.depth = v.getPopDP()
+                    if v2s.allelic_freq is None or float(int(v.getPopAltAD()[0])/int(v.getPopDP())) > v2s.allelic_freq:
+                        v2s.allelic_freq = float(int(v.getPopAltAD()[0])/int(v.getPopDP()))
+                    if v2s.allelic_depth is None or int(v.getPopAltAD()[0]) > v2s.allelic_depth:
+                        v2s.allelic_depth = int(v.getPopAltAD()[0])
+                    if v2s.depth is None or int(v.getPopDP()) > v2s.depth:
+                        v2s.depth = int(v.getPopDP())
+                    if not v2s.pass_filter and v.filter == ['PASS']:
+                        v2s.pass_filter = True
                     db.session.commit()
                 except exc.IntegrityError as e:
                     db.session.rollback()
@@ -607,7 +679,7 @@ def importvcf():
         db.session.commit()
 
 
-def update_clinvar_thread(vcf, version, genome="grch37"):
+def update_clinvar_thread(vcf, version, genome=config["GENOME"]):
     # Check and create locker
     path_locker = Path(app.root_path).joinpath('static/temp/vcf/.lock')
     while path_locker.exists():
@@ -669,7 +741,7 @@ def update_clinvar_thread(vcf, version, genome="grch37"):
 
 
 @scheduler.task('cron', id='update clinvar', day_of_week="mon")
-def check_clinvar(genome="GRCh37"):
+def check_clinvar(genome=config["GENOME"]):
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     path_locker = path_inout.joinpath('.lock')
     app.logger.info("START CLINVAR UPDATE")
