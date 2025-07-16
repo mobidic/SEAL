@@ -352,6 +352,11 @@ pg_restore -x -d seal seal.tar
 psql postgres -c "CREATE DATABASE seal-bis;"
 ```
 
+- Edit Variant Caller for some samples (usefull when forget to precise caller in json, or want to update large scale database)
+```SQL
+UPDATE var2_sample SET caller = jsonb_set(caller::jsonb, '{VC}', caller::jsonb->'default') - 'default' WHERE "sample_ID" >= 50 AND "sample_ID" =< 100;
+UPDATE sample SET caller = array_remove(caller || '{VC}', 'default') WHERE id >= 50 AND id =< 100;
+```
 
 # License
 

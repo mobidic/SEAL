@@ -452,7 +452,6 @@ def importvcf():
 
         if "add_caller" in data and data["add_caller"] == True:
             sample = get_sample(data)
-            msg = ""
             if not sample:
                 app.logger.error(f'Sample does not found')
                 path_locker.unlink()
