@@ -606,26 +606,27 @@ def importvcf():
                 #   - catch exception
                 #   - add to history & comments
                 try:
+                    samplename_vcf = list(v.samples.keys())[0]
+                    vcf_depth = v.samples[samplename_vcf]["DP"]
+                    vcf_allelic_depth = v.samples[samplename_vcf]["AD"][1]
                     caller = {
                         call_name: {
-                            "depth": int(v.getPopDP()),
-                            "allelic_depth": int(v.getPopAltAD()[0]),
-                            "allelic_freq":  int(v.getPopAltAD()[0])/int(v.getPopDP()),
+                            "depth": int(vcf_depth),
+                            "allelic_depth": int(vcf_allelic_depth),
+                            "allelic_freq":  int(vcf_allelic_depth)/int(vcf_depth),
                             "filter": v.filter
                         }
                     }
-                    print(caller)
                     v2s = Var2Sample.query.get((variant.id, sample.id))
                     if not v2s:
                         v2s = Var2Sample(
                             variant_ID=variant.id,
                             sample_ID=sample.id,
-                            depth=v.getPopDP(),
-                            allelic_depth=v.getPopAltAD()[0],
+                            depth=vcf_depth,
+                            allelic_depth=vcf_allelic_depth,
                             filter=v.filter,
                             caller=caller)
                         db.session.add(v2s)
-                    print(v2s)
                     # BUG : need to do 2 commit (dont know why...)
                     t = v2s.caller
                     t.update(caller)
@@ -633,14 +634,17 @@ def importvcf():
                     db.session.commit()
                     v2s.caller = t
                     db.session.commit()
-                    if v2s.depth is None or v.getPopDP() > v2s.depth:
-                        v2s.depth = v.getPopDP()
-                    if v2s.allelic_freq is None or float(int(v.getPopAltAD()[0])/int(v.getPopDP())) > v2s.allelic_freq:
-                        v2s.allelic_freq = float(int(v.getPopAltAD()[0])/int(v.getPopDP()))
-                    if v2s.allelic_depth is None or int(v.getPopAltAD()[0]) > v2s.allelic_depth:
-                        v2s.allelic_depth = int(v.getPopAltAD()[0])
-                    if v2s.depth is None or int(v.getPopDP()) > v2s.depth:
-                        v2s.depth = int(v.getPopDP())
+                    samplename_vcf = list(v.samples.keys())[0]
+                    vcf_depth = v.samples[samplename_vcf]["DP"]
+                    vcf_allelic_depth = v.samples[samplename_vcf]["AD"][1]
+                    if v2s.depth is None or vcf_depth > v2s.depth:
+                        v2s.depth = vcf_depth
+                    if v2s.allelic_freq is None or float(int(vcf_allelic_depth)/int(vcf_depth)) > v2s.allelic_freq:
+                        v2s.allelic_freq = float(int(vcf_allelic_depth)/int(vcf_depth))
+                    if v2s.allelic_depth is None or int(vcf_allelic_depth) > v2s.allelic_depth:
+                        v2s.allelic_depth = int(vcf_allelic_depth)
+                    if v2s.depth is None or int(vcf_depth) > v2s.depth:
+                        v2s.depth = int(vcf_depth)
                     if not v2s.pass_filter and v.filter == ['PASS']:
                         v2s.pass_filter = True
                     db.session.commit()
