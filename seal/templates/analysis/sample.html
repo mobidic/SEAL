@@ -18,6 +18,7 @@
                 {% include 'includes/button-status-sample.j2' %}
             </div>
             <hr>
+            <span onclick="table.settings()[0].jqXHR.abort()" class="w3-button">dfwdfs</span>
         </div>
         <div class="w3-padding w3-small">
             <div class="seal-form-report w3-row w3-padding {% if sample.status == 4 %}w3-disabled {% endif %}">
@@ -39,42 +40,42 @@
                 <table id="variants" class="w3-table display" style="width:100%">
                     <thead>
                         <tr>
-                            <th rowspan="2" class='min-size-75'><span class="seal-display-middle">Gene</span></th>
-                            <th rowspan="2" class='min-size-75'><span class="seal-display-middle"></span></th>
-                            <th colspan="4" class="w3-border-right">Nomenclature</th>
+                            <th rowspan="2" class='min-size-75'><span class="seal-display-middle-left w3-small">Gene</span></th>
+                            <th rowspan="2" class='min-size-200 w3-border-right'><span class="seal-display-middle-left w3-small">HGVS</span></th>
+                            <th rowspan="2" class="min-size-75 w3-border-right"><span class="seal-display-middle-left w3-small" style="left:10px;">Exon/intron</span></th>
                             <th colspan="{{ sample.caller|length }}" class="w3-border-right">Variant</th>
                             {% if family_members|length > 0 %}
                                 <th colspan="{{ family_members|length }}" class="w3-border-right">Family<br /><span class="w3-text-flat-pumpkin w3-tiny"><i class="fa-solid fa-triangle-exclamation"></i> Only max values</span></th>
                             {% endif %}
-                            <th colspan="2" class="w3-border-right">Population Frequency</th>
-                            <th colspan="2" class="w3-border-right">Clinical Informations</th>
-                            <th colspan="2" class="w3-border-right">Localisation</th>
-                            <th colspan="3" class="w3-border-right">Predictions</th>
-                            <th  rowspan="2" class='min-size-2x5'><span class="seal-display-middle">R</span></th>
+                            <th rowspan="2" class="w3-border-right min-size-100"><span class="seal-display-middle-left w3-small">Population Frequency</span></th>
+                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
+                            <th rowspan="2" class="w3-border-right w3-small"><span class="seal-display-middle-left">Consequences</span></th>
+                            <th colspan="2" class="w3-border-right">Predictions</th>
+                            <!-- <th  rowspan="2" class='min-size-2x5'><span class="seal-display-middle">R</span></th> -->
                             <th  rowspan="2" class='min-size-75'><span class="seal-display-middle">Class</span></th>
-                            <th  rowspan="2" class='size-50'></th>
+                            <th  rowspan="2" class=''></th>
                         </tr>
                         <tr>
-                            <th class='min-size-75'>HGVSg</th>
-                            <th class='min-size-75'>HGVSc</th>
-                            <th class='min-size-75'>HGVSp</th>
-                            <th class='min-size-50'>E|I</th>
+                            <!-- <th class='min-size-75'>HGVSg</th> -->
+                            <!-- <th class='min-size-200'>HGVS</th> -->
+                            <!-- <th class='min-size-75'>HGVSp</th> -->
+                            <!-- <th class='min-size-50'>E|I</th> -->
                             <!-- <th class='min-size-75'>Filter</th> -->
                             {% for c in sample.caller %}
                                 <th class='min-size-75'>{{ c }}</th>
                             {% endfor %}
                             {% for s in family_members %}
-                                <th class='min-size-100'>{{ s }}</th>
+                                <th class='min-size-75'>{{ s }}</th>
                             {% endfor %}
-                            <th class='min-size-75'>GnomAD</th>
-                            <th class='min-size-75'>SEAL</th>
-                            <th class='min-size-100'>ClinVar</th>
-                            <th class='min-size-75'>Transmission</th>
-                            <th class='min-size-75'>Impact</th>
-                            <th class='min-size-75'>Consequence</th>
-                            <th class='min-size-50'>MaxEnt</th>
-                            <th class='min-size-50'>SpliceAI</th>
-                            <th class='min-size-100'>Missense</th>
+                            <!-- <th class='min-size-100'>GnomAD</th> -->
+                            <!-- <th class='min-size-75'>SEAL</th> -->
+                            <!-- <th class='min-size-100'>ClinVar</th>
+                            <th class='min-size-75'>Transmission</th> -->
+                            <!-- <th class='min-size-150'>Impact</th>
+                            <th class='min-size-75'>Consequence</th> -->
+                            <!-- <th class='min-size-50'>MaxEnt</th> -->
+                            <th class='min-size-50'>MaxEnt/SpliceAI</th>
+                            <th class='min-size-50'>Missense</th>
                         </tr>
                     </thead>
                     <tfoot>
@@ -85,25 +86,25 @@
                                 </span>
                                 Gene
                             </th>
-                            <th></th>
-                            <th>
+                            <!-- <th></th> -->
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 HGVSg
-                            </th>
-                            <th>
-                                <span title="Help" onclick="openHelp(title='HGVSc', content='The HGVS coding sequence name.<br /><br />Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>, <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                            </th> -->
+                            <th class="">
+                                <span title="Help" onclick="openHelp(title='HGVS', content='The HGVS coding sequence name.<br /><br />Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>, <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 HGVSc
                             </th>
-                            <th>
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 HGVSp
-                            </th>
+                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='Exon/Intron', content='The number of the exon or intron wich have the variant.<br/><b>Exons are in bold</b>, <i>introns in italics.</i>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
@@ -138,42 +139,42 @@
                             </span>
                                 GnomAD
                             </th>
-                            <th>
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='SEAL', content='The number of occurences for this variant among all database.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 SEAL
-                            </th>
+                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='ClinVar', content='ClinVar clinical significance of the variant.<br /><ul><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i> : practice guideline</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : reviewed by expert panel</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, multiple submitters, no conflicts</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, conflicting interpretations or single submitter</li><li><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : no assertion </li></ul><br /><ul><li><span class=\'w3-tag w3-flat-turquoise\'>Benign\Likely Benign</span></li><li><span class=\'w3-tag w3-flat-peter-river\'>Conflicting (VUS/Benign)</span></li><li><span class=\'w3-tag w3-flat-sun-flower\'>Uncertain</span></li><li><span class=\'w3-tag w3-flat-carrot\'>Conflicting (with Pathogenic)</span></li><li><span class=\'w3-tag w3-flat-alizarin\'>Pathogenic/Likely pathogenic</span></li><li><span class=\'w3-tag w3-flat-silver\'>Other</span></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 ClinVar
                             </th>
-                            <th>
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='Transmission', content='This column represent the transmission mode following OMIM data.<br /><ul><li><b>AD</b>: Autosomal dominant</li><li><b>AR</b>: Autosomal recessive</li><li><b>DD</b>: Digenic dominant</li><li><b>DR</b>: Digenic recessive</li><li><b>IC</b>: Isolated cases</li><li><b>Mito</b>: Mitochondrial</li><li><b>MF</b>: Multifactorial</li><li><b>PAD</b>: Pseudoautosomal dominant</li><li><b>PAR</b>: Pseudoautosomal recessive</li><li><b>SMos</b>: Somatic mosaicism</li><li><b>SMut</b>: Somatic mutation</li><li><b>XL</b>: X-linked</li><li><b>XLD</b>: X-linked dominant</li><li><b>XLR</b>: X-linked recessive</li><li><b>YL</b>: Y-linked</li></ul><br /><i class=\'fas fa-question-circle w3-tiny\'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional', footer='For more information see : <a  href=\'https://www.omim.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>OMIM</i></a>' )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                 <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 Transmission
-                            </th>
+                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 Impact
                             </th>
-                            <th>
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 Consequence
-                            </th>
-                            <th>
+                            </th> -->
+                            <!-- <th>
                                 <span title="Help" onclick="openHelp(title='MaxEntScan', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li class=\'w3-text-flat-pomegranate\'>|percent variation| &ge; 15\%</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 MaxEnt
-                            </th>
+                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='SpliceAI DeltaScore', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li class=\'w3-text-flat-sun-flower\'>0.2 (high recall)</li><li class=\'w3-text-flat-orange\'>0.5 (recommended)</li><li class=\'w3-text-flat-pomegranate\'>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
@@ -186,9 +187,9 @@
                                 </span>
                                 Missense
                             </th>
-                            <th>
+                            <!-- <th>
                                 R
-                            </th>
+                            </th> -->
                             <th style="padding:10px 10px 6px 10px!important">
                                 <span title="Help" onclick="openHelp(title='Class', content='You can choose the classification:<ul><li class=\'w3-text-flat-green-sea\'>Benign</li><li class=\'w3-text-flat-nephritis\'>Likely Benign</li><li class=\'w3-text-flat-belize-hole\'>VUS</li><li class=\'w3-text-flat-pumpkin\'>Likely Pathogenic</li><li class=\'w3-text-flat-pomegranate\'>Pathogenic</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4544753/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ACMG guidelines</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
@@ -437,888 +438,1280 @@
         var current_user_transcripts = "{{ current_user.transcripts | safe }}";
         var sample_status = "{{ sample.status }}";
         var disabled_class = "{% if sample.status == 4 %}w3-disabled {% endif %}";
-        var clinvar_stars = {
+        const clinvar_stars = {
             'no_assertion_criteria_provided' : 0,
             'no_assertion_provided' : 0,
             'no_interpretation_for_the_single_variant' : 0,
             'criteria_provided_single_submitter' : 1,
+            'criteria_provided_conflicting_classifications' : 1,
             'criteria_provided_conflicting_interpretations' : 1,
             'criteria_provided_multiple_submitters_no_conflicts' : 2,
             'reviewed_by_expert_panel' : 3,
             'practice_guideline' : 4
         };
+        var MISSENSES = [
+            "CADD_raw_rankscore_hg19",
+            "VEST4_rankscore",
+            "MetaSVM_rankscore",
+            "MetaLR_rankscore",
+            "Eigen-raw_coding_rankscore",
+            "Eigen-PC-raw_coding_rankscore",
+            "REVEL_rankscore",
+            "BayesDel_addAF_rankscore",
+            "BayesDel_noAF_rankscore",
+            "ClinPred_rankscore"
+        ];
+        // Utility functions
+        const formatNA = (value, defaultValue = "NA") => value == null ? defaultValue : value;
+        const formatNAHtml = (value, tag = "i") => value == null ? `<${tag}>NA</${tag}>` : value;
 
+        const getAllelicFrequencyInfo = (data, callerKey) => {
+            if (!(callerKey in data.caller)) return null;
+
+            const callerData = data.caller[callerKey];
+            let final = "";
+
+            if (callerData.allelic_frequency >= 0 && callerData.allelic_frequency < 0.25) {
+                final += "[MOS]\n";
+            } else if (callerData.allelic_frequency < 0.75) {
+                final += "[HTZ]\n";
+            } else if (callerData.allelic_frequency <= 1) {
+                final += "[HOM]\n";
+            }
+
+            final += JSON.stringify(callerData.filter) + "\n";
+
+            if (callerData.allelic_frequency) {
+                final += `Allelic frequency: ${(callerData.allelic_frequency * 100).toFixed(2)}% \n`;
+            }
+
+            if (callerData.allelic_depth && callerData.depth) {
+                final += `Depth (var/total): ${callerData.allelic_depth}/${callerData.depth}\n`;
+            }
+
+            return final;
+        };
+
+        const createColumn = (config) => {
+            const {
+                id,
+                className = '',
+                data,
+                defaultContent,
+                title,
+                exportTitle,
+                renderConfig = {},
+                myTitleFn,
+                searchBuilderTitle,
+                exportTitleDefGen,
+                searchBuilder,
+                type,
+                sType,
+                orderable = true,
+                visible = true
+            } = config;
+
+            const column = {
+                id,
+                className: `showTitle w3-tiny ${className}`.trim(),
+                data,
+                orderable,
+                visible
+            };
+
+            if (exportTitle) { column.exportTitle = exportTitle } 
+                else if (searchBuilderTitle) { column.exportTitle = searchBuilderTitle } 
+                else if (exportTitleDefGen) { column.exportTitle = exportTitleDefGen } 
+                else { column.exportTitle = id };
+            if (exportTitleDefGen) column.exportTitleDefGen = exportTitleDefGen;
+            if (defaultContent) column.defaultContent = defaultContent;
+            if (myTitleFn) column.mytitle = myTitleFn;
+            if (searchBuilderTitle) column.searchBuilderTitle = searchBuilderTitle;
+            if (type) column.type = type;
+            if (searchBuilder) column.searchBuilder = searchBuilder;
+            if (sType) column.sType = sType;
+
+            // Set up render functions
+            column.render = {
+                _: renderConfig.default || ((d) => d),
+                ...(renderConfig.display && { display: renderConfig.display }),
+                ...(renderConfig.sort && { sort: renderConfig.sort }),
+                ...(renderConfig.filter && { filter: renderConfig.filter })
+            };
+
+            return column;
+        };
         var dt_table = [
-            {
-                className: 'showitle ',
-                data: "annotations.SYMBOL",
-                mytitle: function ( data ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                },
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return -1;
-                        }
-                        return data;
-                    },
-                }
-            },
-            {
-                className: 'w3-border-right no-padding',
-                data: null,
-                orderable: false,
-                render: {
-                    _: function ( data, type, row ) {
-                        mobidetails="";
-                        if (current_user_api_key_md !== "None") {
-                            mobidetails = '<span onclick="openMD(\'' + data["annotations"]["HGVSc"] + '\')" class="fa-fw w3-text-flat-peter-river w3-hover-text-flat-carrot" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">MD</span></span> MobiDetails</span> <br />'
-                        }
-                        franklin = '<a target="_blank" href="https://franklin.genoox.com/clinical-db/variant/snp/' + data["id"] + '-hg38" class="fa-layers fa-fw w3-text-flat-midnight-blue w3-hover-text-flat-wet-asphalt" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">F</span></span> Franklin</a> ';
-                        return "<div class='w3-tiny'>" + mobidetails + franklin + "</div>";
-                    }
-                }
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.HGVSg",
-                mytitle: function ( data ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
-                },
-                render : {
-                    _: function ( data, type, row, meta ) {
-                        return data;
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            var regExp = /(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/;
-                            var matches = regExp.exec(data);
-                            var zero = "000000000"
-                            var chr;
-                            if (Number.isInteger(parseInt(matches[2]))) {
-                                chr = (zero + matches[2]).slice(-2);
-                            } else {
-                                regExp2 = /^[Mm](t)?$/;
-                                if(regExp2.test(matches[2])) {
-                                    chr = 25;
-                                }
-                                regExp2 = /^[Yy]$/;
-                                if(regExp2.test(matches[2])) {
-                                    chr = 24;
-                                }
-                                regExp2 = /^[Xx]$/;
-                                if(regExp2.test(matches[2])) {
-                                    chr = 23;
-                                }else {
-                                    chr = (matches[2])
-                                }
-                            }
-                            return chr + "_" + (zero + matches[3]).slice(-9) + "_" + matches[6];
-                        } else {
-                            num = -1
-                            return num.toFixed(6);
-                        }
-                    },
-                },
-            },
-            {
-                className: 'showTitle ',
+            // SYMBOL Column
+            createColumn({
+                id: "visible-SYMBOL",
+                title: "GENE",
                 data: "annotations",
-                mytitle: function ( data ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        response = "";
-                        if (data["canonical"]) {
-                            response = ' (canonical)';
-                        } 
-                        if (data["preferred"]) {
-                            response += " (selected)";
-                        }
-                        return data["HGVSc"] + response;
-                },
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data["HGVSc"] == null) {
-                            return "NA";
-                        }
-                        return data["HGVSc"];
-                    },
-                    display: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        color = "";
-                        if (data["preferred"]) {
-                            color = "w3-text-flat-peter-river";
-                        }
-                        if (data["canonical"]) {
-                            response = '<i class="' + color + ' fas fa-star w3-tiny"></i> ';
-                        } else {
-                            response = '<i class="' + color + ' far fa-star w3-tiny"></i> ';
-                        }
-                        return response + data["HGVSc"];
-                    },
-                    sort: function ( data, type, row ) {
-                        if (data["HGVSc"] == null) {
-                            return -1;
-                        }
-                        return data["HGVSc"];
+                myTitleFn: (data) => formatNA(data.SYMBOL),
+                renderConfig: {
+                    display: (data) => {
+                        return data.SYMBOL == null
+                        ? "<i>NA</i>"
+                        : `<div class="w3-middle w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
+                                <p style="width: 75px;margin:0;word-break: break-word;white-space: normal;"><b>${data.SYMBOL}</b></p>
+                            </div>`
                     }
                 }
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.HGVSp",
-                mytitle: function ( data, type, row ) {
-                    if (data == null) {
+            }),
+            // Nomenclature Column
+            createColumn({
+                id: "visible-Nomenclature",
+                data: "annotations",
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    if (data == null) return "<i>NA</i>";
+
+                    let response = data.preferred ? " (selected)" : "";
+                    response += data.canonical ? " (canonical)" : "";
+
+                    const HGVSg = formatNA(data.HGVSg, "NA");
+                    const HGVSc = formatNA(data.HGVSc, "NA");
+                    const HGVSp = formatNA(data.HGVSp, "NA");
+
+                    return `${HGVSg}\n${HGVSc}${response}\n${HGVSp}`;
+                },
+                renderConfig: {
+                    display: (data) => {
+                        if (data == null) return "<i>NA</i>";
+                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                            <span class="fa-layers do-not-select">
+                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
+                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">MD</span>
+                            </span>
+                        </span></a><br />` : "";
+                        const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/hg38/${data.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                            <span class="fa-layers do-not-select">
+                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
+                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">GB</span>
+                            </span>
+                        </span></a><br />`;
+                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.HGVSg}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                            <span class="fa-layers do-not-select">
+                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
+                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">F</span>
+                            </span>
+                        </span></a>`;
+
+                        const color = data.preferred ? "w3-text-flat-peter-river" : "";
+                        const starIcon = data.canonical
+                            ? `<i class="${color} fas fa-star w3-tiny"></i>`
+                            : `<i class="${color} far fa-star w3-tiny"></i>`;
+
+                        return `
+                            <div class="w3-cell-row" style="margin-left:-10px;">
+                                <div class="w3-center w3-container w3-cell" style="vertical-align: middle;width:20px;padding: 0px !important;">
+                                    ${starIcon}
+                                </div>
+                                <div class="w3-container w3-cell" style="padding: 0px !important;">
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSg, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSc, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSp, "<i>NA</i>")}</p>
+                                </div>
+                                <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
+                                    ${mobidetails}${genebe}${franklin}
+                                </div>
+                            </div>
+                        `;
+                    },
+                    sort: (data) => {
+                        if (!data || !data.HGVSg) return -1;
+
+                        const matches = data.HGVSg.match(/(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/);
+                        if (!matches) return -1;
+
+                        const zero = "000000000";
+                        let chr = matches[2];
+
+                        if (Number.isInteger(parseInt(chr))) {
+                            chr = (zero + chr).slice(-2);
+                        } else {
+                            if (/^[Mm](t)?$/.test(chr)) chr = "25";
+                            else if (/^[Yy]$/.test(chr)) chr = "24";
+                            else if (/^[Xx]$/.test(chr)) chr = "23";
+                        }
+
+                        return `${chr}_${(zero + matches[3]).slice(-9)}_${matches[6] || ''}`;
+                    }
+                }
+            }),
+            // EI Column
+            createColumn({
+                id: "visible-EI",
+                data: "annotations",
+                className: 'w3-border-right w3-center',
+                myTitleFn: (data) => {
+                    if (data.EXON != null) return `Exon ${data.EXON}`;
+                    if (data.INTRON != null) return `Intron ${data.INTRON}`;
+                    return "NA";
+                },
+                renderConfig: {
+                    default: (data) => {
+                        if (data.EXON != null) return `Exon ${data.EXON}`;
+                        if (data.INTRON != null) return `Intron ${data.INTRON}`;
                         return "NA";
-                    }
-                    return data;
-                },
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data == null) {
-                            return "NA";
-                        }
-                        return data;
                     },
-                    display: function ( data, type, row ) {
-                        if (data == null) {
-                            return "<i>NA</i>";
-                        }
-                        return data;
+                    display: (data) => {
+                        if (data.EXON != null) return `<b>Exon ${data.EXON}</b>`;
+                        if (data.INTRON != null) return `<i>Intron ${data.INTRON}</i>`;
+                        return "<i>NA</i>";
                     },
-                    sort: function ( data, type, row ) {
-                        if (data == null) {
-                            return -1;
-                        }
-                        return data;
+                    sort: (data) => {
+                        const ei = data.EXON != null ? data.EXON : (data.INTRON != null ? data.INTRON : "NA");
+                        return ei.toString().split(/\//)[0];
                     }
                 }
-            },
-            {
-                className: 'w3-border-right ',
-                data: "annotations",
-                mytitle: function ( data, type, row ) {
-                    if (data["EXON"] == null) {
-                        if(data["INTRON"] == null) {
-                            return "NA";
-                        }
-                        return "Intron " + data["INTRON"];
-                    }
-                    return "Exon " + data["EXON"];
-                },
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "NA";
-                            }
-                            return "Intron " + data["INTRON"];
-                        }
-                        return "Exon " + data["EXON"];
-                    },
-                    display: function ( data, type, row ) {
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "<i>NA</i>";
-                            }
-                            return "<i>" + data["INTRON"] + "</i>";
-                        }
-                        return "<b>" + data["EXON"] + "</b>";
-                    },
-                    sort: function ( data, type, row ) {
-                        prefix = data
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "NA";
-                            }
-                            ei = data["INTRON"];
-                        } else {
-                            ei = data["EXON"];
-                        }
-                        pos_split = ei.split(/\//);
-                        return pos_split[0];
-                    },
-                }
-            },
+            }),
+            // Variant Caller Columns (generated from template)
             {% for c in sample.caller %}
-            {
-                className: 'w3-tiny showTitle w3-border-right',
-                data: {},
-                mytitle: function ( data, type, row ) {
-                    final = ""
-                    if( "{{ c }}" in data["caller"]) {
-                        if (data["caller"]["{{ c }}"]["allelic_frequency"] >=0 && data["caller"]["{{ c }}"]["allelic_frequency"] < 0.25) {
-                            final += "[MOS]\n";
-                        } else if (data["caller"]["{{ c }}"]["allelic_frequency"] < 0.75) {
-                            final += "[HTZ]\n";
-                        } else if (data["caller"]["{{ c }}"]["allelic_frequency"] <= 1)  {
-                            final += "[HOM]\n";
+            createColumn({
+                id: "variant_caller_{{ loop.index }}",
+                data: null,
+                className: "{% if loop.last %}w3-border-right{% endif %}",
+                myTitleFn: (data) => getAllelicFrequencyInfo(data, "{{ c }}"),
+                renderConfig: {
+                    default: (data) => {
+                        if (!("{{ c }}" in data.caller)) return "NA";
+                        return data.caller["{{ c }}"].allelic_frequency;
+                    },
+                    display: (data) => {
+                        if (!("{{ c }}" in data.caller)) return "<i>NA</i>";
+
+                        const callerData = data.caller["{{ c }}"];
+                        const af = callerData.allelic_frequency;
+                        const filterIcon = JSON.stringify(callerData.filter) === JSON.stringify(["PASS"])
+                            ? '<i class="fas fa-flag w3-text-flat-green-sea"></i>'
+                            : '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
+
+                        let icon;
+                        if (af >= 0 && af < 0.25) {
+                            icon = '<i class="far fa-dot-circle w3-tiny"></i>';
+                        } else if (af < 0.75) {
+                            icon = '<i class="fas fa-adjust w3-tiny"></i>';
+                        } else if (af <= 1) {
+                            icon = '<i class="fas fa-circle w3-tiny"></i>';
+                        } else {
+                            return `<i>${af}</i>`;
                         }
 
-                        final += JSON.stringify(data["caller"]["{{ c }}"]["filter"]) + "\n";
+                        return `${icon} ${(af * 100).toFixed(2)}% <br />${filterIcon} ${callerData.allelic_depth}/${callerData.depth}`;
+                    },
+                    sort: (data) => {
+                        if (!("{{ c }}" in data.caller)) return -1;
+                        return data.caller["{{ c }}"].allelic_frequency;
+                    }
+                }
+            }),
+            {% endfor %}
+            // Family Member Columns (generated from template)
+            {% for s in family_members %}
+            createColumn({
+                id: "family_{{ loop.index }}",
+                data: "family",
+                className: "{% if loop.last %}w3-border-right{% endif %}",
+                myTitleFn: (data) => {
+                    const family = data["{{ s }}"];
+                    if (!family) return null;
 
-                        if (data["caller"]["{{ c }}"]["allelic_frequency"]) {
-                            final += "Allelic frequencie: " + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% \n";
-                        }
-                        if (data["caller"]["{{ c }}"]["allelic_depth"] && data["caller"]["{{ c }}"]["depth"]) {
-                            final += "Depth (var/total): " + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"] + "\n";
+                    let af;
+                    if (isNaN(parseFloat(family.allelic_frequency))) {
+                        if (!isNaN(family.allelic_depth) && !isNaN(family.depth)) {
+                            af = family.allelic_depth / family.depth;
+                        } else {
+                            return null;
                         }
                     } else {
-                        return "NA"
+                        af = parseFloat(family.allelic_frequency);
                     }
+
+                    let final = "";
+                    if (af >= 0 && af < 0.25) final += "[MOS]\n";
+                    else if (af < 0.75) final += "[HTZ]\n";
+                    else if (af <= 1) final += "[HOM]\n";
+                    else return null;
+
+                    final += `${JSON.stringify(family.filter)}\n`;
+                    if (!isNaN(af)) final += `Allelic frequency: ${(af * 100).toFixed(2)}% \n`;
+                    if (family.allelic_depth && family.depth) final += `Depth (var/total): ${family.allelic_depth}/${family.depth}\n`;
 
                     return final;
                 },
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if( "{{ c }}" in data["caller"]) {
-                            return data["caller"]["{{ c }}"]["allelic_frequency"];
-                        } else {
-                            return "NA"
-                        }
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if( "{{ c }}" in data["caller"]) {
-                            filter = "";
-                            if (JSON.stringify(data["caller"]["{{ c }}"]["filter"]) === JSON.stringify(["PASS"])) {
-                                filter = '<i class="fas fa-flag w3-text-flat-green-sea"></i>';
-                            } else {
-                                filter = '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
+                renderConfig: {
+                    default: (data) => {
+                        const family = data["{{ s }}"];
+                        if (!family) return null;
+
+                        if (isNaN(parseFloat(family.allelic_frequency))) {
+                            if (!isNaN(family.allelic_depth) && !isNaN(family.depth)) {
+                                return family.allelic_depth / family.depth;
                             }
-                            if (data["caller"]["{{ c }}"]["allelic_frequency"] >=0 && data["caller"]["{{ c }}"]["allelic_frequency"] < 0.25) {
-                                return '<i class="far fa-dot-circle w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
-                                '' + filter + ' ' + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
-                            } else if (data["caller"]["{{ c }}"]["allelic_frequency"] < 0.75) {
-                                return '<i class="fas fa-adjust w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
-                                '' + filter + ' '  + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
-                            } else if (data["caller"]["{{ c }}"]["allelic_frequency"] <= 1)  {
-                                return '<i class="fas fa-circle w3-tiny"></i> ' + ((data["caller"]["{{ c }}"]["allelic_frequency"]*100).toFixed(2)) + "% <br />" +
-                                '' + filter + ' '  + data["caller"]["{{ c }}"]["allelic_depth"] + '/' + data["caller"]["{{ c }}"]["depth"];
-                            }
-                            return '<i>' + data["caller"]["{{ c }}"]["allelic_frequency"] + '</i>';
-                        } else {
-                            return "NA"
-                        }
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if( "{{ c }}" in data["caller"]) {
-                            return data["caller"]["{{ c }}"]["allelic_frequency"];
-                        } else {
-                            return -1
-                        }
-                    },
-                }
-            },
-            {% endfor %}
-            {% for s in family_members %}
-            {
-                className: 'w3-tiny showTitle{% if loop.last  %} w3-border-right{% endif %}',
-                data: "family.{{ s }}",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        return data["allelic_frequency"];
-                    },
-                    display: function ( data, type, row, meta ) {
-                        filter = "";
-                        if (JSON.stringify(data["filter"]) === JSON.stringify(["PASS"])) {
-                            filter = '<i class="fas fa-flag w3-text-flat-green-sea"></i>';
-                        } else {
-                            filter = '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
-                        }
-                        if (data["allelic_frequency"] >=0 && data["allelic_frequency"] < 0.25) {
-                            return '<br /><i class="far fa-dot-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + filter + ' ' + data["allelic_depth"] + '/' + data["depth"];
-                        } else if (data["allelic_frequency"] < 0.75) {
-                            return '<br /><i class="fas fa-adjust w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + filter + ' '  + data["allelic_depth"] + '/' + data["depth"];
-                        } else if (data["allelic_frequency"] <= 1)  {
-                            return '<br /><i class="fas fa-circle w3-tiny"></i> ' + Math.round(data["allelic_frequency"]*100) + "% <br />" +
-                            '' + filter + ' '  + data["allelic_depth"] + '/' + data["depth"];
-                        }
-                        return '<i>' + data["allelic_frequency"] + '</i>';
-                    },
-                }
-            },
-            {% endfor %}
-            {
-                className: '',
-                data: null,
-                render : {
-                    _: function ( data, type, row, meta ) {
-                        if(data["annotations"]["gnomADg_AF"] != null) {
-                            if (isNaN(parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6))) {
-                                return null
-                            }
-                            return parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6);
-                        } else {
                             return null;
                         }
+                        return parseFloat(family.allelic_frequency);
                     },
-                    display: function ( data, type, row, meta ) {
-                        if(data["annotations"]["gnomADg_AF"] != null) {
-                            if (isNaN(parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6))) {
-                                return "<i>NA</i>"
-                            }
-                            gnomad = parseFloat(data["annotations"]["gnomADg_AF"]);
-                            if (gnomad > 0.01) {
-                                response = parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(4)
+                    display: (data) => {
+                        const family = data["{{ s }}"];
+                        if (!family) return "<i>NA</i>";
+
+                        let af;
+                        if (isNaN(parseFloat(family.allelic_frequency))) {
+                            if (!isNaN(family.allelic_depth) && !isNaN(family.depth)) {
+                                af = family.allelic_depth / family.depth;
                             } else {
-                                response = parseFloat(data["annotations"]["gnomADg_AF"]).toExponential(2)
+                                return "<i>NA</i>";
                             }
-                            {% if genome_version == "grch37" %}
-                                gnomad_version = "r2_1"
-                                ext_exac = "?dataset=exac"
-                                ext_r2_1 = "?dataset=gnomad_r2_1"
-                                ext_r3 = "/gnomad_r2_1/gnomad_r3"
-                                ext_r4 = "/gnomad_r2_1/gnomad_r4"
-                                liftover_exac = ""
-                                liftover_r2_1 = ""
-                                liftover_r3 = "liftover/"
-                                liftover_r4 = "liftover/"
-                            {% else %}
-                                gnomad_version = "r4"
-                                ext_exac = "/gnomad_r4/exac"
-                                ext_r2_1 = "/gnomad_r4/gnomad_r2_1"
-                                ext_r3 = "?dataset=gnomad_r3"
-                                ext_r4 = "?dataset=gnomad_r4"
-                                liftover_exac = "liftover/"
-                                liftover_r2_1 = "liftover/"
-                                liftover_r3 = ""
-                                liftover_r4 = ""
-                            {% endif %}
-                            gnomad_r = '<a target="_blank" href="https://gnomad.broadinstitute.org/variant/' + data["id"] + '?dataset=gnomad_' + gnomad_version + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"></span> '+ response +'</a> ';
-                            gnomad1 = '<a title="ExAC" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_exac + data["id"] + ext_exac + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">E</span></span></a> ';
-                            gnomad2 = '<a title="GnomAD 2.1" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r2_1 + data["id"] + ext_r2_1 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">2</span></span></a> ';
-                            gnomad3 = '<a title="GnomAD 3" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r3 + data["id"] + ext_r3 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">3</span></span></a> ';
-                            gnomad4 = '<a title="GnomAD 4" target="_blank" href="https://gnomad.broadinstitute.org/variant/' + liftover_r4 + data["id"] + ext_r4 + '" class="fa-fw w3-text-indigo w3-hover-text-black" style="cursor: pointer;"><span class="fa-layers"><i class="fas fa-bookmark"></i> <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-10 up-2" style="font-weight:900">4</span></span></a> ';
-                            return '<i title="' + gnomad + '">' + gnomad_r + '</i> <small>(' + gnomad_version + ')</small><br />' + gnomad1 + gnomad2+ gnomad3+ gnomad4;
                         } else {
-                            return "<i>NA</i>";
+                            af = parseFloat(family.allelic_frequency);
                         }
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data["annotations"]["gnomADg_AF"] != null) {
-                            if (isNaN(parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6))) {
-                                return -0.5
-                            }
-                            return parseFloat(data["annotations"]["gnomADg_AF"]).toFixed(6);
-                        } else {
-                            return -1
+
+                        const filterIcon = JSON.stringify(family.filter) === JSON.stringify(["PASS"])
+                            ? '<i class="fas fa-flag w3-text-flat-green-sea"></i>'
+                            : '<i class="fas fa-flag w3-text-flat-pomegranate"></i>';
+
+                        let icon;
+                        if (af >= 0 && af < 0.25) icon = '<i class="far fa-dot-circle w3-tiny"></i>';
+                        else if (af < 0.75) icon = '<i class="fas fa-adjust w3-tiny"></i>';
+                        else if (af <= 1) icon = '<i class="fas fa-circle w3-tiny"></i>';
+
+                        return `${icon} ${Math.round(af * 100)}% <br />${filterIcon} ${family.allelic_depth}/${family.depth}`;
+                    }
+                }
+            }),
+            {% endfor %}
+            // gnomAD Column
+            createColumn({
+                id: "visible-gnomad",
+                data: null,
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    const gnomad = parseFloat(data.annotations?.gnomADg_AF);
+                    if (isNaN(gnomad)) return "NA";
+
+                    const pop = {
+                        "gnomADg_AF_AFR": "African/African-American",
+                        "gnomADg_AF_AMR": "Admixed American",
+                        "gnomADg_AF_ASJ": "Ashkenazi Jewish",
+                        "gnomADg_AF_EAS": "East Asian",
+                        "gnomADg_AF_FIN": "Finnish",
+                        "gnomADg_AF_NFE": "Non-Finnish European",
+                        "gnomADg_AF_OTH": "Remaining individuals"
+                    };
+
+                    let max = -1;
+                    let p = '';
+                    let popKey = '';
+
+                    for (const [key, label] of Object.entries(pop)) {
+                        const v = parseFloat(data.annotations?.[key]);
+                        if (!isNaN(v) && v > max) {
+                            max = v;
+                            popKey = key;
                         }
                     }
-                },
-            },
-            {
-                className: 'w3-border-right showTitle ',
-                data: "inseal",
-                render : {
-                    _: function ( data, type, row, meta ) {
-                        return (data["occurrences"] > 0) ? data["occurrences"] : "NA";
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        return (data["occurrences"] > 0) ? data["occurrences"] : 0;
+
+                    if (popKey) {
+                        const fixed = max > 0 ? Math.min(Math.max(-Math.floor(Math.log10(max * 100)), 2), 5) : 2;
+                        const v = (max * 100).toFixed(fixed);
+                        p = `\nMax: ${v}% - (${pop[popKey]})`;
                     }
+
+                    const fixed = max > 0 ? Math.min(Math.max(-Math.floor(Math.log10(max * 100)), 2), 5) : 2;
+                    return `${(gnomad * 100).toFixed(fixed)}%${p}`;
                 },
-            },
-            {
-                className: 'showTitle ',
-                data: "clinvar",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        stat = ''
-                        if (data.CLNREVSTAT) {
-                            stat = ' (' + clinvar_stars[data.CLNREVSTAT] + '/4)';
-                        }
-                        return data.CLNSIG + stat;
+                renderConfig: {
+                    default: (data) => {
+                        const gnomad = parseFloat(data.annotations?.gnomADg_AF);
+                        return isNaN(gnomad) ? null : gnomad;
                     },
-                    display: function ( data, type, row, meta ) {
-                        color = 'silver';
-                        colorHover = 'concrete';
-                        if (data.CLNSIG) {
-                            if (data.VARID) {
-                                href='https://www.ncbi.nlm.nih.gov/clinvar/variation/' + data.VARID
+                    display: (data) => {
+                        const gnomad = parseFloat(data.annotations?.gnomADg_AF);
+                        const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> SEAL: </span>${data.inseal?.occurrences || ''}</b>`;
+                        if (isNaN(gnomad)) return `<i>NA</i><br />${seal}`;
+
+                        const pop = {
+                            "gnomADg_AF_AFR": "AFR",
+                            "gnomADg_AF_AMR": "AMR",
+                            "gnomADg_AF_ASJ": "ASJ",
+                            "gnomADg_AF_EAS": "EAS",
+                            "gnomADg_AF_FIN": "FIN",
+                            "gnomADg_AF_NFE": "NFE",
+                            "gnomADg_AF_OTH": "OTH"
+                        };
+
+                        let max = -1;
+                        let pmax = '';
+                        for (const [key, label] of Object.entries(pop)) {
+                            const v = parseFloat(data.annotations?.[key]);
+                            if (!isNaN(v) && v > max) {
+                                max = v;
+                                pmax = `<br /><i><i class="fa-solid fa-angles-up w3-text-flat-nephritis"></i> ${label}: ${v > 0.01 ? v.toFixed(4) : v.toExponential(2)}</i>`;
                             }
-                            pattern = /benign/i;
-                            if (pattern.test(data.CLNSIG)) {
+                        }
+
+                        const response = gnomad > 0.01 ? gnomad.toFixed(4) : gnomad.toExponential(2);
+
+                        {% if genome_version == "grch37" %}
+                        const gnomad_version = "r2_1";
+                        const ext_exac = "?dataset=exac";
+                        const ext_r2_1 = "?dataset=gnomad_r2_1";
+                        const ext_r3 = "/gnomad_r2_1/gnomad_r3";
+                        const ext_r4 = "/gnomad_r2_1/gnomad_r4";
+                        const liftover_exac = "";
+                        const liftover_r2_1 = "";
+                        const liftover_r3 = "liftover/";
+                        const liftover_r4 = "liftover/";
+                        {% else %}
+                        const gnomad_version = "r4";
+                        const ext_exac = "/gnomad_r4/exac";
+                        const ext_r2_1 = "/gnomad_r4/gnomad_r2_1";
+                        const ext_r3 = "?dataset=gnomad_r3";
+                        const ext_r4 = "?dataset=gnomad_r4";
+                        const liftover_exac = "liftover/";
+                        const liftover_r2_1 = "liftover/";
+                        const liftover_r3 = "";
+                        const liftover_r4 = "";
+                        {% endif %}
+
+                        const gnomad_r = `<a target="_blank" href="https://gnomad.broadinstitute.org/variant/${data.id}?dataset=gnomad_${gnomad_version}" class="fa-fw w3-text-indigo w3-hover-text-black do-not-select" style="cursor: pointer;">${response}</a>`;
+
+                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}<br />${seal}`;
+                    },
+                    sort: (data) => {
+                        const gnomad = parseFloat(data.annotations?.gnomADg_AF);
+                        if (gnomad == null) return -1;
+                        if (isNaN(gnomad)) return -0.5;
+                        return gnomad;
+                    }
+                }
+            }),
+            // ClinVar Column
+            createColumn({
+                id: "visible-clinvar",
+                data: null,
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    const clinvar = data.clinvar || {};
+                    const phenotypes = data.phenotypes || {};
+                    const star = (clinvar.CLNREVSTAT == null) ? 0 : clinvar_stars[clinvar.CLNREVSTAT];
+                    if(clinvar.CLNREVSTAT == null){
+                    console.log(`${clinvar_stars[clinvar.CLNREVSTAT]}  - ${clinvar.CLNREVSTAT}`)
+                    }
+
+                    let stat = '';
+                    if (clinvar.CLNREVSTAT) {
+                        stat = ` (${star}/4)`;
+                    }
+
+                    const inheritancesArray = Object.entries(phenotypes).map(([_, pheno]) => {
+                        const inh = pheno.inheritances?.replace(/\[|\]|"|'|\s*/g, '')?.split(',') || [];
+                        let t = `${inh.join(',')} - ${pheno.phenotype}`;
+                        t = t.length > 50 ? `${t.substring(0, 47).trimEnd()}...` : t;
+                        return t;
+                    });
+
+                    return `${clinvar.CLNSIG || ''}${stat}\n${inheritancesArray.join("\n")}`;
+                },
+                renderConfig: {
+                    default: (data) => {
+                        const clinvar = data.clinvar || {};
+                        let stat = '';
+                        if (clinvar.CLNREVSTAT) {
+                            stat = ` (${clinvar_stars[clinvar.CLNREVSTAT]}/4)`;
+                        }
+                        return `${clinvar.CLNSIG || ''}${stat}`;
+                    },
+                    display: (data) => {
+                        const clinvar = data.clinvar || {};
+                        const phenotypes = data.phenotypes || {};
+                        const omims = data.omims || '';
+
+                        const inheritancesArray = Object.values(phenotypes)
+                            .flatMap(pheno => pheno.inheritances?.replace(/\[|\]|"|'|\s*/g, '')?.split(','))
+                            .filter(Boolean);
+
+                        const uniqueInheritances = [...new Set(inheritancesArray)];
+
+                        let clinvarHtml = "";
+                        let color = 'silver';
+                        let colorHover = 'concrete';
+
+                        if (clinvar.CLNSIG) {
+                            const href = clinvar.VARID ? `https://www.ncbi.nlm.nih.gov/clinvar/variation/${clinvar.VARID}` : '';
+
+                            if (/benign/i.test(clinvar.CLNSIG)) {
                                 color = "turquoise";
                                 colorHover = "green-sea";
-                            }
-                            pattern = /uncertain/i;
-                            if (pattern.test(data.CLNSIG)) {
+                            } else if (/uncertain/i.test(clinvar.CLNSIG)) {
                                 color = "sun-flower";
                                 colorHover = "orange";
-                            }
-                            pattern = /pathogenic/i;
-                            pattern2 = /establish/i;
-                            if (pattern.test(data.CLNSIG) || pattern2.test(data.CLNSIG)) {
-                                color = "alizarin";
-                                colorHover = "pomegranate";
-                            }
-                            pattern = /conflicting/i;
-                            if (pattern.test(data.CLNSIG)) {
+                            } else if (/conflicting/i.test(clinvar.CLNSIG)) {
                                 color = "peter-river";
                                 colorHover = "belize-hole";
-                                pattern2 = /pathogenic/i;
-                                pattern3 = /establish/i;
-                                if (pattern2.test(data.CLNSIGCONF) || pattern3.test(data.CLNSIG)) {
+                                if (/pathogenic|establish/i.test(clinvar.CLNSIGCONF)) {
+                                    console.log(clinvar.CLNREVSTAT)
                                     color = "carrot";
                                     colorHover = "pumpkin";
                                 }
+                            } else if (/pathogenic|establish/i.test(clinvar.CLNSIG)) {
+                                color = "alizarin";
+                                colorHover = "pomegranate";
+                            } 
+
+                            let title = clinvar.CLNSIGCONF || clinvar.CLNSIG;
+                            let n = 0;
+                            let s = "";
+                            let stat = '';
+
+                            if (clinvar.CLNREVSTAT) {
+                                n = clinvar_stars[clinvar.CLNREVSTAT];
+                                stat = ` (${n}/4)`;
+                                s = Array(4).fill(0).map((_, x) =>
+                                    x < n ? '<i class="fa-solid fa-star fa-2xs"></i>' : '<i class="fa-regular fa-star fa-2xs"></i>'
+                                ).join('');
                             }
-                            title = data.CLNSIG;
-                            if (data.CLNSIGCONF) {
-                                title = data.CLNSIGCONF;
-                            }
-                            n = 0
-                            if (data.CLNREVSTAT) {
-                                n  = clinvar_stars[data.CLNREVSTAT];
-                                s = ""
-                                for (const x of Array(4).keys()) {
-                                    if (x<n) {
-                                        s = s + '<i class="fa-solid fa-star fa-2xs"></i>';
-                                    } else {
-                                        s = s + '<i class="fa-regular fa-star fa-2xs"></i>';
-                                    }
-                                }
-                            }
-                            return "<a href='" + href + "' title='" + title + "' class='w3-tag w3-flat-" + color + " w3-hover-flat-" + colorHover + "' target='_blank' >" + s + " " +  data.CLNSIG + "</a>";
+
+                            const p = "<p class='do-not-select' style='width: 150px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;'>";
+                            clinvarHtml = `<a style='text-align: justify;' href='${href}' title='${title}${stat}' class='w3-tag w3-flat-${color} w3-hover-flat-${colorHover} do-not-select' target='_blank' >${p}${s} ${clinvar.CLNSIG}</p></a>`;
                         }
-                        return data.CLNSIG;
+
+                        return `${clinvarHtml}<br /><i><a class='w3-text-flat-peter-river w3-hover-flat-belize-hole do-not-select' target='_blank' href='https://www.omim.org/entry/${omims}' title='https://www.omim.org/entry/${omims}' style='padding: 0px 8px;display:inline-block'>${uniqueInheritances.sort().join(', ')}</a></i>`;
                     },
-                    sb: function ( data, type, row, meta ) {
-                        value = "2 - NA";
-                        if (data.CLNSIG) {
-                            pattern = /benign/i;
-                            if (pattern.test(data.CLNSIG)) {
-                                value = "0 - Benign/Likely Benign"
-                            }
-                            pattern = /uncertain/i;
-                            if (pattern.test(data.CLNSIG)) {
-                                value = "3 - Uncertain significance"
-                            }
-                            pattern = /pathogenic/i;
-                            pattern2 = /establish/i;
-                            if (pattern.test(data.CLNSIG) || pattern2.test(data.CLNSIG)) {
-                                value = "5 - Pathogenic/Likely Pathogenic"
-                            }
-                            pattern = /conflicting/i;
-                            if (pattern.test(data.CLNSIG)) {
-                                value = "1 - Conflicting (without Pathogenic)"
-                                pattern2 = /pathogenic/i;
-                                pattern3 = /establish/i;
-                                if (pattern2.test(data.CLNSIGCONF) || pattern3.test(data.CLNSIG)) {
-                                    value = "4 - Conflicting (with Pathogenic)"
-                                }
-                            }
-                        }
-                        return value;
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        value = 2;
-                        if (data.CLNSIG) {
-                            pattern = /benign/i;
-                            if (pattern.test(data.CLNSIG)) {
+                    sort: (data) => {
+                        const clinvar = data.clinvar || {};
+                        let value = 2;
+
+                        if (clinvar.CLNSIG) {
+                            if (/benign/i.test(clinvar.CLNSIG)) {
                                 value = 0;
-                                pattern2 = /likely/i;
-                                if (pattern2.test(data.CLNSIGCONF)) {
-                                    value += 0.2;
-                                }
-                            }
-                            pattern = /uncertain/i;
-                            if (pattern.test(data.CLNSIG)) {
+                                if (/likely/i.test(clinvar.CLNSIGCONF)) value += 0.2;
+                            } else if (/uncertain/i.test(clinvar.CLNSIG)) {
                                 value = 3;
-                            }
-                            pattern = /pathogenic/i;
-                            pattern2 = /establish/i;
-                            if (pattern.test(data.CLNSIG) || pattern2.test(data.CLNSIG)) {
-                                value = 5;
-                                pattern3 = /likely/i;
-                                if (pattern3.test(data.CLNSIGCONF)) {
-                                    value -= 0.2;
-                                }
-                            }
-                            pattern = /conflicting/i;
-                            if (pattern.test(data.CLNSIG)) {
+                            } else if (/conflicting/i.test(clinvar.CLNSIG)) {
                                 value = 1;
-                                pattern2 = /pathogenic/i;
-                                pattern3 = /establish/i;
-                                if (pattern2.test(data.CLNSIGCONF) || pattern3.test(data.CLNSIG)) {
+                                if (/pathogenic|establish/i.test(clinvar.CLNSIGCONF)) {
                                     value = 4;
                                 }
+                            } else if (/pathogenic|establish/i.test(clinvar.CLNSIG)) {
+                                value = 5;
+                                if (/likely/i.test(clinvar.CLNSIGCONF)) value -= 0.2;
+                            } 
+                        }
+                        return value;
+                    }
+                }
+            }),
+            // Impact & Consequences Column
+            createColumn({
+                id: "visible-impact_consequences",
+                data: "annotations",
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    if (!data) return null;
+                    const cons = (data.Consequence || []).join("\n");
+                    return `${data.IMPACT || ''}\n${cons}`;
+                },
+                renderConfig: {
+                    default: (data) => data?.IMPACT || null,
+                    display: (data) => {
+                        if (!data) return "<i>NA</i>";
+
+                        const impactColor = impact_dict[data.IMPACT]?.color || "7f8c8d";
+                        const response = `<i class="fa-solid fa-circle w3-text-flat-${impactColor}"></i>`;
+
+                        const cons = (data.Consequence || []).slice(0, 3).map((c, i) => {
+                            const color = consequences_dict[c]?.color || "7f8c8d";
+                            const style = `style='width: 130px;margin:0;padding: 1px 8px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;color:#${color};'`;
+                            return `<p ${style}><b>${c}</b></p>`;
+                        }).join('');
+
+                        return `
+                            <div class="w3-cell-row">
+                                <div class="w3-center w3-container w3-cell" style="vertical-align: middle;width:20px;padding: 0px !important;">
+                                    ${response}
+                                </div>
+                                <div class="w3-container w3-cell" style="padding: 0px !important;">
+                                    ${cons}${data.Consequence?.length > 3 ? "..." : ""}
+                                </div>
+                            </div>
+                        `;
+                    },
+                    filter: (data) => data?.IMPACT?.toString() || "",
+                    sort: (data) => impact_dict[data?.IMPACT]?.score || 0
+                },
+                sType: "numeric"
+            }),
+            // Predictions Column
+            createColumn({
+                id: "visible-predictions",
+                data: "annotations",
+                className: 'w3-border-right',
+                renderConfig: {
+                    default: (data) => {
+                        if (!data) return null;
+
+                        const alt = parseFloat(data.MaxEntScan_alt || 0).toFixed(2);
+                        const ref = parseFloat(data.MaxEntScan_ref || 0).toFixed(2);
+                        const mes_var = (((alt - ref) / Math.abs(ref))).toFixed(2);
+
+                        const spliceai = ["AG", "AL", "DG", "DL"]
+                            .map(type => parseFloat(data[`SpliceAI_pred_DS_${type}`] || 0))
+                            .filter(v => !isNaN(v));
+
+                        const smax = Math.max(...spliceai, 0);
+                        let s = 0;
+
+                        if(!isNaN(mes_var)) {
+                            if ((data.MaxEntScan_alt < 3) && (data.MaxEntScan_ref < 3)) {
+                                s += Math.abs(parseFloat(mes_var)) / 6;
+                            } else {
+                                s += Math.abs(parseFloat(mes_var)) / 2;
                             }
-                            return value;
+                        }                        
+                        if (!isNaN(smax)) s += parseFloat(smax);
+
+                        return s;
+                    },
+                    display: (data) => {
+                        if (!data) return "<i>NA</i>";
+
+                        const alt = parseFloat(data.MaxEntScan_alt || 0).toFixed(2);
+                        const ref = parseFloat(data.MaxEntScan_ref || 0).toFixed(2);
+                        const mes_var = (((alt - ref) / Math.abs(ref)) * 100).toFixed(2);
+
+                        let mes_pre = '';
+                        let mes_post = '';
+                        let mes_alt_pre = '';
+                        let mes_alt_post = '';
+
+                        if ((data.MaxEntScan_alt >= 3) || (data.MaxEntScan_ref >= 3)) {
+                            mes_pre = '<b>';
+                            if (Math.abs(mes_var) >= 15) {
+                                mes_pre += '<span class="w3-text-flat-carrot">';
+                                if (Math.abs(mes_var) >= 30) {
+                                    mes_pre = '<b><span class="w3-text-flat-pomegranate">';
+                                }
+                                mes_post = '</span>';
+                            }
+                            mes_alt_pre = mes_var > 0 ? '<span class="w3-text-flat-nephritis">' : '<span class="w3-text-flat-pomegranate">';
+                            mes_alt_post = '</span>';
+                            mes_post += '</b>';
+                        }
+
+                        const mes = isNaN(mes_var) ? "<i>NA</i>" : `${mes_pre}${mes_var}${mes_post} <i>(${ref}|${mes_alt_pre}${alt}${mes_alt_post})</i>`;
+
+                        // SpliceAI processing
+                        const spliceai_types = ["AG", "AL", "DG", "DL"];
+                        const spliceai = {};
+
+                        spliceai_types.forEach(i => {
+                            const v = parseFloat(data[`SpliceAI_pred_DS_${i}`]);
+                            if (isNaN(v)) return;
+
+                            if (!(v in spliceai)) spliceai[v] = [];
+                            spliceai[v].push(i);
+                        });
+
+                        const spliceai_scores = Object.keys(spliceai)
+                            .map(Number)
+                            .sort((a, b) => b - a);
+
+                        const spliceAI = spliceai_scores.length > 0
+                            ? spliceai_scores.map((i, index) => {
+                                let spliceai_pre = "";
+                                let spliceai_post = "</span>";
+
+                                if (i >= 0.2) spliceai_pre = '<span class="w3-text-flat-orange">';
+                                if (i >= 0.5) {
+                                    spliceai_pre = '<b><span class="w3-text-flat-pumpkin">';
+                                    spliceai_post = "</span></b>";
+                                }
+                                if (i >= 0.8) spliceai_pre = '<b><span class="w3-text-flat-pomegranate">';
+
+                                return `${index > 0 ? " | " : ""}${spliceai_pre}${i} ${spliceai[i].join(',')}${spliceai_post}`;
+                            }).join('')
+                            : "<i>NA</i>";
+
+                        return `${mes}<br />${spliceAI}`;
+                    }
+                }
+            }),
+            // Missense Column
+            createColumn({
+                id: "visible-missense",
+                data: "annotations",
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    if (data?.missensesMean == null) return null;
+
+                    const value = parseFloat(data.missensesMean);
+                    const array = MISSENSES
+                        .map(i => parseFloat(data[i]))
+                        .filter(x => !isNaN(x));
+
+                    const n = array.length;
+                    const stdev = n > 0 ? Math.sqrt(array.map(x => Math.pow(x - value, 2)).reduce((a, b) => a + b, 0) / n) : 0;
+                    const cv = stdev / value;
+
+                    return `${value.toFixed(4)}\nstdev: ${stdev.toFixed(2)}\ncv: ${cv.toFixed(2)}`;
+                },
+                renderConfig: {
+                    default: (data) => data?.missensesMean != null ? parseFloat(data.missensesMean).toFixed(4) : null,
+                    display: (data) => {
+                        if (data?.missensesMean == null) return "<i>NA</i>";
+
+                        const value = parseFloat(data.missensesMean);
+                        let classw3css = "";
+
+                        if (value >= 0.95) classw3css = "w3-tag w3-flat-pomegranate";
+                        else if (value >= 0.9) classw3css = "w3-text-flat-pomegranate";
+                        else if (value >= 0.75) classw3css = "w3-text-flat-orange";
+                        else if (value >= 0.5) classw3css = "w3-text-flat-sun-flower";
+
+                        const array = MISSENSES
+                            .map(i => parseFloat(data[i]))
+                            .filter(x => !isNaN(x));
+
+                        const n = array.length;
+                        const stdev = n > 0 ? Math.sqrt(array.map(x => Math.pow(x - value, 2)).reduce((a, b) => a + b, 0) / n) : 0;
+                        const cv = stdev / value;
+
+                        let stdev_resp, t;
+                        if (cv <= 0.15) {
+                            stdev_resp = `<b><span class="w3-text-flat-nephritis">${stdev.toFixed(2)}</span></b>`;
+                            t = '<b> <i class="w3-text-flat-nephritis fas fa-angles-up"></i></b>';
+                        } else if (cv <= 0.3) {
+                            stdev_resp = `<span class="w3-text-flat-belize-hole">${stdev.toFixed(2)}</span>`;
+                            t = ' <i class="w3-text-flat-belize-hole fas fa-angle-up"></i>';
+                        } else {
+                            stdev_resp = `<span class="w3-text-flat-wisteria">${stdev.toFixed(2)}</span>`;
+                            t = ' <i class="w3-text-flat-pomegranate fas fa-angles-down"></i>';
+                        }
+
+                        return `<b><span style='display:inline-table;' class='${classw3css}'>${value.toFixed(4)}</span></b><br /><i>stdev: ${stdev_resp}${t}`;
+                    },
+                    sort: (data) => data?.missensesMean != null ? parseFloat(data.missensesMean).toFixed(4) : -1
+                }
+            }),
+            // Class Column
+            createColumn({
+                id: "visible-class",
+                data: "class_variant",
+                className: `${disabled_class} no-padding seal-form-report showTitle w3-center w3-border-right`,
+                renderConfig: {
+                    default: (data) => data ? data : 0,
+                    display: (data, type, row) => {
+                        const id_var = row.id;
+                        const class_variant = data ? data : 0;
+
+                        const dropdown = Object.entries(class_variant_html).map(([c, label]) =>
+                            `<a onclick="toggle_class('${id_var}', ${sample_id}, ${c}, this)" class="do-not-select w3-bar-item w3-button" style="width:inherit">${label}</a>`
+                        ).join('');
+                        
+                        return `
+                            <div class="do-not-select w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
+                                <button class="do-not-select w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-${id_var}')" style="min-width:168px;" id="button-class-${id_var}">
+                                    ${class_variant_html[class_variant]}
+                                </button>
+                                <div class="do-not-select w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-${id_var}-content">
+                                    ${dropdown}
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+            }),
+            // Details Column
+            createColumn({
+                id: "visible-details",
+                data: null,
+                orderable: false,
+                className: 'w3-border-left details-control w3-center',
+                renderConfig: {
+                    default: (data) => data?.id || '',
+                    display: (data, type, row) => {
+                        const details = `<i onclick="openDetailsVariantModal('${data.id}', ${sample_id})" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>`;
+                        const hide = `<i onclick="hideRow('${data.id}', ${sample_id}, this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i>`;
+                        const check = row.reported ? 'checked="checked"' : "";
+                        const report = `<input id="${data.id}reported" type="checkbox" ${check} onclick="toggle_var2sample_status('${data.id}reported', '${data.id}', ${sample_id}, 'reported', this);">`;
+
+                        return `${details}<br />${hide}<br />${report}`;
+                    }
+                }
+            }),
+            // Hiden column for export and filtering
+            // SYMBOL Column
+            createColumn({
+                id: "export-genome",
+                data: null,
+                defaultContent: "{{ genome_version }}",
+                exportTitle:"Genome",
+                exportTitleDefGen:"GENOME_REFERENCE",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-chr",
+                data: "chr",
+                searchBuilderTitle:"Chromosome",
+                exportTitleDefGen:"CHROMOSOME",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-pos",
+                data: "pos",
+                searchBuilderTitle:"Position",
+                exportTitleDefGen:"POSITION_GENOMIQUE",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-ref",
+                data: "ref",
+                searchBuilderTitle:"Ref",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-alt",
+                data: "alt",
+                searchBuilderTitle:"Alt",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-SYMBOL",
+                data: "annotations.SYMBOL",
+                searchBuilderTitle:"Gene",
+                exportTitleDefGen:"GENE",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-HGVSg",
+                data: "annotations.HGVSg",
+                searchBuilderTitle:"HGVSg",
+                exportTitleDefGen:"NOMENCLATURE_HGVS",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        if (data != null) return data ;
+                        return "";
+                    },
+                },
+                type:"string"
+            }),
+            createColumn({
+                id: "export-filter-HGVSc",
+                data: "annotations.HGVSc",
+                searchBuilderTitle:"HGVSc",
+                exportTitleDefGen:"VARIANT",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        if (data != null) return data ;
+                        return "";
+                    },
+                },
+                type:"string"
+            }),
+            createColumn({
+                id: "export-filter-HGVSp",
+                data: "annotations.HGVSp",
+                searchBuilderTitle:"HGVSp",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        if (data != null) return data ;
+                        return "";
+                    },
+                },
+                type:"string"
+            }),
+            createColumn({
+                id: "exportDefGen-HGVSg-short",
+                data: "annotations.HGVSg",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => {
+                        hgvs_split = String(data).split(":");
+                        if (hgvs_split.length > 1) {
+                            return hgvs_split[1];
+                        }
+                        return ""
+                    },
+                }
+            }),
+            createColumn({
+                id: "exportDefGen-HGVSc-short",
+                data: "annotations.HGVSc",
+                exportTitleDefGen:"VARIANT_C",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => {
+                        hgvs_split = String(data).split(":");
+                        if (hgvs_split.length > 1) {
+                            return hgvs_split[1];
+                        }
+                        return ""
+                    },
+                }
+            }),
+            createColumn({
+                id: "exportDefGen-HGVSp-short",
+                data: "annotations.HGVSp",
+                exportTitleDefGen:"VARIANT_P",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => {
+                        hgvs_split = String(data).split(":");
+                        if (hgvs_split.length > 1) {
+                            return hgvs_split[1];
+                        }
+                        return ""
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-Nearest",
+                data: "annotations.NEAREST",
+                searchBuilderTitle:"Nearest Transcript",
+                exportTitleDefGen:"ENST",
+                visible: false,
+                type:"string"
+            }),
+            createColumn({
+                id: "export-filter-Transcript",
+                data: "annotations.HGVSc",
+                searchBuilderTitle:"Transcript",
+                exportTitleDefGen:"NM",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => {
+                        hgvs_split = String(data).split(":");
+                        if (hgvs_split.length > 1) {
+                            return hgvs_split[0];
+                        }
+                        return ""
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-COSMIC",
+                data: "annotations.Existing_variation",
+                searchBuilderTitle:"COSMIC",
+                exportTitleDefGen:"COSMIC",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => {
+                        const vars = []
+                        if (data.length > 0) {
+                            for (id_var of data) {
+                                if (RegExp("^COS[MV][0-9]+").test(id_var)) {
+                                    vars.push(id_var);
+                                }
+                            }
+                        }
+                        return vars.toString();
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-RS",
+                data: "annotations.Existing_variation",
+                searchBuilderTitle:"RS",
+                exportTitleDefGen:"RS",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => {
+                        const vars = []
+                        if (data.length > 0) {
+                            for (id_var of data) {
+                                if (RegExp("^rs[0-9]+").test(id_var)) {
+                                    vars.push(id_var);
+                                }
+                            }
+                        }
+                        return vars.toString();
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-EI",
+                data: "annotations",
+                searchBuilderTitle:"Exon/Intron",
+                exportTitleDefGen:"LOCALISATION",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        if (data.EXON != null) return `Exon ${data.EXON.split("/")[0]}`;
+                        if (data.INTRON != null) return `Intron ${data.INTRON.split("/")[0]}`;
+                        return "NA";
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-GnomAD",
+                data: "annotations.gnomADg_AF",
+                searchBuilderTitle:"GnomADg_AF",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        const gnomad = parseFloat(data);
+                        if (isNaN(gnomad) || gnomad == 0) return null;
+                        return gnomad;
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-seal",
+                data: "inseal.occurrences",
+                searchBuilderTitle:"SEAL",
+                visible: false
+            }),
+            createColumn({
+                id: "export-filter-clinvar_revstat",
+                data: "clinvar.CLNSIG",
+                searchBuilderTitle:"ClinVar",
+                visible: false,
+                type: "clinvar",
+                renderConfig: {
+                    default: (data) => {
+                        const clinvar = data || {};
+                        let value = "2 - NA";
+
+                        if (clinvar) {
+                            if (/benign/i.test(clinvar)) value = "0 - Benign/Likely Benign";
+                            else if (/uncertain/i.test(clinvar)) value = "3 - Uncertain significance";
+                            else if (/pathogenic|establish/i.test(clinvar)) value = "5 - Pathogenic/Likely Pathogenic";
+                            else if (/conflicting/i.test(clinvar)) {
+                                value = "1 - Conflicting (without Pathogenic)";
+                                if (/pathogenic|establish/i.test(clinvar)) {
+                                    value = "4 - Conflicting (with Pathogenic)";
+                                }
+                            }
                         }
                         return value;
                     },
-                },
-                searchBuilder: {
-                    orthogonal:'sb'
-                },
-            },
-            {
-                className: ' w3-border-right ',
+                }
+            }),
+            createColumn({
+                id: "export-filter-clinvar_revstat",
+                data: "clinvar.CLNREVSTAT",
+                searchBuilderTitle:"ClinVar Review Stat",
+                visible: false,
+                type: "CLNREVSTAT"
+            }),
+            createColumn({
+                id: "export-filter-OMIM-inheritances",
                 data: "phenotypes",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        inheritances = ""
+                searchBuilderTitle:"OMIM inheritances",
+                visible: false,
+                type: "inheritances",
+                renderConfig: {
+                    default: (data) => {
+                        inheritances_array = []
                         for (d in data) {
-                            title=data[d]["phenotype"];
-                            inheritances = inheritances + data[d]["inheritances"] + ' (' + title + ') | ';
+                            inh = data[d]["inheritances"].replace(/\[|\]|"|'|\s*/g,'').split(',')
+                            inheritances_array = [...new Set([...inheritances_array, ...inh])];
                         }
-                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
+                        return inheritances_array;
                     },
-                    display: function ( data, type, row, meta ) {
-                        inheritances = ""
-                        for (d in data) {
-                            if (data[d]["inheritance"] != "[]") {
-                                link = "https://www.omim.org/entry/" + data[d]["phenotypeMimNumber"];
-                                title=data[d]["phenotype"];
-                                inheritances = inheritances + '<a class="w3-text-flat-peter-river  w3-hover-flat-belize-hole" href="'+link+'" target="_blank" title="' + title + '">' + data[d]["inheritances"] + '</a> | ';
-                            }
-                        }
-                        return inheritances.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    }
-                },
-            },
-            {
-                className: 'showTitle ',
+                }
+            }),
+            createColumn({
+                id: "export-filter-impact",
                 data: "annotations.IMPACT",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        return data;
-                    },
-                    display: function ( data, type, row, meta ) {
-                        style = "style='display:inline-table;max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'";
-                        cell = "<span class='w3-tag w3-flat-" + impact_dict[data]["color"] + "' " + style + ">" + data + "</span>";
-                        return cell;
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        return data.toString();
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        return impact_dict[data]["score"];
-                    },
-                },
-                sType: "numeric"
-            },
-            {
-                className: 'showTitle w3-border-right ',
+                searchBuilderTitle:"Impact",
+                visible: false,
+                type: "impact"
+            }),
+            createColumn({
+                id: "export-filter-consequences",
                 data: "annotations.Consequence",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in consequences_dict) {
-                            if (data.includes(idx)){
-                                cell += idx + " | "
-                            }
-                        }
-                        return cell.replace( /^\s*\|*|\s*\|*\s*$/g, '' );
-                    },
-                    display: function ( data, type, row, meta ) {
-                        cell = "";
-                        for (idx in consequences_dict) {
-                            if (data.includes(idx)){
-                                color = idx in consequences_dict ? consequences_dict[idx]["color"] : "7f8c8d";
-                                style = "style='display:inline-table;max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:#" + color + ";'";
-                                cell += " <span class='w3-tag' " + style + ">" + idx + "</span>"
-                            }
-                        }
-                        return cell;
-                    },
-                    filter: function ( data, type, row, meta ) {
-                        return data.toString();
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        var sort = 0;
-                        for (idx in data) {
-                            sort += consequences_dict[data[idx]]["score"];
-                        }
-                        return Math.log10(sort);
-                    }
-                },
-                sType: "numeric"
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.MES_var",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return null;
-                        }
-                        return Math.abs(parseFloat(data).toFixed(3));
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return "<i>NA</i>";
-                        }
-                        value = parseFloat(data).toFixed(2)
-                        classw3css = "";
-                        if (Math.abs(value) >= 15) {
-                            classw3css = "w3-text-flat-pomegranate";
-                        }
-                        return "<span class='" + classw3css + "'>" + value + "</span>";
-                    },
-                },
-            },
-            {
-                className: 'showTitle ',
-                data: "annotations.spliceAI",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return null;
-                        }
-                        return parseFloat(data).toFixed(3);
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return "<i>NA</i>";
-                        }
-                        value = parseFloat(data).toFixed(2)
-                        classw3css = "";
-                        if (value >= 0.8) {
-                            classw3css = "w3-text-flat-pomegranate";
-                        } else if (value >= 0.5) {
-                            classw3css = "w3-text-flat-orange";
-                        } else if (value >= 0.2) {
-                            classw3css = "w3-text-flat-sun-flower";
-                        }
-                        return "<span class='" + classw3css + "'>" + value + "</span>";
-                    },
-                },
-            },
-            {
-                className: 'showTitle w3-border-right ',
-                data: "annotations.missensesMean",
-                render: {
-                    _: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            return data.toFixed(4);
-                        } else {
-                            return null;
-                        }
-                    },
-                    display: function ( data, type, row, meta ) {
-                        if (data == null){
-                            return "<i>NA</i>";
-                        }
-                        value = parseFloat(data).toFixed(3)
-                        classw3css = "";
-                        if (value >= 0.95) {
-                            classw3css = "w3-tag w3-flat-pomegranate";
-                        } else if (value >= 0.9) {
-                            classw3css = "w3-text-flat-pomegranate";
-                        } else if (value >= 0.75) {
-                            classw3css = "w3-text-flat-orange";
-                        } else if (value >= 0.5) {
-                            classw3css = "w3-text-flat-sun-flower";
-                        }
-                        return "<span style='display:inline-table;' class='" + classw3css + "'>" + value + "</span>";
-                    },
-                    sort: function ( data, type, row, meta ) {
-                        if(data != null) {
-                            return data.toFixed(4);
-                        } else {
-                            num = -1
-                            return num.toFixed(4);
-                        }
-                    }
-                },
-            },
-            {
-                className: disabled_class + "seal-form-report showTitle  w3-center w3-border-right ",
-                data: {
-                    "data": "reported",
-                },
-                render: function ( data, type, row, meta ) {
-                    if(type === 'display') {
-                        const id_var=data["id"];
-                        const id=data["id"] + "reported";
-                        var check="";
-                        if (data["reported"]) {
-                            check='checked="checked"';
-                        }
-                        return '<input id="'+ id +'" type="checkbox" ' + check + ' onclick="toggle_var2sample_status(\''+ id +'\', \'' + id_var + '\',' + sample_id + ', \'reported\', this);">';
-                    }
-                    return data["reported"] ? "Reported" : "Not Reported";
-                },
-                searchBuilder: {
-                    orthogonal: {
-                        display: 'filter'
-                    }
-                }
-            },
-            {
-                className: disabled_class + "no-padding seal-form-report showTitle  w3-center w3-border-right ",
-                data: {
-                    "data": "class_variant"
-                },
-                render:
-                    function ( data, type, row ) {
-                        if(type === 'display') {
-                            id_var = data.id
-                            class_variant = data.class_variant ? data.class_variant : 0;
-                            dropdown = ""
-                            for (c in class_variant_html) {
-                                dropdown += '<a onclick="toggle_class(\'' + id_var + '\', ' + sample_id + ', ' + c +', this)" class="w3-bar-item w3-button" style="width:inherit">'+
-                                        class_variant_html[c]+
-                                    '</a>'
-                            }
-                            response = `<div class="w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
-                                <button class="w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-` + id_var + `')" style="min-width:168px;" id="button-class-` + id_var + `">
-                                    ` + class_variant_html[class_variant] + `
-                                </button>
-                                <div class="w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-` + id_var + `-content">
-                                    `+ dropdown +`
-                                </div>
-                            </div>`
-                            return response;
-                        }
-                        if(type === 'export') {
-                            return class_variant_export[data.class_variant ? data.class_variant : 0];
-                        }
-                        return class_variant_html[data.class_variant ? data.class_variant : 0];
-                    },
-                searchBuilder: {
-                    orthogonal: {
-                        display: 'filter'
-                    }
-                }
-            },
-            {
-                className: 'w3-border-left details-control w3-center',
-                orderable: false,
-                data: "id",
-                render: {
-                    _: function ( data, type, row ) {
-                        return data;
-                    },
-                    display: function ( data, type, row ) {
-                        details = '<i onclick="openDetailsVariantModal(\'' + data + '\', ' + sample_id + ')" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>';
-                        hide = '<i onclick="hideRow(\'' + data + '\', ' + sample_id + ', this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i> ';
-                        return details + " " + hide;
-                    },
-                },
-            },
-            // Hiden column for DEFGEN file generation
-            {
-                data: "annotations.HGVSp",
-                render: {
-                    _:function ( data, type, row ) {
-                        psplit = String(data).split(":");
-                        if (psplit.length > 1) {
-                            return psplit[1].replace("p.", "p.(") + ")";
-                        }
-                        return ""
-                    },
-                },
-                searchable: false , visible: false
-            },
-            {
-                data: "annotations.HGVSc",
-                render: {
-                    _:function ( data, type, row ) {
-                        psplit = String(data).split(":");
-                        if (psplit.length > 1) {
-                            return psplit[1];
-                        }
-                        return ""
-                    },
-                },
-                searchable: false , visible: false
-            },
-            {
-                data: "annotations.NEAREST",
-                searchable: false , visible: false
-            },
-            {
-                data: "annotations.Feature",
-                searchable: false , visible: false
-            },
-            {
-                data: "annotations.Existing_variation",
-                render: {
-                    _:function ( data, type, row ) {
-                        if (data.length > 0) {
-                            for (idx_var in data) {
-                                id_var = data[idx_var]
-                                if (RegExp("^COS[MV][0-9]+").test(id_var)) {
-                                    return id_var;
-                                }
-                            }
-                        }
-                        return "";
-                    },
-                },
-                searchable: false , visible: false
-            },
-            {
-                data: "annotations.Existing_variation",
-                render: {
-                    _:function ( data, type, row ) {
-                        if (data.length > 0) {
-                            for (idx_var in data) {
-                                id_var = data[idx_var]
-                                if (RegExp("^rs[0-9]+").test(id_var)) {
-                                    return id_var;
-                                }
-                            }
-                        }
-                        return "";
-                    },
-                },
-                searchable: false , visible: false
-            },
-            {
-                data: "pos",
-                searchable: false , visible: false
-            },
-            {
-                data: "chr",
-                searchable: false , visible: false
-            },
-            {
-                data: null, "defaultContent": "hg38",
-                searchable: false , visible: false
-            },
-            {
+                searchBuilderTitle:"Consequences",
+                exportTitleDefGen:"CONSEQUENCES",
+                visible: false,
+                type: "consequences"
+            }),
+            createColumn({
+                id: "export-filter-MES",
                 data: "annotations",
-                render: {
-                    _: function ( data, type, row ) {
-                        if (data["EXON"] == null) {
-                            if(data["INTRON"] == null) {
-                                return "NA";
-                            }
-                            return "Intron " + data["INTRON"].split("/")[0];
-                        }
-                        return "Exon " + data["EXON"].split("/")[0];
+                searchBuilderTitle:"Prediction - MaxEntScan",
+                visible: false,
+                renderConfig: {
+                    default: (data, type) => {
+                        const alt = parseFloat(data.MaxEntScan_alt || 0).toFixed(2);
+                        const ref = parseFloat(data.MaxEntScan_ref || 0).toFixed(2);
+                        const mes_var = (((alt - ref) / Math.abs(ref)) * 100).toFixed(2);
+                        d = isNaN(parseFloat(mes_var)) ? null: parseFloat(mes_var).toFixed(2);
+                        return type === 'export' && d=== null?  '' : data;
                     },
-                },
-                searchable: false , visible: false
-            },
-            {
+                }
+            }),
+            createColumn({
+                id: "export-filter-spliceAI",
+                data: "annotations.spliceAI",
+                searchBuilderTitle:"Prediction - SpliceAI",
+                visible: false,
+                renderConfig: {
+                    default: (data, type) => {
+                        d = isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
+                        return type === 'export' && d=== null?  '' : data;
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-missenses",
+                data: "annotations.missensesMean",
+                searchBuilderTitle:"Prediction - Missenses",
+                visible: false,
+                renderConfig: {
+                    default: (data, type) => {
+                        d = isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
+                        return type === 'export' && d=== null?  '' : data;
+                        return isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
+                    },
+                }
+            }),
+            createColumn({
+                id: "export-filter-reported",
+                data: "reported",
+                searchBuilderTitle:"Reported",
+                visible: false,
+                type:"reported"
+            }),
+            createColumn({
+                id: "filter-AF",
                 data: "allelic_frequency",
-                searchable: true , visible: false
-            },
-            { data: "depth", searchable: true , visible: false},
-            { data: "allelic_depth",searchable: true , visible: false},
+                searchBuilderTitle:"Sample AF",
+                exportTitle:"{{ sample.samplename }} - AF",
+                exportTitleDefGen:"FREQUENCE_ALLELIQUE",
+                visible: false
+            }),
+            createColumn({
+                id: "filter-DP",
+                data: "depth",
+                searchBuilderTitle:"Sample DP",
+                exportTitle:"{{ sample.samplename }} - DP",
+                visible: false
+            }),
+            createColumn({
+                id: "filter-AD",
+                data: "allelic_depth",
+                searchBuilderTitle:"Sample AD",
+                exportTitle:"{{ sample.samplename }} - AD",
+                visible: false
+            }),
+            createColumn({
+                id: "filter-filter_var",
+                data: "filter",
+                searchBuilderTitle:"Sample filter",
+                exportTitle:"{{ sample.samplename }} - filter",
+                visible: false
+            }),
+            {% for c in sample.caller %}
+            createColumn({
+                id: "export-variant_caller_{{ loop.index }}",
+                data: null,
+                exportTitle:"{{ sample.samplename }} - {{ c }}",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        if (!("{{ c }}" in data.caller)) return "NA";
+                        const caller=data.caller["{{ c }}"];
+                        return `[${caller.filter}] ${caller.allelic_frequency} (${caller.allelic_depth}/${caller.depth})`;
+                    },
+                }
+            }),
+            {% endfor %}
+            // {% if sample.caller|length > 1 %}
+            createColumn({
+                id: "export-sample",
+                data: null,
+                exportTitle:"{{ sample.samplename }} - synthesis",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        return `[${data.filter}] ${data.allelic_frequency} (${data.allelic_depth}/${data.depth})`;
+                    },
+                }
+            }),
+            // {% endif %}
+            // Family Member Columns 
+            {% for s in family_members %}
+            createColumn({
+                id: "export-sample",
+                data: "family",
+                exportTitle:"FAM - {{ s }} - synthesis",
+                visible: false,
+                renderConfig: {
+                    default: (data) => {
+                        const family = data["{{s}}"]
+                        if (isNaN(parseFloat(family.allelic_depth)) && isNaN(parseFloat(family.allelic_frequency))) {
+                            return "NA"
+                        }
+                        const af = (isNaN(parseFloat(family.allelic_frequency))) ? ((parseFloat(family.allelic_depth)/parseFloat(family.allelic_frequency))*100).toFixed(2) : '';
+                        return `[${family.filter}] ${af} (${family.allelic_depth}/${family.depth})`;
+                    },
+                }
+            }),
+            // createColumn({
+            //     id: "export-AF-family-{{ loop.index }}",
+            //     data: "family",
+            //     exportTitle:"{{ s }} - filter",
+            //     visible: false,
+            //     renderConfig: {
+            //         default: (data) => {
+            //             const family = data["{{ s }}"];
+            //             return family.allelic_frequency
+            //         },
+            //     }
+            // }),
+            // createColumn({
+            //     id: "export-DP-family-{{ loop.index }}",
+            //     data: "family",
+            //     exportTitle:"{{ s }} - filter",
+            //     visible: false,
+            //     renderConfig: {
+            //         default: (data) => {
+            //             const family = data["{{ s }}"];
+            //             console.log(parseInt(family.depth))
+            //             return parseInt(family.depth)
+            //         },
+            //     }
+            // }),
+            // createColumn({
+            //     id: "export-AD-family-{{ loop.index }}",
+            //     data: "family",
+            //     exportTitle:"{{ s }} - filter",
+            //     visible: false,
+            //     renderConfig: {
+            //         default: (data) => {
+            //             const family = data["{{ s }}"];
+            //             return family.allelic_depth
+            //         },
+            //     }
+            // }),
+            // createColumn({
+            //     id: "export-filter_var-family-{{ loop.index }}",
+            //     data: "family",
+            //     exportTitle:"{{ s }} - filter",
+            //     visible: false,
+            //     renderConfig: {
+            //         default: (data) => {
+            //             const family = data["{{ s }}"];
+            //             return family.filter
+            //         },
+            //     }
+            // }),
+            {% endfor %}
         ];
+
         var number_family = {{ family_members|length }};
         var number_caller = {{ sample.caller|length }};
     </script>
