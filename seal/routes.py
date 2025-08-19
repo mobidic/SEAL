@@ -1211,7 +1211,8 @@ def json_variants(id, idbed=False, version=-1):
                 "family_members": members
             },
             "phenotypes": phenotypes,
-            "family": t
+            "family": t,
+            "omims": [o.mimNumber for o in omims]
         })
     return jsonify(variants)
 
