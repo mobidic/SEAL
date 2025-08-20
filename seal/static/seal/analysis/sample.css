@@ -9,6 +9,12 @@
     transform: translate(-50%,-50%);
     -ms-transform: translate(-50%,-50%);
 }
+.dataTables_scrollHeadInner .seal-display-middle-left {
+    position: absolute;
+    top: 50%;
+    transform: translate(-0%,-50%);
+    -ms-transform: translate(-0%,-50%);
+}
 #variants tr td {
     height: 29px;
 }

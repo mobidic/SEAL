@@ -87,6 +87,10 @@ def inject_config():
     return dict(app.config)
 
 
+if 'GENOME' not in config or config['GENOME'] not in ['grch37', 'grch38']:
+    app.logger.warning("Genome version not recognize : use default version 'grch38'")
+    config['GENOME'] = 'grch38'
+
 
 from seal import routes
 from seal import schedulers

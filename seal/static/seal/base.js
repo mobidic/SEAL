@@ -5,10 +5,25 @@ $.ajaxSetup({
         }
     }
 });
+function getValueFromHash(hash, path) {
+    // Divise le chemin en une liste de clés
+    if (path == null || typeof path !== 'string') {
+        return hash;
+    }
+    const keys = path.split('.');
 
-$(document).on("mouseenter", ".showTitle", function() {
-    $(this).attr('title', this.innerText);
-});
+    // Parcourt la table de hachage en utilisant les clés
+    let current = hash;
+    for (let key of keys) {
+        if (current[key] !== undefined) {
+            current = current[key];
+        } else {
+            return undefined; // Si la clé n'existe pas, retourne undefined
+        }
+    }
+    return current;
+}
+
 function updateSideBar(){
     if ($(window).width() <= 992) {
         if ($('#sidebar').is(":visible") != $('#overlay').is(":visible")) {

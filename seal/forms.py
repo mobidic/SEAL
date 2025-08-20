@@ -82,7 +82,7 @@ class UpdateAccountForm(FlaskForm):
 
     def validate_api_key_md(self, api_key_md):
         payload = {'api_key': api_key_md.data}
-        r = requests.post("https://mobidetails.iurc.montp.inserm.fr/MD/api/service/check_api_key", data=payload)
+        r = requests.post("https://mobidetails.chu-montpellier.fr/api/service/check_api_key", data=payload)
         response = r.json()
         if not response["api_key_pass_check"]:
             raise ValidationError(f'API key status {response["api_key_status"]}. Please check your API key.')

@@ -161,6 +161,9 @@
 .min-size-25 {
     min-width: 25px;
 }
+.min-size-50 {
+    min-width: 50px;
+}
 .min-size-75 {
     min-width: 75px;
 }

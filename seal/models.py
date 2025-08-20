@@ -170,6 +170,7 @@ class Sample(db.Model):
     status = db.Column(db.Integer, unique=False, nullable=False, default=0)
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
+    caller = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
 
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=True)
     filter = relationship("Filter", back_populates="samples")
@@ -296,9 +297,16 @@ class Comment_sample(db.Model):
 class Var2Sample(db.Model):
     variant_ID = db.Column(db.Text, db.ForeignKey('variant.id'), primary_key=True)
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+    
+    ## FAIRE EN JSON !!!!
+    caller = db.Column(db.JSON, nullable=True)
+    
     depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
-    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
+    allelic_freq = db.Column(db.Float, nullable=True, unique=False)
+    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list()) # temporaire a supprimer
+    pass_filter = db.Column(db.Boolean, nullable=False, unique=False, default=False)
+    
     reported = db.Column(db.Boolean, nullable=False, unique=False, default=False)
     hide = db.Column(db.Boolean, nullable=False, unique=False, default=False)
 

@@ -32,7 +32,7 @@ const impact_dict = {
         "score" : 2
     },
     "MODIFIER": {
-        "color": "orange",
+        "color": "amethyst",
         "score" : 1.5
     },
     "HIGH": {
@@ -45,191 +45,516 @@ const impact_dict = {
     }
 };
 
+
 const consequences_dict = {
     "stop_gained": {
-        "color": "ff0000",
+        "color": "e74c3c",
         "score": 50,
     },
     "stop_lost": {
-        "color": "ff0000",
+        "color": "e74c3c",
         "score": 50,
     },
     "start_lost": {
-        "color": "ffd700",
+        "color": "f39c12",
         "score": 30,
     },
     "splice_acceptor_variant": {
-        "color": "FF581A",
+        "color": "d35400",
         "score": 20,
     },
     "splice_donor_variant": {
-        "color": "FF581A",
+        "color": "d35400",
         "score": 20,
     },
     "frameshift_variant": {
-        "color": "9400D3",
+        "color": "8e44ad",
         "score": 15,
     },
     "transcript_ablation": {
-        "color": "ff0000",
+        "color": "e74c3c",
         "score": 8,
     },
     "transcript_amplification": {
-        "color": "ff69b4",
+        "color": "e44c7e",
         "score": 8,
     },
     "missense_variant": {
-        "color": "ffd700",
+        "color": "f39c12",
         "score": 6,
     },
     "protein_altering_variant": {
-        "color": "ff0080",
+        "color": "b086c0",
+        "score": 5,
+    },
+    "splice_donor_5th_base_variant": {
+        "color": "dd874d",
         "score": 5,
     },
     "splice_region_variant": {
-        "color": "ff7f50",
+        "color": "dd874d",
+        "score": 5,
+    },
+    "splice_donor_region_variant": {
+        "color": "dd874d",
+        "score": 5,
+    },
+    "splice_polypyrimidine_tract_variant": {
+        "color": "dd874d",
         "score": 5,
     },
     "inframe_insertion": {
-        "color": "ff69b4",
+        "color": "e44c7e",
         "score": 2,
     },
     "inframe_deletion": {
-        "color": "ff69b4",
+        "color": "e44c7e",
         "score": 2,
     },
     "incomplete_terminal_codon_variant": {
-        "color": "ff00ff",
+        "color": "9b59b6",
         "score": 2,
     },
     "stop_retained_variant": {
-        "color": "76ee00",
+        "color": "27ae60",
         "score": 1,
     },
     "start_retained_variant": {
-        "color": "76ee00",
+        "color": "27ae60",
         "score": 1,
     },
     "synonymous_variant": {
-        "color": "76ee00",
+        "color": "27ae60",
         "score": 1,
     },
     "coding_sequence_variant": {
-        "color": "458b00",
+        "color": "16a085",
         "score": 0.75,
     },
     "mature_miRNA_variant": {
-        "color": "458b00",
+        "color": "16a085",
         "score": 0.5,
     },
     "intron_variant": {
-        "color": "02599c",
+        "color": "2980b9",
         "score": 0.25,
     },
     "NMD_transcript_variant": {
-        "color": "ff4500",
+        "color": "eb796d",
         "score": 0.1,
     },
     "non_coding_transcript_exon_variant": {
-        "color": "32cd32",
+        "color": "1abc9c",
         "score": 0.05,
     },
     "non_coding_transcript_variant": {
-        "color": "32cd32",
+        "color": "1abc9c",
         "score": 0.005,
     },
+    "coding_transcript_variant": {
+        "color": "16a085",
+        "score": 0.75,
+    },
     "5_prime_UTR_variant": {
-        "color": "7ac5cd",
+        "color": "62aee0",
         "score": 0.5,
     },
     "3_prime_UTR_variant": {
-        "color": "7ac5cd",
+        "color": "62aee0",
         "score": 0.45,
     },
     "upstream_gene_variant": {
-        "color": "a2b5cd",
+        "color": "83bfe7",
         "score": 0.0005,
     },
     "downstream_gene_variant": {
-        "color": "a2b5cd",
+        "color": "83bfe7",
         "score": 0.0005,
     },
     "TFBS_ablation": {
-        "color": "a52a2a",
+        "color": "c0392b",
         "score": 0.00001,
     },
     "TFBS_amplification": {
-        "color": "a52a2a",
+        "color": "c0392b",
         "score": 0.00001,
     },
     "TF_binding_site_variant": {
-        "color": "a52a2a",
+        "color": "c0392b",
         "score": 0.00001,
     },
     "regulatory_region_ablation": {
-        "color": "a52a2a",
+        "color": "c0392b",
         "score": 0.005,
     },
     "regulatory_region_amplification": {
-        "color": "a52a2a",
+        "color": "c0392b",
         "score": 0.005,
     },
     "regulatory_region_variant": {
-        "color": "a52a2a",
+        "color": "c0392b",
         "score": 0.005,
     },
     "feature_elongation": {
-        "color": "7f7f7f",
+        "color": "7f8c8d",
         "score": 0.00001,
     },
     "feature_truncation": {
-        "color": "7f7f7f",
+        "color": "7f8c8d",
         "score": 0.0000001,
     },
     "intergenic_variant": {
-        "color": "636363",
+        "color": "34495e",
         "score": 0.0000001,
-    }
-};
-
-const spliceAI_Type_dict = {
-    "AG": {
-        "color": "w3-flat-amethyst"
     },
-    "AL": {
-        "color": "w3-flat-wisteria"
-    },
-    "DG": {
-        "color": "w3-flat-carrot"
-    },
-    "DL": {
-        "color": "w3-flat-pumpkin"
+    "sequence_variant": {
+        "color": "34495e",
+        "score": 0.0000001,
     }
 };
 
 const class_variant_html = [
-    '<span><i class="fas fa-ellipsis-h"></i></span>',
-    '<span class="w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
-        '<i class="fas fa-bookmark"></i>'+
-        '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
+    '<span class="do-not-select"><i class="fas fa-ellipsis-h"></i></span>',
+    '<span class="do-not-select w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
+        '<i class="do-not-select fas fa-bookmark"></i>'+
+        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
     '</span> - Benign</span>',
-    '<span class="w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
-        '<i class="fas fa-bookmark"></i>'+
-        '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
+    '<span class="do-not-select w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
+        '<i class="do-not-select fas fa-bookmark"></i>'+
+        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
     '</span> - Likely Benign</span>',
-    '<span class="w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
-        '<i class="fas fa-bookmark"></i>'+
-        '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
+    '<span class="do-not-select w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
+        '<i class="do-not-select fas fa-bookmark"></i>'+
+        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
     '</span> - VUS</span>',
-    '<span class="w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
-        '<i class="fas fa-bookmark"></i>'+
-        '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
+    '<span class="do-not-select w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
+        '<i class="do-not-select fas fa-bookmark"></i>'+
+        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
     '</span> - Likely Pathogenic</span>',
-    '<span class="w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
-        '<i class="fas fa-bookmark"></i>'+
-        '<span class="fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
+    '<span class="do-not-select w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
+        '<i class="do-not-select fas fa-bookmark"></i>'+
+        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
     '</span> - Pathogenic</span>',
 ];
+const class_clinvar = [
+    "0 - Benign/Likely Benign",
+    "1 - Conflicting (without Pathogenic)",
+    "2 - NA",
+    "3 - Uncertain significance",
+    "4 - Conflicting (with Pathogenic)",
+    "5 - Pathogenic/Likely Pathogenic"
+];
+const reported_v = {
+    true: "Reported"
+};
+const phenotypes = {
+    "AD": "AD - Autosomal dominant",
+    "AR": "AR - Autosomal recessive",
+    "PD": "PD - Pseudoautosomal dominant",
+    "PR": "PR - Pseudoautosomal recessive",
+    "DD": "DD - Digenic dominant",
+    "DR": "DR - Digenic recessive",
+    "IC": "IC - Isolated cases",
+    "ICB": "ICB - Inherited chromosomal imbalance",
+    "Mi": "Mi - Mitochondrial",
+    "Mu": "Mu - Multifactorial",
+    "SMo": "SMo - Somatic mosaicism",
+    "SMu": "SMu - Somatic mutation",
+    "XL": "XL - X-linked",
+    "XLD": "XLD - X-linked dominant",
+    "XLR": "XLR - X-linked recessive",
+    "YL": "YL - Y-linked"
+};
+const class_variant_export = {
+    '0':'NA',
+    '1':'1 - Benign',
+    '2':'2 - Likely Benign',
+    '3':'3 - VUS',
+    '4':'4 - Likely Pathogenic',
+    '5':'5 - Pathogenic',
+};
+
+function createBaseNList(number, n) {
+    // return [...Array(number).keys()]
+    return Array.from({ length: number }, (_, index) => index + n);
+}
+
+function getTextFromHTML(htmlString) {
+    let temp = document.createElement('div');
+    temp.innerHTML = htmlString;
+    return temp.textContent || temp.innerText || '';
+}
+
+function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
+    init = function (that, fn, preDefined = null) {
+            that.dom.valueTitle.prop('selected', true);
+
+            // // For "isTrue" or "isFalse", do not need select
+            // if (condition === "isTrue" || condition === "isFalse") {
+            //     let el = $()
+            //         .addClass($.fn.dataTable.Criteria.classes.value);
+            //     return el;
+            // }
+
+            // Declare select element to be used with all of the default classes and listeners.
+            let el = $('<select/>')
+                .addClass($.fn.dataTable.Criteria.classes.value)
+                .addClass($.fn.dataTable.Criteria.classes.dropDown)
+                .addClass($.fn.dataTable.Criteria.classes.italic)
+                .addClass($.fn.dataTable.Criteria.classes.select)
+                .append(that.dom.valueTitle)
+                .on('change.dtsb', function() {
+                    $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
+                    fn(that, this);
+                });
+
+            if (that.c.greyscale) {
+                el.addClass($.fn.dataTable.Criteria.classes.greyscale);
+            }
+
+            let added = [];
+            let options = [];
+
+            // Function to add an option to the select element
+            let addOption = (filt, text) => {
+                if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
+                    filt.replace(/(<([^>]+)>)/ig, '');
+                }
+
+                // Add text and value, stripping out any html if that is the column type
+                let opt = $('<option>', {
+                    type: Array.isArray(filt) ? 'Array' : 'String',
+                    value: filt
+                })
+                .data('sbv', filt)
+                .addClass(that.classes.option)
+                .addClass(that.classes.notItalic)
+                // Have to add the text this way so that special html characters are not escaped - &amp; etc.
+                .html(
+                    typeof text === 'string' ?
+                    text.replace(/(<([^>]+)>)/ig, '') :
+                    text
+                );
+
+                let val = opt.val();
+
+                // Check that this value has not already been added
+                if (added.indexOf(val) === -1) {
+                    added.push(val);
+                    options.push(opt);
+
+                    if (preDefined !== null && Array.isArray(preDefined[0])) {
+                    preDefined[0] = preDefined[0].sort().join(',');
+                    }
+
+                    // If this value was previously selected as indicated by preDefined, then select it again
+                    if (preDefined !== null && opt.val() === preDefined[0]) {
+                    opt.prop('selected', true);
+                    el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                    that.dom.valueTitle.removeProp('selected');
+                    }
+                }
+            };
+            for (i in values_options) {
+                addOption(i, values_options[i]);
+            }
+            if (sort) {
+                options.sort((a, b) => {
+                    console.log(a.val())
+                    if (a.val().toLowerCase() < b.val().toLowerCase()) {
+                        return -1;
+                    } else if (a.val().toLowerCase() > b.val().toLowerCase()) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                });
+            }
+
+            for (let opt of options) {
+                el.append(opt);
+            }
+
+            return el;
+        };
+    switch (condition) {
+        case "==":
+            conditionName ="Is"
+            search = function (value, comparison) {
+                v = value.split(",");
+                return value == comparison[0];
+            }
+            break;
+        case "!=":
+            conditionName ="Is not"
+            search = function (value, comparison) {
+                return value != comparison[0];
+            }
+            break;
+        case "contains":
+            conditionName ="Contains"
+            search = function (value, comparison) {
+                v = value.split(",");
+                return v.includes(comparison[0]);
+            }
+            break;
+        case "!contains":
+            conditionName ="Not Contains"
+            search = function (value, comparison) {
+                v = value.split(",");
+                return ! v.includes(comparison[0]);
+            }
+            break;
+        case "isTrue":
+            conditionName = "Is True";
+            search = function (value) {
+                console.log("t");
+                console.log((value === false ||
+                       value === "false" ||
+                       value === "0" ||
+                       value === null ||
+                       value === undefined ||
+                       value === "" ||
+                       (typeof value === 'number' && isNaN(value))))
+                return value === true ||
+                       value === "true" ||
+                       value === "1" ||
+                       (value !== null && value !== undefined && value !== "" && value !== "0" && value !== "false");
+            };
+            init = function(a){a.s.dt.one("draw.dtsb",function(){a.s.topGroup.trigger("dtsb-redrawLogic")})}
+            break;
+        case "isFalse":
+            conditionName = "Is False";
+            search = function (value) {
+                console.log("f");
+                console.log((value === false ||
+                       value === "false" ||
+                       value === "0" ||
+                       value === null ||
+                       value === undefined ||
+                       value === "" ||
+                       (typeof value === 'number' && isNaN(value))))
+                return value === false ||
+                       value === "false" ||
+                       value === "0" ||
+                       value === null ||
+                       value === undefined ||
+                       value === "" ||
+                       (typeof value === 'number' && isNaN(value));
+            };
+            init = function(a){a.s.dt.one("draw.dtsb",function(){a.s.topGroup.trigger("dtsb-redrawLogic")})}
+            break;
+        default:
+            conditionName = condition;
+            search = function (value, comparison) {
+                return false;
+            };
+    }
+    return {
+        conditionName: conditionName, // This is the string displayed in the condition select
+        init: init,
+        // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
+        inputValue: function (el) {
+            if (condition === "isTrue") {
+                return ["isTrue"]; 
+            }
+            if (condition === "isFalse") {
+                return ["isFalse"]; 
+            }
+            let values = [];
+
+            for (let element of el) {
+                if ($(element).is('select')) {
+                    values.push($(element).children('option:selected').val());
+                }
+            }
+
+            // return the selected values
+            return values;
+        },
+        isInputValid: function (el, that) {
+            // "isTrue" and "isFalse" : no need of values
+            if (condition === "isTrue" || condition === "isFalse") {
+                return true;
+            }
+            // If no options have been selected, or one has but it has no value then do not include the criteria
+            if (
+                $(el[0]).has('option:selected').length < 1 ||
+                (
+                    $(el[0]).has('option:selected').length === 1 &&
+                    $($(el[0]).children('option:selected')[0]).text().length === 0
+                )
+            ) {
+                return false;
+            }
+
+            return true;
+        },
+        // Straightforward search function comparing value from table and comparison from the select2 element
+        // These values are retrieved in `inputValue`
+        search: search,
+        // Add a function to handle condition changes
+        conditionChange: function(newCondition) {
+            // When changing between no-value conditions, we need to trigger an update
+            if ((condition === "isTrue" || condition === "isFalse") &&
+                (newCondition === "isTrue" || newCondition === "isFalse")) {
+                return true; // Indicate that an update is needed
+            }
+            return false;
+        }
+    }
+}
+
+function conditionsFilter(values_options, conditions=["==","!="], sort=true) {
+    d = {}
+    for (c of conditions) {
+        d[c] = BaseConditionsFilterSelect(values_options,c, sort)
+    }
+    return d
+}
+
+function getIndexById(array, id, regexp=false) {
+    if (regexp) {
+        re = new RegExp(`${id}`)
+        return array.map((elm, idx) => re.test(elm.id) ? idx : '').filter(String);
+    }
+    return array.findIndex(element => element.id === id);
+}
+
+function format_export (title) {
+    return {
+        header: function ( data, columnIdx ) {
+            return (dt_table[columnIdx][title] !== undefined) ?  dt_table[columnIdx][title] : ((getTextFromHTML(data) === '' && dt_table[columnIdx]["id"] !== undefined) ?  dt_table[columnIdx]["id"] : getTextFromHTML(data));
+        }
+    }
+}
+
+// Define columns and format for export, filters...
+columns_defGen = [
+    getIndexById(dt_table, "export-filter-SYMBOL"),
+    getIndexById(dt_table, "export-filter-HGVSc"),
+    getIndexById(dt_table, "exportDefGen-HGVSp-short"),
+    getIndexById(dt_table, "exportDefGen-HGVSc-short"),
+    getIndexById(dt_table, "export-filter-Nearest"),
+    getIndexById(dt_table, "export-filter-Transcript"),
+    getIndexById(dt_table, "export-filter-COSMIC"),
+    getIndexById(dt_table, "export-filter-RS"),
+    getIndexById(dt_table, "export-filter-pos"),
+    getIndexById(dt_table, "export-filter-consequences"),
+    getIndexById(dt_table, "export-genome"),
+    getIndexById(dt_table, "export-filter-chr"),
+    getIndexById(dt_table, "export-filter-HGVSg"),
+    getIndexById(dt_table, "export-filter-EI"),
+    getIndexById(dt_table, "export-filter-AF")
+]
+
+columns_export = [
+    getIndexById(dt_table, "^export-.*", true),
+].flat()
+
+columns_filter=[
+    getIndexById(dt_table, "^(.*-){0,1}filter-.*", true),
+].flat()
 
 $(document).ready(function() {
     $.getJSON("/json/filters", function(data) {
@@ -269,255 +594,6 @@ $(document).ready(function() {
         }
         $('#selectBed').html(options);
     });
-
-    $.fn.dataTable.ext.searchBuilder.conditions.clinvar = {
-        "=": {
-            // This function decides whether to include the criteria in the search
-            isInputValid: function (el, that) {
-                // If no options have been selected, or one has but it has no value then do not include the criteria
-                if (
-                    $(el[0]).has('option:selected').length < 1 ||
-                    (
-                        $(el[0]).has('option:selected').length === 1 &&
-                        $($(el[0]).children('option:selected')[0]).text().length === 0
-                    )
-                ) {
-                    return false;
-                }
-
-                return true;
-            },
-            // This is the string displayed in the condition select
-            conditionName: 'Is',
-            // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
-            inputValue: function (el) {
-                let values = [];
-
-                for (let element of el) {
-                    if ($(element).is('select')) {
-                        values.push($(element).children('option:selected').val());
-                    }
-                }
-
-                // return the selected values
-                return values;
-            },
-            // This function initialises the criteria, specifically any dom elements that are required for its use
-            init: function(that, fn, preDefined = null) {
-                // Declare select element to be used with all of the default classes and listeners.
-                let el = $('<select/>')
-                    .addClass($.fn.dataTable.Criteria.classes.value)
-                    .addClass($.fn.dataTable.Criteria.classes.dropDown)
-                    .addClass($.fn.dataTable.Criteria.classes.italic)
-                    .addClass($.fn.dataTable.Criteria.classes.select)
-                    .append(that.dom.valueTitle)
-                    .on('change.dtsb', function() {
-                        $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
-                        fn(that, this);
-                    });
-
-                if (that.c.greyscale) {
-                    el.addClass($.fn.dataTable.Criteria.classes.greyscale);
-                }
-
-                let added = [];
-                let options = [];
-
-                // Function to add an option to the select element
-                let addOption = (filt, text) => {
-                    if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
-                        filt.replace(/(<([^>]+)>)/ig, '');
-                    }
-
-                    // Add text and value, stripping out any html if that is the column type
-                    let opt = $('<option>', {
-                        type: Array.isArray(filt) ? 'Array' : 'String',
-                        value: filt
-                    })
-                    .data('sbv', filt)
-                    .addClass(that.classes.option)
-                    .addClass(that.classes.notItalic)
-                    // Have to add the text this way so that special html characters are not escaped - &amp; etc.
-                    .html(
-                        typeof text === 'string' ?
-                        text.replace(/(<([^>]+)>)/ig, '') :
-                        text
-                    );
-
-                    let val = opt.val();
-
-                    // Check that this value has not already been added
-                    if (added.indexOf(val) === -1) {
-                        added.push(val);
-                        options.push(opt);
-
-                        if (preDefined !== null && Array.isArray(preDefined[0])) {
-                        preDefined[0] = preDefined[0].sort().join(',');
-                        }
-
-                        // If this value was previously selected as indicated by preDefined, then select it again
-                        if (preDefined !== null && opt.val() === preDefined[0]) {
-                        opt.prop('selected', true);
-                        el.removeClass($.fn.dataTable.Criteria.classes.italic);
-                        that.dom.valueTitle.removeProp('selected');
-                        }
-                    }
-                };
-
-                addOption("0 - Benign/Likely Benign", "0 - Benign/Likely Benign");
-                addOption("1 - Conflicting (without Pathogenic)", "1 - Conflicting (without Pathogenic)");
-                addOption("2 - NA", "2 - NA");
-                addOption("3 - Uncertain significance", "3 - Uncertain significance");
-                addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
-                addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
-
-                options.sort((a, b) => {
-                    if (a.val() < b.val()) {
-                        return -1;
-                    } else if (a.val() > b.val()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                });
-
-                for (let opt of options) {
-                    el.append(opt);
-                }
-
-                return el;
-            },
-            // Straightforward search function comparing value from table and comparison from the select2 element
-            // These values are retrieved in `inputValue`
-            search: function ( value, comparison) {
-                return value === comparison[0];
-            }
-        }, "!=": {
-            // This function decides whether to include the criteria in the search
-            isInputValid: function (el, that) {
-                // If no options have been selected, or one has but it has no value then do not include the criteria
-                if (
-                    $(el[0]).has('option:selected').length < 1 ||
-                    (
-                        $(el[0]).has('option:selected').length === 1 &&
-                        $($(el[0]).children('option:selected')[0]).text().length === 0
-                    )
-                ) {
-                    return false;
-                }
-
-                return true;
-            },
-            // This is the string displayed in the condition select
-            conditionName: 'Is Not',
-            // This function gathers/sets the values from the dom elements created in the init function that are to be used for searching
-            inputValue: function (el) {
-                let values = [];
-
-                for (let element of el) {
-                    if ($(element).is('select')) {
-                        values.push($(element).children('option:selected').val());
-                    }
-                }
-
-                // return the selected values
-                return values;
-            },
-            // This function initialises the criteria, specifically any dom elements that are required for its use
-            init: function(that, fn, preDefined = null) {
-                that.dom.valueTitle.prop('selected', true);
-
-                // Declare select element to be used with all of the default classes and listeners.
-                let el = $('<select/>')
-                    .addClass($.fn.dataTable.Criteria.classes.value)
-                    .addClass($.fn.dataTable.Criteria.classes.dropDown)
-                    .addClass($.fn.dataTable.Criteria.classes.italic)
-                    .addClass($.fn.dataTable.Criteria.classes.select)
-                    .append(that.dom.valueTitle)
-                    .on('change.dtsb', function() {
-                        $(this).removeClass($.fn.dataTable.Criteria.classes.italic);
-                        fn(that, this);
-                    });
-
-                if (that.c.greyscale) {
-                    el.addClass($.fn.dataTable.Criteria.classes.greyscale);
-                }
-
-                let added = [];
-                let options = [];
-
-                // Function to add an option to the select element
-                let addOption = (filt, text) => {
-                  if (that.s.type.includes('html') && filt !== null && typeof filt === 'string') {
-                    filt.replace(/(<([^>]+)>)/ig, '');
-                  }
-
-                  // Add text and value, stripping out any html if that is the column type
-                  let opt = $('<option>', {
-                    type: Array.isArray(filt) ? 'Array' : 'String',
-                    value: filt
-                  })
-                  .data('sbv', filt)
-                  .addClass(that.classes.option)
-                  .addClass(that.classes.notItalic)
-                  // Have to add the text this way so that special html characters are not escaped - &amp; etc.
-                  .html(
-                    typeof text === 'string' ?
-                    text.replace(/(<([^>]+)>)/ig, '') :
-                    text
-                  );
-
-                  let val = opt.val();
-
-                  // Check that this value has not already been added
-                  if (added.indexOf(val) === -1) {
-                    added.push(val);
-                    options.push(opt);
-
-                    if (preDefined !== null && Array.isArray(preDefined[0])) {
-                      preDefined[0] = preDefined[0].sort().join(',');
-                    }
-
-                    // If this value was previously selected as indicated by preDefined, then select it again
-                    if (preDefined !== null && opt.val() === preDefined[0]) {
-                      opt.prop('selected', true);
-                      el.removeClass($.fn.dataTable.Criteria.classes.italic);
-                      that.dom.valueTitle.removeProp('selected');
-                    }
-                  }
-                };
-
-                addOption("0 - Benign/Likely Benign", "0 - Benign/Likely Benign");
-                addOption("1 - Conflicting (without Pathogenic)", "1 - Conflicting (without Pathogenic)");
-                addOption("2 - NA", "2 - NA");
-                addOption("3 - Uncertain significance", "3 - Uncertain significance");
-                addOption("4 - Conflicting (with Pathogenic)", "4 - Conflicting (with Pathogenic)");
-                addOption("5 - Pathogenic/Likely Pathogenic", "5 - Pathogenic/Likely Pathogenic");
-
-                options.sort((a, b) => {
-                    if (a.val() < b.val()) {
-                        return -1;
-                    } else if (a.val() > b.val()) {
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                });
-
-                for (let opt of options) {
-                    el.append(opt);
-                }
-
-                return el;
-            },
-            // Straightforward search function comparing value from table and comparison from the select2 element
-            // These values are retrieved in `inputValue`
-            search: function ( value, comparison) {
-                return value != comparison[0];
-            }
-        }
-    }
-
     table = $('#variants').DataTable({
         buttons:[],
         processing: true,
@@ -541,19 +617,24 @@ $(document).ready(function() {
             left:2,
             right:1
         },
-        columnDefs: [{
-            type:"clinvar",
-            targets: 10+number_family
-        },{
-            searchBuilderTitle: 'Depth',
-            targets: [31]
-        },{
-            searchBuilderTitle: 'Allelic Depth',
-            targets: [32]
-        }],
+        'createdRow': function (row, data, rowIndex) {
+            // Per-cell function to do whatever needed with cells
+            $.each($('td', row), function (colIndex) {
+                // For example, adding data-* attributes to the cell
+                if (dt_table[colIndex]["mytitle"]) {
+                    d2 = data;
+                    if (dt_table[colIndex]["data"]) {
+                        d2 = getValueFromHash(data, dt_table[colIndex]["data"]);
+                    }
+                    $(this).attr('title', dt_table[colIndex]["mytitle"](d2));
+                }
+                ;
+            });
+        },
         select: {
-            style:    'os',
-            selector: 'td:not(:nth-child(2), :nth-child(' + (11 + number_family) + '), :nth-child(' + (12 + number_family) + '), :nth-last-child(-n+3))'
+            style: 'multi',
+            selector: 'td:not(:last-child)'
+
         },
         ajax: json_variants,
         columns: dt_table,
@@ -572,8 +653,19 @@ $(document).ready(function() {
                     {
                         extend: 'searchBuilder',
                         config: {
-                            columns: columns_filter
-                        }
+                            columns: columns_filter,
+                            conditions: {
+                                consequences: conditionsFilter(Object.keys(consequences_dict).reduce((acc, curr) => {acc[curr] = curr;return acc;}, {}), ["contains", "!contains"]),
+                                impact: conditionsFilter(Object.keys(impact_dict).reduce((acc, curr) => {acc[curr] = curr;return acc;}, {}), ["==", "!="]),
+                                clinvar: conditionsFilter(class_clinvar.reduce((acc, curr) => {acc[curr] = curr;return acc;}, {}), ["==", "!="]),
+                                CLNREVSTAT: conditionsFilter(Object.keys(clinvar_stars).reduce((acc, curr) => {acc[curr] = `${curr} ${clinvar_stars[curr]}/4`;return acc;}, {}), ["==", "!="], false),
+                                inheritances:  conditionsFilter(phenotypes, ["contains", "!contains"]),
+                                class_seal:  conditionsFilter(class_variant_export, ["==", "!="]),
+                                num: {"=":null, "!=": null},
+                                reported:  conditionsFilter(reported_v, ["isTrue", "isFalse"]),
+
+                            }
+                        },
                     },
                     {
                         text: 'Save Filter',
@@ -588,47 +680,6 @@ $(document).ready(function() {
                     }
                 ]
             } );
-            var format_base = {
-                body: function(data, row, column, node) {
-                    if (column === (number_family + 18-1)) {
-                        data = $(node).children().prop("checked")===true?"Yes":"No";
-                    }
-                    if (column === (number_family + 19-1)) {
-                        value = $(node).children('div').children('button').text();
-                        data = $.trim(value);
-                    }
-                    return data;
-                }
-            };
-            var format_defGen = {
-                body: function(data, row, column, node) {
-                    return column === 14 ? data + "\r" :data;
-                },
-                header: function ( data, columnIdx ) {
-                    dict = {};
-                    dict['0'] = "GENE";
-                    dict['3'] = "VARIANT";
-                    dict[parseInt(number_family)-1+21] = "VARIANT_P";
-                    dict[parseInt(number_family)-1+22] = "VARIANT_C";
-                    dict[parseInt(number_family)-1+23] = "ENST";
-                    dict[parseInt(number_family)-1+24] = "NM";
-                    dict[parseInt(number_family)-1+25] = "COSMIC";
-                    dict[parseInt(number_family)-1+26] = "RS";
-                    dict[parseInt(number_family)-1+27] = "POSITION_GENOMIQUE";
-                    dict[parseInt(number_family)-1+14] = "CONSEQUENCES";
-                    dict[parseInt(number_family)-1+28] = "CHROMOSOME";
-                    dict[parseInt(number_family)-1+29] = "GENOME_REFERENCE";
-                    dict['2'] = "NOMENCLATURE_HGVS";
-                    dict[parseInt(number_family)-1+30] = "LOCALISATION";
-                    dict[parseInt(number_family)-1+31] = "FREQUENCE_ALLELIQUE\r";
-                    if (columnIdx in dict) {
-                        return dict[parseInt(columnIdx)]
-                    } 
-                    return data;
-                }
-            };
-            // var columns_base = [22, 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21];
-            var columns_defGen = [0,3,parseInt(number_family)-1+21,parseInt(number_family)-1+22,parseInt(number_family)-1+23,parseInt(number_family)-1+24,parseInt(number_family)-1+25,parseInt(number_family)-1+26,parseInt(number_family)-1+27,parseInt(number_family)-1+14,parseInt(number_family)-1+28,parseInt(number_family)-1+29,2,parseInt(number_family)-1+30,parseInt(number_family)-1+31];
             table.button().add(1, {
                 extend: 'collection',
                 text: 'Export',
@@ -641,11 +692,11 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_base
+                            columns: columns_export
                         },
                     },
                     {
@@ -653,11 +704,11 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -665,11 +716,11 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -680,7 +731,7 @@ $(document).ready(function() {
                         createEmptyCells: true,
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_defGen,
+                            format: format_export("exportTitleDefGen"),
                             modifier: {
                                 selected: null
                             },
@@ -695,7 +746,7 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: null
                             },
@@ -707,7 +758,7 @@ $(document).ready(function() {
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -715,7 +766,7 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: null
                             },
@@ -727,7 +778,7 @@ $(document).ready(function() {
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -735,7 +786,7 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: null
                             },
@@ -747,7 +798,7 @@ $(document).ready(function() {
                             modifier: {
                                 selected: null
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -758,7 +809,7 @@ $(document).ready(function() {
                         createEmptyCells: true,
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_defGen,
+                            format: format_export("exportTitleDefGen"),
                             modifier: {
                                 selected: null
                             },
@@ -778,11 +829,11 @@ $(document).ready(function() {
                         text: 'Copy',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: true
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -790,11 +841,11 @@ $(document).ready(function() {
                         text: 'Excel',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: true
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -802,11 +853,11 @@ $(document).ready(function() {
                         text: 'CSV',
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_base,
+                            format: format_export("exportTitle"),
                             modifier: {
                                 selected: true
                             },
-                            columns: columns_base
+                            columns: columns_export
                         }
                     },
                     {
@@ -817,7 +868,7 @@ $(document).ready(function() {
                         createEmptyCells: true,
                         exportOptions: {
                             orthogonal: 'export',
-                            format: format_defGen,
+                            format: format_export("exportTitleDefGen"),
                             modifier: {
                                 selected: true
                             },
@@ -831,6 +882,18 @@ $(document).ready(function() {
             hide_message(count_hide);
         }
     });
+    
+ 
+	// $('a').on('click', function(e){
+    //     e.preventDefault()
+	// });
+  
+    table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
+        if ( originalEvent.target.classList.toString().match('do-not-select') ) {
+            return false;
+        }
+    } );
+    
 } );
 
 function hide_message(count_hide) {
@@ -961,7 +1024,7 @@ function openMD(id) {
             Swal.showLoading()
             $.ajax({
                 type: 'POST',
-                url: 'https://mobidetails.iurc.montp.inserm.fr/MD/api/variant/create',
+                url: 'https://mobidetails.chu-montpellier.fr/api/variant/create',
                 data: {
                     variant_chgvs: encodeURIComponent(id),
                     caller: 'cli',
@@ -974,9 +1037,10 @@ function openMD(id) {
                     const b = Swal.getHtmlContainer().querySelector('b')
                     b.textContent = '<i class="fas fa-times-circle w3-text-flat-alizarin"></i> ' + data.mobidetails_error;
                 } else {
-                    b.textContent = 'Redirection to <a href="' + data.url + '" target="_blank" style="text-decoration:underline">' + data.url + '</a>';
+                    b.textContent = `Redirection to ${data.url}`;
                     window.open(data.url);
-                    Swal.close()
+
+                    // Swal.close()
                 }
             });
         }
@@ -1680,11 +1744,8 @@ function toggle_class(id_var, sample_id, class_variant, self) {
             "class_variant": class_variant
         },
         success: function() {
-            id_button = 'button-class-' + id_var;
             var cell = $('#variants').DataTable().cell(self.closest('td'))
-            var data = cell.data();
-            data["class_variant"]=class_variant;
-            cell.data(data).draw();
+            cell.data(class_variant).draw();
             // CREATE SWEET ALERT
         }
     })
