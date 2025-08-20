@@ -18,7 +18,6 @@
                 {% include 'includes/button-status-sample.j2' %}
             </div>
             <hr>
-            <span onclick="table.settings()[0].jqXHR.abort()" class="w3-button">dfwdfs</span>
         </div>
         <div class="w3-padding w3-small">
             <div class="seal-form-report w3-row w3-padding {% if sample.status == 4 %}w3-disabled {% endif %}">
@@ -1659,56 +1658,7 @@
                         return `[${family.filter}] ${af} (${family.allelic_depth}/${family.depth})`;
                     },
                 }
-            }),
-            // createColumn({
-            //     id: "export-AF-family-{{ loop.index }}",
-            //     data: "family",
-            //     exportTitle:"{{ s }} - filter",
-            //     visible: false,
-            //     renderConfig: {
-            //         default: (data) => {
-            //             const family = data["{{ s }}"];
-            //             return family.allelic_frequency
-            //         },
-            //     }
-            // }),
-            // createColumn({
-            //     id: "export-DP-family-{{ loop.index }}",
-            //     data: "family",
-            //     exportTitle:"{{ s }} - filter",
-            //     visible: false,
-            //     renderConfig: {
-            //         default: (data) => {
-            //             const family = data["{{ s }}"];
-            //             console.log(parseInt(family.depth))
-            //             return parseInt(family.depth)
-            //         },
-            //     }
-            // }),
-            // createColumn({
-            //     id: "export-AD-family-{{ loop.index }}",
-            //     data: "family",
-            //     exportTitle:"{{ s }} - filter",
-            //     visible: false,
-            //     renderConfig: {
-            //         default: (data) => {
-            //             const family = data["{{ s }}"];
-            //             return family.allelic_depth
-            //         },
-            //     }
-            // }),
-            // createColumn({
-            //     id: "export-filter_var-family-{{ loop.index }}",
-            //     data: "family",
-            //     exportTitle:"{{ s }} - filter",
-            //     visible: false,
-            //     renderConfig: {
-            //         default: (data) => {
-            //             const family = data["{{ s }}"];
-            //             return family.filter
-            //         },
-            //     }
-            // }),
+            })
             {% endfor %}
         ];
 
