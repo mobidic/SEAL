@@ -548,6 +548,9 @@
                 data: "annotations",
                 myTitleFn: (data) => formatNA(data.SYMBOL),
                 renderConfig: {
+                    default: (data) => {
+                        return data.SYMBOL
+                    },
                     display: (data) => {
                         return data.SYMBOL == null
                         ? "<i>NA</i>"
