@@ -1541,13 +1541,13 @@
             }),
             createColumn({
                 id: "export-filter-MES",
-                data: "annotations",
+                data: null,
                 searchBuilderTitle:"Prediction - MaxEntScan",
                 visible: false,
                 renderConfig: {
                     default: (data, type) => {
-                        const alt = parseFloat(data.MaxEntScan_alt || 0).toFixed(2);
-                        const ref = parseFloat(data.MaxEntScan_ref || 0).toFixed(2);
+                        const alt = parseFloat(data.annotations.MaxEntScan_alt || 0).toFixed(2);
+                        const ref = parseFloat(data.annotations.MaxEntScan_ref || 0).toFixed(2);
                         const mes_var = (((alt - ref) / Math.abs(ref)) * 100).toFixed(2);
                         d = isNaN(parseFloat(mes_var)) ? null: parseFloat(mes_var).toFixed(2);
                         return type === 'export' && d=== null?  '' : Math.abs(d);
