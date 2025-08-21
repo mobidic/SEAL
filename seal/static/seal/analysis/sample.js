@@ -360,7 +360,6 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
             }
             if (sort) {
                 options.sort((a, b) => {
-                    console.log(a.val())
                     if (a.val().toLowerCase() < b.val().toLowerCase()) {
                         return -1;
                     } else if (a.val().toLowerCase() > b.val().toLowerCase()) {
@@ -408,14 +407,6 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
         case "isTrue":
             conditionName = "Is True";
             search = function (value) {
-                console.log("t");
-                console.log((value === false ||
-                       value === "false" ||
-                       value === "0" ||
-                       value === null ||
-                       value === undefined ||
-                       value === "" ||
-                       (typeof value === 'number' && isNaN(value))))
                 return value === true ||
                        value === "true" ||
                        value === "1" ||
@@ -426,14 +417,6 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
         case "isFalse":
             conditionName = "Is False";
             search = function (value) {
-                console.log("f");
-                console.log((value === false ||
-                       value === "false" ||
-                       value === "0" ||
-                       value === null ||
-                       value === undefined ||
-                       value === "" ||
-                       (typeof value === 'number' && isNaN(value))))
                 return value === false ||
                        value === "false" ||
                        value === "0" ||
