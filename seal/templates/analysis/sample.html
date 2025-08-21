@@ -577,30 +577,48 @@
 
                     return `${HGVSg}\n${HGVSc}${response}\n${HGVSp}`;
                 },
+            // Nomenclature Column
+            createColumn({
+                id: "visible-Nomenclature",
+                data: null,
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    if (data.annotations == null) return "<i>NA</i>";
+
+                    let response = data.annotations.preferred ? " (selected)" : "";
+                    response += data.annotations.canonical ? " (canonical)" : "";
+
+                    const HGVSg = formatNA(data.annotations.HGVSg, "NA");
+                    const HGVSc = formatNA(data.annotations.HGVSc, "NA");
+                    const HGVSp = formatNA(data.annotations.HGVSp, "NA");
+
+                    return `${HGVSg}\n${HGVSc}${response}\n${HGVSp}`;
+                },
                 renderConfig: {
                     display: (data) => {
-                        if (data == null) return "<i>NA</i>";
-                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        if (data.annotations == null) return "<i>NA</i>";
+                        const genome = "{{ genome_version }}".toLowerCase() == "grch38" ? "hg38" : "hg19";
+                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.annotations.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">MD</span>
                             </span>
                         </span></a><br />` : "";
-                        const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/hg38/${data.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/${genome}/${data.annotations.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">GB</span>
                             </span>
                         </span></a><br />`;
-                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.HGVSg}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.id}-${genome}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">F</span>
                             </span>
                         </span></a>`;
 
-                        const color = data.preferred ? "w3-text-flat-peter-river" : "";
-                        const starIcon = data.canonical
+                        const color = data.annotations.preferred ? "w3-text-flat-peter-river" : "";
+                        const starIcon = data.annotations.canonical
                             ? `<i class="${color} fas fa-star w3-tiny"></i>`
                             : `<i class="${color} far fa-star w3-tiny"></i>`;
 
@@ -610,9 +628,9 @@
                                     ${starIcon}
                                 </div>
                                 <div class="w3-container w3-cell" style="padding: 0px !important;">
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSg, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSc, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSp, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSg, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSc, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSp, "<i>NA</i>")}</p>
                                 </div>
                                 <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
                                     ${mobidetails}${genebe}${franklin}
@@ -621,9 +639,9 @@
                         `;
                     },
                     sort: (data) => {
-                        if (!data || !data.HGVSg) return -1;
+                        if (!data.annotations || !data.annotations.HGVSg) return -1;
 
-                        const matches = data.HGVSg.match(/(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/);
+                        const matches = data.annotations.HGVSg.match(/(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/);
                         if (!matches) return -1;
 
                         const zero = "000000000";
