@@ -896,10 +896,6 @@
                     const clinvar = data.clinvar || {};
                     const phenotypes = data.phenotypes || {};
                     const star = (clinvar.CLNREVSTAT == null) ? 0 : clinvar_stars[clinvar.CLNREVSTAT];
-                    if(clinvar.CLNREVSTAT == null){
-                    console.log(`${clinvar_stars[clinvar.CLNREVSTAT]}  - ${clinvar.CLNREVSTAT}`)
-                    }
-
                     let stat = '';
                     if (clinvar.CLNREVSTAT) {
                         stat = ` (${star}/4)`;
@@ -951,7 +947,6 @@
                                 color = "peter-river";
                                 colorHover = "belize-hole";
                                 if (/pathogenic|establish/i.test(clinvar.CLNSIGCONF)) {
-                                    console.log(clinvar.CLNREVSTAT)
                                     color = "carrot";
                                     colorHover = "pumpkin";
                                 }
