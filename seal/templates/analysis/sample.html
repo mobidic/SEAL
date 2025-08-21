@@ -563,23 +563,6 @@
             // Nomenclature Column
             createColumn({
                 id: "visible-Nomenclature",
-                data: "annotations",
-                className: 'w3-border-right',
-                myTitleFn: (data) => {
-                    if (data == null) return "<i>NA</i>";
-
-                    let response = data.preferred ? " (selected)" : "";
-                    response += data.canonical ? " (canonical)" : "";
-
-                    const HGVSg = formatNA(data.HGVSg, "NA");
-                    const HGVSc = formatNA(data.HGVSc, "NA");
-                    const HGVSp = formatNA(data.HGVSp, "NA");
-
-                    return `${HGVSg}\n${HGVSc}${response}\n${HGVSp}`;
-                },
-            // Nomenclature Column
-            createColumn({
-                id: "visible-Nomenclature",
                 data: null,
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
@@ -1490,25 +1473,28 @@
             }),
             createColumn({
                 id: "export-filter-clinvar_revstat",
-                data: "clinvar.CLNSIG",
+                data: null,
                 searchBuilderTitle:"ClinVar",
                 visible: false,
                 type: "clinvar",
                 renderConfig: {
                     default: (data) => {
-                        const clinvar = data || {};
+                        const clinvar = data.clinvar || {};
                         let value = "2 - NA";
 
-                        if (clinvar) {
-                            if (/benign/i.test(clinvar)) value = "0 - Benign/Likely Benign";
-                            else if (/uncertain/i.test(clinvar)) value = "3 - Uncertain significance";
-                            else if (/pathogenic|establish/i.test(clinvar)) value = "5 - Pathogenic/Likely Pathogenic";
-                            else if (/conflicting/i.test(clinvar)) {
-                                value = "1 - Conflicting (without Pathogenic)";
-                                if (/pathogenic|establish/i.test(clinvar)) {
-                                    value = "4 - Conflicting (with Pathogenic)";
+                        if (clinvar.CLNSIG) {
+                            if (/benign/i.test(clinvar.CLNSIG)) {
+                                value = "0 - Benign/Likely Benign"
+                            } else if (/uncertain/i.test(clinvar.CLNSIG)) {
+                                value = "3 - Uncertain significance"
+                            } else if (/conflicting/i.test(clinvar.CLNSIG)) {
+                                value = "1 - Conflicting (without Pathogenic)"
+                                if (/pathogenic|establish/i.test(clinvar.CLNSIGCONF)) {
+                                    value = "4 - Conflicting (with Pathogenic)"
                                 }
-                            }
+                            } else if (/pathogenic|establish/i.test(clinvar.CLNSIG)) {
+                                value = "5 - Pathogenic/Likely Pathogenic"
+                            } 
                         }
                         return value;
                     },
@@ -1564,7 +1550,7 @@
                         const ref = parseFloat(data.MaxEntScan_ref || 0).toFixed(2);
                         const mes_var = (((alt - ref) / Math.abs(ref)) * 100).toFixed(2);
                         d = isNaN(parseFloat(mes_var)) ? null: parseFloat(mes_var).toFixed(2);
-                        return type === 'export' && d=== null?  '' : data;
+                        return type === 'export' && d=== null?  '' : Math.abs(d);
                     },
                 }
             }),
@@ -1576,7 +1562,7 @@
                 renderConfig: {
                     default: (data, type) => {
                         d = isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
-                        return type === 'export' && d=== null?  '' : data;
+                        return type === 'export' && d=== null?  '' : d;
                     },
                 }
             }),
@@ -1588,8 +1574,7 @@
                 renderConfig: {
                     default: (data, type) => {
                         d = isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
-                        return type === 'export' && d=== null?  '' : data;
-                        return isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
+                        return type === 'export' && d=== null?  '' : d;
                     },
                 }
             }),
