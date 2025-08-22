@@ -50,29 +50,16 @@
                             <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
                             <th rowspan="2" class="w3-border-right w3-small"><span class="seal-display-middle-left">Consequences</span></th>
                             <th colspan="2" class="w3-border-right">Predictions</th>
-                            <!-- <th  rowspan="2" class='min-size-2x5'><span class="seal-display-middle">R</span></th> -->
                             <th  rowspan="2" class='min-size-75'><span class="seal-display-middle">Class</span></th>
                             <th  rowspan="2" class=''></th>
                         </tr>
                         <tr>
-                            <!-- <th class='min-size-75'>HGVSg</th> -->
-                            <!-- <th class='min-size-200'>HGVS</th> -->
-                            <!-- <th class='min-size-75'>HGVSp</th> -->
-                            <!-- <th class='min-size-50'>E|I</th> -->
-                            <!-- <th class='min-size-75'>Filter</th> -->
                             {% for c in sample.caller %}
                                 <th class='min-size-75'>{{ c }}</th>
                             {% endfor %}
                             {% for s in family_members %}
                                 <th class='min-size-75'>{{ s }}</th>
                             {% endfor %}
-                            <!-- <th class='min-size-100'>GnomAD</th> -->
-                            <!-- <th class='min-size-75'>SEAL</th> -->
-                            <!-- <th class='min-size-100'>ClinVar</th>
-                            <th class='min-size-75'>Transmission</th> -->
-                            <!-- <th class='min-size-150'>Impact</th>
-                            <th class='min-size-75'>Consequence</th> -->
-                            <!-- <th class='min-size-50'>MaxEnt</th> -->
                             <th class='min-size-50'>MaxEnt/SpliceAI</th>
                             <th class='min-size-50'>Missense</th>
                         </tr>
@@ -85,37 +72,18 @@
                                 </span>
                                 Gene
                             </th>
-                            <!-- <th></th> -->
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                HGVSg
-                            </th> -->
                             <th class="">
                                 <span title="Help" onclick="openHelp(title='HGVS', content='The HGVS coding sequence name.<br /><br />Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>, <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                HGVSc
+                                HGVS
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                HGVSp
-                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='Exon/Intron', content='The number of the exon or intron wich have the variant.<br/><b>Exons are in bold</b>, <i>introns in italics.</i>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 E|I
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Filter
-                            </th> -->
                             {% for c in sample.caller %}
                                 <th>
                                     <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
@@ -138,47 +106,23 @@
                             </span>
                                 GnomAD
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='SEAL', content='The number of occurences for this variant among all database.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                SEAL
-                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='ClinVar', content='ClinVar clinical significance of the variant.<br /><ul><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i> : practice guideline</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : reviewed by expert panel</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, multiple submitters, no conflicts</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, conflicting interpretations or single submitter</li><li><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : no assertion </li></ul><br /><ul><li><span class=\'w3-tag w3-flat-turquoise\'>Benign\Likely Benign</span></li><li><span class=\'w3-tag w3-flat-peter-river\'>Conflicting (VUS/Benign)</span></li><li><span class=\'w3-tag w3-flat-sun-flower\'>Uncertain</span></li><li><span class=\'w3-tag w3-flat-carrot\'>Conflicting (with Pathogenic)</span></li><li><span class=\'w3-tag w3-flat-alizarin\'>Pathogenic/Likely pathogenic</span></li><li><span class=\'w3-tag w3-flat-silver\'>Other</span></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 ClinVar
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Transmission', content='This column represent the transmission mode following OMIM data.<br /><ul><li><b>AD</b>: Autosomal dominant</li><li><b>AR</b>: Autosomal recessive</li><li><b>DD</b>: Digenic dominant</li><li><b>DR</b>: Digenic recessive</li><li><b>IC</b>: Isolated cases</li><li><b>Mito</b>: Mitochondrial</li><li><b>MF</b>: Multifactorial</li><li><b>PAD</b>: Pseudoautosomal dominant</li><li><b>PAR</b>: Pseudoautosomal recessive</li><li><b>SMos</b>: Somatic mosaicism</li><li><b>SMut</b>: Somatic mutation</li><li><b>XL</b>: X-linked</li><li><b>XLD</b>: X-linked dominant</li><li><b>XLR</b>: X-linked recessive</li><li><b>YL</b>: Y-linked</li></ul><br /><i class=\'fas fa-question-circle w3-tiny\'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional', footer='For more information see : <a  href=\'https://www.omim.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>OMIM</i></a>' )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Transmission
-                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                Impact
+                                Consequences
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Consequence
-                            </th> -->
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='MaxEntScan', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li class=\'w3-text-flat-pomegranate\'>|percent variation| &ge; 15\%</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                MaxEnt
-                            </th> -->
                             <th>
                                 <span title="Help" onclick="openHelp(title='SpliceAI DeltaScore', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li class=\'w3-text-flat-sun-flower\'>0.2 (high recall)</li><li class=\'w3-text-flat-orange\'>0.5 (recommended)</li><li class=\'w3-text-flat-pomegranate\'>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                SpliceAI
+                                Splice
                             </th>
                             <th>
                                 <span title="Help" onclick="openHelp(title='Missense', content='This score represents the mean rank scores of the top 10 missense predictions tools from dbNSFP v4.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul><br />The threshold are : <ul><li><span class=\'w3-tag w3-flat-pomegranate\'>0.95</span> <i>top 5% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-pomegranate\'>0.9</span> <i>top 10% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-orange\'>0.75</span> <i>top 25% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-sun-flower\'>0.5</span> <i>top 50% deleteriousness of all missense variant</i></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
