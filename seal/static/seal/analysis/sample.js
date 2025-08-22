@@ -610,8 +610,7 @@ $(document).ready(function() {
                         d2 = getValueFromHash(data, dt_table[colIndex]["data"]);
                     }
                     $(this).attr('title', dt_table[colIndex]["mytitle"](d2));
-                }
-                ;
+                };
             });
         },
         select: {

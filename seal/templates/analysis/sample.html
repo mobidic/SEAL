@@ -510,7 +510,7 @@
                 data: null,
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
-                    if (data.annotations == null) return "<i>NA</i>";
+                    if (data.annotations == null) return "NA";
 
                     let response = data.annotations.preferred ? " (selected)" : "";
                     response += data.annotations.canonical ? " (canonical)" : "";
