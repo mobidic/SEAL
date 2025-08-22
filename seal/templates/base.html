@@ -7,13 +7,13 @@
 
         <link rel="stylesheet" href="{{ url_for('static', filename='w3.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='balloon.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome-free-6/all.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='logo-font/style.css') }}" />
 
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
         <script type="text/javascript" src="{{ url_for('static', filename='DataTables/datatables.min.js') }}"></script>
-
-        <script defer src="{{ url_for('static', filename='fontawesome-free-6/all.min.js') }}"></script>
+        
+        <script defer src="{{ url_for('static', filename='fontawesome-free-7.0.0-web/all.min.js') }}"></script>
+        {# <script defer src="{{ url_for('static', filename='fontawesome-free-6/all.min.js') }}"></script> #}
         <link rel="stylesheet" href="{{ url_for('static', filename='seal.css') }}">
 
         {% if current_user.sidebar %}<style>.w3-main {margin-left:350px}</style>{% endif %}
@@ -27,7 +27,7 @@
         <header class="fh-fixedHeader w3-top" style="z-index:6" id="navHead">
             <div class="w3-bar {% if ENV|upper != 'PRODUCTION' %}w3-flat-pomegranate{% else %}w3-flat-green-sea{% endif %} w3-left-align w3-large">
                 {% if current_user.logged %}
-                    <span class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" onclick="w3_toggle_menu()" aria-label="SideBar" data-balloon-pos="right"><i class="fas fa-window-maximize fa-rotate-270"></i></span>
+                    <span class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" onclick="w3_toggle_menu()" aria-label="SideBar" data-balloon-pos="right"><i class="fa-regular fa-window-maximize fa-rotate-270"></i></span>
                 {% endif %}
                 <a href="{{ url_for('index') }}" class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" aria-label="Home" data-balloon-pos="right"><span class="icon-seal"></span> SEAL</a>
                 {% if ENV|upper != 'PRODUCTION' %}<span class="w3-bar-item w3-padding-large w3-left" aria-label="{{ ENV|upper }}" data-balloon-pos="right"><i class="fas fa-exclamation-triangle"></i><span class="w3-hide-small w3-hide-medium"> {{ ENV|upper }} <i class="fas fa-exclamation-triangle"></i></span></span>{% endif %}
@@ -47,7 +47,7 @@
                                 </a>
                                 {% if current_user.admin %}
                                     <a href="{{ url_for('admin.index') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
-                                        <i class="fas fa-tools fa-fw w3-margin-right"></i> Admin tools
+                                        <i class="fas fa-wrench w3-margin-right"></i> Admin tools
                                     </a>
                                     <a href="{{ url_for('update_clinvar') }}" class="w3-text-dark-gray w3-bar-item w3-button {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %}">
                                         <i class="fa-solid fa-download fa-fw w3-margin-right"></i></i> Update ClinVar
