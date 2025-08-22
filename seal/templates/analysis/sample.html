@@ -548,6 +548,9 @@
                 data: "annotations",
                 myTitleFn: (data) => formatNA(data.SYMBOL),
                 renderConfig: {
+                    default: (data) => {
+                        return data.SYMBOL
+                    },
                     display: (data) => {
                         return data.SYMBOL == null
                         ? "<i>NA</i>"
@@ -560,44 +563,45 @@
             // Nomenclature Column
             createColumn({
                 id: "visible-Nomenclature",
-                data: "annotations",
+                data: null,
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
-                    if (data == null) return "<i>NA</i>";
+                    if (data.annotations == null) return "<i>NA</i>";
 
-                    let response = data.preferred ? " (selected)" : "";
-                    response += data.canonical ? " (canonical)" : "";
+                    let response = data.annotations.preferred ? " (selected)" : "";
+                    response += data.annotations.canonical ? " (canonical)" : "";
 
-                    const HGVSg = formatNA(data.HGVSg, "NA");
-                    const HGVSc = formatNA(data.HGVSc, "NA");
-                    const HGVSp = formatNA(data.HGVSp, "NA");
+                    const HGVSg = formatNA(data.annotations.HGVSg, "NA");
+                    const HGVSc = formatNA(data.annotations.HGVSc, "NA");
+                    const HGVSp = formatNA(data.annotations.HGVSp, "NA");
 
                     return `${HGVSg}\n${HGVSc}${response}\n${HGVSp}`;
                 },
                 renderConfig: {
                     display: (data) => {
-                        if (data == null) return "<i>NA</i>";
-                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        if (data.annotations == null) return "<i>NA</i>";
+                        const genome = "{{ genome_version }}".toLowerCase() == "grch38" ? "hg38" : "hg19";
+                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.annotations.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">MD</span>
                             </span>
                         </span></a><br />` : "";
-                        const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/hg38/${data.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/${genome}/${data.annotations.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">GB</span>
                             </span>
                         </span></a><br />`;
-                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.HGVSg}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.id}-${genome}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">F</span>
                             </span>
                         </span></a>`;
 
-                        const color = data.preferred ? "w3-text-flat-peter-river" : "";
-                        const starIcon = data.canonical
+                        const color = data.annotations.preferred ? "w3-text-flat-peter-river" : "";
+                        const starIcon = data.annotations.canonical
                             ? `<i class="${color} fas fa-star w3-tiny"></i>`
                             : `<i class="${color} far fa-star w3-tiny"></i>`;
 
@@ -607,9 +611,9 @@
                                     ${starIcon}
                                 </div>
                                 <div class="w3-container w3-cell" style="padding: 0px !important;">
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSg, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSc, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.HGVSp, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSg, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSc, "<i>NA</i>")}</p>
+                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSp, "<i>NA</i>")}</p>
                                 </div>
                                 <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
                                     ${mobidetails}${genebe}${franklin}
@@ -618,9 +622,9 @@
                         `;
                     },
                     sort: (data) => {
-                        if (!data || !data.HGVSg) return -1;
+                        if (!data.annotations || !data.annotations.HGVSg) return -1;
 
-                        const matches = data.HGVSg.match(/(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/);
+                        const matches = data.annotations.HGVSg.match(/(chr|cen|pter|qter|sup)?([0-9XYMt]+):[gmno]\.([0-9]+)(_[0-9]+)?([ACGT]+>)?(dup|ins|del|inv|[ACGT]+)?/);
                         if (!matches) return -1;
 
                         const zero = "000000000";
@@ -896,10 +900,6 @@
                     const clinvar = data.clinvar || {};
                     const phenotypes = data.phenotypes || {};
                     const star = (clinvar.CLNREVSTAT == null) ? 0 : clinvar_stars[clinvar.CLNREVSTAT];
-                    if(clinvar.CLNREVSTAT == null){
-                    console.log(`${clinvar_stars[clinvar.CLNREVSTAT]}  - ${clinvar.CLNREVSTAT}`)
-                    }
-
                     let stat = '';
                     if (clinvar.CLNREVSTAT) {
                         stat = ` (${star}/4)`;
@@ -951,7 +951,6 @@
                                 color = "peter-river";
                                 colorHover = "belize-hole";
                                 if (/pathogenic|establish/i.test(clinvar.CLNSIGCONF)) {
-                                    console.log(clinvar.CLNREVSTAT)
                                     color = "carrot";
                                     colorHover = "pumpkin";
                                 }
@@ -1474,25 +1473,28 @@
             }),
             createColumn({
                 id: "export-filter-clinvar_revstat",
-                data: "clinvar.CLNSIG",
+                data: null,
                 searchBuilderTitle:"ClinVar",
                 visible: false,
                 type: "clinvar",
                 renderConfig: {
                     default: (data) => {
-                        const clinvar = data || {};
+                        const clinvar = data.clinvar || {};
                         let value = "2 - NA";
 
-                        if (clinvar) {
-                            if (/benign/i.test(clinvar)) value = "0 - Benign/Likely Benign";
-                            else if (/uncertain/i.test(clinvar)) value = "3 - Uncertain significance";
-                            else if (/pathogenic|establish/i.test(clinvar)) value = "5 - Pathogenic/Likely Pathogenic";
-                            else if (/conflicting/i.test(clinvar)) {
-                                value = "1 - Conflicting (without Pathogenic)";
-                                if (/pathogenic|establish/i.test(clinvar)) {
-                                    value = "4 - Conflicting (with Pathogenic)";
+                        if (clinvar.CLNSIG) {
+                            if (/benign/i.test(clinvar.CLNSIG)) {
+                                value = "0 - Benign/Likely Benign"
+                            } else if (/uncertain/i.test(clinvar.CLNSIG)) {
+                                value = "3 - Uncertain significance"
+                            } else if (/conflicting/i.test(clinvar.CLNSIG)) {
+                                value = "1 - Conflicting (without Pathogenic)"
+                                if (/pathogenic|establish/i.test(clinvar.CLNSIGCONF)) {
+                                    value = "4 - Conflicting (with Pathogenic)"
                                 }
-                            }
+                            } else if (/pathogenic|establish/i.test(clinvar.CLNSIG)) {
+                                value = "5 - Pathogenic/Likely Pathogenic"
+                            } 
                         }
                         return value;
                     },
@@ -1539,16 +1541,16 @@
             }),
             createColumn({
                 id: "export-filter-MES",
-                data: "annotations",
+                data: null,
                 searchBuilderTitle:"Prediction - MaxEntScan",
                 visible: false,
                 renderConfig: {
                     default: (data, type) => {
-                        const alt = parseFloat(data.MaxEntScan_alt || 0).toFixed(2);
-                        const ref = parseFloat(data.MaxEntScan_ref || 0).toFixed(2);
+                        const alt = parseFloat(data.annotations.MaxEntScan_alt || 0).toFixed(2);
+                        const ref = parseFloat(data.annotations.MaxEntScan_ref || 0).toFixed(2);
                         const mes_var = (((alt - ref) / Math.abs(ref)) * 100).toFixed(2);
                         d = isNaN(parseFloat(mes_var)) ? null: parseFloat(mes_var).toFixed(2);
-                        return type === 'export' && d=== null?  '' : data;
+                        return type === 'export' && d=== null?  '' : Math.abs(d);
                     },
                 }
             }),
@@ -1560,7 +1562,7 @@
                 renderConfig: {
                     default: (data, type) => {
                         d = isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
-                        return type === 'export' && d=== null?  '' : data;
+                        return type === 'export' && d=== null?  '' : d;
                     },
                 }
             }),
@@ -1572,8 +1574,7 @@
                 renderConfig: {
                     default: (data, type) => {
                         d = isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
-                        return type === 'export' && d=== null?  '' : data;
-                        return isNaN(parseFloat(data)) ? null: parseFloat(data).toFixed(2);
+                        return type === 'export' && d=== null?  '' : d;
                     },
                 }
             }),
@@ -1658,7 +1659,7 @@
                         return `[${family.filter}] ${af} (${family.allelic_depth}/${family.depth})`;
                     },
                 }
-            })
+            }),
             {% endfor %}
         ];
 

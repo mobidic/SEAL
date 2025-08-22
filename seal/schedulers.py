@@ -449,7 +449,7 @@ def importvcf():
             app.logger.error(f'Path does not exist for : {vcf_path}')
             path_locker.unlink()
             return
-
+        status_final = False
         if "add_caller" in data and data["add_caller"] == True:
             sample = get_sample(data)
             if not sample:
@@ -457,6 +457,7 @@ def importvcf():
                 path_locker.unlink()
                 return
             msg = "Add new caller"
+            status_final = sample.status
         else:
             sample = create_sample(data)
             msg = "Import Sample"
@@ -493,7 +494,8 @@ def importvcf():
             app.logger.info("------ END VEP ------")
         except CommandFailedError as e:
             app.logger.info(f"{type(e).__name__} : {e}")
-            sample.status = -1
+            if not status_final:
+                sample.status = -1
             path_locker.unlink()
             db.session.commit()
             error_file = current_file.with_suffix('.error')
@@ -678,7 +680,8 @@ def importvcf():
             date=datetime.now(),
             action=f"Sample Imported")
         db.session.add(history)
-        sample.status = 1
+        if not status_final:
+            sample.status = status
         db.session.commit()
 
 
