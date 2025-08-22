@@ -873,6 +873,7 @@ def json_samples():
     """
     key_list = {
         "asc": [
+            0,
             Sample.samplename.asc(),
             Family.family.asc(),
             Run.name.asc(),
@@ -881,6 +882,7 @@ def json_samples():
             Sample.lastAction.asc()
         ],
         "desc": [
+            0,
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.name.desc(),
@@ -924,6 +926,8 @@ def json_samples():
             teams.append({"teamname": team.teamname, "color": team.color})
         samples_json["data"].append({
             "id": sample.id,
+            "index": sample.index,
+            "affected": sample.affected,
             "samplename": sample.samplename,
             "family": sample.family.family if sample.familyid else None,
             "run": {

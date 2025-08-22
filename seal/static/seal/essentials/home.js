@@ -25,27 +25,42 @@ function toggle_status(id, status, self) {
     });
 }
 
-$(document).ready(function() {
-    table = $('#samples').DataTable({
-        scrollX: true,
-        proccessing: true,
-        serverSide: true,
-        order: [[5, 'desc']],
-        ajax: {
-            url: '/json/samples',
-            type: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': csrf_token
+columns= [
+            {
+                className: 'showTitle',
+                orderable: false,
+                data: {},
+                render: {
+                    _: function ( data, type, row , meta) {
+                        if(data) {
+                            const index = `<i class="fa-solid fa-id-badge ${data.index ? "w3-text-flat-nephritis" : "w3-opacity"}"></i>`;
+                            const affected = `<i class="fa-solid fa-square-virus ${data.affected ? "w3-text-flat-carrot" : "w3-opacity"}"></i>`;
+                            return  `${index}${affected}`
+                        }
+                        return data
+                    },
+                    display: function ( data, type, row, meta ) {
+                        if(data) {
+                            const index = `<i class="fa-solid fa-id-badge ${data.index ? "w3-text-flat-nephritis" : "w3-opacity"}"></i>`;
+                            const affected = `<i class="fa-solid fa-square-virus ${data.affected ? "w3-text-flat-carrot" : "w3-opacity"}"></i>`;
+                            return  `${index}${affected}`
+                        }
+                        return data
+                    }
+                },
+                mytitle: function ( data, type, row ) {
+                    const index = data.index ? "Index" : "Not index";
+                    const affected = data.affected ? "Affected" : "Not affected";
+                    return `${index}\n${affected}`
+                },
             },
-        },
-        columns: [
             {
                 className: 'showTitle',
                 data: {
                     _: "samplename",
                     display: function ( data, type, row ) {
                         if(data) {
-                            return '<a onclick="view_sample(' + data.id + ')" href="/sample/' + data.id  + '" class="w3-button w3-hover-flat-green-sea">' + data.samplename + '</a>';
+                            return  `<a onclick="view_sample(${data.id})" href="/sample/${data.id}" class="w3-button w3-hover-flat-green-sea">${data.samplename}</a>`
                         }
                         return data
                     }
@@ -166,10 +181,29 @@ $(document).ready(function() {
                 }
             }
         ],
+$(document).ready(function() {
+    table = $('#samples').DataTable({
+        scrollX: true,
+        proccessing: true,
+        serverSide: true,
+        order: [[6, 'desc']],
+        ajax: {
+            url: '/json/samples',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrf_token
+            },
+        },
+        columns:columns, 
         createdRow: function( row, data, dataIndex ) {
             if ( data.status < 1 ) {
                 $(row).addClass( 'w3-disabled' );
             }
+            $.each($('td', row), function (colIndex) {
+                if (columns[colIndex]["mytitle"]) {
+                    $(this).attr('title', columns[colIndex]["mytitle"](getValueFromHash(data, columns[colIndex]["data"])))
+                }
+            });
         }
     });
 });
