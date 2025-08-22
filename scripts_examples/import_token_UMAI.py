@@ -1,9 +1,9 @@
-# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 # 
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2023  Jean-Charles DELMAS - MoBiDiC - CHU Montpellier
+# Copyright (C) 2025  Jean-Charles DELMAS - MoBiDiC - CHU Montpellier
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
