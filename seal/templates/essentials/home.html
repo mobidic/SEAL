@@ -8,6 +8,17 @@
     {% include 'includes/sidebar.j2' %}
     <div class="w3-main" {% if current_user.sidebar %}style="margin-left:350px"{% endif %}>
         <div class="w3-padding w3-small">
+            <h4>Filtering options : </h4>
+            <div class="w3-row w3-margin-left" style="margin-bottom:8px">
+                <div class="w3-col" style="width:70px">Index</div>
+                <div class="w3-col" style="width:100px"><input type="button" class="w3-button w3-flat-silver" style="padding:0 6px!important;width:100px" id="index_filtering" value="All" onclick="javascript:toggle(this);"></div>
+            </div>
+            <div class="w3-row w3-margin-left" style="margin-bottom:8px">
+                <div class="w3-col" style="width:70px">Affected</div>
+                <div class="w3-col" style="width:100px"><input type="button" class="w3-button w3-flat-silver" style="padding:0 6px!important;width:100px" id="affected_filtering" value="All" onclick="javascript:toggle(this);"></div>
+            </div>
+        </div>
+        <div class="w3-padding w3-small">
             <table id="samples" class="w3-table display w3-small" style="width:100%">
                 <thead>
                     <tr>

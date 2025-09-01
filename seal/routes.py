@@ -908,6 +908,16 @@ def json_samples():
     recordsTotal = samples.count()
     samples_filter = samples.outerjoin(Family, Sample.family)\
                             .outerjoin(Run, Sample.run).filter(filters)
+
+    if request.form['index_filtering'] == 'True': 
+        samples_filter = samples_filter.filter(Sample.index  == True)
+    if request.form['index_filtering'] == 'False': 
+        samples_filter = samples_filter.filter(Sample.index  == False)
+    if request.form['affected_filtering'] == 'True': 
+        samples_filter = samples_filter.filter(Sample.affected  == True)
+    if request.form['affected_filtering'] == 'False': 
+        samples_filter = samples_filter.filter(Sample.affected  == False)
+
     recordsFiltered = samples_filter.count()
     samples = samples_filter\
         .order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])])\

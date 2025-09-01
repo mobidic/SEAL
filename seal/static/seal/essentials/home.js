@@ -193,6 +193,10 @@ $(document).ready(function() {
             headers: {
                 'X-CSRF-TOKEN': csrf_token
             },
+            data: function (d) {
+                d.index_filtering = $('#index_filtering').val();
+                d.affected_filtering = $('#affected_filtering').val();
+            }
         },
         columns:columns, 
         createdRow: function( row, data, dataIndex ) {
@@ -224,4 +228,19 @@ function toggle_dd_status(id) {
     $('#' + id + "-content").css('margin-right', right);
     $('#' + id + "-content").toggle();
     $('#' + id + "-content").toggleClass("StatusVisible");
+}
+
+function toggle(button) {
+    switch (button.value) {
+        case "True":
+            button.value = "False";
+            break;
+        case "False":
+            button.value = "All";
+            break;
+        case "All":
+            button.value = "True";
+            break;
+    }
+    table.draw();
 }
