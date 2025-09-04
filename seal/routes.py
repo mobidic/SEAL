@@ -1,9 +1,9 @@
-# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 #
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2025  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
+# Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -1221,6 +1221,8 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
                 "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
+                "occurrences_run":  Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(Var2Sample.variant == variant).filter(Sample.runid == sample.runid).count(),
+                "run_samples":  Sample.query.filter(Sample.runid == sample.runid).count(),
                 "occurences_family": len(members),
                 "family_members": members
             },
