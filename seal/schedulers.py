@@ -1,9 +1,9 @@
-# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 #
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2025  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
+# Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -449,7 +449,8 @@ def importvcf():
             app.logger.error(f'Path does not exist for : {vcf_path}')
             path_locker.unlink()
             return
-        status_final = False
+
+        status = 1
         if "add_caller" in data and data["add_caller"] == True:
             sample = get_sample(data)
             if not sample:
@@ -457,7 +458,9 @@ def importvcf():
                 path_locker.unlink()
                 return
             msg = "Add new caller"
-            status_final = sample.status
+            status = sample.status
+            sample.status = 0
+            db.session.commit()
         else:
             sample = create_sample(data)
             msg = "Import Sample"
@@ -494,8 +497,7 @@ def importvcf():
             app.logger.info("------ END VEP ------")
         except CommandFailedError as e:
             app.logger.info(f"{type(e).__name__} : {e}")
-            if not status_final:
-                sample.status = -1
+            sample.status = -1
             path_locker.unlink()
             db.session.commit()
             error_file = current_file.with_suffix('.error')
@@ -680,8 +682,7 @@ def importvcf():
             date=datetime.now(),
             action=f"Sample Imported")
         db.session.add(history)
-        if not status_final:
-            sample.status = status
+        sample.status = status
         db.session.commit()
 
 
