@@ -48,10 +48,10 @@
                             {% endif %}
                             <th rowspan="2" class="w3-border-right min-size-100"><span class="seal-display-middle-left w3-small">Population Frequency</span></th>
                             <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
-                            <th rowspan="2" class="w3-border-right w3-small"><span class="seal-display-middle-left">Consequences</span></th>
+                            <th rowspan="2" class="w3-border-right w3-small min-size-150"><span class="seal-display-middle-left">Consequences</span></th>
                             <th colspan="2" class="w3-border-right">Predictions</th>
-                            <th  rowspan="2" class='min-size-75'><span class="seal-display-middle">Class</span></th>
-                            <th  rowspan="2" class=''></th>
+                            <th rowspan="2" class='min-size-75'><span class="seal-display-middle">Class</span></th>
+                            <th rowspan="2" class=''></th>
                         </tr>
                         <tr>
                             {% for c in sample.caller %}
@@ -101,10 +101,10 @@
                                 </th>
                             {% endfor %}
                             <th>
-                                <span title="Help" onclick="openHelp(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                <i class="fas fa-question-circle w3-tiny"></i>
-                            </span>
-                                GnomAD
+                                <span title="Help" onclick="openHelp(title='Population Frequency', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <i class="fas fa-question-circle w3-tiny"></i>
+                                </span>
+                                Population Frequency
                             </th>
                             <th>
                                 <span title="Help" onclick="openHelp(title='ClinVar', content='ClinVar clinical significance of the variant.<br /><ul><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i> : practice guideline</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : reviewed by expert panel</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, multiple submitters, no conflicts</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, conflicting interpretations or single submitter</li><li><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : no assertion </li></ul><br /><ul><li><span class=\'w3-tag w3-flat-turquoise\'>Benign\Likely Benign</span></li><li><span class=\'w3-tag w3-flat-peter-river\'>Conflicting (VUS/Benign)</span></li><li><span class=\'w3-tag w3-flat-sun-flower\'>Uncertain</span></li><li><span class=\'w3-tag w3-flat-carrot\'>Conflicting (with Pathogenic)</span></li><li><span class=\'w3-tag w3-flat-alizarin\'>Pathogenic/Likely pathogenic</span></li><li><span class=\'w3-tag w3-flat-silver\'>Other</span></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
