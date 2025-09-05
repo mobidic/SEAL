@@ -737,7 +737,7 @@
                 myTitleFn: (data) => {
                     const gnomad = parseFloat(data.annotations?.gnomADg_AF);
                     const seal = `SEAL: ${data.inseal?.occurrences || ''}`;
-                    const seal_run = `(Run ${data.inseal.occurrences_run}/${data.inseal.run_samples})`;
+                    const seal_run = {{ sample.run.samples|length }} > 0 ? `(Run ${data.inseal.occurrences_run}/{{ sample.run.samples|length }})`: '';
                     if (isNaN(gnomad)) return `GnomAD : NA\n${seal} ${seal_run}`;
 
                     const pop = {
@@ -779,7 +779,7 @@
                     display: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
                         const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> SEAL: </span>${data.inseal?.occurrences || ''}</b>`;
-                        const seal_run = `<span class="w3-text-flat-asbestos">(<i class="fas fa-digital-tachograph"></i> ${data.inseal.occurrences_run}/${data.inseal.run_samples})</span>`;
+                        const seal_run = {{ sample.run.samples|length }} > 0 ? `<span class="w3-text-flat-asbestos">(<i class="fas fa-digital-tachograph"></i> ${data.inseal.occurrences_run}/{{ sample.run.samples|length }})</span>` : '';
                         if (isNaN(gnomad)) return `<i>NA</i><br />${seal} ${seal_run}`;
 
                         const pop = {
@@ -1418,17 +1418,19 @@
                 searchBuilderTitle:"SEAL",
                 visible: false
             }),
+            {% if sample.runid %}
             createColumn({
                 id: "export-filter-seal",
-                data: "inseal",
+                data: "inseal.occurrences_run",
                 searchBuilderTitle:"Run Occurences",
                 visible: false,
                 renderConfig: {
                     default: (data, type) => {
-                        return type === 'export'? `${data.occurrences_run}/${data.run_samples}`: parseFloat(data.occurrences_run/data.run_samples);
+                        return type === 'export'? `${data}/{{ sample.run.samples|length }}`: data;
                     },
                 }
             }),
+            {% endif %}
             createColumn({
                 id: "export-filter-clinvar_revstat",
                 data: null,

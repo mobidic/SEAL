@@ -1221,8 +1221,7 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
                 "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
-                "occurrences_run":  Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(Var2Sample.variant == variant).filter(Sample.runid == sample.runid).count(),
-                "run_samples":  Sample.query.filter(Sample.runid == sample.runid).count(),
+                "occurrences_run": Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(Var2Sample.variant == variant).filter(Sample.runid == sample.runid).count(),
                 "occurences_family": len(members),
                 "family_members": members
             },
