@@ -46,7 +46,7 @@
                             {% if family_members|length > 0 %}
                                 <th colspan="{{ family_members|length }}" class="w3-border-right">Family<br /><span class="w3-text-flat-pumpkin w3-tiny"><i class="fa-solid fa-triangle-exclamation"></i> Only max values</span></th>
                             {% endif %}
-                            <th rowspan="2" class="w3-border-right min-size-100"><span class="seal-display-middle-left w3-small">Population Frequency</span></th>
+                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left w3-small">Population Frequency</span></th>
                             <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
                             <th rowspan="2" class="w3-border-right w3-small min-size-150"><span class="seal-display-middle-left">Consequences</span></th>
                             <th colspan="2" class="w3-border-right">Predictions</th>
@@ -736,7 +736,9 @@
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
                     const gnomad = parseFloat(data.annotations?.gnomADg_AF);
-                    if (isNaN(gnomad)) return "NA";
+                    const seal = `SEAL: ${data.inseal?.occurrences || ''}`;
+                    const seal_run = `(Run ${data.inseal.occurrences_run}/${data.inseal.run_samples})`;
+                    if (isNaN(gnomad)) return `GnomAD : NA\n${seal} ${seal_run}`;
 
                     const pop = {
                         "gnomADg_AF_AFR": "African/African-American",
@@ -767,7 +769,7 @@
                     }
 
                     const fixed = max > 0 ? Math.min(Math.max(-Math.floor(Math.log10(max * 100)), 2), 5) : 2;
-                    return `${(gnomad * 100).toFixed(fixed)}%${p}`;
+                    return `${(gnomad * 100).toFixed(fixed)}%${p}\n${seal} ${seal_run}`;
                 },
                 renderConfig: {
                     default: (data) => {
@@ -777,7 +779,8 @@
                     display: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
                         const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> SEAL: </span>${data.inseal?.occurrences || ''}</b>`;
-                        if (isNaN(gnomad)) return `<i>NA</i><br />${seal}`;
+                        const seal_run = `<span class="w3-text-flat-asbestos">(<i class="fas fa-digital-tachograph"></i> ${data.inseal.occurrences_run}/${data.inseal.run_samples})</span>`;
+                        if (isNaN(gnomad)) return `<i>NA</i><br />${seal} ${seal_run}`;
 
                         const pop = {
                             "gnomADg_AF_AFR": "AFR",
@@ -825,7 +828,7 @@
 
                         const gnomad_r = `<a target="_blank" href="https://gnomad.broadinstitute.org/variant/${data.id}?dataset=gnomad_${gnomad_version}" class="fa-fw w3-text-indigo w3-hover-text-black do-not-select" style="cursor: pointer;">${response}</a>`;
 
-                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}<br />${seal}`;
+                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}<br />${seal} ${seal_run}`;
                     },
                     sort: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
@@ -1414,6 +1417,17 @@
                 data: "inseal.occurrences",
                 searchBuilderTitle:"SEAL",
                 visible: false
+            }),
+            createColumn({
+                id: "export-filter-seal",
+                data: "inseal",
+                searchBuilderTitle:"Run Occurences",
+                visible: false,
+                renderConfig: {
+                    default: (data, type) => {
+                        return type === 'export'? `${data.occurrences_run}/${data.run_samples}`: parseFloat(data.occurrences_run/data.run_samples);
+                    },
+                }
             }),
             createColumn({
                 id: "export-filter-clinvar_revstat",
