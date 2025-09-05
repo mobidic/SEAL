@@ -620,6 +620,7 @@ $(document).ready(function() {
         },
         ajax: json_variants,
         columns: dt_table,
+        order: [[ 1, "asc" ]],
         initComplete: function(settings, json) {
             changeFilter(sample_filter_id, sample_id);
             if (sample_status != 4) {
@@ -645,7 +646,6 @@ $(document).ready(function() {
                                 class_seal:  conditionsFilter(class_variant_export, ["==", "!="]),
                                 num: {"=":null, "!=": null},
                                 reported:  conditionsFilter(reported_v, ["isTrue", "isFalse"]),
-
                             }
                         },
                     },
@@ -1649,7 +1649,6 @@ function changeFilter(id=1, sample_id) {
                 },
                 success: function() {
                     $('#tableHistorySample').DataTable().ajax.reload();
-                    table.order([2, "asc"]).draw();
                 }
             });
         }, 30);
