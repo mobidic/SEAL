@@ -1164,7 +1164,6 @@ def json_variants(id, idbed=False, version=-1):
                         "filter": f"NA",
                     }
 
-        allelic_frequency = var2sample.allelic_depth / var2sample.depth
         calls = dict()
         for caller in var2sample.caller:
             try:
@@ -1179,6 +1178,7 @@ def json_variants(id, idbed=False, version=-1):
                 )
             except:
                  calls[caller] = None
+        allelic_frequency = var2sample.allelic_freq if var2sample.allelic_freq else var2sample.allelic_depth / var2sample.depth
         variants["data"].append({
             "annotations": main_annot,
             "chr": f"{variant.chr}",
