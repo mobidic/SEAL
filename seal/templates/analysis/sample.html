@@ -1372,6 +1372,16 @@
                 }
             }),
             createColumn({
+                id: "exportDefGen-class",
+                data: "class_variant",
+                exportTitleDefGen: "CLASSEUR5",
+                visible: false,
+                type:"string",
+                renderConfig: {
+                    default: (data) => data ? data : "",
+                }
+            }),
+            createColumn({
                 id: "export-filter-Nearest",
                 data: "annotations.NEAREST",
                 searchBuilderTitle:"Nearest Transcript",

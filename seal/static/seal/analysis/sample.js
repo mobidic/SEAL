@@ -528,7 +528,8 @@ columns_defGen = [
     getIndexById(dt_table, "export-filter-chr"),
     getIndexById(dt_table, "export-filter-HGVSg"),
     getIndexById(dt_table, "export-filter-EI"),
-    getIndexById(dt_table, "export-filter-AF")
+    getIndexById(dt_table, "filter-AF"),
+    getIndexById(dt_table, "exportDefGen-class")
 ]
 
 columns_export = [
