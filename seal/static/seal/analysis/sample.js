@@ -504,7 +504,7 @@ function getIndexById(array, id, regexp=false) {
     return array.findIndex(element => element.id === id);
 }
 
-function format_export (title) {
+function format_export(title) {
     return {
         header: function ( data, columnIdx ) {
             return (dt_table[columnIdx][title] !== undefined) ?  dt_table[columnIdx][title] : ((getTextFromHTML(data) === '' && dt_table[columnIdx]["id"] !== undefined) ?  dt_table[columnIdx]["id"] : getTextFromHTML(data));
@@ -1650,7 +1650,7 @@ function changeFilter(id=1, sample_id) {
                 },
                 success: function() {
                     $('#tableHistorySample').DataTable().ajax.reload();
-                    table.order([2, "asc"]).draw();
+                    table.order([1, "asc"]).draw();
                 }
             });
         }, 30);
