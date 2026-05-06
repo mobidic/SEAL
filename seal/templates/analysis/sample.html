@@ -1363,9 +1363,9 @@
                 type:"string",
                 renderConfig: {
                     default: (data) => {
-                        hgvs_split = String(data).split(":");
+                        hgvs_split = String(data).split(":p.");
                         if (hgvs_split.length > 1) {
-                            return hgvs_split[1];
+                            return `p.(${hgvs_split[1]})`;
                         }
                         return ""
                     },
@@ -1655,7 +1655,7 @@
                         if (isNaN(parseFloat(family.allelic_depth)) && isNaN(parseFloat(family.allelic_frequency))) {
                             return "NA"
                         }
-                        const af = (isNaN(parseFloat(family.allelic_frequency))) ? ((parseFloat(family.allelic_depth)/parseFloat(family.allelic_frequency))*100).toFixed(2) : '';
+                        const af = (isNaN(parseFloat(family.allelic_frequency))) ? ((parseFloat(family.allelic_depth)/parseFloat(family.allelic_frequency))*100).toFixed(2) : parseFloat(family.allelic_frequency).toFixed(2);
                         return `[${family.filter}] ${af} (${family.allelic_depth}/${family.depth})`;
                     },
                 }
