@@ -504,7 +504,7 @@ def importvcf():
 
         with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
             for v in vcf_io:
-                if v.alt[0] == "*":
+                if v.alt[0] == "*" or v.alt[0] == "<*>" :
                     continue
                 variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if not variant:
@@ -681,7 +681,7 @@ def importvcf():
             action=f"Sample Imported")
         db.session.add(history)
         if not status_final:
-            sample.status = status
+            sample.status = 1
         db.session.commit()
 
 
