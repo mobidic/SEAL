@@ -24,7 +24,7 @@ import time
 import numpy
 import random
 import subprocess
-from ftplib import FTP
+import urllib.request
 from pathlib import Path
 from datetime import datetime
 from threading import Thread
@@ -711,7 +711,6 @@ def update_clinvar_thread(vcf, version, genome=config["GENOME"]):
     # Try to update
     try:
         cpt = 0
-        execute_shell_command(["tabix", "-p", "vcf", new_clinvar])
         with annotVcf.AnnotVCFIO(new_clinvar) as vcf_io:
             for v in vcf_io:
                 cpt += 1
@@ -759,44 +758,23 @@ def check_clinvar(genome=config["GENOME"]):
     lockFile = open(path_locker, 'x')
     lockFile.close()
 
-    try:
-        ftp=FTP('ftp.ncbi.nlm.nih.gov')
-        ftp.login()
-        ftp.cwd(f'pub/clinvar/vcf_{genome}')
-    except Exception as e:
-        app.logger.error(e)
-    else:
-        ls = ftp.nlst()
-        for i in ls:
-            r = re.compile("clinvar_([0-9]+).vcf.gz$")
-            match = r.search(i)
-            app.logger.info(f"  - file : {i}")
-            if match:
-                app.logger.info(f"    - match : {match.group(1)}")
-                version = match.group(1)
-                file = match.group(0)
+    path_clinvar=Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/')
+    base_url = f'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_{genome[:3].upper()}{genome[3:]}/'
+    
+    d = datetime.today().strftime('%Y%m%d')
+    dates = list(range(int(d)-6,int(d)+1))
+    dates.reverse()
 
-                if not Clinvar.query.filter_by(version=version, genome=genome.lower()).one_or_none():
-                    app.logger.info(f"    - new clinvar")
-                    vcf_path = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}')
-                    vcf_path = vcf_path.joinpath(file)
-                    t = 0
-                    while t < 10:
-                        try:
-                            app.logger.info(f"    - download attempt : {t}")
-                            with open(f'{vcf_path}', 'wb') as fp:
-                                ftp.retrbinary(f'RETR {file}', fp.write)
-                            Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower(), )).start()
-                            app.logger.info(f"    - thread launched")
-                            t=10
-                        except Exception as e:
-                            app.logger.info(f"    - download filed retry")
-                            app.logger.error(e)
-                            ftp.close()
-                            ftp=FTP('ftp.ncbi.nlm.nih.gov')
-                            ftp.login()
-                            ftp.cwd(f'pub/clinvar/vcf_{genome}')
-                            t+=1
-    finally:
-        app.logger.info("END CLINVAR UPDATE")
-        path_locker.unlink()
+    for version in dates:
+        try:
+            clinvar = f'clinvar_{version}.vcf.gz'
+            urllib.request.urlretrieve(f'{base_url}/{clinvar}.tbi', f'{str(path_clinvar)}/{clinvar}.tbi')
+            urllib.request.urlretrieve(f'{base_url}/{clinvar}', f'{str(path_clinvar)}/{clinvar}')
+            vcf_path = path_clinvar.joinpath(f'/{clinvar}')
+            break
+        except urllib.error.HTTPError as e:
+            print(f'{base_url}/clinvar_{version}.vcf.gz')
+            print(e)
+    Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower())).start()
+    path_locker.unlink()
+    return
