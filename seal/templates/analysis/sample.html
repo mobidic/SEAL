@@ -1651,6 +1651,14 @@
                     },
                 }
             }),
+            createColumn({
+                id: "export-sampleName",
+                data: null,
+                exportTitle:"SampleName",
+                exportTitleDefGen:"SampleName",
+                visible: false,
+                renderConfig: {default: function(){return "{{ sample.samplename }}"}}
+            }),
             // {% endif %}
             // Family Member Columns 
             {% for s in family_members %}
