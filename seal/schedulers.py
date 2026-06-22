@@ -694,15 +694,8 @@ def importvcf():
 
         path_locker.unlink()
 
-
-def update_clinvar_thread(vcf, version, genome=config["GENOME"]):
-    # Check and create locker
-    path_locker = Path(app.root_path).joinpath('static/temp/vcf/.lock')
-    while path_locker.exists():
-        time.sleep(1)
-    lockFile = open(path_locker, 'x')
-    lockFile.close()
-
+def update_clinvar(vcf, version, genome=config["GENOME"]):
+    app.logger.info(f"ClinVar Version : '{version}' processing")
     # Switch on maintenance mode
     app.config["MAINTENANCE"] = True
     app.config["MAINTENANCE_REASON"] = "Update ClinVar"
@@ -720,51 +713,46 @@ def update_clinvar_thread(vcf, version, genome=config["GENOME"]):
 
     # Try to update
     try:
-        cpt = 0
         with annotVcf.AnnotVCFIO(new_clinvar) as vcf_io:
             for v in vcf_io:
-                cpt += 1
                 variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
                 if variant:
                     variant.clinvar_VARID = v.id
                     variant.clinvar_CLNSIG = ''.join(v.info["CLNSIG"]) if "CLNSIG" in v.info else None
                     variant.clinvar_CLNSIGCONF = ''.join(v.info["CLNSIGCONF"]) if "CLNSIGCONF" in v.info else None
                     variant.clinvar_CLNREVSTAT = ''.join(v.info["CLNREVSTAT"]) if "CLNREVSTAT" in v.info else None
+
+        # Update Clinvar database
+        for c in Clinvar.query.filter_by(genome=genome, current=True).all():
+            c.current = False
+        clinvar.current = True
+        db.session.commit()
+        new_clinvar.rename(current)
+        new_clinvar_index.rename(current_index)
     except Exception as e:
         db.session.rollback()
         path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')
         with open(path_log, "w") as log:
             log.write(f"Error on file: {new_clinvar}")
             log.write(e)
+        app.logger.error(e)
+    finally:
+        # Switch off maintenance mode
         app.config["MAINTENANCE"] = False
         del app.config["MAINTENANCE_REASON"]
-        path_locker.unlink()
         return
 
-    # Update Clinvar
-    for c in Clinvar.query.filter_by(genome=genome, current=True).all():
-        c.current = False
-    clinvar.current = True
-    db.session.commit()
-    new_clinvar.rename(current)
-    new_clinvar_index.rename(current_index)
 
-    # Switch off maintenance mode
-    app.config["MAINTENANCE"] = False
-    del app.config["MAINTENANCE_REASON"]
-    path_locker.unlink()
-
-
-@scheduler.task('cron', id='update clinvar', day_of_week="mon")
+@scheduler.task('cron', id='update clinvar', day_of_week="*")
 def check_clinvar(genome=config["GENOME"]):
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     path_locker = path_inout.joinpath('.lock')
     app.logger.info("START CLINVAR UPDATE")
 
     while path_locker.exists():
-        time.sleep(1)
+        app.logger.debug("  - waiting free time (locker file)")
+        time.sleep(60)
 
-    app.logger.info("  - No locker")
     lockFile = open(path_locker, 'x')
     lockFile.close()
 
@@ -772,19 +760,28 @@ def check_clinvar(genome=config["GENOME"]):
     base_url = f'https://ftp.ncbi.nlm.nih.gov/pub/clinvar/vcf_{genome[:3].upper()}{genome[3:]}/'
     
     d = datetime.today().strftime('%Y%m%d')
-    dates = list(range(int(d)-6,int(d)+1))
+    dates = list(range(int(d)-8,int(d)+1))
     dates.reverse()
 
     for version in dates:
+        if Clinvar.query.get(int(version)):
+            app.logger.debug(f"ClinVar Version : '{version}' already updated ")
+            break
         try:
             clinvar = f'clinvar_{version}.vcf.gz'
+            app.logger.debug(f"ClinVar version : '{version}' check")
             urllib.request.urlretrieve(f'{base_url}/{clinvar}.tbi', f'{str(path_clinvar)}/{clinvar}.tbi')
             urllib.request.urlretrieve(f'{base_url}/{clinvar}', f'{str(path_clinvar)}/{clinvar}')
+            app.logger.info(f"ClinVar version : '{version}' uploaded")
             vcf_path = path_clinvar.joinpath(f'{clinvar}')
+            update_clinvar(vcf_path, int(version), genome.lower())
             break
         except urllib.error.HTTPError as e:
-            print(f'{base_url}/clinvar_{version}.vcf.gz')
-            print(e)
-    Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower())).start()
-    # path_locker.unlink()
+            app.logger.debug(f'{e} : {base_url}/clinvar_{version}.vcf.gz')
+        except Exception as e:
+            app.logger.error(e)
+            
+    app.logger.info("END CLINVAR UPDATE")
+    path_locker.unlink()
     return
+
