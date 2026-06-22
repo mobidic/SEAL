@@ -116,11 +116,19 @@ SPLICEAI = [
 ]
 
 
+# multicaller not opti but it works for our 2 callers process
+# NEED TO WORK
 def get_token(path_tokens):
+    tokens = []
+    others = []
     for file in path_tokens.iterdir():
-        if file.suffix == '.token':
-            return file
-    return False
+        if str(file).endswith('.token'):
+            tokens.append(file)
+            tokens.sort()
+        elif str(file).endswith('.token2'):
+            others.append(file)
+            others.sort()
+    return tokens + others
 
 
 def random_color(format="HEX"):
@@ -404,285 +412,287 @@ def create_and_execute_shell_command(json_file, values):
 def importvcf():
     # Check launchable
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
-    current_token = get_token(path_inout)
     path_locker = path_inout.joinpath('.lock')
+    if path_locker.exists():
+        return
 
-    if current_token and not path_locker.exists():
-        app.logger.info("---------------- Add a VCF ----------------")
+    tokens = get_token(path_inout)
 
+    if tokens and not path_locker.exists():
         # Create lock file
         lockFile = open(path_locker, 'x')
         lockFile.close()
+        for current_token in tokens:
+            # Change token to treat file
+            app.logger.info("---------------- Add a VCF ----------------")
+            current_file = current_token.with_suffix('.treat')
+            current_token.rename(current_file)
 
-        # Change token to treat file
-        current_file = current_token.with_suffix('.treat')
-        current_token.rename(current_file)
+            # Load data
+            with current_file.open('r') as json_sample:
+                data = json.load(json_sample)
 
-        # Load data
-        with current_file.open('r') as json_sample:
-            data = json.load(json_sample)
+            # Check user
+            try:
+                user_id = data["userid"]
+            except KeyError:
+                user_id = 1
 
-        # Check user
-        try:
-            user_id = data["userid"]
-        except KeyError:
-            user_id = 1
+            try:
+                date_import = data["date"]
+            except KeyError:
+                date_import = datetime.now()
 
-        try:
-            date_import = data["date"]
-        except KeyError:
-            date_import = datetime.now()
+            try:
+                genome = data["genome"]
+            except KeyError:
+                genome = config["GENOME"]
 
-        try:
-            genome = data["genome"]
-        except KeyError:
-            genome = config["GENOME"]
+            # Come from interface
+            try:
+                interface = data["interface"]
+            except KeyError:
+                interface = False
 
-        # Come from interface
-        try:
-            interface = data["interface"]
-        except KeyError:
-            interface = False
-
-        vcf_path = Path(data["vcf_path"])
-        if not vcf_path.exists():
-            app.logger.error(f'Path does not exist for : {vcf_path}')
-            path_locker.unlink()
-            return
-        status_final = False
-        if "add_caller" in data and data["add_caller"] == True:
-            sample = get_sample(data)
-            if not sample:
-                app.logger.error(f'Sample does not found')
-                path_locker.unlink()
+            vcf_path = Path(data["vcf_path"])
+            if not vcf_path.exists():
+                app.logger.error(f'Path does not exist for : {vcf_path}')
+                # path_locker.unlink()
                 return
-            msg = "Add new caller"
-            status_final = sample.status
-        else:
-            sample = create_sample(data)
-            msg = "Import Sample"
-        
-        call_name = "default"
-        if "caller" in data:
-            call_name = data["caller"]
-
-        i = 0
-        while call_name in sample.caller:
-            i += 1
-            call_name = f"default_{i}"
+            status_final = False
+            if "add_caller" in data and data["add_caller"] == True:
+                sample = get_sample(data)
+                if not sample:
+                    app.logger.error(f'Sample does not found')
+                    # path_locker.unlink()
+                    return
+                msg = "Add new caller"
+                status_final = sample.status
+            else:
+                sample = create_sample(data)
+                msg = "Import Sample"
             
-        sample.caller.append(call_name)
-        history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=msg)
-        db.session.add(history)
-        db.session.commit()
+            call_name = "default"
+            if "caller" in data:
+                call_name = data["caller"]
 
-        vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
-        stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
-        clinvar_vcf = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/current.vcf.gz')
-
-        values = {
-            "vcf_path": vcf_path,
-            "vcf_vep": vcf_vep,
-            "stats_vep": stats_vep,
-            "ClinVar_vcf": clinvar_vcf
-        }
-
-        current_date = datetime.now().isoformat()
-        try:
-            app.logger.info("------ Variant Annotation with VEP ------")
-            create_and_execute_shell_command(Path(app.root_path).joinpath('static/vep.config.json'), values)
-            app.logger.info("------ END VEP ------")
-        except CommandFailedError as e:
-            app.logger.info(f"{type(e).__name__} : {e}")
-            if not status_final:
-                sample.status = -1
-            path_locker.unlink()
+            i = 0
+            while call_name in sample.caller:
+                i += 1
+                call_name = f"default_{i}"
+                
+            sample.caller.append(call_name)
+            history = History(sample_ID=sample.id, user_ID=user_id, date=date_import, action=msg)
+            db.session.add(history)
             db.session.commit()
-            error_file = current_file.with_suffix('.error')
-            current_file.rename(error_file)
-            return
 
-        with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
-            for v in vcf_io:
-                if v.alt[0] == "*" or v.alt[0] == "<*>" :
-                    continue
-                variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
-                if not variant:
-                    variant = Variant(
-                        id=f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}",
-                        chr=f"chr{v.chrom.replace('chr','')}",
-                        pos=v.pos,
-                        ref=v.ref,
-                        alt=v.alt[0])
-                    db.session.add(variant)
+            vcf_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.vcf')
+            stats_vep = path_inout.joinpath(f'{vcf_path.stem}.vep.html')
+            clinvar_vcf = Path(app.root_path).joinpath(f'static/temp/clinvar/{genome}/current.vcf.gz')
 
-                if not variant.annotations:
-                    annotations = [{
-                        "date": current_date,
-                        "ANN": list()
-                    }]
+            values = {
+                "vcf_path": vcf_path,
+                "vcf_vep": vcf_vep,
+                "stats_vep": stats_vep,
+                "ClinVar_vcf": clinvar_vcf
+            }
 
-                    for annot in v.info["ANN"]:
-                        variant.clinvar_VARID = annot["ClinVar"]
-                        variant.clinvar_CLNSIG = annot["ClinVar_CLNSIG"]
-                        variant.clinvar_CLNSIGCONF = ''.join(annot["ClinVar_CLNSIGCONF"].split("&")) if annot["ClinVar_CLNSIGCONF"] else None
-                        variant.clinvar_CLNREVSTAT = ''.join(annot["ClinVar_CLNREVSTAT"].split("&")) if annot["ClinVar_CLNREVSTAT"] else None
-                        # Split annotations
-                        for splitAnn in ANNOT_TO_SPLIT:
-                            if splitAnn == 'VAR_SYNONYMS':
-                                try:
-                                    var_synonyms = dict()
-                                    for vs in annot[splitAnn].split("--"):
-                                        key, values = vs.split("::")
-                                        values_array = values.split("&")
-                                        var_synonyms[key] = values_array
+            current_date = datetime.now().isoformat()
+            try:
+                app.logger.info("------ Variant Annotation with VEP ------")
+                create_and_execute_shell_command(Path(app.root_path).joinpath('static/vep.config.json'), values)
+                app.logger.info("------ END VEP ------")
+            except CommandFailedError as e:
+                app.logger.info(f"{type(e).__name__} : {e}")
+                if not status_final:
+                    sample.status = -1
+                # path_locker.unlink()
+                db.session.commit()
+                error_file = current_file.with_suffix('.error')
+                current_file.rename(error_file)
+                return
 
-                                    annot[splitAnn] = var_synonyms
-                                except AttributeError:
-                                    annot[splitAnn] = dict()
-                            else:
-                                try:
-                                    annot[splitAnn] = annot[splitAnn].split("&")
-                                except AttributeError:
-                                    annot[splitAnn] = []
+            with annotVcf.AnnotVCFIO(vcf_vep) as vcf_io:
+                for v in vcf_io:
+                    if v.alt[0] == "*" or v.alt[0] == "<*>" :
+                        continue
+                    variant = Variant.query.get(f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}")
+                    if not variant:
+                        variant = Variant(
+                            id=f"chr{v.chrom.replace('chr','')}-{v.pos}-{v.ref}-{v.alt[0]}",
+                            chr=f"chr{v.chrom.replace('chr','')}",
+                            pos=v.pos,
+                            ref=v.ref,
+                            alt=v.alt[0])
+                        db.session.add(variant)
 
-                        # transcript
-                        transcript = Transcript.query.get(annot["Feature"])
-                        if not transcript and annot["Feature"] is not None:
-                            transcript = Transcript(
-                                feature=annot["Feature"],
-                                biotype=annot["BIOTYPE"],
-                                feature_type=annot["Feature_type"],
-                                symbol=annot["SYMBOL"],
-                                symbol_source=annot["SYMBOL_SOURCE"],
-                                gene=annot["Gene"],
-                                source=annot["SOURCE"],
-                                protein=annot["ENSP"],
-                                canonical=annot["CANONICAL"],
-                                hgnc=annot["HGNC_ID"]
-                            )
-                            db.session.add(transcript)
+                    if not variant.annotations:
+                        annotations = [{
+                            "date": current_date,
+                            "ANN": list()
+                        }]
 
-                        # Get consequence score
-                        consequence_score = 0
-                        for consequence in annot["Consequence"]:
-                            consequence_score += CONSEQUENCES_DICT[consequence]
-                        annot["consequenceScore"] = consequence_score
+                        for annot in v.info["ANN"]:
+                            variant.clinvar_VARID = annot["ClinVar"]
+                            variant.clinvar_CLNSIG = annot["ClinVar_CLNSIG"]
+                            variant.clinvar_CLNSIGCONF = ''.join(annot["ClinVar_CLNSIGCONF"].split("&")) if annot["ClinVar_CLNSIGCONF"] else None
+                            variant.clinvar_CLNREVSTAT = ''.join(annot["ClinVar_CLNREVSTAT"].split("&")) if annot["ClinVar_CLNREVSTAT"] else None
+                            # Split annotations
+                            for splitAnn in ANNOT_TO_SPLIT:
+                                if splitAnn == 'VAR_SYNONYMS':
+                                    try:
+                                        var_synonyms = dict()
+                                        for vs in annot[splitAnn].split("--"):
+                                            key, values = vs.split("::")
+                                            values_array = values.split("&")
+                                            var_synonyms[key] = values_array
 
-                        # Get Exon/Intron
-                        annot["EI"] = None
-                        if annot["EXON"] is not None:
-                            annot["EI"] = f"{annot['EXON']}"
-                        if annot["INTRON"] is not None:
-                            annot["EI"] = f"{annot['INTRON']}"
+                                        annot[splitAnn] = var_synonyms
+                                    except AttributeError:
+                                        annot[splitAnn] = dict()
+                                else:
+                                    try:
+                                        annot[splitAnn] = annot[splitAnn].split("&")
+                                    except AttributeError:
+                                        annot[splitAnn] = []
 
-                        # Get Exon/Intron
-                        annot["canonical"] = True if annot['CANONICAL'] == 'YES' else False
+                            # transcript
+                            transcript = Transcript.query.get(annot["Feature"])
+                            if not transcript and annot["Feature"] is not None:
+                                transcript = Transcript(
+                                    feature=annot["Feature"],
+                                    biotype=annot["BIOTYPE"],
+                                    feature_type=annot["Feature_type"],
+                                    symbol=annot["SYMBOL"],
+                                    symbol_source=annot["SYMBOL_SOURCE"],
+                                    gene=annot["Gene"],
+                                    source=annot["SOURCE"],
+                                    protein=annot["ENSP"],
+                                    canonical=annot["CANONICAL"],
+                                    hgnc=annot["HGNC_ID"]
+                                )
+                                db.session.add(transcript)
 
-                        # missense
-                        missenses = list()
-                        for value in MISSENSES:
-                            missenses.append(annot[value])
-                        missenses = numpy.array(missenses, dtype=numpy.float64)
-                        mean = numpy.nanmean(missenses)
-                        annot["missensesMean"] = None if numpy.isnan(mean) else mean
+                            # Get consequence score
+                            consequence_score = 0
+                            for consequence in annot["Consequence"]:
+                                consequence_score += CONSEQUENCES_DICT[consequence]
+                            annot["consequenceScore"] = consequence_score
 
-                        # max spliceAI
-                        spliceAI = list()
-                        for value in SPLICEAI:
-                            spliceAI.append(annot[value])
-                        spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
-                        max = numpy.nanmax(spliceAI)
-                        annot["spliceAI"] = None if numpy.isnan(max) else max
+                            # Get Exon/Intron
+                            annot["EI"] = None
+                            if annot["EXON"] is not None:
+                                annot["EI"] = f"{annot['EXON']}"
+                            if annot["INTRON"] is not None:
+                                annot["EI"] = f"{annot['INTRON']}"
 
-                        # max MaxEntScan
-                        annot["MES_var"] = None
-                        if (annot["MaxEntScan_alt"] is not None
-                                and annot["MaxEntScan_ref"] is not None):
-                            annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
+                            # Get Exon/Intron
+                            annot["canonical"] = True if annot['CANONICAL'] == 'YES' else False
 
-                        annotations[-1]["ANN"].append(annot)
-                    variant.annotations = annotations
+                            # missense
+                            missenses = list()
+                            for value in MISSENSES:
+                                missenses.append(annot[value])
+                            missenses = numpy.array(missenses, dtype=numpy.float64)
+                            mean = numpy.nanmean(missenses)
+                            annot["missensesMean"] = None if numpy.isnan(mean) else mean
 
-                # If duplicate variant for sample :
-                #   - catch exception
-                #   - add to history & comments
-                try:
-                    samplename_vcf = list(v.samples.keys())[0]
-                    vcf_depth = v.samples[samplename_vcf]["DP"]
-                    vcf_allelic_depth = v.samples[samplename_vcf]["AD"][1]
-                    caller = {
-                        call_name: {
-                            "depth": int(vcf_depth),
-                            "allelic_depth": int(vcf_allelic_depth),
-                            "allelic_freq":  int(vcf_allelic_depth)/int(vcf_depth),
-                            "filter": v.filter
+                            # max spliceAI
+                            spliceAI = list()
+                            for value in SPLICEAI:
+                                spliceAI.append(annot[value])
+                            spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
+                            max = numpy.nanmax(spliceAI)
+                            annot["spliceAI"] = None if numpy.isnan(max) else max
+
+                            # max MaxEntScan
+                            annot["MES_var"] = None
+                            if (annot["MaxEntScan_alt"] is not None
+                                    and annot["MaxEntScan_ref"] is not None):
+                                annot["MES_var"] = -100 + (float(annot["MaxEntScan_alt"]) * 100) / float(annot["MaxEntScan_ref"])
+
+                            annotations[-1]["ANN"].append(annot)
+                        variant.annotations = annotations
+
+                    # If duplicate variant for sample :
+                    #   - catch exception
+                    #   - add to history & comments
+                    try:
+                        samplename_vcf = list(v.samples.keys())[0]
+                        vcf_depth = v.samples[samplename_vcf]["DP"]
+                        vcf_allelic_depth = v.samples[samplename_vcf]["AD"][1]
+                        caller = {
+                            call_name: {
+                                "depth": int(vcf_depth),
+                                "allelic_depth": int(vcf_allelic_depth),
+                                "allelic_freq":  int(vcf_allelic_depth)/int(vcf_depth),
+                                "filter": v.filter
+                            }
                         }
-                    }
-                    v2s = Var2Sample.query.get((variant.id, sample.id))
-                    if not v2s:
-                        v2s = Var2Sample(
-                            variant_ID=variant.id,
+                        v2s = Var2Sample.query.get((variant.id, sample.id))
+                        if not v2s:
+                            v2s = Var2Sample(
+                                variant_ID=variant.id,
+                                sample_ID=sample.id,
+                                depth=vcf_depth,
+                                allelic_depth=vcf_allelic_depth,
+                                filter=v.filter,
+                                caller=caller)
+                            db.session.add(v2s)
+                        # BUG : need to do 2 commit (dont know why...)
+                        t = v2s.caller
+                        t.update(caller)
+                        v2s.caller = t
+                        db.session.commit()
+                        v2s.caller = t
+                        db.session.commit()
+                        samplename_vcf = list(v.samples.keys())[0]
+                        vcf_depth = v.samples[samplename_vcf]["DP"]
+                        vcf_allelic_depth = v.samples[samplename_vcf]["AD"][1]
+                        if v2s.depth is None or vcf_depth > v2s.depth:
+                            v2s.depth = vcf_depth
+                        if v2s.allelic_freq is None or float(int(vcf_allelic_depth)/int(vcf_depth)) > v2s.allelic_freq:
+                            v2s.allelic_freq = float(int(vcf_allelic_depth)/int(vcf_depth))
+                        if v2s.allelic_depth is None or int(vcf_allelic_depth) > v2s.allelic_depth:
+                            v2s.allelic_depth = int(vcf_allelic_depth)
+                        if v2s.depth is None or int(vcf_depth) > v2s.depth:
+                            v2s.depth = int(vcf_depth)
+                        if not v2s.pass_filter and v.filter == ['PASS']:
+                            v2s.pass_filter = True
+                        db.session.commit()
+                    except exc.IntegrityError as e:
+                        db.session.rollback()
+                        app.logger.info(f"{type(e).__name__} : {e}")
+                        history = History(
                             sample_ID=sample.id,
-                            depth=vcf_depth,
-                            allelic_depth=vcf_allelic_depth,
-                            filter=v.filter,
-                            caller=caller)
-                        db.session.add(v2s)
-                    # BUG : need to do 2 commit (dont know why...)
-                    t = v2s.caller
-                    t.update(caller)
-                    v2s.caller = t
-                    db.session.commit()
-                    v2s.caller = t
-                    db.session.commit()
-                    samplename_vcf = list(v.samples.keys())[0]
-                    vcf_depth = v.samples[samplename_vcf]["DP"]
-                    vcf_allelic_depth = v.samples[samplename_vcf]["AD"][1]
-                    if v2s.depth is None or vcf_depth > v2s.depth:
-                        v2s.depth = vcf_depth
-                    if v2s.allelic_freq is None or float(int(vcf_allelic_depth)/int(vcf_depth)) > v2s.allelic_freq:
-                        v2s.allelic_freq = float(int(vcf_allelic_depth)/int(vcf_depth))
-                    if v2s.allelic_depth is None or int(vcf_allelic_depth) > v2s.allelic_depth:
-                        v2s.allelic_depth = int(vcf_allelic_depth)
-                    if v2s.depth is None or int(vcf_depth) > v2s.depth:
-                        v2s.depth = int(vcf_depth)
-                    if not v2s.pass_filter and v.filter == ['PASS']:
-                        v2s.pass_filter = True
-                    db.session.commit()
-                except exc.IntegrityError as e:
-                    db.session.rollback()
-                    app.logger.info(f"{type(e).__name__} : {e}")
-                    history = History(
-                        sample_ID=sample.id,
-                        user_ID=user_id,
-                        date=datetime.now(),
-                        action=f"{type(e).__name__}")
-                    db.session.add(history)
-                    comment = Comment_sample(
-                        comment=f"{type(e).__name__} : {e}",
-                        sampleid=sample.id,
-                        date=datetime.now(),
-                        userid=user_id)
-                    db.session.add(comment)
-                    db.session.commit
+                            user_ID=user_id,
+                            date=datetime.now(),
+                            action=f"{type(e).__name__}")
+                        db.session.add(history)
+                        comment = Comment_sample(
+                            comment=f"{type(e).__name__} : {e}",
+                            sampleid=sample.id,
+                            date=datetime.now(),
+                            userid=user_id)
+                        db.session.add(comment)
+                        db.session.commit
+            db.session.commit()
+            current_file.unlink()
+            vcf_vep.unlink()
+            stats_vep.unlink()
+            if interface:
+                vcf_path.unlink()
+            history = History(
+                sample_ID=sample.id,
+                user_ID=user_id,
+                date=datetime.now(),
+                action=f"Sample Imported")
+            db.session.add(history)
+            if not status_final:
+                sample.status = 1
+            db.session.commit()
 
         path_locker.unlink()
-        db.session.commit()
-        current_file.unlink()
-        vcf_vep.unlink()
-        stats_vep.unlink()
-        if interface:
-            vcf_path.unlink()
-        history = History(
-            sample_ID=sample.id,
-            user_ID=user_id,
-            date=datetime.now(),
-            action=f"Sample Imported")
-        db.session.add(history)
-        if not status_final:
-            sample.status = 1
-        db.session.commit()
 
 
 def update_clinvar_thread(vcf, version, genome=config["GENOME"]):
@@ -770,11 +780,11 @@ def check_clinvar(genome=config["GENOME"]):
             clinvar = f'clinvar_{version}.vcf.gz'
             urllib.request.urlretrieve(f'{base_url}/{clinvar}.tbi', f'{str(path_clinvar)}/{clinvar}.tbi')
             urllib.request.urlretrieve(f'{base_url}/{clinvar}', f'{str(path_clinvar)}/{clinvar}')
-            vcf_path = path_clinvar.joinpath(f'/{clinvar}')
+            vcf_path = path_clinvar.joinpath(f'{clinvar}')
             break
         except urllib.error.HTTPError as e:
             print(f'{base_url}/clinvar_{version}.vcf.gz')
             print(e)
     Thread(target=update_clinvar_thread, args=(vcf_path, int(version), genome.lower())).start()
-    path_locker.unlink()
+    # path_locker.unlink()
     return
