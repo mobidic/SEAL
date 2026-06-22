@@ -27,7 +27,6 @@ import subprocess
 import urllib.request
 from pathlib import Path
 from datetime import datetime
-from threading import Thread
 
 from anacore import annotVcf
 
