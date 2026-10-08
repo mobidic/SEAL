@@ -504,7 +504,7 @@ function getIndexById(array, id, regexp=false) {
     return array.findIndex(element => element.id === id);
 }
 
-function format_export (title) {
+function format_export(title) {
     return {
         header: function ( data, columnIdx ) {
             return (dt_table[columnIdx][title] !== undefined) ?  dt_table[columnIdx][title] : ((getTextFromHTML(data) === '' && dt_table[columnIdx]["id"] !== undefined) ?  dt_table[columnIdx]["id"] : getTextFromHTML(data));
@@ -528,8 +528,12 @@ columns_defGen = [
     getIndexById(dt_table, "export-filter-chr"),
     getIndexById(dt_table, "export-filter-HGVSg"),
     getIndexById(dt_table, "export-filter-EI"),
-    getIndexById(dt_table, "export-filter-AF")
+    getIndexById(dt_table, "filter-AF"),
+    getIndexById(dt_table, "exportDefGen-class")
 ]
+
+columns_defGen2 = columns_defGen.slice()
+columns_defGen2.unshift(getIndexById(dt_table, "export-sampleName"))
 
 columns_export = [
     getIndexById(dt_table, "^export-.*", true),
@@ -722,6 +726,23 @@ $(document).ready(function() {
                         fieldSeparator: ";",
                         fieldBoundary: ''
                     },
+                    {
+                        extend: 'csv',
+                        text: 'defGen2',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_export("exportTitleDefGen"),
+                            modifier: {
+                                selected: null
+                            },
+                            columns: columns_defGen2
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
+                    },
                     '<h3>Reported</h3>',
                     {
                         extend: 'copy',
@@ -805,6 +826,28 @@ $(document).ready(function() {
                         fieldSeparator: ";",
                         fieldBoundary: ''
                     },
+                    {
+                        extend: 'csv',
+                        text: 'defGen2',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_export("exportTitleDefGen"),
+                            modifier: {
+                                selected: null
+                            },
+                            rows: [function(data, row, column, node) {
+                                if(row.reported) {
+                                    return data+1;
+                                }
+                            }],
+                            columns: columns_defGen2
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
+                    },
                     '<h3>Selected</h3>',
                     {
                         extend: 'copy',
@@ -855,6 +898,23 @@ $(document).ready(function() {
                                 selected: true
                             },
                             columns: columns_defGen
+                        },
+                        fieldSeparator: ";",
+                        fieldBoundary: ''
+                    },
+                    {
+                        extend: 'csv',
+                        text: 'defGen2',
+                        title: '',
+                        bom: false,
+                        createEmptyCells: true,
+                        exportOptions: {
+                            orthogonal: 'export',
+                            format: format_export("exportTitleDefGen"),
+                            modifier: {
+                                selected: true
+                            },
+                            columns: columns_defGen2
                         },
                         fieldSeparator: ";",
                         fieldBoundary: ''
@@ -1649,6 +1709,7 @@ function changeFilter(id=1, sample_id) {
                 },
                 success: function() {
                     $('#tableHistorySample').DataTable().ajax.reload();
+                    table.order([1, "asc"]).draw();
                 }
             });
         }, 30);

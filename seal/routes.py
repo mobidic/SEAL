@@ -26,7 +26,6 @@ import urllib
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import urlparse
-from threading import Thread
 
 from PIL import Image
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
@@ -45,7 +44,7 @@ from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
                          Transcript, User, Variant, Var2Sample, Clinvar)
-from seal.schedulers import update_clinvar_thread
+from seal.schedulers import update_clinvar
 
 
 ###############################################################################
@@ -780,7 +779,7 @@ def update_clinvar():
         vcf_path = vcf_path.joinpath(UploadClinvarForm.vcf_file.data.filename)
         UploadClinvarForm.vcf_file.data.save(vcf_path)
 
-        Thread(target=update_clinvar_thread, args=(vcf_path, version, genome, )).start()
+        update_clinvar(vcf_path, version, genome)
 
         return redirect(url_for('index'))
 
@@ -1178,7 +1177,6 @@ def json_variants(id, idbed=False, version=-1):
                         "filter": f"NA",
                     }
 
-        allelic_frequency = var2sample.allelic_depth / var2sample.depth
         calls = dict()
         for caller in var2sample.caller:
             try:
@@ -1193,6 +1191,7 @@ def json_variants(id, idbed=False, version=-1):
                 )
             except:
                  calls[caller] = None
+        allelic_frequency = var2sample.allelic_freq if var2sample.allelic_freq else var2sample.allelic_depth / var2sample.depth
         variants["data"].append({
             "annotations": main_annot,
             "chr": f"{variant.chr}",

@@ -67,12 +67,15 @@
                 {% else %}
                 <a href="{{ url_for('login') }}" class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="Login" data-balloon-pos="left"><i class="fas fa-sign-in-alt"></i></a>
                 {% endif %}
-        </div>
+            </div>
+
+            <div class="w3-ar w3-flat-pumpkin w3-container w3-center w3-padding">
+                <i class="fa-solid fa-circle-exclamation"></i> GnomAD MAX AF (ie <i class="fa-solid fa-angles-up"></i>) missing some population : AMI, MID & SAS <i class="fa-solid fa-circle-exclamation"></i>
             </div>
         </header>
 
         <div id="page-container">
-            <section id="content-wrap" class="w3-text-dark-gray" style="padding-top:51px;">
+            <section id="content-wrap" class="w3-text-dark-gray" style="padding-top:89.5px;">
                 {% block content %}{% endblock %}
             </section>
 
