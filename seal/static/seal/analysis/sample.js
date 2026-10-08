@@ -380,13 +380,18 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
         case "==":
             conditionName ="Is"
             search = function (value, comparison) {
-                v = value.split(",");
+                if (comparison[0] == 0) {
+                    return (value == comparison[0]) || (value == null) || (value == "")
+                }
                 return value == comparison[0];
             }
             break;
         case "!=":
             conditionName ="Is not"
             search = function (value, comparison) {
+                if (comparison[0] == 0) {
+                    return !((value == comparison[0]) || (value == null) || (value == ""))
+                }
                 return value != comparison[0];
             }
             break;
