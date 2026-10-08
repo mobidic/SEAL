@@ -194,8 +194,8 @@ $(document).ready(function() {
                 'X-CSRF-TOKEN': csrf_token
             },
             data: function (d) {
-                d.index_filtering = $('#index_filtering').val();
-                d.affected_filtering = $('#affected_filtering').val();
+                d.index_filtering = "All" // $('#index_filtering').val();
+                d.affected_filtering = "All" // $('#affected_filtering').val();
             }
         },
         columns:columns, 
