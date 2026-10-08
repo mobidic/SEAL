@@ -872,6 +872,7 @@ def json_samples():
     """
     key_list = {
         "asc": [
+            0,
             Sample.samplename.asc(),
             Family.family.asc(),
             Run.name.asc(),
@@ -880,6 +881,7 @@ def json_samples():
             Sample.lastAction.asc()
         ],
         "desc": [
+            0,
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.name.desc(),
@@ -905,6 +907,16 @@ def json_samples():
     recordsTotal = samples.count()
     samples_filter = samples.outerjoin(Family, Sample.family)\
                             .outerjoin(Run, Sample.run).filter(filters)
+
+    if request.form['index_filtering'] == 'True': 
+        samples_filter = samples_filter.filter(Sample.index  == True)
+    if request.form['index_filtering'] == 'False': 
+        samples_filter = samples_filter.filter(Sample.index  == False)
+    if request.form['affected_filtering'] == 'True': 
+        samples_filter = samples_filter.filter(Sample.affected  == True)
+    if request.form['affected_filtering'] == 'False': 
+        samples_filter = samples_filter.filter(Sample.affected  == False)
+
     recordsFiltered = samples_filter.count()
     samples = samples_filter\
         .order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])])\
@@ -923,6 +935,8 @@ def json_samples():
             teams.append({"teamname": team.teamname, "color": team.color})
         samples_json["data"].append({
             "id": sample.id,
+            "index": sample.index,
+            "affected": sample.affected,
             "samplename": sample.samplename,
             "family": sample.family.family if sample.familyid else None,
             "run": {
@@ -1206,6 +1220,7 @@ def json_variants(id, idbed=False, version=-1):
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "inseal": {
                 "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
+                "occurrences_run": Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(Var2Sample.variant == variant).filter(Sample.runid == sample.runid).count(),
                 "occurences_family": len(members),
                 "family_members": members
             },

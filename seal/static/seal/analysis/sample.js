@@ -614,8 +614,7 @@ $(document).ready(function() {
                         d2 = getValueFromHash(data, dt_table[colIndex]["data"]);
                     }
                     $(this).attr('title', dt_table[colIndex]["mytitle"](d2));
-                }
-                ;
+                };
             });
         },
         select: {
@@ -625,6 +624,7 @@ $(document).ready(function() {
         },
         ajax: json_variants,
         columns: dt_table,
+        order: [[ 1, "asc" ]],
         initComplete: function(settings, json) {
             changeFilter(sample_filter_id, sample_id);
             if (sample_status != 4) {
@@ -650,7 +650,6 @@ $(document).ready(function() {
                                 class_seal:  conditionsFilter(class_variant_export, ["==", "!="]),
                                 num: {"=":null, "!=": null},
                                 reported:  conditionsFilter(reported_v, ["isTrue", "isFalse"]),
-
                             }
                         },
                     },
