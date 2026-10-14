@@ -14,7 +14,7 @@
     <div class="w3-main {% if sample.status == 5 %}w3-disabled{% endif %}">
         <div class="w3-container">
             <div class="w3-center">
-                <h1>{{ sample.samplename}}</h1>
+                <h1>{{ sample.samplename }}</h1>
                 {% include 'includes/button-status-sample.j2' %}
             </div>
             <hr>
@@ -201,6 +201,68 @@
                 </table>
             </div>
         </div>
+
+        <div class="w3-container w3-center">
+            <hr>
+        </div>
+
+        <div class="w3-container w3-center">
+
+            <div id="igv-div" style="padding:1px 5px 5px 5px; border-radius: 3px; border:1px solid lightgray;"></div>
+            <div class="w3-bar w3-light-grey w3-border w3-border-bottom-0 w3-tiny w3-margin" style="padding:4px 8px;">
+                <input type="file" id="local-file-input" multiple style="display:none">
+                <button onclick="document.getElementById('local-file-input').click()"
+                        class="w3-button w3-white w3-border w3-round w3-hover-light-blue">
+                    <i class="fa fa-folder-open"></i> Load local tracks
+                </button>
+                <span class="w3-right w3-text-grey" style="padding:6px 4px;">
+                    <i class="fa fa-circle-info"></i> Select file and its corresponding index file together
+                </span>
+            </div>
+            
+            {% if not bams or not beds or not vcfs or bams|length > 1 or beds|length > 1 or vcfs|length > 1 %}
+            <div class='w3-small w3-left-align w3-flash w3-warning'>
+                {% if not bams %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        No alignment files available.
+                    </b></i></p>
+                {% endif %}
+                {% if not vcfs %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        No variants files available.
+                    </b></i></p>
+                {% endif %}
+                {% if not beds %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        No regions files available.
+                    </b></i></p>
+                {% endif %}
+                {% if bams|length > 1 %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        Multiple alignment files available, only the first one has been loaded. This is sufficient in most cases.
+                    </b></i></p>
+                {% endif %}
+                {% if vcfs|length > 1 %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        Multiple variants files available, only the first one has been loaded. This is sufficient in most cases.
+                    </b></i></p>
+                {% endif %}
+                {% if beds|length > 1 %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        Multiple regions files available, only the first one has been loaded. This is sufficient in most cases.
+                    </b></i></p>
+                {% endif %}
+                <i>If you want more informations: contact your administrator.</i>
+            </div>
+            {% endif %}
+        </div>
+
         <div class="w3-container w3-center">
             <hr>
         </div>
@@ -545,18 +607,33 @@
             createColumn({
                 id: "visible-SYMBOL",
                 title: "GENE",
-                data: "annotations",
-                myTitleFn: (data) => formatNA(data.SYMBOL),
+                data: null,
+                myTitleFn: (data) => formatNA(data.annotations.SYMBOL),
                 renderConfig: {
                     default: (data) => {
-                        return data.SYMBOL
+                        return data.annotations.SYMBOL
                     },
                     display: (data) => {
-                        return data.SYMBOL == null
-                        ? "<i>NA</i>"
+                        const testa = `<a href="#igv-div" title="MobiDetails" class="w3-text-flat-silver w3-hover-text-flat-concrete do-not-select" style="cursor: pointer;" onclick="changelocus('${data.chr}:${parseInt(data.pos) - 50}-${parseInt(data.pos) + Math.max(data.ref.length, data.alt.length)  + 49}', event)"><span class="do-not-select">
+                            <svg class="do-not-select" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="21.29px" height="10px" viewBox="0 0 690 324" version="1.1">
+                                <!-- Generator: Sketch 40.3 (33839) - http://www.bohemiancoding.com/sketch -->
+                                <title>IGV</title>
+                                <desc>Created with Sketch.</desc>
+                                <defs></defs>
+                                <g  class="do-not-select" id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <g  class="do-not-select" id="IGV" fill="currentColor">
+                                        <polygon  class="do-not-select" id="Path" points="379.54574 8.00169252 455.581247 8.00169252 515.564813 188.87244 532.884012 253.529506 537.108207 253.529506 554.849825 188.87244 614.833392 8.00169252 689.60164 8.00169252 582.729511 320.722144 486.840288 320.722144"></polygon>
+                                        <path class="do-not-select"  d="M261.482414,323.793286 C207.975678,323.793286 168.339046,310.552102 142.571329,284.069337 C116.803612,257.586572 103.919946,217.158702 103.919946,162.784513 C103.919946,108.410325 117.437235,67.8415913 144.472217,41.0770945 C171.507199,14.3125977 212.903894,0.930550071 268.663545,0.930550071 C283.025879,0.930550071 298.232828,1.84616386 314.284849,3.6774189 C330.33687,5.50867394 344.839793,7.97378798 357.794056,11.072835 L357.794056,68.968378 C339.48912,65.869331 323.578145,63.5450806 310.060654,61.9955571 C296.543163,60.4460336 284.574731,59.6712835 274.154998,59.6712835 C255.850062,59.6712835 240.502308,61.4320792 228.111274,64.9537236 C215.720241,68.4753679 205.793482,74.2507779 198.330701,82.2801269 C190.867919,90.309476 185.587729,100.87425 182.48997,113.974767 C179.392212,127.075284 177.843356,143.345037 177.843356,162.784513 C177.843356,181.942258 179.251407,198.000716 182.067551,210.960367 C184.883695,223.920018 189.671068,234.41436 196.429813,242.443709 C203.188559,250.473058 212.059279,256.178037 223.042241,259.558815 C234.025202,262.939594 247.683295,264.629958 264.01693,264.629958 C268.241146,264.629958 273.098922,264.489094 278.590403,264.207362 C284.081883,263.925631 289.643684,263.50304 295.275972,262.939577 L295.275972,159.826347 L361.595831,159.826347 L361.595831,308.579859 C344.698967,313.087564 327.239137,316.750019 309.215815,319.567334 C291.192494,322.38465 275.281519,323.793286 261.482414,323.793286 L261.482414,323.793286 L261.482414,323.793286 Z" id="Path"></path>
+                                        <polygon class="do-not-select"  id="Path" points="0.81355666 5.00169252 73.0472883 5.00169252 73.0472883 317.722144 0.81355666 317.722144"></polygon>
+                                    </g>
+                                </g>
+                            </svg>
+                        </a>`
+                        return data.annotations.SYMBOL == null
+                        ? `<i>NA</i> + ${testa}`
                         : `<div class="w3-middle w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
-                                <p style="width: 75px;margin:0;word-break: break-word;white-space: normal;"><b>${data.SYMBOL}</b></p>
-                            </div>`
+                                <p style="width: 75px;margin:0;word-break: break-word;white-space: normal;"><b>${data.annotations.SYMBOL}</b></p>
+                            </div> ${testa}`
                     }
                 }
             }),
@@ -1694,6 +1771,128 @@
 
         var number_family = {{ family_members|length }};
         var number_caller = {{ sample.caller|length }};
+    </script>
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='igvjs/igv.min.js') }}"></script>
+
+    <script type="text/javascript">
+        var options_igv =
+        {
+            genome: "hg38",
+            tracks: [
+                //{% if beds %}
+                {
+                    "name": "bed",
+                    "url": "{{ beds[0] }}",
+                    "displayMode": "COLLAPSED",
+                    "height": 40
+                },
+                // {% endif %}
+                // {% if vcfs %}
+                {
+                    "name": "vcf",
+                    "format": "vcf",
+                    "url": "{{ vcfs[0] }}"
+                },
+                // {% endif %}
+                // {% if bams %}
+                {
+                    "name": "{{ sample.samplename }}",
+                    "url": "{{ bams[0] }}",
+                    "indexURL": "{{ bams[0] }}{% if bams[0].split('.')[-1] == 'bam'  %}.bai{% else %}.crai{% endif %}"
+                },
+                // {% endif %}
+            ]
+        };
+
+
+        var igvDiv = document.getElementById("igv-div");
+
+        var browser = null;
+        igv.createBrowser(igvDiv, options_igv)
+        .then(function (b) {
+            browser = b; 
+        });
+
+        function changelocus(locus, event) {
+            if (!browser) {
+                console.warn("IGV browser not ready yet");
+                return;
+            }
+
+            if (event.ctrlKey) {
+                event.preventDefault(); 
+                loci = Array(browser.currentLoci()).flat()
+                loci.push(locus);
+                browser.search(loci.slice(-3).join(" "));
+            } else {
+                browser.search(locus);
+            }
+        }
+
+        document.getElementById("local-file-input").addEventListener("change", function (e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            const dataFile   = files.find(f => /\.(bam|cram|vcf\.gz|bed\.gz|gff\.gz|bgz)$/i.test(f.name));
+            const indexFile  = files.find(f => /\.(bai|csi|crai|tbi)$/i.test(f.name));
+            const plainFiles = files.filter(f => f !== dataFile && f !== indexFile);
+
+            // --- if index without file ---
+            if (dataFile && !indexFile) {
+                showLoadError(
+                    '<strong>' + escapeHtml(dataFile.name) + '</strong> requires its index file.<br>' +
+                    'Expected: <code>' + guessIndexName(dataFile.name) + '</code><br><br>' +
+                    'Please select both files together.'
+                );
+                e.target.value = "";
+                return;
+            }
+
+            // --- if index is missing ---
+            if (!dataFile && indexFile) {
+                showLoadError(
+                    'You selected an index file (<strong>' + escapeHtml(indexFile.name) + '</strong>) ' +
+                    'without its data file.<br>Please select both files together.'
+                );
+                e.target.value = "";
+                return;
+            }
+
+            if (dataFile) {
+                browser.loadTrack({
+                    name: dataFile.name,
+                    url: dataFile,
+                    indexURL: indexFile,
+                    format: /\.cram$/i.test(dataFile.name) ? "cram" : undefined
+                });
+            }
+            plainFiles.forEach(f => browser.loadTrack({ name: f.name, url: f }));
+
+            e.target.value = "";
+        });
+
+        // Tri to guess index file waiting
+        function guessIndexName(filename) {
+            if (/\.bam$/i.test(filename))     return filename + '.bai (or .csi)';
+            if (/\.cram$/i.test(filename))    return filename + '.crai';
+            if (/\.vcf\.gz$/i.test(filename)) return filename + '.tbi (or .csi)';
+            return 'a .bai / .csi / .crai / .tbi index';
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // SweetAlert for error on loading
+        function showLoadError(content) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cannot load tracks',
+                html: '<div class="w3-left-align">' + content + '</div>',
+                width: 'max(50%, 400px)'
+            });
+        }
     </script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='seal/analysis/sample.js') }}"></script>
