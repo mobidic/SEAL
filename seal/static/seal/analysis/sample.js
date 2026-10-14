@@ -2079,6 +2079,62 @@ function edit_family() {
 }
 
 
+
+var runs=[];
+$.getJSON('/json/runs', function(data, status, xhr){
+    for (var i = 0; i < data['data'].length; i++ ) {
+        runs.push(data["data"][i]["name"]);
+    }
+});
+
+$('#edit-run').autocomplete({
+    source: runs,
+});
+
+$("#edit-run").keyup(function(event) {
+    if (event.keyCode === 13) {
+        edit_run()
+    }
+});
+
+function edit_run() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You change the run associated to the sample.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Changed!',
+                'The run will be changed.',
+                'success'
+            )
+            $.ajax({
+                type: "POST",
+                url: "/edit/sample/run",
+                data: {
+                    "sample_id": sample_id,
+                    "new_run": $('#edit-run').val()
+                },
+                success: function() {
+                    $( "#error-message-edit-run" ).remove();
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                },
+                error: function(XMLHttpRequest) {
+                    $( "#error-message-edit-run" ).remove();
+                    msg = "<p id='error-message-edit-run' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
+                    $( "#sample-run-sidebar" ).after( msg );
+                }
+            })
+        }
+    })
+}
+
+
 $(document).ready(function() {
     $('#tableHistorySample').DataTable({
         searching:true,
@@ -2099,9 +2155,12 @@ $(document).ready(function() {
             },
             {
                 data: "action",
+                "render":  function (data, type, row, meta) {
+				    return `<p style="max-width: 140px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${data}</p>`;
+                }
             },
             {
-                data: "date",
+                data: "date"
             }
         ]
     });
