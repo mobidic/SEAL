@@ -658,6 +658,12 @@
                     display: (data) => {
                         if (data.annotations == null) return "<i>NA</i>";
                         const genome = "{{ genome_version }}".toLowerCase() == "grch38" ? "hg38" : "hg19";
+                        const mutalyzer3 = `<a target="_blank" title="Mutalyzer3" href="https://mutalyzer.nl/normalizer/${genome}(${data.chr}):${data.annotations.HGVSg.split(":")[1]}" class="w3-text-flat-belize-hole w3-hover-text-flat-pomgrenate do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                            <span class="fa-layers do-not-select">
+                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
+                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">M3</span>
+                            </span>
+                        </span></a>`;
                         const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.annotations.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
@@ -688,12 +694,15 @@
                                     ${starIcon}
                                 </div>
                                 <div class="w3-container w3-cell" style="padding: 0px !important;">
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSg, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSc, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSp, "<i>NA</i>")}</p>
+                                    <p style="width: 170px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSg, "<i>NA</i>")}</p>
+                                    <p style="width: 170px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSc, "<i>NA</i>")}</p>
+                                    <p style="width: 170px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSp, "<i>NA</i>")}</p>
                                 </div>
                                 <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
-                                    ${mobidetails}${genebe}${franklin}
+                                    ${mobidetails}${franklin}
+                                </div>
+                                <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0 0 0 5px !important;">
+                                    ${genebe}${mutalyzer3}
                                 </div>
                             </div>
                         `;
