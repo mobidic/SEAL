@@ -19,7 +19,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import functools
+import glob
 import json
+import re
 import secrets
 import urllib
 
@@ -642,6 +644,11 @@ def sample(id):
 
     clinvar = Clinvar.query.filter(Clinvar.genome == config["GENOME"], Clinvar.current == True).one()
 
+    # Get BAM
+    bams = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(r'.*\.(cr|b)am$', files)]
+    beds = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(r'.*\.bed$', files)]
+    vcfs = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(rf'{sample.samplename}\.vcf$', files)]
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
@@ -651,7 +658,10 @@ def sample(id):
         form=commentForm,
         saveFilterForm=saveFilterForm,
         clinvar = clinvar,
-        genome_version = config["GENOME"]
+        genome_version = config["GENOME"],
+        bams = bams,
+        beds = beds,
+        vcfs = vcfs
     )
 
 
