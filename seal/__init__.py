@@ -23,7 +23,7 @@ import yaml
 from pathlib import Path
 from datetime import timedelta
 
-from flask import Flask, session, g, request, redirect, url_for
+from flask import Flask, session, g, request, redirect, url_for, Blueprint
 from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, current_user
@@ -56,6 +56,18 @@ migrate = Migrate(app, db, compare_type=True)
 
 
 app.logger.info(app.config)
+
+
+for key, value in config["BP"].items():
+    print(value["path"])
+    data_bp = Blueprint(
+        key,
+        __name__,
+        static_folder=value["folder"],
+        static_url_path=value["path"]
+    )
+
+app.register_blueprint(data_bp)
 
 
 @app.before_request

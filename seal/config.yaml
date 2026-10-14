@@ -12,3 +12,7 @@ FLASK:
   FLASK_ADMIN_SWATCH: 'darkly'
   SESSION_COOKIE_NAME: "seal38"
 GENOME: "grch38" # choices : "grch37", "grch38"
+BP:
+  aviti:
+    folder: "/path/to/analysis/folder"
+    path: "/path/to/analysis/folder"
