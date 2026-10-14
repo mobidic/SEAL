@@ -171,6 +171,7 @@ class Sample(db.Model):
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
     caller = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
+    wf_path = db.Column(db.String(500), unique=False, nullable=True)
 
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=True)
     filter = relationship("Filter", back_populates="samples")

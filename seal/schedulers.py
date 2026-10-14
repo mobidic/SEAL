@@ -303,6 +303,10 @@ def create_sample(data):
         filter = get_filter(id, name)
         if filter:
             sample.filter = filter
+
+    if "wf_path" in data:
+        sample.wf_path = data["wf_path"]
+
     db.session.add(sample)
     db.session.commit()
     return sample
