@@ -658,28 +658,28 @@
                     display: (data) => {
                         if (data.annotations == null) return "<i>NA</i>";
                         const genome = "{{ genome_version }}".toLowerCase() == "grch38" ? "hg38" : "hg19";
-                        const mutalyzer3 = `<a target="_blank" title="Mutalyzer3" href="https://mutalyzer.nl/normalizer/${genome}(${data.chr}):${data.annotations.HGVSg.split(":")[1]}" class="w3-text-flat-belize-hole w3-hover-text-flat-pomgrenate do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
-                            <span class="fa-layers do-not-select">
-                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
-                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">M3</span>
-                            </span>
-                        </span></a>`;
                         const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.annotations.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">MD</span>
                             </span>
                         </span></a><br />` : "";
+                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.id}-${genome}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                            <span class="fa-layers do-not-select">
+                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
+                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">F</span>
+                            </span>
+                        </span></a>`;
                         const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/${genome}/${data.annotations.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">GB</span>
                             </span>
                         </span></a><br />`;
-                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.id}-${genome}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        const mutalyzer3 = `<a target="_blank" title="Mutalyzer3" href="https://mutalyzer.nl/normalizer/${genome}(${data.chr}):${data.annotations.HGVSg.split(":")[1]}" class="w3-text-flat-belize-hole w3-hover-text-flat-pomegranate do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
                             <span class="fa-layers do-not-select">
                                 <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
-                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">F</span>
+                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">M3</span>
                             </span>
                         </span></a>`;
 
