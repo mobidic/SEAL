@@ -24,7 +24,7 @@
 
     <body>
 
-        <header class="fh-fixedHeader w3-top" style="z-index:6" id="navHead">
+        <header class="fh-fixedHeader w3-top" style="z-index:10000" id="navHead">
             <div class="w3-bar {% if ENV|upper != 'PRODUCTION' %}w3-flat-pomegranate{% else %}w3-flat-green-sea{% endif %} w3-left-align w3-large">
                 {% if current_user.logged %}
                     <span class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-left" onclick="w3_toggle_menu()" aria-label="SideBar" data-balloon-pos="right"><i class="fa-regular fa-window-maximize fa-rotate-270"></i></span>
