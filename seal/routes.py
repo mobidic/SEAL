@@ -1645,10 +1645,63 @@ def edit_family():
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"New Family created : '{family.family}' (id: {family.id})")
             db.session.add(history)
         if sample.family:
+            if sample.familyid == family.id:
+                return "ok"
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family edited : '{sample.family.family}' (id: {sample.familyid}) -> '{family.family}' (id: {family.id})")
         else:
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family added : '{family.family}' (id: {family.id})")
         sample.familyid = family.id
+
+    db.session.add(history)
+    db.session.commit()
+
+    return "ok"
+
+
+@app.route("/edit/sample/run", methods=['POST'])
+@login_required
+def edit_run():
+    """
+    Edits the run associated to a sample.
+
+    This function handles a POST request to edit the run associated to a
+    sample. It gets the new name run from the request's form data and
+    updates the `run` field of the sample in the database. It also creates a
+    new `History` record in the database to log the action.
+
+    Returns:
+        str: "No Changes" if the new name is the same as the old name, "ok" if
+             the update was successful.
+
+    Raises:
+        InvalidAPIUsage: If the run name is less than 2 or more than 20
+                         characters long.
+    """
+    sample_id = request.form["sample_id"]
+    new_run = request.form["new_run"]
+    sample = Sample.query.get(sample_id)
+
+    if not new_run:
+        if sample.runid:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Run removed : '{sample.run.name}' (id: {sample.runid})")
+            sample.runid = None
+        else:
+            return "ok"
+    else:
+        run = Run.query.filter(Run.name == new_run).first()
+        if not run:
+            run = Run(name=new_run)
+            db.session.add(run)
+            db.session.commit()
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"New Run created : '{run.name}' (id: {run.id})")
+            db.session.add(history)
+        if sample.run:
+            if sample.runid == run.id:
+                return "ok"
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Run edited : '{sample.run.name}' (id: {sample.runid}) -> '{run.name}' (id: {run.id})")
+        else:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Run added : '{run.name}' (id: {run.id})")
+        sample.runid = run.id
 
     db.session.add(history)
     db.session.commit()
