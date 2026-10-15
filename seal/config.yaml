@@ -13,6 +13,17 @@ FLASK:
   SESSION_COOKIE_NAME: "seal38"
 GENOME: "grch38" # choices : "grch37", "grch38"
 BP:
-  aviti:
+  name_bp:
     folder: "/path/to/analysis/folder"
     path: "/path/to/analysis/folder"
+IGV_PATH: 
+  fastaURL: "/path/to/igv/folder/hg38.fa"
+  indexURL: "/path/to/igv/folder/hg38.fa.fai"
+  twoBitURL: "/path/to/igv/folder/hg38.2bit"
+  cytobandURL: "/path/to/igv/folder/cytoBandIdeo.txt.gz"
+  aliasURL: "/path/to/igv/folder/hg38_alias.tab"
+  chromSizesURL: "/path/to/igv/folder/hg38.chrom.sizes"
+  maneBbURL: "/path/to/igv/folder/mane.1.0.bb"
+  maneTrixURL: "/path/to/igv/folder/mane.1.0.ix"
+  rsdbURL: "/path/to/igv/folder/refSeqHistorical.bb"
+  refseq: "/path/to/igv/folder/ncbiRefSeq.txt.gz"
