@@ -59,15 +59,13 @@ app.logger.info(app.config)
 
 
 for key, value in config["BP"].items():
-    print(value["path"])
     data_bp = Blueprint(
         key,
         __name__,
         static_folder=value["folder"],
         static_url_path=value["path"]
     )
-
-app.register_blueprint(data_bp)
+    app.register_blueprint(data_bp)
 
 
 @app.before_request
