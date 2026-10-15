@@ -659,6 +659,7 @@ def sample(id):
         saveFilterForm=saveFilterForm,
         clinvar = clinvar,
         genome_version = config["GENOME"],
+        igv_path = config["IGV_PATH"],
         bams = bams,
         beds = beds,
         vcfs = vcfs
