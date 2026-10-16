@@ -622,11 +622,6 @@ $(document).ready(function() {
                 };
             });
         },
-        select: {
-            style: 'multi',
-            selector: 'td:not(:last-child)'
-
-        },
         ajax: json_variants,
         columns: dt_table,
         order: [[ 1, "asc" ]],
@@ -684,9 +679,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         },
                     },
@@ -696,9 +688,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -708,9 +697,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -723,9 +709,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_defGen
                         },
                         fieldSeparator: ";",
@@ -740,9 +723,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_defGen2
                         },
                         fieldSeparator: ";",
@@ -755,17 +735,11 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
                                 }
                             }],
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -775,9 +749,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
@@ -803,9 +774,6 @@ $(document).ready(function() {
                                     return data+1;
                                 }
                             }],
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -818,9 +786,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
@@ -840,85 +805,11 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
                                 }
                             }],
-                            columns: columns_defGen2
-                        },
-                        fieldSeparator: ";",
-                        fieldBoundary: ''
-                    },
-                    '<h3>Selected</h3>',
-                    {
-                        extend: 'copy',
-                        text: 'Copy',
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitle"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_export
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        text: 'Excel',
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitle"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_export
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'CSV',
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitle"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_export
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'defGen',
-                        title: '',
-                        bom: false,
-                        createEmptyCells: true,
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_defGen
-                        },
-                        fieldSeparator: ";",
-                        fieldBoundary: ''
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'defGen2',
-                        title: '',
-                        bom: false,
-                        createEmptyCells: true,
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: true
-                            },
                             columns: columns_defGen2
                         },
                         fieldSeparator: ";",
