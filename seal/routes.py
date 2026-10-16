@@ -1538,6 +1538,7 @@ def json_variant(id, version=-1, sample=None):
                 current = True
             allelic_frequency = v2s.allelic_depth / v2s.depth
             samples.append({
+                "id": v2s.sample.id,
                 "samplename": v2s.sample.samplename,
                 "affected": v2s.sample.affected,
                 "family": v2s.sample.family.family if v2s.sample.family else "",

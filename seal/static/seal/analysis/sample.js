@@ -1378,14 +1378,14 @@ function openDetailsVariantModal(id, sample_id) {
             }
             if (data["samples"][x]["current_family"]) {
                 family = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["family"] + '</span></b>';
-                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
+                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis w3-hover-text-flat-silver">' + data["samples"][x]["samplename"] + '</span></b>';
             } else {
                 family = data["samples"][x]["family"];
                 sample = data["samples"][x]["samplename"];
             }
             style=""
             if (data["samples"][x]["current"]) {
-                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
+                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis w3-hover-text-flat-silver">' + data["samples"][x]["samplename"] + '</span></b>';
                 style =  "style='background-color:#85b3d5'"
             }
             teams=""
@@ -1393,8 +1393,8 @@ function openDetailsVariantModal(id, sample_id) {
                 teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data["samples"][x]["teams"][i]["color"] + '">' + data["samples"][x]["teams"][i]["teamname"] + '</span> ';
             };
             inSeal = inSeal + '<tr>'+
-                '<td class="control-size-100" ' + style + '>' + sample + '</td>'+
-                '<td class="control-size-100" ' + style + '>' + family+ '</td>'+
+                '<td class="control-size-100" ' + style + '><a target="_blank" href="/sample/' + data["samples"][x]["id"] + '" class="w3-hover-text-flat-silver">' +  sample + '</a></td>'+
+                '<td class="control-size-100" ' + style + '>' + family + '</td>'+
                 '<td class="control-size-100" ' + style + '>' + teams + '</td>'+
                 '<td class="control-size-75 w3-center" ' + style + '>' + affected + '</td>'+
                 '<td class="control-size-75 w3-center" ' + style + '>' + data["samples"][x]["depth"] + '</td>'+
