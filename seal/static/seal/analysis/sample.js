@@ -213,29 +213,38 @@ const consequences_dict = {
     }
 };
 
-const class_variant_html = [
-    '<span class="do-not-select"><i class="fas fa-ellipsis-h"></i></span>',
-    '<span class="do-not-select w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
-    '</span> - Benign</span>',
-    '<span class="do-not-select w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
-    '</span> - Likely Benign</span>',
-    '<span class="do-not-select w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
-    '</span> - VUS</span>',
-    '<span class="do-not-select w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
-    '</span> - Likely Pathogenic</span>',
-    '<span class="do-not-select w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
-    '</span> - Pathogenic</span>',
-];
+const class_variant_text = [
+    '<i> - Not Classified</i>',
+    ' - Benign',
+    ' - Likely Benign',
+    ' - VUS',
+    ' - Likely Pathogenic',
+    ' - Pathogenic'
+]
+const class_variant_color = [
+    'asbestos',
+    'green-sea',
+    'nephritis',
+    'belize-hole',
+    'pumpkin',
+    'pomegranate'
+]
+const class_variant_color_hover = [
+    'concrete',
+    'turquoise',
+    'emerald',
+    'peter-river',
+    'carrot',
+    'alizarin'
+]
+function class_variant_html(class_acmg, text=false) {
+    return `
+        <span class="w3-text-flat-${class_variant_color[class_acmg]} w3-hover-text-flat-${class_variant_color_hover[class_acmg]}"><span class="fa-layers fa-fw">
+            <i class="fas fa-bookmark" data-fa-transform="grow-5"></i>
+            <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-2 up-2" style="font-weight: 900;">${class_acmg}</span>
+        </span>${text ? class_variant_text[class_acmg]: ""}</span>
+    `
+}
 const class_clinvar = [
     "0 - Benign/Likely Benign",
     "1 - Conflicting (without Pathogenic)",
@@ -607,7 +616,7 @@ $(document).ready(function() {
         scroller:       true,
         fixedColumns: {
             left:2,
-            right:1
+            right:2
         },
         'createdRow': function (row, data, rowIndex) {
             // Per-cell function to do whatever needed with cells
@@ -1672,21 +1681,58 @@ function edit_name() {
     })
 }
 
-function toggle_class(id_var, sample_id, class_variant, self) {
-    $.ajax({
-        type: "POST",
-        url: "/toggle/samples/variant/class",
-        data: {
-            "id_var": id_var,
-            "sample_id": sample_id,
-            "class_variant": class_variant
-        },
-        success: function() {
-            var cell = $('#variants').DataTable().cell(self.closest('td'))
-            cell.data(class_variant).draw();
-            // CREATE SWEET ALERT
+function switch_class(id_var, sample_id, current=0) {
+    var radioButtons = [];
+    for (i in [0,1,2,3,4,5]) {
+        var radioId = `radio-switch-class-${i}`;
+        var isSelected = i == current;
+        radioButtons.push(`
+            <label class="w3-bar-item" style="margin: 10px;text-align: left;display: block; cursor: pointer;"
+                ">
+                <input type="radio"
+                    name="class-variant"
+                    value="${i}"
+                    id="${radioId}"
+                    ${isSelected ? 'checked' : ''}
+                    style="margin-right: 8px;">
+                    ${class_variant_html(i, true)}
+            </label>
+        `)
+    }
+    radioButtons = radioButtons.join('');
+    Swal.fire({
+    title: `Switch variant classification ${id_var}`,
+    html: `
+        ${radioButtons}
+    `,
+    showCancelButton: true,
+    confirmButtonText: 'Confirm',
+    cancelButtonText: 'Cancel',
+    preConfirm: () => {
+        const choice = document.querySelector(`input[name="class-variant"]:checked`);
+        if (!choice) {
+            Swal.showValidationMessage('Please choose an option !');
+            return false;
         }
-    })
+        return choice.value;
+    }
+    }).then((result) => {
+    if (result.isConfirmed) {
+        Swal.fire('Confirmed !', `Variant is now : "${class_variant_html(result.value, true)}"`, 'success');
+        $.ajax({
+            type: "POST",
+            url: "/toggle/samples/variant/class",
+            data: {
+                "id_var": id_var,
+                "sample_id": sample_id,
+                "class_variant": result.value
+            },
+            success: function() {
+                document.getElementById(`switch-${id_var}`).innerHTML = class_variant_html(result.value)
+            }
+        })
+    }
+    });
 }
 
 function toggle_on_off(div) {

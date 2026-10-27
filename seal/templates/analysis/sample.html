@@ -51,7 +51,7 @@
                             <th rowspan="2" class="w3-border-right w3-small"><span class="seal-display-middle-left">Consequences</span></th>
                             <th colspan="2" class="w3-border-right">Predictions</th>
                             <!-- <th  rowspan="2" class='min-size-2x5'><span class="seal-display-middle">R</span></th> -->
-                            <th  rowspan="2" class='min-size-75'><span class="seal-display-middle">Class</span></th>
+                            <th  rowspan="2" class='' style="max-width:13px !important; padding:10px !important;"><span class="seal-display-middle-left" style=" margin-left:-20px !important;transform: rotate(-90deg);">Class</span></th>
                             <th  rowspan="2" class=''></th>
                         </tr>
                         <tr>
@@ -186,15 +186,7 @@
                                 </span>
                                 Missense
                             </th>
-                            <!-- <th>
-                                R
-                            </th> -->
-                            <th style="padding:10px 10px 6px 10px!important">
-                                <span title="Help" onclick="openHelp(title='Class', content='You can choose the classification:<ul><li class=\'w3-text-flat-green-sea\'>Benign</li><li class=\'w3-text-flat-nephritis\'>Likely Benign</li><li class=\'w3-text-flat-belize-hole\'>VUS</li><li class=\'w3-text-flat-pumpkin\'>Likely Pathogenic</li><li class=\'w3-text-flat-pomegranate\'>Pathogenic</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4544753/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ACMG guidelines</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Class
-                            </th>
+                            <th id="nd"></th>
                             <th></th>
                         </tr>
                     </tfoot>
@@ -1285,29 +1277,19 @@
             }),
             // Class Column
             createColumn({
-                id: "visible-class",
-                data: "class_variant",
-                className: `${disabled_class} no-padding seal-form-report showTitle w3-center w3-border-right`,
+                id: "visible-details",
+                data: null,
+                orderable: true,
+                className: 'w3-border-left details-control w3-center',
                 renderConfig: {
-                    default: (data) => data ? data : 0,
+                    default: (data) => data.class_variant ? data.class_variant : 0,
                     display: (data, type, row) => {
                         const id_var = row.id;
-                        const class_variant = data ? data : 0;
-
-                        const dropdown = Object.entries(class_variant_html).map(([c, label]) =>
-                            `<a onclick="toggle_class('${id_var}', ${sample_id}, ${c}, this)" class="do-not-select w3-bar-item w3-button" style="width:inherit">${label}</a>`
-                        ).join('');
+                        const class_variant = data.class_variant ? data.class_variant : 0;
                         
-                        return `
-                            <div class="do-not-select w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
-                                <button class="do-not-select w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-${id_var}')" style="min-width:168px;" id="button-class-${id_var}">
-                                    ${class_variant_html[class_variant]}
-                                </button>
-                                <div class="do-not-select w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-${id_var}-content">
-                                    ${dropdown}
-                                </div>
-                            </div>
-                        `;
+                        const swal_class = `<a onclick="switch_class('${id_var}', '${sample_id}', ${class_variant})" id="switch-${id_var}" style="cursor:pointer">${class_variant_html(class_variant)}</a>`
+
+                        return `${swal_class}`;
                     }
                 }
             }),

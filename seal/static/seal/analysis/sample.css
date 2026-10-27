@@ -46,6 +46,14 @@ div.dataTables_processing span{
     right:0px !important
 }
 
+#variants_wrapper #nd {
+    right:34.02px !important
+}
+
 .dtfc-right-bottom-blocker {
     background-color: #ffffff;
+}
+
+.swal2-shown {
+    padding-right: 0px !important;
 }
