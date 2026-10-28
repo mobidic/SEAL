@@ -35,8 +35,9 @@ from flask import (flash, jsonify, redirect, render_template, request, url_for,
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload, selectinload
 from psycopg2.errors import UniqueViolation
 
 from seal import app, bcrypt, db, config
@@ -1008,7 +1009,7 @@ def json_comments_sample(id):
 @app.route("/json/variants/sample/<int:id>/bed/<int:idbed>", methods=['GET', 'POST'])
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
-def json_variants(id, idbed=False, version=-1):
+def json_variants(id, idbed=None, version=-1):
     """
     Endpoint for retrieving all variants associated with a particular sample.
 
@@ -1018,144 +1019,111 @@ def json_variants(id, idbed=False, version=-1):
                                Default is False.
         version (int, optional): The version number of the sample.
                                  Default is -1.
-
-
     Returns:
-        A JSON object with the following keys:
-        - data: A list of dictionaries, each representing a variant associated
-                with the sample.
-            Each dictionary has the following keys:
-            - annotations: A dictionary containing the main annotation for the
-                           variant.
-            - chr: The chromosome where the variant is located.
-            - id: The identifier of the variant.
-            - pos: The position of the variant.
-            - ref: The reference sequence for the variant.
-            - alt: The alternate sequence for the variant.
-            - filter: The filter status of the variant in the sample.
-            - depth: The sequencing depth of the variant in the sample.
-            - reported: A boolean indicating whether the variant was reported
-                        in the sample.
-            - class_variant: The class of the variant.
-            - allelic_depth: The allelic depth of the variant in the sample.
-            - allelic_frequency: The allelic frequency of the variant in the
-                                 sample.
-            - inseal: A dictionary containing information about the variant in
-                      SEAL database.
-                - occurrences: The number of occurrences of the variant.
-                - total_samples: The total number of samples.
-                - occurrences_family: The number of occurrences of the variant
-                                      within the same family.
-                - family_members: A list of family members with the variant.
-            - phenotypes: A list of phenotypes associated with the variant.
+        JSON: variants list with metadata
     """
-    sample = Sample.query.get(int(id))
+    # 1. Get sample with pre-loaded relations
+    sample = Sample.query.options(
+        selectinload(Sample.variants).selectinload(Var2Sample.variant),
+        joinedload(Sample.family).joinedload(Family.samples),
+        joinedload(Sample.run)
+    ).get(id)
+
     if not sample:
-        flash(f"Sample '{id}' not found! Please contact admin!",
-              category="error")
+        flash(f"Sample '{id}' not found! Please contact admin!", category="error")
         return redirect(url_for('index'))
 
-    if idbed >= 1:
-        bed = Bed.query.get(int(idbed))
+    # 2. Pre-loaded all sample variants
+    #    + bed filtering
+    bed = Bed.query.get(idbed) if idbed else None
+    query = Var2Sample.query.options(
+        joinedload(Var2Sample.variant),
+        joinedload(Var2Sample.sample)
+    ).filter(Var2Sample.sample_ID == id, Var2Sample.hide == False)
 
-    variants = {"data": list()}
+    if bed:
+        query = query.join(Variant).filter(
+            or_(
+                Bed.varInBed(bed, Variant),
+            )
+        )
 
-    # Get all canonical trancripts
+    var2samples = query.all()
 
-    ##################################################
+    # 3. Pre-loaded all OMIM needed + max scores
+    all_symbols = set()
+    for v2s in var2samples:
+        if v2s.variant.annotations:
+            for annot in v2s.variant.annotations[version].get("ANN", []):
+                symbol = annot.get("SYMBOL")
+                if symbol:
+                    all_symbols.add(symbol)
 
-    for var2sample in sample.variants:
-        variant = var2sample.variant
-        try:
-            if bed and not bed.varInBed(variant):
-                continue
-        except NameError:
-            pass
-        if var2sample.hide:
-            continue
-        annotations = variant.annotations
-        main_annot = None
-        consequence_score = -999
-        canonical = False
-        refseq = False
-        protein_coding = False
-        preferred_transcript = False
-
-        for annot in annotations[version]["ANN"]:
-            current_consequence_score = annot['consequenceScore']
-            current_canonical = annot['canonical']
-            current_refseq = True if annot['SOURCE'] == 'RefSeq' else False
-            current_protein_coding = True if annot['BIOTYPE'] == 'protein_coding' else False
-            current_preferred_transcript = True if annot['Feature'] in current_user.transcripts else False
-
-            if preferred_transcript == current_preferred_transcript:
-                if refseq == current_refseq:
-                    if current_protein_coding and not protein_coding:
-                        canonical = current_canonical
-                        consequence_score = current_consequence_score
-                        refseq = current_refseq
-                        protein_coding = current_protein_coding
-                        preferred_transcript = current_preferred_transcript
-                        annot["preferred"] = preferred_transcript
-                        main_annot = annot
-                        continue
-                    if protein_coding and not current_protein_coding:
-                        continue
-                    if canonical and not current_canonical:
-                        continue
-                    if not canonical and current_canonical:
-                        canonical = current_canonical
-                        consequence_score = current_consequence_score
-                        refseq = current_refseq
-                        protein_coding = current_protein_coding
-                        preferred_transcript = current_preferred_transcript
-                        annot["preferred"] = preferred_transcript
-                        main_annot = annot
-                        continue
-                    if current_consequence_score > consequence_score:
-                        canonical = current_canonical
-                        consequence_score = current_consequence_score
-                        refseq = current_refseq
-                        protein_coding = current_protein_coding
-                        preferred_transcript = current_preferred_transcript
-                        annot["preferred"] = preferred_transcript
-                        main_annot = annot
-                        continue
-                    continue
-
-                if current_refseq:
-                    canonical = current_canonical
-                    consequence_score = current_consequence_score
-                    refseq = current_refseq
-                    protein_coding = current_protein_coding
-                    preferred_transcript = current_preferred_transcript
-                    annot["preferred"] = preferred_transcript
-                    main_annot = annot
-                    continue
-                continue
-
-            if current_preferred_transcript:
-                canonical = current_canonical
-                consequence_score = current_consequence_score
-                refseq = current_refseq
-                protein_coding = current_protein_coding
-                preferred_transcript = current_preferred_transcript
-                annot["preferred"] = preferred_transcript
-                main_annot = annot
-                continue
-
-            if main_annot is None:
-                canonical = current_canonical
-                consequence_score = current_consequence_score
-                refseq = current_refseq
-                protein_coding = current_protein_coding
-                preferred_transcript = current_preferred_transcript
-                annot["preferred"] = preferred_transcript
-                main_annot = annot
-                continue
-        omims = Omim.query.filter(or_(Omim.geneSymbols.contains([main_annot["SYMBOL"]]), Omim.approvedGeneSymbol==main_annot["SYMBOL"])).all()
-        phenotypes = list()
+    omims_dict = {}
+    if all_symbols:
+        omims = Omim.query.filter(
+            or_(
+                Omim.geneSymbols.contains(list(all_symbols)),
+                Omim.approvedGeneSymbol.in_(list(all_symbols))
+            )
+        ).all()
         for omim in omims:
+            for symbol in omim.geneSymbols:
+                omims_dict[symbol] = omim
+            omims_dict[omim.approvedGeneSymbol] = omim
+
+    # 4. Pre-computed occurences
+    occurrences_query = db.session.query(
+        Var2Sample.variant_ID,
+        func.count().label("total_occurrences"),  # ✅ Compte toutes les lignes (pas besoin de colonne)
+        func.count().filter(Sample.runid == sample.runid).label("run_occurrences")
+    ).join(Sample, Var2Sample.sample_ID == Sample.id).group_by(Var2Sample.variant_ID)
+
+    occurrences_data = {row.variant_ID: {"total": row.total_occurrences, "run": row.run_occurrences}
+                        for row in occurrences_query.all()}
+
+    # 5. Get Main annotation
+    def get_main_annot(annotations, version, user_transcripts):
+        ann_list = annotations[version].get("ANN", [])
+        if not ann_list:
+            return None
+
+        def get_priority(annot):
+            priority = 0
+            annot["preferred"] = False
+            if annot.get("Feature") in user_transcripts:
+                annot["preferred"] = True
+                priority += 1000
+            if annot.get("canonical", False):
+                priority += 500
+            if annot.get("SOURCE") == "RefSeq":
+                priority += 200
+            if annot.get("BIOTYPE") == "protein_coding":
+                priority += 100
+            priority += annot.get("consequenceScore", 0)
+            return priority
+
+        sorted_ann = sorted(ann_list, key=get_priority, reverse=True)
+        return sorted_ann[0] if sorted_ann else None
+
+    # 6. Construct response
+    variants = {"data": []}
+    for var2sample in var2samples:
+        variant = var2sample.variant
+        main_annot = get_main_annot(variant.annotations, version, current_user.transcripts)
+        
+        missenses_max = max(
+            (float(annot["missensesMean"]) for annot in variant.annotations[version].get("ANN", [])
+            if annot.get("missensesMean") is not None),
+            default=None
+        )
+        if not main_annot:
+            continue
+
+        symbol = main_annot.get("SYMBOL")
+        omim_list = [omims_dict[symbol]] if symbol in omims_dict else []
+        phenotypes = []
+        for omim in omim_list:
             for pheno in omim.phenotypes:
                 phenotypes.append({
                     "id": pheno.id,
@@ -1164,80 +1132,86 @@ def json_variants(id, idbed=False, version=-1):
                     "inheritances": str(pheno.inheritances),
                     "phenotypeMappingKey": pheno.phenotypeMappingKey
                 })
-        members = []
-        t = dict()
-        if sample.familyid is not None:
+
+        family_members = {}
+        if sample.familyid:
             for s in sample.family.samples:
                 if s == sample or s.status < 1:
                     continue
-                t[str(s)] = dict()
-                req = Var2Sample.query.filter_by(variant_ID=var2sample.variant_ID, sample_ID=s.id).one_or_none()
-                if req:
-                    members.append(s.samplename)
-                    t[str(s)] = {
-                        "depth": f"{req.depth}",
-                        "allelic_depth": f"{req.allelic_depth}",
-                        "allelic_frequency": f"{req.allelic_freq}",
-                        "filter": req.filter,
+                v2s_family = Var2Sample.query.filter_by(
+                    variant_ID=var2sample.variant_ID,
+                    sample_ID=s.id
+                ).one_or_none()
+                if v2s_family:
+                    allelic_freq = v2s_family.allelic_depth / v2s_family.depth if v2s_family.depth > 0 else 0
+                    family_members[s.samplename] = {
+                        "depth": v2s_family.depth,
+                        "allelic_depth": v2s_family.allelic_depth,
+                        "allelic_frequency": f"{allelic_freq:.4f}",
+                        "filter": v2s_family.filter,
                     }
                 else:
-                    t[str(s)] = {
-                        "depth": f"NA",
-                        "allelic_depth": f"NA",
-                        "allelic_frequency": f"NA",
-                        "filter": f"NA",
+                    family_members[s.samplename] = {
+                        "depth": "NA",
+                        "allelic_depth": "NA",
+                        "allelic_frequency": "NA",
+                        "filter": "NA",
                     }
 
-        calls = dict()
-        for caller in var2sample.caller:
+        allelic_frequency = (
+            var2sample.allelic_freq
+            if var2sample.allelic_freq is not None
+            else (var2sample.allelic_depth / var2sample.depth if var2sample.depth > 0 else 0)
+        )
+
+        calls = {}
+        for caller, data in var2sample.caller.items():
             try:
-                c = var2sample.caller[caller]
-                allelic_frequency = c["allelic_depth"] / c["depth"]
-                calls[caller] = dict(
-                    {"filter": c["filter"],
-                    "depth": c["depth"],
-                    "allelic_depth": c["allelic_depth"],
-                    "allelic_frequency": f"{allelic_frequency:.4f}",
-                    "allelic_freq": f"{c['allelic_freq']:.4f}"}
-                )
-            except:
-                 calls[caller] = None
-        allelic_frequency = var2sample.allelic_freq if var2sample.allelic_freq else var2sample.allelic_depth / var2sample.depth
+                allelic_freq_caller = data["allelic_depth"] / data["depth"] if data["depth"] > 0 else 0
+                calls[caller] = {
+                    "filter": data["filter"],
+                    "depth": data["depth"],
+                    "allelic_depth": data["allelic_depth"],
+                    "allelic_frequency": f"{allelic_freq_caller:.4f}",
+                    "allelic_freq": f"{data.get('allelic_freq', allelic_freq_caller):.4f}"
+                }
+            except (TypeError, KeyError, ZeroDivisionError):
+                calls[caller] = None
+
+        variant_id = var2sample.variant_ID
+        total_occurrences = occurrences_data.get(variant_id, {}).get("total", 0)
+        run_occurrences = occurrences_data.get(variant_id, {}).get("run", 0)
+
         variants["data"].append({
             "annotations": main_annot,
-            "chr": f"{variant.chr}",
+            "chr": variant.chr,
             "clinvar": {
-                "VARID" : variant.clinvar_VARID,
-                "CLNSIG" : variant.clinvar_CLNSIG,
-                "CLNSIGCONF" : variant.clinvar_CLNSIGCONF,
-                "CLNREVSTAT" : variant.clinvar_CLNREVSTAT
+                "VARID": variant.clinvar_VARID,
+                "CLNSIG": variant.clinvar_CLNSIG,
+                "CLNSIGCONF": variant.clinvar_CLNSIGCONF,
+                "CLNREVSTAT": variant.clinvar_CLNREVSTAT
             },
-            # "scores": {
-            #     "MES_var" : variant.MES_var,
-            #     "spliceAI" : variant.spliceAI,
-            #     "missensesMean" : variant.missensesMean,
-            #     "gnomADg_AF" : variant.gnomADg_AF
-            # },
             "caller": calls,
-            "id": f"{variant.id}",
-            "pos": f"{variant.pos}",
-            "ref": f"{variant.ref}",
-            "alt": f"{variant.alt}",
+            "id": variant.id,
+            "pos": variant.pos,
+            "ref": variant.ref,
+            "alt": variant.alt,
             "filter": var2sample.filter,
-            "depth": f"{var2sample.depth}",
+            "depth": var2sample.depth,
             "reported": var2sample.reported,
             "class_variant": variant.class_variant,
-            "allelic_depth": f"{var2sample.allelic_depth}",
+            "allelic_depth": var2sample.allelic_depth,
             "allelic_frequency": f"{allelic_frequency:.4f}",
+            "missenses_max": missenses_max,
             "inseal": {
-                "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
-                "occurrences_run": Var2Sample.query.outerjoin(Sample, Var2Sample.sample).filter(Var2Sample.variant == variant).filter(Sample.runid == sample.runid).count(),
-                "occurences_family": len(members),
-                "family_members": members
+                "occurrences": total_occurrences,
+                "occurrences_run": run_occurrences,
+                "occurrences_family": len(family_members),
+                "family_members": list(family_members.keys())
             },
             "phenotypes": phenotypes,
-            "family": t,
-            "omims": [o.mimNumber for o in omims]
+            "family": family_members,
+            "omims": [o.mimNumber for o in omim_list]
         })
     return jsonify(variants)
 
