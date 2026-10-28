@@ -41,7 +41,7 @@
                         <tr>
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle-left w3-small">Gene</span></th>
                             <th rowspan="2" class='min-size-200 w3-border-right'><span class="seal-display-middle-left w3-small">HGVS</span></th>
-                            <th rowspan="2" class="min-size-75 w3-border-right"><span class="seal-display-middle-left w3-small" style="left:10px;">Exon/intron</span></th>
+                            <th rowspan="2" class="min-size-50 w3-border-right"><span class="seal-display-middle-left w3-small" style="left:10px;">Exon<br/>Intron</span></th>
                             <th colspan="{{ sample.caller|length }}" class="w3-border-right">Variant</th>
                             {% if family_members|length > 0 %}
                                 <th colspan="{{ family_members|length }}" class="w3-border-right">Family<br /><span class="w3-text-flat-pumpkin w3-tiny"><i class="fa-solid fa-triangle-exclamation"></i> Only max values</span></th>
@@ -116,7 +116,7 @@
                                     onclick="openHelp(
                                         title='Exon/Intron',
                                         content=`The number of the exon or intron wich have the variant.<br />
-                                        <b>Exons are in bold</b>, <i>introns in italics.</i>`
+                                        <span class='w3-text-flat-nephritis'><b>Exons are in bold</b></span>, <span class='w3-text-flat-wisteria'><i>introns in italics.</i></span>`
                                     )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
@@ -510,6 +510,7 @@
 
             <div id="missense" class="w3-container detail">
                 <h3>Missense</h3>
+                <div class='w3-flash w3-warning'><p>Maximum scores are kept for these view (not transcript depending)</p></div>
                 <div class="w3-row">
                     <div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
                     <div class="w3-col l6 m12 s12">
@@ -861,13 +862,13 @@
                         return "NA";
                     },
                     display: (data) => {
-                        if (data.EXON != null) return `<b>Exon ${data.EXON}</b>`;
-                        if (data.INTRON != null) return `<i>Intron ${data.INTRON}</i>`;
+                        if (data.EXON != null) return `<span class="w3-text-flat-nephritis"><b>Exon<br />${data.EXON}</b></span>`;
+                        if (data.INTRON != null) return `<span class="w3-text-flat-wisteria"><i>Intron<br />${data.INTRON}</i></span>`;
                         return "<i>NA</i>";
                     },
                     sort: (data) => {
                         const ei = data.EXON != null ? data.EXON : (data.INTRON != null ? data.INTRON : "NA");
-                        return ei.toString().split(/\//)[0];
+                        return ei.toString().split(/\//)[0].padStart(3, "0");
                     }
                 }
             }),
