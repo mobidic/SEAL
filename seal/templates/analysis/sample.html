@@ -1221,14 +1221,14 @@
             // Missense Column
             createColumn({
                 id: "visible-missense",
-                data: "annotations",
+                data: null,
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
-                    if (data?.missensesMean == null) return null;
+                    if (data.annotations?.missensesMean == null) return null;
 
-                    const value = parseFloat(data.missensesMean);
+                    const value = parseFloat(data.annotations.missensesMean);
                     const array = MISSENSES
-                        .map(i => parseFloat(data[i]))
+                        .map(i => parseFloat(data.annotations[i]))
                         .filter(x => !isNaN(x));
 
                     const n = array.length;
@@ -1238,41 +1238,44 @@
                     return `${value.toFixed(4)}\nstdev: ${stdev.toFixed(2)}\ncv: ${cv.toFixed(2)}`;
                 },
                 renderConfig: {
-                    default: (data) => data?.missensesMean != null ? parseFloat(data.missensesMean).toFixed(4) : null,
+                    default: (data) => data.missenses_max != null ? parseFloat(data.missenses_max).toFixed(4) : null,
                     display: (data) => {
-                        if (data?.missensesMean == null) return "<i>NA</i>";
+                        if (data.missenses_max == null) return "<i>NA</i>";
 
-                        const value = parseFloat(data.missensesMean);
-                        let classw3css = "";
+                        if (data.annotations?.missensesMean != null) {
+                            const value = parseFloat(data.annotations.missensesMean);
+                            let classw3css = "";
 
-                        if (value >= 0.95) classw3css = "w3-tag w3-flat-pomegranate";
-                        else if (value >= 0.9) classw3css = "w3-text-flat-pomegranate";
-                        else if (value >= 0.75) classw3css = "w3-text-flat-orange";
-                        else if (value >= 0.5) classw3css = "w3-text-flat-sun-flower";
+                            if (value >= 0.95) classw3css = "w3-tag w3-flat-pomegranate";
+                            else if (value >= 0.9) classw3css = "w3-text-flat-pomegranate";
+                            else if (value >= 0.75) classw3css = "w3-text-flat-orange";
+                            else if (value >= 0.5) classw3css = "w3-text-flat-sun-flower";
 
-                        const array = MISSENSES
-                            .map(i => parseFloat(data[i]))
-                            .filter(x => !isNaN(x));
+                            const array = MISSENSES
+                                .map(i => parseFloat(data.annotations[i]))
+                                .filter(x => !isNaN(x));
 
-                        const n = array.length;
-                        const stdev = n > 0 ? Math.sqrt(array.map(x => Math.pow(x - value, 2)).reduce((a, b) => a + b, 0) / n) : 0;
-                        const cv = stdev / value;
+                            const n = array.length;
+                            const stdev = n > 0 ? Math.sqrt(array.map(x => Math.pow(x - value, 2)).reduce((a, b) => a + b, 0) / n) : 0;
+                            const cv = stdev / value;
 
-                        let stdev_resp, t;
-                        if (cv <= 0.15) {
-                            stdev_resp = `<b><span class="w3-text-flat-nephritis">${stdev.toFixed(2)}</span></b>`;
-                            t = '<b> <i class="w3-text-flat-nephritis fas fa-angles-up"></i></b>';
-                        } else if (cv <= 0.3) {
-                            stdev_resp = `<span class="w3-text-flat-belize-hole">${stdev.toFixed(2)}</span>`;
-                            t = ' <i class="w3-text-flat-belize-hole fas fa-angle-up"></i>';
-                        } else {
-                            stdev_resp = `<span class="w3-text-flat-wisteria">${stdev.toFixed(2)}</span>`;
-                            t = ' <i class="w3-text-flat-pomegranate fas fa-angles-down"></i>';
+                            let stdev_resp, t;
+                            if (cv <= 0.15) {
+                                stdev_resp = `<b><span class="w3-text-flat-nephritis">${stdev.toFixed(2)}</span></b>`;
+                                t = '<b> <i class="w3-text-flat-nephritis fas fa-angles-up"></i></b>';
+                            } else if (cv <= 0.3) {
+                                stdev_resp = `<span class="w3-text-flat-belize-hole">${stdev.toFixed(2)}</span>`;
+                                t = ' <i class="w3-text-flat-belize-hole fas fa-angle-up"></i>';
+                            } else {
+                                stdev_resp = `<span class="w3-text-flat-wisteria">${stdev.toFixed(2)}</span>`;
+                                t = ' <i class="w3-text-flat-pomegranate fas fa-angles-down"></i>';
+                            }
+                            return `<b><span style='display:inline-table;' class='${classw3css}'>${value.toFixed(4)}</span></b><br /><i>stdev: ${stdev_resp}${t}<br /><span style="opacity: 0.33;">Max: ${data.missenses_max.toFixed(4)}</span>`;
                         }
 
-                        return `<b><span style='display:inline-table;' class='${classw3css}'>${value.toFixed(4)}</span></b><br /><i>stdev: ${stdev_resp}${t}`;
+                        return `<i>NA</i><br /><span style="opacity: 0.33;">Max: ${data.missenses_max.toFixed(4)}</span>`;
                     },
-                    sort: (data) => data?.missensesMean != null ? parseFloat(data.missensesMean).toFixed(4) : -1
+                    sort: (data) => data.missenses_max != null ? parseFloat(data.missenses_max).toFixed(4) : -1,
                 }
             }),
             // Class Column
@@ -1649,7 +1652,7 @@
             }),
             createColumn({
                 id: "export-filter-missenses",
-                data: "annotations.missensesMean",
+                data: "missenses_max",
                 searchBuilderTitle:"Prediction - Missenses",
                 visible: false,
                 renderConfig: {
