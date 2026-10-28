@@ -37,7 +37,7 @@ from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
 from sqlalchemy import select, func, and_, or_
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import joinedload, selectinload
+from sqlalchemy.orm import joinedload, selectinload, aliased
 from psycopg2.errors import UniqueViolation
 
 from seal import app, bcrypt, db, config
@@ -882,6 +882,31 @@ def json_samples():
             - teams: a list of dictionaries, each containing the name and color
                      of a team associated with the sample
     """
+
+    # === 1. Subquery to retrieve the last action for each sample ===
+    last_action_cte = db.session.query(
+        History.sample_ID,
+        History.date,
+        History.user_ID,
+        History.action,
+        func.row_number().over(
+            partition_by=History.sample_ID,
+            order_by=History.date.desc()
+        ).label('row_num')
+    ).subquery()
+
+    last_action_subq = db.session.query(
+        last_action_cte.c.sample_ID,
+        last_action_cte.c.date.label('last_action_date'),
+        last_action_cte.c.user_ID.label('last_action_user_id'),
+        last_action_cte.c.action.label('last_action_action')
+    ).filter(
+        last_action_cte.c.row_num == 1
+    ).subquery()
+
+    last_action_alias = aliased(last_action_subq, name='last_action')
+
+    # === 2. Defining sortable columns ===
     key_list = {
         "asc": [
             0,
@@ -890,7 +915,7 @@ def json_samples():
             Run.name.asc(),
             Run.alias.asc(),
             Sample.status.asc(),
-            Sample.lastAction.asc()
+            last_action_alias.c.last_action_date.asc()
         ],
         "desc": [
             0,
@@ -899,17 +924,26 @@ def json_samples():
             Run.name.desc(),
             Run.alias.desc(),
             Sample.status.desc(),
-            Sample.lastAction.desc()
+            last_action_alias.c.last_action_date.desc()
         ]
     }
-    filters = or_(
-        Sample.samplename.op('~')(request.form['search[value]']),
-        Family.family.op('~')(request.form['search[value]']),
-        Run.name.op('~')(request.form['search[value]']),
-        Run.alias.op('~')(request.form['search[value]'])
+
+    # === 3. Main query with a join on last_action ===
+    base_query = Sample.query.outerjoin(
+        last_action_alias,
+        Sample.id == last_action_alias.c.sample_ID
+    ).add_columns(
+        last_action_alias.c.last_action_date,
+        last_action_alias.c.last_action_user_id,
+        last_action_alias.c.last_action_action
+    ).options(
+        joinedload(Sample.family),
+        joinedload(Sample.run),
+        joinedload(Sample.teams)
     )
 
-    samples = Sample.query
+    # === 4. Filters by teams (if user is not an admin) ===
+    samples = base_query
     if not current_user.admin:
         filter_samples_teams = or_(
             Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])),
@@ -917,31 +951,49 @@ def json_samples():
         )
         samples = samples.filter(filter_samples_teams)
     recordsTotal = samples.count()
-    samples_filter = samples.outerjoin(Family, Sample.family)\
-                            .outerjoin(Run, Sample.run).filter(filters)
 
-    if request.form['index_filtering'] == 'True': 
-        samples_filter = samples_filter.filter(Sample.index  == True)
-    if request.form['index_filtering'] == 'False': 
-        samples_filter = samples_filter.filter(Sample.index  == False)
-    if request.form['affected_filtering'] == 'True': 
-        samples_filter = samples_filter.filter(Sample.affected  == True)
-    if request.form['affected_filtering'] == 'False': 
-        samples_filter = samples_filter.filter(Sample.affected  == False)
+    # === 5. Search filters and others ===
+    samples_filter = samples.outerjoin(Family, Sample.family).outerjoin(Run, Sample.run).outerjoin(Team, Sample.teams)
+    search_value = request.form.get('search[value]', '')
+    if search_value:
+        filters = or_(
+            Sample.samplename.op('~')(search_value),
+            Family.family.op('~')(search_value),
+            Run.name.op('~')(search_value),
+            Run.alias.op('~')(search_value)
+        )
+        samples_filter = samples_filter.filter(filters)
+
+    if request.form.get('index_filtering') in ('True', 'False'):
+        samples_filter = samples_filter.filter(
+            Sample.index == (request.form['index_filtering'] == 'True')
+        )
+    if request.form.get('affected_filtering') in ('True', 'False'):
+        samples_filter = samples_filter.filter(
+            Sample.affected == (request.form['affected_filtering'] == 'True')
+        )
 
     recordsFiltered = samples_filter.count()
-    samples = samples_filter\
-        .order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])])\
-        .offset(request.form["start"])\
-        .limit(request.form["length"])\
-        .all()
+
+    # === 6. Pagination and sorting (default: column 5 = lastAction.date, DESC) ===
+    start = int(request.form.get("start", 0))
+    length = int(request.form.get("length", 10))
+    order_dir = request.form.get('order[0][dir]', 'desc')
+    order_col = int(request.form.get('order[0][column]', 6))
+
+
+    ordered_samples = samples_filter.order_by(
+       key_list[order_dir][order_col]
+    ).offset(start).limit(length).all()
+
     samples_json = {
         "recordsTotal": recordsTotal,
         "recordsFiltered": recordsFiltered,
         "data": list()
     }
 
-    for sample in samples:
+    for sample_tuple in ordered_samples:
+        sample = sample_tuple[0]
         teams = []
         for team in sample.teams:
             teams.append({"teamname": team.teamname, "color": team.color})
@@ -964,7 +1016,6 @@ def json_samples():
             "teams": teams
         })
     return jsonify(samples_json)
-
 
 
 @app.route("/json/comments/sample/<int:id>", methods=['GET', 'POST'])
