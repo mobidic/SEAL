@@ -35,21 +35,12 @@ div.dataTables_processing span{
 #barPopulation > div > div > svg:nth-child(1) > g.cartesianlayer > g > g.plot > g > g > g > g > path {
     clip-path: inset(0% 0% round 50px 50px 0% 0%);
 }
+#variants_wrapper > .dataTables_scroll > .dataTables_scrollFoot > .dataTables_scrollFootInner {
+    box-sizing: content-box !important;
+}
 #variants_wrapper > .dataTables_scroll {
     margin:0 -30px!important;
 } 
-
-#variants_wrapper  .dataTables_scrollFoot {
-    padding-right:15px !important
-}
-#variants_wrapper .dataTables_scrollFoot .dtfc-fixed-right {
-    right:0px !important
-}
-
-#variants_wrapper #nd {
-    right:34.02px !important
-}
-
 .dtfc-right-bottom-blocker {
     background-color: #ffffff;
 }
