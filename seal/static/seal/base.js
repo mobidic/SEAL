@@ -52,6 +52,7 @@ async function w3_toggle_menu() {
     updateSideBar();
     await new Promise(r => setTimeout(r, 450));
     $('.w3-table-all').DataTable().columns.adjust();
+    table.data().draw();
 }
 $(window).resize(updateSideBar);
 $(document).ready(function(){
