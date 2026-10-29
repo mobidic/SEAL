@@ -1876,7 +1876,10 @@
                 visible: false,
                 renderConfig: {
                     default: (data) => {
-                        const family = data["{{s}}"]
+                        const family = data["{{s.id}}"]
+                        if (isNaN(parseFloat(family))) {
+                            return "NA"
+                        }
                         if (isNaN(parseFloat(family.allelic_depth)) && isNaN(parseFloat(family.allelic_frequency))) {
                             return "NA"
                         }
