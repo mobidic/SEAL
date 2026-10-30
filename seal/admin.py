@@ -29,7 +29,7 @@ from flask_login import current_user
 from seal import app, db, bcrypt
 from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
-                         Region, Bed, Phenotype, Omim, History, Clinvar)
+                         Region, Bed, Phenotype, Omim, History, Clinvar, Tag)
 
 ###############################################################################
 
@@ -401,6 +401,15 @@ admin.add_view(
 admin.add_view(
     CustomView(
         Clinvar,
+        db.session,
+        category="Analysis"
+    )
+)
+
+
+admin.add_view(
+    CustomView(
+        Tag,
         db.session,
         category="Analysis"
     )

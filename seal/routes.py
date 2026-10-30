@@ -46,7 +46,7 @@ from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample, Clinvar)
+                         Transcript, User, Variant, Var2Sample, Clinvar, Tag)
 from seal.schedulers import update_clinvar
 
 
@@ -2133,3 +2133,105 @@ def toggle_user_sidebar():
 #     return send_file()
 
 ###############################################################################
+
+@app.route('/api/tags', methods=['GET', 'POST'])
+@login_required
+def api_tags():
+    if request.method == 'GET':
+        tags = Tag.query.all()
+        return jsonify([{
+            'id': tag.id,
+            'name': tag.name,
+            'color': tag.color
+        } for tag in tags])
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        name = data.get('name')
+        color = data.get('color', None)
+
+        if not name:
+            return jsonify({'error': 'Name is required'}), 400
+
+        existing_tag = Tag.query.filter_by(name=name).first()
+        if existing_tag:
+            return jsonify({
+                'id': existing_tag.id,
+                'name': existing_tag.name,
+                'color': existing_tag.color,
+                'exists': True
+            })
+
+        new_tag = Tag(name=name, color=color)
+        db.session.add(new_tag)
+        db.session.commit()
+
+        return jsonify({
+            'id': new_tag.id,
+            'name': new_tag.name,
+            'color': new_tag.color
+        })
+
+@app.route('/api/sample/<int:sample_id>/tags', methods=['POST', 'DELETE'])
+@login_required
+def manage_sample_tags(sample_id):
+    sample = Sample.query.get_or_404(sample_id)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        tag_id = data.get('tag_id')
+        if not tag_id:
+            return jsonify({'error': 'tag_id is required'}), 400
+
+        tag = Tag.query.get(tag_id)
+        if not tag:
+            return jsonify({'error': 'Tag not found'}), 404
+
+        if tag in sample.tags:
+            return jsonify({'error': 'Tag already associated'}), 400
+
+        sample.tags.append(tag)
+        db.session.commit()
+
+        history = History(
+            user_ID=current_user.id,
+            sample_ID=sample.id,
+            date=datetime.now(),
+            action=f"Added tag: {tag.name}"
+        )
+        db.session.add(history)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'tag': {
+                'id': tag.id,
+                'name': tag.name,
+                'color': tag.color  # <-- On retourne la couleur du tag en base
+            }
+        })
+
+    elif request.method == 'DELETE':
+        data = request.get_json()
+        tag_id = data.get('tag_id')
+        if not tag_id:
+            return jsonify({'error': 'tag_id is required'}), 400
+
+        tag = Tag.query.get(tag_id)
+        if not tag:
+            return jsonify({'error': 'Tag not found'}), 404
+
+        if tag in sample.tags:
+            sample.tags.remove(tag)
+            db.session.commit()
+
+            history = History(
+                user_ID=current_user.id,
+                sample_ID=sample.id,
+                date=datetime.now(),
+                action=f"Removed tag: {tag.name}"
+            )
+            db.session.add(history)
+            db.session.commit()
+
+        return jsonify({'success': True})

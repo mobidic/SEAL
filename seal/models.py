@@ -63,6 +63,29 @@ sample2team = db.Table(
     )
 )
 
+sample2tag = db.Table(
+    'sample2tag',
+    db.Column('tag_ID', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
+    db.Column('sample_ID', db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+)
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    color = db.Column(db.String(7), unique=False, nullable=False, default="#95A5A6")
+
+    samples = db.relationship(
+        'Sample', secondary=sample2tag, lazy='subquery',
+        backref=db.backref('tags', lazy=True)
+    )
+
+    def __repr__(self):
+        return f"Tag('{self.name}','{self.color}')"
+
+    def __str__(self):
+        return self.name
+
 
 class MutableList(Mutable, list):
     def append(self, value):
