@@ -32,9 +32,24 @@
                 {% endfor %}
 
                 <span onclick="showAddTagAlert({{ sample.id }})"
-                        class="w3-tag sample-tag sample-tag-add-button w3-round w3-light-grey w3-hover-white w3-border"
-                        style="cursor: pointer; border: 1px dashed #ccc !important;">
+                        class="w3-tag sample-tag sample-tag-add-button w3-round">
                     <i class="fas fa-plus"></i> Add a tag
+                </span>
+            </div>
+            <hr>
+            <h3><i class="w3-text-flat-green-sea fas fa-tags"></i> HPO</h3>
+            <div id="sample-hpos-container-{{ sample.id }}" class="w3-margin-top">
+                {% for hpo in sample.hpos %}
+                <span class="w3-tag sample-hpo w3-round " aria-label="{{ hpo.label }}" data-balloon-pos="down">
+                    HP_{{ hpo.hpo }}
+                    <i class="fas fa-times" style="cursor: pointer;"
+                    onclick="removeHPO({{ sample.id }}, {{ hpo.id }}, this)"></i>
+                </span>
+                {% endfor %}
+
+                <span onclick="showAddHPOAlert({{ sample.id }})"
+                        class="w3-hpo sample-hpo sample-hpo-add-button w3-round">
+                    <i class="fas fa-plus"></i> Add HPO
                 </span>
             </div>
             <hr>

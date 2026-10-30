@@ -15,9 +15,156 @@ function getTextColor(hexColor) {
     return getBrightness(hexColor) > 130 ? '#34495e' : '#ecf0f1';
 }
 
-function generateRandomColor() {
-    const colors = ["#E74C3C", "#3498DB", "#2ECC71", "#F39C12", "#9B59B6", "#1ABC9C"];
-    return colors[Math.floor(Math.random() * colors.length)];
+function showAddHPOAlert(sampleId) {
+    var random_color = getRandomColor()
+    Swal.fire({
+        title: '<i class="fas fa-tag w3-margin-right"></i> Add HPO',
+        html: `
+            <div style="display: flex; align-items: center; gap: 8px; margin: 8px 0;">
+                <input id="swal-hpo-name"
+                    class="swal2-input"
+                    placeholder="HPO ID or HPO label..."
+                    style="margin: 4px !important;flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
+                <input type="hidden"
+                    id="swal-hpo-id"
+                    value="">
+            </div>
+        `,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonText: '<i class="fas fa-plus w3-margin-right"></i> Add',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#dd3333',
+        preConfirm: () => {
+            return {
+                name: document.getElementById(`swal-hpo-name`).value.trim(),
+                id: document.getElementById(`swal-hpo-id`).value,
+            };
+        },
+        didOpen: () => {
+            document.getElementById(`swal-hpo-name`).focus();
+            
+            var hpos=[];
+            var ids={};
+            $.ajax({
+                url: `/api/hpos`,
+                method: 'GET',
+                success: function(temp_response) {
+                    for (i in temp_response) {
+                        var label=`HP_${temp_response[i]["id"]} :${temp_response[i]["label"]}`
+                        hpos.push(label);
+                        ids[label] = temp_response[i]["id"]
+                    }
+                },
+            });
+            $("#swal-hpo-name").autocomplete({
+                source: hpos,
+                select: function(event, ui){
+                    document.getElementById(`swal-hpo-id`).value = ids[ui.item.label]
+                }
+            });
+        }
+    }).then((result) => {
+        if(result.isConfirmed) {
+            addHPOWithSweetAlert(sampleId, result.value.id);
+        }
+    });
+}
+
+
+// =============================================
+// tags managment
+// =============================================
+
+function addHPOWithSweetAlert(sampleId, id) {
+    if (!id) {
+        Swal.fire('Info', 'HPO is not valid (cancel)', 'info');
+        return;
+    }
+
+    $.ajax({
+        url: `/api/hpos?q=${encodeURIComponent(id)}&exclude_sample_id=${sampleId}`,
+        method: 'GET',
+        success: function(hpos) {
+            console.log(id)
+            console.log(hpos)
+            const existingHpo = hpos.find(hpo =>
+                hpo.id == id
+            );
+            console.log(existingHpo)
+            if (existingHpo) {
+                addHPOToSample(sampleId, existingHpo);
+            } else {
+                Swal.fire('Error', "HPO unavailable", 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', "HPO unavailable", 'error');
+        }
+    });
+}
+
+function addHPOToSample(sampleId, hpo) {
+    $.ajax({
+        url: `/api/sample/${sampleId}/hpos`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ hpo_id: hpo.id }),
+        success: function(response) {
+            if (response.success) {
+                $(`#sample-hpos-container-${sampleId} .sample-hpo-add-button`).remove();
+
+                $(`#sample-hpos-container-${sampleId}`).append(`
+                    <span class="w3-tag sample-hpo w3-round" aria-label="${hpo.label}" data-balloon-pos="down" onclick="">
+                        HP_${hpo.hpo}
+                        <i class="fas fa-times" style="cursor: pointer;"
+                           onclick="removeHPO(${sampleId}, ${hpo.id}, this)"></i>
+                    </span>
+                `);
+
+                $(`#sample-hpos-container-${sampleId}`).append(`
+                    <span onclick="showAddHPOAlert(${sampleId})"
+                            class="w3-tag sample-hpo sample-hpo-add-button w3-round">
+                        <i class="fas fa-plus"></i> Add HPO
+                    </span>
+                `);
+            }
+        },
+        error: function(xhr) {
+            if (xhr.responseJSON?.error === 'HPO already associated') {
+                Swal.fire('Info', 'This HPO is already associated to this sample', 'info');
+            } else {
+                Swal.fire('Error', "HPO's creation is impossible", 'error');
+            }
+        }
+    });
+}
+
+function removeHPO(sampleId, hpoId, element) {
+    Swal.fire({
+        title: 'Delete this HPO ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/api/sample/${sampleId}/hpos`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ hpo_id: hpoId }),
+                success: function() {
+                    $(element).closest('.w3-tag').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    Swal.fire('Error', "HPO's deletion is impossible", 'error');
+                }
+            });
+        }
+    });
 }
 
 // =============================================
@@ -27,12 +174,12 @@ function generateRandomColor() {
 function showAddTagAlert(sampleId) {
     var random_color = getRandomColor()
     Swal.fire({
-        title: '<i class="fas fa-tag w3-margin-right"></i> Ajouter un tag',
+        title: '<i class="fas fa-tag w3-margin-right"></i> Add a tag',
         html: `
             <div style="display: flex; align-items: center; gap: 8px; margin: 8px 0;">
                 <input id="swal-tag-name"
                     class="swal2-input"
-                    placeholder="Nom du tag..."
+                    placeholder="Tag name..."
                     style="margin: 4px !important;flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
                 <input type="color"
                     id="swal-tag-color"
