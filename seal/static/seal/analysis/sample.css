@@ -48,3 +48,35 @@ div.dataTables_processing span{
 .swal2-shown {
     padding-right: 0px !important;
 }
+
+.ui-autocomplete {
+    z-index:10000
+}
+/* ===== tags style ===== */
+.sample-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1;
+    margin: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sample-tag:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* ===== Style pour le bouton "+ Add a tag" ===== */
+.sample-tag.w3-light-grey {
+    background-color: #f0f0f0 !important;
+    border: 1px dashed #ccc !important;
+    color: #777 !important;
+}
+
+.sample-tag.w3-light-grey:hover {
+    background-color: #e0e0e0 !important;
+    border: 1px dashed #aaa !important;
+}

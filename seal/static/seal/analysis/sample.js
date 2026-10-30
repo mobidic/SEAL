@@ -1,3 +1,225 @@
+
+        
+
+// =============================================
+// Utilities
+// =============================================
+function getBrightness(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+function getTextColor(hexColor) {
+    return getBrightness(hexColor) > 130 ? '#34495e' : '#ecf0f1';
+}
+
+function generateRandomColor() {
+    const colors = ["#E74C3C", "#3498DB", "#2ECC71", "#F39C12", "#9B59B6", "#1ABC9C"];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// =============================================
+// Main : add tags (sweet alert)
+// =============================================
+
+function showAddTagAlert(sampleId) {
+    var random_color = getRandomColor()
+    Swal.fire({
+        title: '<i class="fas fa-tag w3-margin-right"></i> Ajouter un tag',
+        html: `
+            <div style="display: flex; align-items: center; gap: 8px; margin: 8px 0;">
+                <input id="swal-tag-name"
+                    class="swal2-input"
+                    placeholder="Nom du tag..."
+                    style="margin: 4px !important;flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
+                <input type="color"
+                    id="swal-tag-color"
+                    value="${random_color}"
+                    style="width: 40px; height: 36px; padding: 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; flex-shrink: 0;">
+            </div>
+        `,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonText: '<i class="fas fa-plus w3-margin-right"></i>Add',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#dd3333',
+        preConfirm: () => {
+            return {
+                name: document.getElementById(`swal-tag-name`).value.trim(),
+                color: document.getElementById(`swal-tag-color`).value
+            };
+        },
+        didOpen: () => {
+            document.getElementById(`swal-tag-name`).focus();
+            
+            var tags=[];
+            var colors={};
+            $.ajax({
+                url: `/api/tags`,
+                method: 'GET',
+                success: function(temp_response) {
+                    for (i in temp_response) {
+                        tags.push(temp_response[i]["name"]);
+                        colors[temp_response[i]["name"]] = temp_response[i]["color"]
+                    }
+                },
+            });
+
+            $("#swal-tag-name").autocomplete({
+                source: tags,
+                select: function(event, ui){
+                    document.getElementById(`swal-tag-color`).value = colors[ui.item.label]
+                }
+            });
+        }
+    }).then((result) => {
+        addTagWithSweetAlert(sampleId, result.value.name, result.value.color);
+    });
+}
+
+// =============================================
+// tags managment
+// =============================================
+
+function addTagWithSweetAlert(sampleId, name, color) {
+    if (!name) {
+        Swal.fire('Info', 'Tag name is empty (cancel)', 'info');
+        return;
+    }
+
+    $.ajax({
+        url: `/api/tags?q=${encodeURIComponent(name)}&exclude_sample_id=${sampleId}`,
+        method: 'GET',
+        success: function(tags) {
+            const existingTag = tags.find(tag =>
+                tag.name.toLowerCase() === name.toLowerCase()
+            );
+
+            if (existingTag) {
+                addTagToSample(sampleId, existingTag.id, existingTag.name, existingTag.color);
+            } else {
+                $.ajax({
+                    url: '/api/tags',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name: name, color: color }),
+                    success: function(newTag) {
+                        addTagToSample(sampleId, newTag.id, newTag.name, newTag.color);
+                    },
+                    error: function() {
+                        Swal.fire('Error', "Tag's creation is impossible", 'error');
+                    }
+                });
+            }
+        },
+        error: function() {
+            $.ajax({
+                url: '/api/tags',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ name: name, color: color }),
+                success: function(newTag) {
+                    addTagToSample(sampleId, newTag.id, newTag.name, newTag.color);
+                },
+                error: function() {
+                    Swal.fire('Error', "Tag's creation is impossible", 'error');
+                }
+            });
+        }
+    });
+}
+
+function addTagToSample(sampleId, tagId, name, color) {
+    $.ajax({
+        url: `/api/sample/${sampleId}/tags`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ tag_id: tagId }),
+        success: function(response) {
+            if (response.success) {
+                $(`#sample-tags-container-${sampleId} .sample-tag-add-button`).remove();
+
+                $(`#sample-tags-container-${sampleId}`).append(`
+                    <span class="w3-tag sample-tag w3-round"
+                          style="background-color: ${color}99;border:1px solid ${color}4D;
+                                color: ${getTextColor(color)};">
+                        ${name}
+                        <i class="fas fa-times" style="cursor: pointer;"
+                           onclick="removeTag(${sampleId}, ${tagId}, this)"></i>
+                    </span>
+                `);
+
+                $(`#sample-tags-container-${sampleId}`).append(`
+                    <span onclick="showAddTagAlert(${sampleId})"
+                            class="w3-tag sample-tag sample-tag-add-button w3-round w3-light-grey w3-hover-white w3-border"
+                            style="cursor: pointer; border: 1px dashed #ccc;">
+                        <i class="fas fa-plus"></i> Add a tag
+                    </span>
+                `);
+            }
+        },
+        error: function(xhr) {
+            if (xhr.responseJSON?.error === 'Tag already associated') {
+                Swal.fire('Info', 'This tag is already associated to this sample', 'info');
+            } else {
+                Swal.fire('Error', "Tag's creation is impossible", 'error');
+            }
+        }
+    });
+}
+
+function removeTag(sampleId, tagId, element) {
+    Swal.fire({
+        title: 'Delete this tag ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/api/sample/${sampleId}/tags`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ tag_id: tagId }),
+                success: function() {
+                    $(element).closest('.w3-tag').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    Swal.fire('Error', "Tag's creation is impossible", 'error');
+                }
+            });
+        }
+    });
+}
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+spans = document.querySelectorAll('span.sample-tag:not(.sample-tag-add-button)')
+// Source - https://stackoverflow.com/a/3627747
+// Posted by Erick Petrucelli, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-10-30, License - CC BY-SA 4.0
+
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
+function changeColor(coll){
+    for(var i=0, len=coll.length; i<len; i++)
+    {
+        coll[i].style["color"] = getTextColor(rgba2hex(coll[i].style["background-color"]));
+    }
+}
+changeColor(spans)
+
 function toggle_status(id, status) {
     $.ajax({
         type: "POST",

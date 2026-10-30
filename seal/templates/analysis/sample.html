@@ -20,6 +20,24 @@
             <hr>
         </div>
         <div class="w3-padding w3-small">
+            <h3><i class="w3-text-flat-green-sea fas fa-tags"></i> Tags</h3>
+            <div id="sample-tags-container-{{ sample.id }}" class="w3-margin-top">
+                {% for tag in sample.tags %}
+                <span class="w3-tag sample-tag sample-tag-colors w3-round"
+                    style="background-color: {{ tag.color }}99;border:1px solid {{ tag.color }}4D;">
+                    {{ tag.name }}
+                    <i class="fas fa-times" style="cursor: pointer;"
+                    onclick="removeTag({{ sample.id }}, {{ tag.id }}, this)"></i>
+                </span>
+                {% endfor %}
+
+                <span onclick="showAddTagAlert({{ sample.id }})"
+                        class="w3-tag sample-tag sample-tag-add-button w3-round w3-light-grey w3-hover-white w3-border"
+                        style="cursor: pointer; border: 1px dashed #ccc !important;">
+                    <i class="fas fa-plus"></i> Add a tag
+                </span>
+            </div>
+            <hr>
             <div class="seal-form-report w3-row w3-padding {% if sample.status == 4 %}w3-disabled {% endif %}">
                 <div class="w3-col l4 m6 s12 w3-row w3-padding">
                     <div class="w3-col w3-text-flat-green-sea l6 m6 s6"><p><i class="fa fa-filter fa-xl"></i> <b>Choose a filter</b></p></div>
@@ -385,7 +403,7 @@
 
         <div class="w3-container w3-padding">
             <div id="comments_sample" class=" w3-container w3-border-right">
-                <h2><i class="w3-text-flat-green-sea w3-xxlarge fas fa-comment"></i> Comments (<span class="commentsCountSample">{{ sample.comments | length }}</span>)</h2>
+                <h3><i class="w3-text-flat-green-sea fas fa-comment"></i> Comments (<span class="commentsCountSample">{{ sample.comments | length }}</span>)</h3>
 
                 <div id="commentsTableSample" class="w3-small">
                     <table id="tableCommentsSample" class="display" style="width:100%">
