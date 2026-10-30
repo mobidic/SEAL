@@ -75,7 +75,9 @@ function showAddTagAlert(sampleId) {
             });
         }
     }).then((result) => {
-        addTagWithSweetAlert(sampleId, result.value.name, result.value.color);
+        if(result.isConfirmed) {
+            addTagWithSweetAlert(sampleId, result.value.name, result.value.color);
+        }
     });
 }
 
