@@ -87,6 +87,29 @@ class Tag(db.Model):
         return self.name
 
 
+sample2hpo = db.Table(
+    'sample2hpo',
+    db.Column('hpo_ID', db.Integer, db.ForeignKey('hpo.id'), primary_key=True),
+    db.Column('sample_ID', db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+)
+
+class Hpo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    hpo = db.Column(db.String(10), unique=True, nullable=False)
+    label = db.Column(db.Text, nullable=True)
+
+    samples = db.relationship(
+        'Sample', secondary=sample2hpo, lazy='subquery',
+        backref=db.backref('hpos', lazy=True)
+    )
+
+    def __repr__(self):
+        return f"HPO('{self.hpo_id}: {self.name}')"
+
+    def __str__(self):
+        return f"{self.hpo_id}: {self.name}"
+
+
 class MutableList(Mutable, list):
     def append(self, value):
         list.append(self, value)

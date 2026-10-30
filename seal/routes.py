@@ -46,7 +46,7 @@ from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample, Clinvar, Tag)
+                         Transcript, User, Variant, Var2Sample, Clinvar, Tag, Hpo)
 from seal.schedulers import update_clinvar
 
 
@@ -2207,7 +2207,7 @@ def manage_sample_tags(sample_id):
             'tag': {
                 'id': tag.id,
                 'name': tag.name,
-                'color': tag.color  # <-- On retourne la couleur du tag en base
+                'color': tag.color
             }
         })
 
@@ -2230,6 +2230,113 @@ def manage_sample_tags(sample_id):
                 sample_ID=sample.id,
                 date=datetime.now(),
                 action=f"Removed tag: {tag.name}"
+            )
+            db.session.add(history)
+            db.session.commit()
+
+        return jsonify({'success': True})
+
+
+# ===============================================================
+
+
+@app.route('/api/hpos', methods=['GET', 'POST'])
+@login_required
+def api_hpo():
+    if request.method == 'GET':
+        hpos = Hpo.query.all()
+        return jsonify([{
+            'id': hpo.id,
+            "hpo": hpo.hpo,
+            'label': hpo.label,
+        } for hpo in hpos])
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        id = data.get('id')
+        hpo = data.get('hpo')
+        label = data.get('label', None)
+
+        if not id:
+            return jsonify({'error': 'ID is required'}), 400
+
+        existing_hpo = Hpo.query.filter_by(id=id).first()
+        if existing_hpo:
+            return jsonify({
+                'id': existing_hpo.id,
+                'hpo': existing_hpo.hpo,
+                'label': existing_hpo.label,
+                'exists': True
+            })
+
+        new_hpo = Hpo(id=id, label=label)
+        db.session.add(new_hpo)
+        db.session.commit()
+
+        return jsonify({
+            'id': new_hpo.id,
+            'hpo': new_hpo.hpo,
+            'label': new_hpo.label
+        })
+
+@app.route('/api/sample/<int:sample_id>/hpos', methods=['POST', 'DELETE'])
+@login_required
+def manage_sample_hpos(sample_id):
+    sample = Sample.query.get_or_404(sample_id)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        hpo_id = data.get('hpo_id')
+        if not hpo_id:
+            return jsonify({'error': 'hpo_id is required'}), 400
+
+        hpo = Hpo.query.get(hpo_id)
+        if not hpo:
+            return jsonify({'error': 'HPO not found'}), 404
+
+        if hpo in sample.hpos:
+            return jsonify({'error': 'HPO already associated'}), 400
+
+        sample.hpos.append(hpo)
+        db.session.commit()
+
+        history = History(
+            user_ID=current_user.id,
+            sample_ID=sample.id,
+            date=datetime.now(),
+            action=f"Added HPO: {hpo.hpo}"
+        )
+        db.session.add(history)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'hpo': {
+                'id': hpo.id,
+                'hpo': hpo.hpo,
+                'label': hpo.label,
+            }
+        })
+
+    elif request.method == 'DELETE':
+        data = request.get_json()
+        hpo_id = data.get('hpo_id')
+        if not hpo_id:
+            return jsonify({'error': 'hpo_id is required'}), 400
+
+        hpo = Hpo.query.get(hpo_id)
+        if not hpo:
+            return jsonify({'error': 'HPO not found'}), 404
+
+        if hpo in sample.hpos:
+            sample.hpos.remove(hpo)
+            db.session.commit()
+
+            history = History(
+                user_ID=current_user.id,
+                sample_ID=sample.id,
+                date=datetime.now(),
+                action=f"Removed HPO: {hpo.hpo}"
             )
             db.session.add(history)
             db.session.commit()

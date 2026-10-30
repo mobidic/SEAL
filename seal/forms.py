@@ -30,7 +30,7 @@ from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 from seal import bcrypt
-from seal.models import User, Sample, Run, Team, Bed, Region, Tag
+from seal.models import User, Sample, Run, Team, Bed, Region, Tag, Hpo
 
 ################################################################################
 # Authentication
@@ -145,6 +145,7 @@ class UploadVariantForm(FlaskForm):
 
     teams = SelectMultipleField('Teams', coerce=int)
     tags = SelectMultipleField('Tags', coerce=int)
+    hpos = SelectMultipleField('Hpos', coerce=int)
 
     submit = SubmitField('Create New Sample')
 

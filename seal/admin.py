@@ -29,7 +29,7 @@ from flask_login import current_user
 from seal import app, db, bcrypt
 from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
-                         Region, Bed, Phenotype, Omim, History, Clinvar, Tag)
+                         Region, Bed, Phenotype, Omim, History, Clinvar, Tag, Hpo)
 
 ###############################################################################
 
@@ -486,5 +486,17 @@ admin.add_view(
                                   'comments', 'computedCytoLocation',
                                   'cytoLocation', 'ensemblGeneID',
                                   'entrezGeneID']
+    )
+)
+
+
+admin.add_view(
+    CustomView(
+        Hpo,
+        db.session,
+        category="Genes",
+        column_searchable_list = ['label', "hpo"],
+        column_editable_list = ['hpo', 'label'],
+        form_excluded_columns = ['samples']
     )
 )
