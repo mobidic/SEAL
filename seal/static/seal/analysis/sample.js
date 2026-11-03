@@ -51,7 +51,7 @@ function showAddHPOAlert(sampleId) {
                 method: 'GET',
                 success: function(temp_response) {
                     for (i in temp_response) {
-                        var label=`HP_${temp_response[i]["id"]} :${temp_response[i]["label"]}`
+                        var label=`HP_${temp_response[i]["hpo"]} :${temp_response[i]["label"]}`
                         hpos.push(label);
                         ids[label] = temp_response[i]["id"]
                     }

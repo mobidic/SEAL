@@ -20,37 +20,42 @@
             <hr>
         </div>
         <div class="w3-padding w3-small">
-            <h3><i class="w3-text-flat-green-sea fas fa-tags"></i> Tags</h3>
-            <div id="sample-tags-container-{{ sample.id }}" class="w3-margin-top">
-                {% for tag in sample.tags %}
-                <span class="w3-tag sample-tag sample-tag-colors w3-round"
-                    style="background-color: {{ tag.color }}99;border:1px solid {{ tag.color }}4D;">
-                    {{ tag.name }}
-                    <i class="fas fa-times" style="cursor: pointer;"
-                    onclick="removeTag({{ sample.id }}, {{ tag.id }}, this)"></i>
-                </span>
-                {% endfor %}
+            <div class="w3-row">
+                <div class="w3-col s12 m6 l6">
+                    <h3><i class="w3-text-flat-green-sea fas fa-tags"></i> Tags</h3>
+                    <div id="sample-tags-container-{{ sample.id }}" class="w3-margin-top">
+                        {% for tag in sample.tags %}
+                        <span class="w3-tag sample-tag sample-tag-colors w3-round"
+                            style="background-color: {{ tag.color }}99;border:1px solid {{ tag.color }}4D;">
+                            {{ tag.name }}
+                            <i class="fas fa-times" style="cursor: pointer;"
+                            onclick="removeTag({{ sample.id }}, {{ tag.id }}, this)"></i>
+                        </span>
+                        {% endfor %}
 
-                <span onclick="showAddTagAlert({{ sample.id }})"
-                        class="w3-tag sample-tag sample-tag-add-button w3-round">
-                    <i class="fas fa-plus"></i> Add a tag
-                </span>
-            </div>
-            <hr>
-            <h3><i class="w3-text-flat-green-sea fas fa-tags"></i> HPO</h3>
-            <div id="sample-hpos-container-{{ sample.id }}" class="w3-margin-top">
-                {% for hpo in sample.hpos %}
-                <span class="w3-tag sample-hpo w3-round " aria-label="{{ hpo.label }}" data-balloon-pos="down">
-                    HP_{{ hpo.hpo }}
-                    <i class="fas fa-times" style="cursor: pointer;"
-                    onclick="removeHPO({{ sample.id }}, {{ hpo.id }}, this)"></i>
-                </span>
-                {% endfor %}
+                        <span onclick="showAddTagAlert({{ sample.id }})"
+                                class="w3-tag sample-tag sample-tag-add-button w3-round">
+                            <i class="fas fa-plus"></i> Add a tag
+                        </span>
+                    </div>
+                </div>
+                <div class="w3-col s12 m6 l6">
+                    <h3><i class="w3-text-flat-green-sea fa-solid fa-shield-virus"></i> HPO</h3>
+                    <div id="sample-hpos-container-{{ sample.id }}" class="w3-margin-top">
+                        {% for hpo in sample.hpos %}
+                        <span class="w3-tag sample-hpo w3-round " aria-label="{{ hpo.label }}" data-balloon-pos="down">
+                            HP_{{ hpo.hpo }}
+                            <i class="fas fa-times" style="cursor: pointer;"
+                            onclick="removeHPO({{ sample.id }}, {{ hpo.id }}, this)"></i>
+                        </span>
+                        {% endfor %}
 
-                <span onclick="showAddHPOAlert({{ sample.id }})"
-                        class="w3-hpo sample-hpo sample-hpo-add-button w3-round">
-                    <i class="fas fa-plus"></i> Add HPO
-                </span>
+                        <span onclick="showAddHPOAlert({{ sample.id }})"
+                                class="w3-hpo sample-hpo sample-hpo-add-button w3-round">
+                            <i class="fas fa-plus"></i> Add HPO
+                        </span>
+                    </div>
+                </div>
             </div>
             <hr>
             <div class="seal-form-report w3-row w3-padding {% if sample.status == 4 %}w3-disabled {% endif %}">
