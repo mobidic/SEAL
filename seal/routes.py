@@ -649,6 +649,7 @@ def sample(id):
     bams = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(r'.*\.(cr|b)am$', files)]
     beds = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(r'.*\.bed$', files)]
     vcfs = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(rf'{sample.samplename}\.vcf$', files)]
+    covreport = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(rf'{sample.samplename}_covreport\.pdf$', files)]
 
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
@@ -663,7 +664,8 @@ def sample(id):
         igv_path = config["IGV_PATH"],
         bams = bams,
         beds = beds,
-        vcfs = vcfs
+        vcfs = vcfs,
+        covreport = covreport
     )
 
 
