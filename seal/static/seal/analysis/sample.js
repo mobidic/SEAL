@@ -86,12 +86,9 @@ function addHPOWithSweetAlert(sampleId, id) {
         url: `/api/hpos?q=${encodeURIComponent(id)}&exclude_sample_id=${sampleId}`,
         method: 'GET',
         success: function(hpos) {
-            console.log(id)
-            console.log(hpos)
             const existingHpo = hpos.find(hpo =>
                 hpo.id == id
             );
-            console.log(existingHpo)
             if (existingHpo) {
                 addHPOToSample(sampleId, existingHpo);
             } else {
@@ -2286,25 +2283,6 @@ function applied_panel(id, sample_id) {
     table.ajax.url( '/json/variants/sample/' + sample_id + '/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
 }
 $('.js-example-basic-multiple').select2();
-
-
-$(document).on("click", function(event){
-    if($(event.target).parents('.button-class').length || $(event.target).hasClass('button-class')) {
-        return;
-    }
-    $('.ClassVisible').toggle();
-    $('.ClassVisible').removeClass("ClassVisible");
-});
-function toggle_dd_class(id) {
-    if (! $('#' + id +'-content').hasClass("ClassVisible")) {
-        $('.ClassVisible').hide();
-        $('.ClassVisible').removeClass("ClassVisible");
-    }
-    right = $(window).width() - $('#' + id).offset().left - $('#' + id).outerWidth();
-    $('#' + id +'-content').css('margin-right', right);
-    $('#' + id +'-content').toggle();
-    $('#' + id +'-content').toggleClass("ClassVisible");
-}
 
 
 $('#tableCommentsSample').DataTable({
