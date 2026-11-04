@@ -84,8 +84,8 @@
                             {% if family_members|length > 0 %}
                                 <th colspan="{{ family_members|length }}" class="w3-border-right">Family<br /><span class="w3-text-flat-pumpkin w3-tiny"><i class="fa-solid fa-triangle-exclamation"></i> Only max values</span></th>
                             {% endif %}
-                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left w3-small">Population Frequency</span></th>
-                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
+                            <th colspan="2" class="w3-border-right min-size-150"><span class="w3-small">Occurencies</span></th>
+                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left w3-small">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
                             <th rowspan="2" class="w3-border-right w3-small min-size-150"><span class="seal-display-middle-left">Consequences</span></th>
                             <th colspan="2" class="w3-border-right">Predictions</th>
                             <th  rowspan="2" class='' style="max-width:13px !important; padding:10px !important;"><span class="seal-display-middle-left" style=" margin-left:-20px !important;transform: rotate(-90deg);">Class</span></th>
@@ -98,6 +98,8 @@
                             {% for s in family_members %}
                                 <th class='min-size-75'>{{ s }}</th>
                             {% endfor %}
+                            <th class='min-size-100'>GnomAD</th>
+                            <th class='min-size-75'>Seal</th>
                             <th class='min-size-100'>MaxEnt/SpliceAI</th>
                             <th class='min-size-75'>Missense</th>
                         </tr>
@@ -223,7 +225,19 @@
                                         footer=`For more information see : <a  href='https://gnomad.broadinstitute.org' target='_blank' style='text-decoration:underline'><i>GnomAD website</i></a>`)" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                 <i class="fas fa-question-circle w3-tiny"></i>
                             </span>
-                                Population Frequency
+                                GnomAD
+                            </th>
+                            <th>
+                                <span title="Help" 
+                                    onclick="openHelp(
+                                        title='Population Frequency',
+                                        content=`The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.<br />
+                                        You can see the highest population occurences.<br />
+                                        The number of occurences for this variant among all database and into the run are also visible here.`,
+                                        footer=`For more information see : <a  href='https://gnomad.broadinstitute.org' target='_blank' style='text-decoration:underline'><i>GnomAD website</i></a>`)" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <i class="fas fa-question-circle w3-tiny"></i>
+                            </span>
+                                SEAL
                             </th>
                             <th>
                                 <span title="Help"
@@ -1057,9 +1071,7 @@
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
                     const gnomad = parseFloat(data.annotations?.gnomADg_AF);
-                    const seal = `SEAL: ${data.inseal?.occurrences || ''}`;
-                    const seal_run = {{ sample.run.samples|length }} > 0 ? `(Run ${data.inseal.occurrences_run}/{{ sample.run.samples|length }})`: '';
-                    if (isNaN(gnomad)) return `GnomAD : NA\n${seal} ${seal_run}`;
+                    if (isNaN(gnomad)) return `GnomAD : NA`;
 
                     const pop = {
                         "gnomADg_AF_AFR": "African/African-American",
@@ -1090,7 +1102,7 @@
                     }
 
                     const fixed = max > 0 ? Math.min(Math.max(-Math.floor(Math.log10(max * 100)), 2), 5) : 2;
-                    return `${(gnomad * 100).toFixed(fixed)}%${p}\n${seal} ${seal_run}`;
+                    return `${(gnomad * 100).toFixed(fixed)}%${p}`;
                 },
                 renderConfig: {
                     default: (data) => {
@@ -1099,9 +1111,7 @@
                     },
                     display: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
-                        const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> SEAL: </span>${data.inseal?.occurrences || ''}</b>`;
-                        const seal_run = {{ sample.run.samples|length }} > 0 ? `<span class="w3-text-flat-asbestos">(<i class="fas fa-digital-tachograph"></i> ${data.inseal.occurrences_run}/{{ sample.run.samples|length }})</span>` : '';
-                        if (isNaN(gnomad)) return `<i>NA</i><br />${seal} ${seal_run}`;
+                        if (isNaN(gnomad)) return `<i>NA</i>`;
 
                         const pop = {
                             "gnomADg_AF_AFR": "AFR",
@@ -1149,13 +1159,47 @@
 
                         const gnomad_r = `<a target="_blank" href="https://gnomad.broadinstitute.org/variant/${data.id}?dataset=gnomad_${gnomad_version}" class="fa-fw w3-text-indigo w3-hover-text-black do-not-select" style="cursor: pointer;">${response}</a>`;
 
-                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}<br />${seal} ${seal_run}`;
+                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}`;
                     },
                     sort: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
                         if (gnomad == null) return -1;
                         if (isNaN(gnomad)) return -0.5;
                         return gnomad;
+                    }
+                }
+            }),
+            // seal Column
+            createColumn({
+                id: "visible-gnomad",
+                data: null,
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    const seal = `SEAL: ${data.inseal?.occurrences || ''}`;
+                    const seal_run = {{ sample.run.samples|length }} > 0 ? `(Run ${data.inseal.occurrences_run}/{{ sample.run.samples|length }})`: '';
+                    return `${seal}\n${seal_run}`;
+                },
+                renderConfig: {
+                    default: (data) => {
+                        return `${data.inseal?.occurrences || 0}`;
+                    },
+                    display: (data) => {
+                        const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> </span>${data.inseal?.occurrences || ''}</b>`;
+                        const seal_run = {{ sample.run.samples|length }} > 0 ? `<span class="w3-text-flat-midnight-blue"><i class="fas fa-digital-tachograph"></i> ${data.inseal.occurrences_run}/{{ sample.run.samples|length }}</span>` : '';
+                        var color = "concrete";
+                        if (data.hide) {
+                            color = "pomegranate";
+                        } else if (data.inseal.hidden > 0) {
+                            color = "sun-flower";
+                        }
+                        const seal_artefact = `<span id="span_hidden-${data.id}" onclick="artefact('${data.id}', ${sample_id}, this)" class="w3-text-flat-${color} w3-hover-text-flat-carrot w3-tag w3-border w3-border-flat-${color} w3-round w3-hover-border-flat-carrot" style="cursor:pointer;display:block;background: rgba(0,0,0,0);"><i class="fas fa-bug"></i> <span id="val_hidden-${data.id}">${data.inseal.hidden}</span></span>`;
+                        return `${seal}<br />${seal_run}<br />${seal_artefact}`;
+                    },
+                    sort: (data) => {
+                        const seal = parseInt(data.inseal?.occurrences);
+                        if (seal == null) return -1;
+                        if (isNaN(seal)) return -0.5;
+                        return seal;
                     }
                 }
             }),
@@ -1467,7 +1511,7 @@
             }),
             // Class Column
             createColumn({
-                id: "visible-details",
+                id: "visible-class",
                 data: null,
                 orderable: true,
                 className: 'w3-border-left details-control w3-center',
@@ -1493,11 +1537,10 @@
                     default: (data) => data?.id || '',
                     display: (data, type, row) => {
                         const details = `<i onclick="openDetailsVariantModal('${data.id}', ${sample_id})" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>`;
-                        const hide = `<i onclick="hideRow('${data.id}', ${sample_id}, this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i>`;
                         const check = row.reported ? 'checked="checked"' : "";
                         const report = `<input id="${data.id}reported" type="checkbox" ${check} onclick="toggle_var2sample_status('${data.id}reported', '${data.id}', ${sample_id}, 'reported', this);">`;
 
-                        return `${details}<br />${hide}<br />${report}`;
+                        return `${details}<br />${report}`;
                     }
                 }
             }),

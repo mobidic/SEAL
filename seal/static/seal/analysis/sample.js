@@ -977,7 +977,7 @@ $(document).ready(function() {
             },
             infoPostFix: " [Total variants: " + sample_variants_length + "]",
         },
-        dom: 'Blfrti<"toolbar-variants">',
+        dom: 'Blfrti',
         scrollY:        "40vh",
         scrollX:        true,
         scrollCollapse: true,
@@ -1194,14 +1194,8 @@ $(document).ready(function() {
                     },
                 ]
             });
-            hide_message(count_hide);
         }
     });
-    
- 
-	// $('a').on('click', function(e){
-    //     e.preventDefault()
-	// });
   
     table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
         if ( originalEvent.target.classList.toString().match('do-not-select') ) {
@@ -1211,31 +1205,30 @@ $(document).ready(function() {
     
 } );
 
-function hide_message(count_hide) {
-    if (count_hide > 0) {
-        $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> <span id="cpt-hide-row">' + count_hide + '</span> row(s) hidden (<b class="w3-hover-text-blue" onclick="showAllRows()" style="cursor:pointer">click here to show all</b>)<span>');
-    } else {
-        $('.toolbar-variants').html('');
+var k = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
+n = 0;
+$(document).keydown(function (e) {
+    if (e.keyCode === k[n++]) {
+        if (n === k.length) {
+            $(".fa-bug").removeClass("fa-bug").addClass("fa-poo")
+        }
     }
-}
+    else {
+        n = 0;
+    }
+});
 
-function hideRow(id_var, sample_id, item) {
+function artefact(id_var, sample_id) {
     Swal.fire({
         title: 'Are you sure?',
-        text: "You will hide a variant",
+        text: `You will switch artefact status of this variant : ${id_var}`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, hide it!'
+        confirmButtonText: 'Confirm'
     }).then((result) => {
         if (result.isConfirmed) {
-            $('#variants').DataTable()
-                .row($(item).parents('tr'))
-                .remove()
-                .draw();
-            var cpt = parseInt($('#cpt-hide-row').text()) || 0;
-            hide_message(cpt+1);
             $.ajax({
                 type: "POST",
                 url: "/toggle/samples/variant/hide",
@@ -1243,30 +1236,29 @@ function hideRow(id_var, sample_id, item) {
                     id_var: id_var,
                     sample_id: sample_id
                 },
-                success: function() {
+                success: function(result) {
                     $('#tableHistorySample').DataTable().ajax.reload();
+                    if (result == "True") {
+                        $(`#val_hidden-${id_var}`).text(parseInt($(`#val_hidden-${id_var}`).text()) + 1 )
+                        if (parseInt($(`#val_hidden-${id_var}`).text()) > 0) {
+                            color = "pomegranate";
+                        }
+                    } else {
+                        $(`#val_hidden-${id_var}`).text(parseInt($(`#val_hidden-${id_var}`).text()) - 1 )
+                        if (parseInt($(`#val_hidden-${id_var}`).text()) > 0) {
+                            color = "sun-flower";
+                        } else {
+                            color = "concrete";
+                        }
+                    }
+                    $(`#span_hidden-${id_var}`).removeClass(function (index, className) {
+                        return (className.match (/(^|\s)w3-(text|border)-flat\S+/g) || []).join(' ');
+                    })
+                    $(`#span_hidden-${id_var}`).addClass(`w3-border-flat-${color} w3-text-flat-${color}`)
                 }
             })
         }
     })
-}
-
-function showAllRows() {
-    $('#variants').DataTable()
-        .clear()
-        .draw();
-    $.ajax({
-        type: "POST",
-        url: "/toggle/samples/variant/hide/all",
-        data: {
-            sample_id: sample_id
-        },
-        success: function() {
-            $('#tableHistorySample').DataTable().ajax.reload();
-            $('#variants').DataTable().ajax.reload();
-        }
-    })
-    hide_message(0);
 }
 
 function save_filters() {
@@ -2273,9 +2265,8 @@ function applied_panel(id, sample_id) {
             "id_sample": sample_id,
             "id_panel": id
         },
-        success: function(count_hide) {
+        success: function() {
             $('#tableHistorySample').DataTable().ajax.reload();
-            hide_message(count_hide);
         }
     });
     table = $('#variants').DataTable();

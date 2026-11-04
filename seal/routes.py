@@ -1126,11 +1126,12 @@ def json_variants(id, idbed=None, version=-1):
     # 4. Pre-computed occurences
     occurrences_query = db.session.query(
         Var2Sample.variant_ID,
-        func.count().label("total_occurrences"),  # ✅ Compte toutes les lignes (pas besoin de colonne)
-        func.count().filter(Sample.runid == sample.runid).label("run_occurrences")
+        func.count().label("total_occurrences"),
+        func.count().filter(Sample.runid == sample.runid).label("run_occurrences"),
+        func.count().filter(Var2Sample.hide == True).label("hidden_occurrences")
     ).join(Sample, Var2Sample.sample_ID == Sample.id).group_by(Var2Sample.variant_ID)
 
-    occurrences_data = {row.variant_ID: {"total": row.total_occurrences, "run": row.run_occurrences}
+    occurrences_data = {row.variant_ID: {"total": row.total_occurrences, "run": row.run_occurrences, "hidden": row.hidden_occurrences}
                         for row in occurrences_query.all()}
 
     # 5. Get Main annotation
@@ -1255,11 +1256,13 @@ def json_variants(id, idbed=None, version=-1):
             "allelic_frequency": f"{allelic_frequency:.4f}",
             "missenses_max": missenses_max,
             "inseal": {
+                "hidden": occurrences_data.get(variant_id, {}).get("hidden", 0),
                 "occurrences": total_occurrences,
                 "occurrences_run": run_occurrences,
                 "occurrences_family": len(family_members),
                 "family_members": list(family_members.keys())
             },
+            "hide": var2sample.hide,
             "phenotypes": phenotypes,
             "family": family_members,
             "omims": [o.mimNumber for o in omim_list]
