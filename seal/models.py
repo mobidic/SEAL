@@ -24,7 +24,7 @@ from seal import db, login_manager, bcrypt
 
 from flask_login import UserMixin
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -495,6 +495,19 @@ class Bed(db.Model):
             if region.varInRegion(variant):
                 return True
         return False
+
+    @classmethod
+    def varInBed_sql(cls, bed, variant_model):
+        conditions = []
+        for region in bed.regions:
+            conditions.append(
+                and_(
+                    variant_model.chr == region.chr,
+                    variant_model.pos >= region.start,
+                    variant_model.pos <= region.stop
+                )
+            )
+        return or_(*conditions) if conditions else False
 
 
 class Lane(db.Model):

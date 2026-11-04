@@ -1092,13 +1092,11 @@ def json_variants(id, idbed=None, version=-1):
     query = Var2Sample.query.options(
         joinedload(Var2Sample.variant),
         joinedload(Var2Sample.sample)
-    ).filter(Var2Sample.sample_ID == id, Var2Sample.hide == False)
+    ).filter(Var2Sample.sample_ID == id)
 
     if bed:
         query = query.join(Variant).filter(
-            or_(
-                Bed.varInBed(bed, Variant),
-            )
+            Bed.varInBed_sql(bed, Variant),
         )
 
     var2samples = query.all()
