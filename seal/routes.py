@@ -2247,12 +2247,33 @@ def manage_sample_tags(sample_id):
 @login_required
 def api_hpo():
     if request.method == 'GET':
-        hpos = Hpo.query.all()
-        return jsonify([{
+        search_term = request.args.get('q', '').strip()
+        id_hpo = request.args.get('id', '').strip()
+
+        query = Hpo.query
+
+        if search_term:
+            query = query.filter(
+                or_(
+                    Hpo.hpo.ilike(f'%{search_term}%'),
+                    Hpo.label.ilike(f'%{search_term}%')
+                )
+            )
+        if id_hpo:
+            query = query.filter(
+                Hpo.id == int(id_hpo)
+            )
+
+        hpos = query.limit(10).all()
+
+        results = [{
             'id': hpo.id,
-            "hpo": hpo.hpo,
+            'hpo': hpo.hpo,
             'label': hpo.label,
-        } for hpo in hpos])
+            'display': f"{hpo.hpo} : {hpo.label}"
+        } for hpo in hpos]
+
+        return jsonify(results)
 
     elif request.method == 'POST':
         data = request.get_json()

@@ -1,6 +1,3 @@
-
-        
-
 // =============================================
 // Utilities
 // =============================================
@@ -14,9 +11,7 @@ function getBrightness(hex) {
 function getTextColor(hexColor) {
     return getBrightness(hexColor) > 130 ? '#34495e' : '#ecf0f1';
 }
-
 function showAddHPOAlert(sampleId) {
-    var random_color = getRandomColor()
     Swal.fire({
         title: '<i class="fas fa-tag w3-margin-right"></i> Add HPO',
         html: `
@@ -24,7 +19,7 @@ function showAddHPOAlert(sampleId) {
                 <input id="swal-hpo-name"
                     class="swal2-input"
                     placeholder="HPO ID or HPO label..."
-                    style="margin: 4px !important;flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
+                    style="margin: 4px !important; flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
                 <input type="hidden"
                     id="swal-hpo-id"
                     value="">
@@ -42,35 +37,43 @@ function showAddHPOAlert(sampleId) {
             };
         },
         didOpen: () => {
-            document.getElementById(`swal-hpo-name`).focus();
-            
-            var hpos=[];
-            var ids={};
-            $.ajax({
-                url: `/api/hpos`,
-                method: 'GET',
-                success: function(temp_response) {
-                    for (i in temp_response) {
-                        var label=`HP_${temp_response[i]["hpo"]} :${temp_response[i]["label"]}`
-                        hpos.push(label);
-                        ids[label] = temp_response[i]["id"]
-                    }
+            const input = document.getElementById(`swal-hpo-name`);
+            input.focus();
+
+            $(input).autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: `/api/hpos?q=${encodeURIComponent(request.term)}`,
+                        method: 'GET',
+                        success: function(data) {
+                            const results = data.map(function(hpo) {
+                                return {
+                                    label: hpo.display,
+                                    value: hpo.display,
+                                    id: hpo.id
+                                };
+                            });
+                            response(results);
+                        },
+                        error: function() {
+                            response([]);
+                        }
+                    });
                 },
-            });
-            $("#swal-hpo-name").autocomplete({
-                source: hpos,
-                select: function(event, ui){
-                    document.getElementById(`swal-hpo-id`).value = ids[ui.item.label]
+                minLength: 2,
+                select: function(event, ui) {
+                    document.getElementById(`swal-hpo-id`).value = ui.item.id;
                 }
             });
         }
     }).then((result) => {
-        if(result.isConfirmed) {
+        if (result.isConfirmed && result.value.id) {
             addHPOWithSweetAlert(sampleId, result.value.id);
+        } else if (result.isConfirmed) {
+            Swal.fire('Error', 'Please select a valid HPO term', 'error');
         }
     });
 }
-
 
 // =============================================
 // tags managment
@@ -83,25 +86,29 @@ function addHPOWithSweetAlert(sampleId, id) {
     }
 
     $.ajax({
-        url: `/api/hpos?q=${encodeURIComponent(id)}&exclude_sample_id=${sampleId}`,
+        url: `/api/hpos?id=${encodeURIComponent(id)}&exclude_sample_id=${sampleId}`,
         method: 'GET',
         success: function(hpos) {
+            console.log(JSON.stringify(hpos))
             const existingHpo = hpos.find(hpo =>
                 hpo.id == id
             );
             if (existingHpo) {
                 addHPOToSample(sampleId, existingHpo);
             } else {
-                Swal.fire('Error', "HPO unavailable", 'error');
+                Swal.fire('Error', "HPO unavailable 1", 'error');
             }
         },
         error: function() {
-            Swal.fire('Error', "HPO unavailable", 'error');
+            Swal.fire('Error', "HPO unavailable 2", 'error');
         }
     });
 }
 
 function addHPOToSample(sampleId, hpo) {
+    console.log(hpo)
+    console.log(hpo.id)
+    console.log(JSON.stringify({ hpo_id: hpo.id }))
     $.ajax({
         url: `/api/sample/${sampleId}/hpos`,
         method: 'POST',
@@ -113,7 +120,7 @@ function addHPOToSample(sampleId, hpo) {
 
                 $(`#sample-hpos-container-${sampleId}`).append(`
                     <span class="w3-tag sample-hpo w3-round" aria-label="${hpo.label}" data-balloon-pos="down" onclick="">
-                        HP_${hpo.hpo}
+                        ${hpo.hpo}
                         <i class="fas fa-times" style="cursor: pointer;"
                            onclick="removeHPO(${sampleId}, ${hpo.id}, this)"></i>
                     </span>

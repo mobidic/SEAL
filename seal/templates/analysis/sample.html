@@ -44,7 +44,7 @@
                     <div id="sample-hpos-container-{{ sample.id }}" class="w3-margin-top">
                         {% for hpo in sample.hpos %}
                         <span class="w3-tag sample-hpo w3-round " aria-label="{{ hpo.label }}" data-balloon-pos="down">
-                            HP_{{ hpo.hpo }}
+                            {{ hpo.hpo }}
                             <i class="fas fa-times" style="cursor: pointer;"
                             onclick="removeHPO({{ sample.id }}, {{ hpo.id }}, this)"></i>
                         </span>
