@@ -994,6 +994,9 @@ $(document).ready(function() {
             right:2
         },
         'createdRow': function (row, data, rowIndex) {
+            if (data.hide) {
+                $(row).css('opacity', '0.3')
+            }
             // Per-cell function to do whatever needed with cells
             $.each($('td', row), function (colIndex) {
                 // For example, adding data-* attributes to the cell
@@ -1246,11 +1249,13 @@ function artefact(id_var, sample_id) {
                 success: function(result) {
                     $('#tableHistorySample').DataTable().ajax.reload();
                     if (result == "True") {
+                        $(`#val_hidden-${id_var}`).closest('tr').css("opacity","0.3")
                         $(`#val_hidden-${id_var}`).text(parseInt($(`#val_hidden-${id_var}`).text()) + 1 )
                         if (parseInt($(`#val_hidden-${id_var}`).text()) > 0) {
                             color = "pomegranate";
                         }
                     } else {
+                        $(`#val_hidden-${id_var}`).closest('tr').css("opacity","1")
                         $(`#val_hidden-${id_var}`).text(parseInt($(`#val_hidden-${id_var}`).text()) - 1 )
                         if (parseInt($(`#val_hidden-${id_var}`).text()) > 0) {
                             color = "sun-flower";
