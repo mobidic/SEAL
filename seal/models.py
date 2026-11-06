@@ -104,10 +104,10 @@ class Hpo(db.Model):
     )
 
     def __repr__(self):
-        return f"HPO('{self.hpo_id}: {self.name}')"
+        return f"HPO('{self.hpo}: {self.labe}')"
 
     def __str__(self):
-        return f"{self.hpo_id}: {self.name}"
+        return f"{self.hpo}: {self.label}"
 
 
 class MutableList(Mutable, list):
