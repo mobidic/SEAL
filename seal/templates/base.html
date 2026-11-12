@@ -12,8 +12,7 @@
         <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='DataTables/datatables.min.css') }}"/>
         <script type="text/javascript" src="{{ url_for('static', filename='DataTables/datatables.min.js') }}"></script>
         
-        <script defer src="{{ url_for('static', filename='fontawesome-free-7.0.0-web/all.min.js') }}"></script>
-        {# <script defer src="{{ url_for('static', filename='fontawesome-free-6/all.min.js') }}"></script> #}
+        <script defer src="{{ url_for('static', filename='fontawesome/all.min.js') }}"></script>
         <link rel="stylesheet" href="{{ url_for('static', filename='seal.css') }}">
 
         {% if current_user.sidebar %}<style>.w3-main {margin-left:350px}</style>{% endif %}
