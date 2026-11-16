@@ -252,7 +252,7 @@ def get_filter(id=1, name=None):
     return False
 
 
-def create_sample(data):
+def create_sample(data, wf_path=None):
     app.logger.info("---------------- Import Sample ----------------")
     if not "samplename" in data:
         raise KeyError
@@ -264,6 +264,10 @@ def create_sample(data):
         sample.affected = bool(data["affected"])
     if "index" in data:
         sample.index = bool(data["index"])
+    if "wf_path" in data:
+        sample.wf_path = data["wf_path"]
+    elif wf_path:
+        sample.wf_path = str(wf_path)
 
     if "family" in data:
         id = data["family"]["id"] if "id" in data["family"] else None
@@ -303,9 +307,6 @@ def create_sample(data):
         filter = get_filter(id, name)
         if filter:
             sample.filter = filter
-
-    if "wf_path" in data:
-        sample.wf_path = data["wf_path"]
 
     db.session.add(sample)
     db.session.commit()
@@ -462,6 +463,7 @@ def importvcf():
                 app.logger.error(f'Path does not exist for : {vcf_path}')
                 # path_locker.unlink()
                 return
+            wf_path = vcf_path.parent
             status_final = False
             if "add_caller" in data and data["add_caller"] == True:
                 sample = get_sample(data)
@@ -472,7 +474,7 @@ def importvcf():
                 msg = "Add new caller"
                 status_final = sample.status
             else:
-                sample = create_sample(data)
+                sample = create_sample(data, wf_path)
                 msg = "Import Sample"
             
             call_name = "default"
