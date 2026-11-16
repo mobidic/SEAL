@@ -431,36 +431,32 @@
             {% endif %}
         </div>
 
-        
-        {% if covreport %}
         <div class="w3-container w3-center">
             <hr>
         </div>
 
-        <div class="w3-container w3-center">
-            <h3><i class="w3-text-flat-green-sea fa-solid fa-file-pdf"></i> CovReport</h3>
-            <object data="{{ covreport[0] }}" type="application/pdf" width="100%" style="height:calc(80vh);">
-                <p>Alternative text - include a link <a href="{{ covreport[0] }}">to the PDF!</a></p>
-            </object>
-            {% if covreport|length > 1 %}
-            <div class='w3-small w3-left-align w3-flash w3-warning'>
-                    <p class="w3-text-flat-asbestos"><i><b></b>
-                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
-                        Multiple covreport files available, only the first one has been loaded. This is sufficient in most cases.
-                    </b></i></p>
-                    <i>If you want more informations: contact your administrator.</i>
+        <div class="w3-container w3-padding w3-row">
+            {% if covreport %}
+            <div class=" w3-col s12 m6 l6">
+                <div class="w3-container w3-center">
+                    <h3><i class="w3-text-flat-green-sea fa-solid fa-file-pdf"></i> CovReport</h3>
+                    <object data="{{ covreport[0] }}" type="application/pdf" width="100%" style="height:80vh;">
+                        <p>Alternative text - include a link <a href="{{ covreport[0] }}">to the PDF!</a></p>
+                    </object>
+                    {% if covreport|length > 1 %}
+                    <div class='w3-small w3-left-align w3-flash w3-warning'>
+                            <p class="w3-text-flat-asbestos"><i><b></b>
+                            <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                                Multiple covreport files available, only the first one has been loaded. This is sufficient in most cases.
+                            </b></i></p>
+                            <i>If you want more informations: contact your administrator.</i>
+                        </div>
+                    {% endif %}
                 </div>
+            </div>
             {% endif %}
-        </div>
-        {% endif %}
 
-
-        <div class="w3-container w3-center">
-            <hr>
-        </div>
-
-        <div class="w3-container w3-padding">
-            <div id="comments_sample" class=" w3-container w3-border-right">
+            <div id="comments_sample" class=" w3-container w3-border-right{% if covreport %} w3-col s12 m6 l6{% endif %}">
                 <h3><i class="w3-text-flat-green-sea fas fa-comment"></i> Comments (<span class="commentsCountSample">{{ sample.comments | length }}</span>)</h3>
 
                 <div id="commentsTableSample" class="w3-small">
@@ -495,9 +491,6 @@
                     {{ form.submit(id="submitCommentSample", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="send_comment();") }}
                 </div>
             </div>
-        </div>
-        <div class="w3-container w3-center">
-            <hr>
         </div>
     </div>
 
