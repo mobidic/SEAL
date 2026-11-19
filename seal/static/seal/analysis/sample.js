@@ -2059,8 +2059,13 @@ function switch_class(id_var, sample_id, current=0) {
         ${radioButtons}
     `,
     showCancelButton: true,
-    confirmButtonText: 'Confirm',
+    showConfirmButton: false,
     cancelButtonText: 'Cancel',
+    didOpen: () => {
+        Swal.getPopup().querySelectorAll('input[name="class-variant"]').forEach((input) => {
+            input.addEventListener('click', () => Swal.clickConfirm());
+        });
+    },
     preConfirm: () => {
         const choice = document.querySelector(`input[name="class-variant"]:checked`);
         if (!choice) {
@@ -2071,7 +2076,7 @@ function switch_class(id_var, sample_id, current=0) {
     }
     }).then((result) => {
     if (result.isConfirmed) {
-        Swal.fire('Confirmed !', `Variant is now : "${class_variant_html(result.value, true)}"`, 'success');
+        Swal.fire({title: 'Confirmed !', html: `${class_variant_html(result.value, true)}`, icon: 'success', timer: 1500, showConfirmButton: false});
         $.ajax({
             type: "POST",
             url: "/toggle/samples/variant/class",
