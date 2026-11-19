@@ -43,7 +43,7 @@ from psycopg2.errors import UniqueViolation
 from seal import app, bcrypt, db, config
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
-                        UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
+                        UpdateAccountForm, UpdatePasswordForm, UploadClinvarForm)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
                          Transcript, User, Variant, Var2Sample, Clinvar, Tag, Hpo)
@@ -782,8 +782,8 @@ def create_panel():
 @app.route("/update/clinvar", methods=['GET', 'POST'])
 @login_required
 @admin_required
-def update_clinvar():
-    UploadClinvarForm = UploadClinvar()
+def updload_clinvar():
+    UploadClinvarForm = UploadClinvarForm()
 
     if "submit" in request.form and UploadClinvarForm.validate_on_submit():
         version = int(UploadClinvarForm.version.data.strftime("%Y%m%d"))
@@ -1810,14 +1810,13 @@ def toggle_varhideall():
     Returns:
         str: The array of unhide variants
     """
-    var_hide=list()
     sample_id = request.form["sample_id"]
+    return_value = False
     for v2s in Sample.query.get(sample_id).variants:
         if not v2s.hide:
             continue
         v2s.hide = not v2s.hide
         return_value = v2s.hide
-        var_hide.append(str(v2s))
         db.session.commit()
 
         report = "Hide" if v2s.hide else "Show"
@@ -2105,35 +2104,6 @@ def toggle_user_sidebar():
     current_user.sidebar = (not current_user.sidebar)
     db.session.commit()
     return "OK"
-
-# from anacore.vcf import VCFIO, VCFRecord, HeaderInfoAttr, HeaderFormatAttr
-# import tempfile
-
-# @app.route("/variants/all/vcf")
-# def get_variant_vcf():
-#     """
-#     Send variant into vcf.
-
-#     Returns:
-#         str: Returns all variants into a vcf file.
-#     """
-#     handle, filepath = tempfile.mkstemp(suffix=".vcf.gz")
-#     with VCFIO(filepath, "w") as writer:
-#         writer.samples = ["my_sample"]
-#         writer.extra_header = [
-#             "##source=seal",
-#         ]
-#         writer.info = {
-#             "DB": HeaderInfoAttr("DB", "dbSNP membership, build 129", "Flag", 0)
-#         }
-#         writer.format = {
-#             "AF": HeaderFormatAttr("AF", "Allele Frequency", "Float", "A")
-#         }
-#         writer.writeHeader()
-#         writer.writer(VCFRecord("chr3", "12", '', "A", "T", 30, ["PASS"], {'DB':'T'}, ["AF"], {"10"}))
-#         # for record in vcf_record_list:
-#         #     writer.write(record)
-#     return send_file()
 
 ###############################################################################
 

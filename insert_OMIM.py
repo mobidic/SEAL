@@ -21,10 +21,6 @@
 import re
 from seal import db
 from seal.models import Phenotype, Omim
-import pprint
-
-
-pp = pprint.PrettyPrinter(indent=4)
 
 
 shorter_transmission = {
@@ -75,20 +71,15 @@ with open("genemap2.txt") as fd:
         valueList = line.split('\t')
 
         # Get the fields
-        chromosome = valueList[0]
-        genomicPositionStart = valueList[1]
-        genomicPositionEnd = valueList[2]
         cytoLocation = valueList[3]
         computedCytoLocation = valueList[4]
         mimNumber = valueList[5]
         geneSymbols = valueList[6]
-        geneName = valueList[7]
         approvedGeneSymbol = valueList[8]
         entrezGeneID = valueList[9]
         ensemblGeneID = valueList[10]
         comments = valueList[11]
         phenotypeString = valueList[12]
-        mouse = valueList[13]
 
         # Skip empty phenotypes
         if not phenotypeString or not entrezGeneID or not approvedGeneSymbol:

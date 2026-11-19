@@ -139,7 +139,7 @@ def random_color(format="HEX"):
     if format == "RGB":
         return f'rgb({red},{green},{blue})'
     if format == "RGBA":
-        alpha = random.random.uniform(0, 1)
+        alpha = random.uniform(0, 1)
         return f'rgba({red},{green},{blue},{alpha})'
 
 
@@ -607,8 +607,8 @@ def importvcf():
                             for value in SPLICEAI:
                                 spliceAI.append(annot[value])
                             spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
-                            max = numpy.nanmax(spliceAI)
-                            annot["spliceAI"] = None if numpy.isnan(max) else max
+                            max_spliceai = numpy.nanmax(spliceAI)
+                            annot["spliceAI"] = None if numpy.isnan(max_spliceai) else max_spliceai
 
                             # max MaxEntScan
                             annot["MES_var"] = None
@@ -680,7 +680,7 @@ def importvcf():
                             date=datetime.now(),
                             userid=user_id)
                         db.session.add(comment)
-                        db.session.commit
+                        db.session.commit()
             db.session.commit()
             current_file.unlink()
             vcf_vep.unlink()
@@ -739,8 +739,8 @@ def update_clinvar(vcf, version, genome=config["GENOME"]):
         path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')
         with open(path_log, "w") as log:
             log.write(f"Error on file: {new_clinvar}")
-            log.write(e)
-        app.logger.error(e)
+            log.write(str(e))
+        app.logger.error(str(e))
     finally:
         # Switch off maintenance mode
         app.config["MAINTENANCE"] = False

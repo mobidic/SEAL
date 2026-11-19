@@ -104,7 +104,7 @@ class Hpo(db.Model):
     )
 
     def __repr__(self):
-        return f"HPO('{self.hpo}: {self.labe}')"
+        return f"HPO('{self.hpo}: {self.label}')"
 
     def __str__(self):
         return f"{self.hpo}: {self.label}"
@@ -345,13 +345,12 @@ class Var2Sample(db.Model):
     variant_ID = db.Column(db.Text, db.ForeignKey('variant.id'), primary_key=True)
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
     
-    ## FAIRE EN JSON !!!!
     caller = db.Column(db.JSON, nullable=True)
     
     depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_freq = db.Column(db.Float, nullable=True, unique=False)
-    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list()) # temporaire a supprimer
+    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     pass_filter = db.Column(db.Boolean, nullable=False, unique=False, default=False)
     
     reported = db.Column(db.Boolean, nullable=False, unique=False, default=False)

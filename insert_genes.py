@@ -44,4 +44,4 @@ for b in genes:
     for c in genes[b]:
         region = Region(name=b, chr=c, start=genes[b][c]["start"], stop=genes[b][c]["stop"])
         db.session.add(region)
-        db.session.commit()
+db.session.commit()

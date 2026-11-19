@@ -733,9 +733,9 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
 
                     // If this value was previously selected as indicated by preDefined, then select it again
                     if (preDefined !== null && opt.val() === preDefined[0]) {
-                    opt.prop('selected', true);
-                    el.removeClass($.fn.dataTable.Criteria.classes.italic);
-                    that.dom.valueTitle.removeProp('selected');
+                        opt.prop('selected', true);
+                        el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                        that.dom.valueTitle.removeProp('selected');
                     }
                 }
             };

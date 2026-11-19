@@ -214,7 +214,7 @@ class SaveFilterForm(FlaskForm):
     submit = SubmitField('Add A New Filter')
 
 
-class UploadClinvar(FlaskForm):
+class UploadClinvarForm(FlaskForm):
     version = DateField(
         'Version',
         validators=[DataRequired()], format='%Y-%m-%d'

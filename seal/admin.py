@@ -35,16 +35,6 @@ from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
 
 
 class MyAdminIndexView(AdminIndexView):
-    @expose('/')
-    def index(self):
-        cnt = {
-            "user": User.query.count(),
-            "sample": Sample.query.count(),
-            "variant": Variant.query.count(),
-            "family": Family.query.count(),
-            "bed": Bed.query.count(),
-        }
-        return self.render('admin/index.html', cnt=cnt)
     """
     Custom class for Flask-Admin index view.
 
@@ -57,6 +47,17 @@ class MyAdminIndexView(AdminIndexView):
         inaccessible_callback(name, **kwargs): Redirects to the login page if
                                                the user doesn't have access.
     """
+    @expose('/')
+    def index(self):
+        cnt = {
+            "user": User.query.count(),
+            "sample": Sample.query.count(),
+            "variant": Variant.query.count(),
+            "family": Family.query.count(),
+            "bed": Bed.query.count(),
+        }
+        return self.render('admin/index.html', cnt=cnt)
+        
     def is_accessible(self):
         """
         Determines if the current user has access to the admin view.
@@ -264,7 +265,7 @@ class UserView(CustomView):
 
 
 admin = Admin(app, index_view = MyAdminIndexView(), template_mode='bootstrap3')
-BCRYPT_PATTERN = re.compile("^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
+BCRYPT_PATTERN = re.compile(r"^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
 
 
 ###############################################################################
