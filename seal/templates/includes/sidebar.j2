@@ -7,7 +7,7 @@
 	<div class="w3-row">
 		<div class="w3-col w3-container w3-half w3-cell w3-cell-middle">
 			<a href="{{ url_for('account') }}">
-				<img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:100px; height:100px" class="w3-white w3-circle w3-margin">
+				<img src="{{ url_for('static', filename='images/profile/' ~ current_user.image_file) }}" alt="Avatar" style="width:100px; height:100px" class="w3-white w3-circle w3-margin">
 			</a>
 		</div>
 		<div class="w3-col w3-half w3-cell w3-cell-middle"">
