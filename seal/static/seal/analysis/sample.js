@@ -993,21 +993,8 @@ $(document).ready(function() {
             left:2,
             right:2
         },
-        'createdRow': function (row, data, rowIndex) {
-            if (data.hide) {
-                $(row).css('opacity', '0.3')
-            }
-            // Per-cell function to do whatever needed with cells
-            $.each($('td', row), function (colIndex) {
-                // For example, adding data-* attributes to the cell
-                if (dt_table[colIndex]["mytitle"]) {
-                    d2 = data;
-                    if (dt_table[colIndex]["data"]) {
-                        d2 = getValueFromHash(data, dt_table[colIndex]["data"]);
-                    }
-                    $(this).attr('title', dt_table[colIndex]["mytitle"](d2));
-                };
-            });
+        'rowCallback': function (row, data) {
+            $(row).css('opacity', data.hide ? '0.3' : '1');
         },
         ajax: json_variants,
         columns: dt_table,
@@ -1246,27 +1233,21 @@ function artefact(id_var, sample_id) {
                     id_var: id_var,
                     sample_id: sample_id
                 },
-                success: function(result) {
+                success: function(status) {
                     $('#tableHistorySample').DataTable().ajax.reload();
-                    if (result == "True") {
-                        $(`#val_hidden-${id_var}`).closest('tr').css("opacity","0.3")
-                        $(`#val_hidden-${id_var}`).text(parseInt($(`#val_hidden-${id_var}`).text()) + 1 )
-                        if (parseInt($(`#val_hidden-${id_var}`).text()) > 0) {
-                            color = "pomegranate";
-                        }
-                    } else {
-                        $(`#val_hidden-${id_var}`).closest('tr').css("opacity","1")
-                        $(`#val_hidden-${id_var}`).text(parseInt($(`#val_hidden-${id_var}`).text()) - 1 )
-                        if (parseInt($(`#val_hidden-${id_var}`).text()) > 0) {
-                            color = "sun-flower";
-                        } else {
-                            color = "concrete";
-                        }
+                    const row = table.row((idx, data) => data.id == id_var);
+                    if (row.any()) {
+                        const data = row.data();
+                        data.hide = status == "True";
+                        data.inseal.hidden = Math.max(0, (data.inseal.hidden || 0) + (data.hide ? 1 : -1));
+                        row.invalidate('data').draw(false);
                     }
-                    $(`#span_hidden-${id_var}`).removeClass(function (index, className) {
-                        return (className.match (/(^|\s)w3-(text|border)-flat\S+/g) || []).join(' ');
-                    })
-                    $(`#span_hidden-${id_var}`).addClass(`w3-border-flat-${color} w3-text-flat-${color}`)
+                    // const row = table.row((idx, data) => data.id == id_var);
+                    // if (row.any()) {
+                    //     const data = row.data();
+                    //     data.class_variant = parseInt(result.value, 10);
+                    //     row.invalidate('data').draw(false);
+                    // }
                 }
             })
         }
@@ -2100,7 +2081,12 @@ function switch_class(id_var, sample_id, current=0) {
                 "class_variant": result.value
             },
             success: function() {
-                document.getElementById(`switch-${id_var}`).innerHTML = class_variant_html(result.value)
+                const row = table.row((idx, data) => data.id == id_var);
+                if (row.any()) {
+                    const data = row.data();
+                    data.class_variant = parseInt(result.value, 10);
+                    row.invalidate('data').draw(false);
+                }
             }
         })
     }
