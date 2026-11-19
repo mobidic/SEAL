@@ -19,6 +19,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
+import subprocess
+import time
 import yaml
 from pathlib import Path
 from datetime import timedelta
@@ -66,6 +68,36 @@ for key, value in config["BP"].items():
         static_url_path=value["path"]
     )
     app.register_blueprint(data_bp)
+
+
+def get_asset_version():
+    """
+    Returns an identifier for the current code deployment (git description
+    of the repository, or a timestamp if git is not available).
+    """
+    try:
+        return subprocess.check_output(
+            ["git", "describe", "--tags", "--always"],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            stderr=subprocess.DEVNULL
+        ).decode().strip()
+    except Exception:
+        return str(int(time.time()))
+
+
+app.config["ASSET_VERSION"] = get_asset_version()
+
+
+@app.url_defaults
+def add_static_version(endpoint, values):
+    """
+    Appends a version parameter to all static file URLs, so that browsers
+    fetch updated assets after each new deployment, even if they are cached
+    by the client or by a reverse proxy (e.g. nginx).
+    """
+    if endpoint == 'static' or endpoint.endswith('.static'):
+        if 'filename' in values:
+            values.setdefault('v', app.config["ASSET_VERSION"])
 
 
 @app.before_request

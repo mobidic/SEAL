@@ -58,7 +58,7 @@
                             </div>
                         </div>
                         <a href="{{ url_for('account') }}" class="w3-bar-item {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="My Account" data-balloon-pos="left">
-                            <img src="{{ url_for('static', filename='images/profile/') }}{{ current_user.image_file }}" alt="Avatar" style="width:35px; height:35px" style="padding:0px" class="w3-white w3-circle">  <span class="w3-hide-small">{{ current_user.username }}</span>
+                            <img src="{{ url_for('static', filename='images/profile/' ~ current_user.image_file) }}" alt="Avatar" style="width:35px; height:35px" style="padding:0px" class="w3-white w3-circle">  <span class="w3-hide-small">{{ current_user.username }}</span>
                         </a>
                     {% else %}
                         <a href="{{ url_for('logout') }}" class="w3-bar-item w3-padding-large {% if ENV|upper != 'PRODUCTION' %}w3-hover-flat-alizarin{% else %}w3-hover-flat-turquoise{% endif %} w3-right" aria-label="Logout" data-balloon-pos="left"><i class="fas fa-sign-out-alt"></i></a>
