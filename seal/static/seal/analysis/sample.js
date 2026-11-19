@@ -2141,7 +2141,7 @@ function toggle_var2sample_status(id, id_var, sample_id, type, self) {
             var cell = $('#variants').DataTable().cell(self.closest('td'))
             var data = cell.data();
             data["reported"]=!cell.data()["reported"];
-            cell.data(data).draw();
+            cell.data(data).draw(false);
         }
     })
 }
