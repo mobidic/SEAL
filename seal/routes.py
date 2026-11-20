@@ -30,6 +30,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from PIL import Image
+import markdown
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
                    escape, abort)
 from flask_login import current_user, login_user, logout_user
@@ -403,9 +404,35 @@ def about():
     Returns:
         A rendered template for the about page.
     """
+    releases = []
+    try:
+        with open(Path(app.root_path).parent.joinpath("RELEASE_NOTE.md"), "r") as release_file:
+            html = markdown.markdown(
+                release_file.read(),
+                extensions=["tables", "fenced_code"]
+            )
+        releases = [
+            {
+                "title": section[4:section.index("</h2>")],
+                "body": section[section.index("</h2>") + 5:]
+            }
+            for section in re.split(r"(?=<h2>)", html)
+            if section.startswith("<h2>")
+        ]
+    except Exception as error:
+        app.logger.warning(f"Unable to load release notes: {error}")
+    license_text = ""
+    try:
+        with open(Path(app.root_path).parent.joinpath("COPYING"), "r") as copying_file:
+            license_text = copying_file.read()
+    except Exception as error:
+        app.logger.warning(f"Unable to load license: {error}")
+
     return render_template(
         "essentials/about.html",
-        title="About"
+        title="About",
+        releases=releases,
+        license_text=license_text
     )
 
 
