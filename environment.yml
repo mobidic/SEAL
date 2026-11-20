@@ -12,6 +12,7 @@ dependencies:
   - conda-forge::flask-sqlalchemy=2.5.1
   - conda-forge::flask-testing=0.8.1
   - conda-forge::flask-wtf=1.0.1
+  - conda-forge::markdown=3.3.
   - conda-forge::pandas=1.1.5
   - conda-forge::pillow=8.2.0
   - conda-forge::postgresql=14.5
