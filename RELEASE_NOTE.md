@@ -12,10 +12,11 @@ This release features significant improvements, as well as a few fixes.
 
 - **GRCh38 support**: SEAL now runs on both GRCh37 and GRCh38, with GRCh38 as the default genome build (need 2 different instancies)
 - **Multi variant-caller support** : import several VCFs for the same sample, one per caller (GATK-hc, DeepVariant, FreeBayes, ...) (#55)
-- **HPO**: HPO terms for samples, with a script to import HPO from a JSON file (#31)
+- **HPO**: HPO terms for samples (#31)
 - **Tag system**: add tags to samples (#42)
 - **IGV.js**: fully local visualization of BAM, BED and VCF files
 - **CovReport**: new dedicated coverage report view
+- **Utilities**: add some utilities
 
 ### 🛠️ Improvements
 
