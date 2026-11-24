@@ -1,9 +1,9 @@
-# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 # 
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
+# Copyright (C) 2025  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
 # 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -44,4 +44,4 @@ for b in genes:
     for c in genes[b]:
         region = Region(name=b, chr=c, start=genes[b][c]["start"], stop=genes[b][c]["stop"])
         db.session.add(region)
-        db.session.commit()
+db.session.commit()

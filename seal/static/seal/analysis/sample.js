@@ -1,3 +1,406 @@
+// =============================================
+// Utilities
+// =============================================
+function getBrightness(hex) {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+function getTextColor(hexColor) {
+    return getBrightness(hexColor) > 130 ? '#34495e' : '#ecf0f1';
+}
+function showAddHPOAlert(sampleId) {
+    Swal.fire({
+        title: '<i class="fas fa-tag w3-margin-right"></i> Add HPO',
+        html: `
+            <div style="display: flex; align-items: center; gap: 8px; margin: 8px 0;">
+                <input id="swal-hpo-name"
+                    class="swal2-input"
+                    placeholder="HPO ID or HPO label..."
+                    style="margin: 4px !important; flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
+                <input type="hidden"
+                    id="swal-hpo-id"
+                    value="">
+            </div>
+        `,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonText: '<i class="fas fa-plus w3-margin-right"></i> Add',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#dd3333',
+        preConfirm: () => {
+            return {
+                name: document.getElementById(`swal-hpo-name`).value.trim(),
+                id: document.getElementById(`swal-hpo-id`).value,
+            };
+        },
+        didOpen: () => {
+            const input = document.getElementById(`swal-hpo-name`);
+            input.focus();
+
+            $(input).autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: `/api/hpos?q=${encodeURIComponent(request.term)}`,
+                        method: 'GET',
+                        success: function(data) {
+                            const results = data.map(function(hpo) {
+                                return {
+                                    label: hpo.display,
+                                    value: hpo.display,
+                                    id: hpo.id
+                                };
+                            });
+                            response(results);
+                        },
+                        error: function() {
+                            response([]);
+                        }
+                    });
+                },
+                minLength: 2,
+                select: function(event, ui) {
+                    document.getElementById(`swal-hpo-id`).value = ui.item.id;
+                }
+            });
+        }
+    }).then((result) => {
+        if (result.isConfirmed && result.value.id) {
+            addHPOWithSweetAlert(sampleId, result.value.id);
+        } else if (result.isConfirmed) {
+            Swal.fire('Error', 'Please select a valid HPO term', 'error');
+        }
+    });
+}
+
+// =============================================
+// tags managment
+// =============================================
+
+function addHPOWithSweetAlert(sampleId, id) {
+    if (!id) {
+        Swal.fire('Info', 'HPO is not valid (cancel)', 'info');
+        return;
+    }
+
+    $.ajax({
+        url: `/api/hpos?id=${encodeURIComponent(id)}&exclude_sample_id=${sampleId}`,
+        method: 'GET',
+        success: function(hpos) {
+            console.log(JSON.stringify(hpos))
+            const existingHpo = hpos.find(hpo =>
+                hpo.id == id
+            );
+            if (existingHpo) {
+                addHPOToSample(sampleId, existingHpo);
+            } else {
+                Swal.fire('Error', "HPO unavailable 1", 'error');
+            }
+        },
+        error: function() {
+            Swal.fire('Error', "HPO unavailable 2", 'error');
+        }
+    });
+}
+
+function addHPOToSample(sampleId, hpo) {
+    console.log(hpo)
+    console.log(hpo.id)
+    console.log(JSON.stringify({ hpo_id: hpo.id }))
+    $.ajax({
+        url: `/api/sample/${sampleId}/hpos`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ hpo_id: hpo.id }),
+        success: function(response) {
+            if (response.success) {
+                $(`#sample-hpos-container-${sampleId} .sample-hpo-add-button`).remove();
+
+                $(`#sample-hpos-container-${sampleId}`).append(`
+                    <span class="w3-tag sample-hpo w3-round" aria-label="${hpo.label}" data-balloon-pos="down" onclick="">
+                        ${hpo.hpo}
+                        <i class="fas fa-times" style="cursor: pointer;"
+                           onclick="removeHPO(${sampleId}, ${hpo.id}, this)"></i>
+                    </span>
+                `);
+
+                $(`#sample-hpos-container-${sampleId}`).append(`
+                    <span onclick="showAddHPOAlert(${sampleId})"
+                            class="w3-tag sample-hpo sample-hpo-add-button w3-round">
+                        <i class="fas fa-plus"></i> Add HPO
+                    </span>
+                `);
+            }
+        },
+        error: function(xhr) {
+            if (xhr.responseJSON?.error === 'HPO already associated') {
+                Swal.fire('Info', 'This HPO is already associated to this sample', 'info');
+            } else {
+                Swal.fire('Error', "HPO's creation is impossible", 'error');
+            }
+        }
+    });
+}
+
+function removeHPO(sampleId, hpoId, element) {
+    Swal.fire({
+        title: 'Delete this HPO ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/api/sample/${sampleId}/hpos`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ hpo_id: hpoId }),
+                success: function() {
+                    $(element).closest('.w3-tag').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    Swal.fire('Error', "HPO's deletion is impossible", 'error');
+                }
+            });
+        }
+    });
+}
+
+// =============================================
+// Main : add tags (sweet alert)
+// =============================================
+
+function showAddTagAlert(sampleId) {
+    var random_color = getRandomColor()
+    Swal.fire({
+        title: '<i class="fas fa-tag w3-margin-right"></i> Add a tag',
+        html: `
+            <div style="display: flex; align-items: center; gap: 8px; margin: 8px 0;">
+                <input id="swal-tag-name"
+                    class="swal2-input"
+                    placeholder="Tag name..."
+                    style="margin: 4px !important;flex: 1; height: 36px; border: 1px solid #ddd; border-radius: 4px; padding: 0 12px; font-size: 14px;">
+                <input type="color"
+                    id="swal-tag-color"
+                    value="${random_color}"
+                    style="width: 40px; height: 36px; padding: 0; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; flex-shrink: 0;">
+            </div>
+        `,
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonText: '<i class="fas fa-plus w3-margin-right"></i>Add',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#dd3333',
+        preConfirm: () => {
+            return {
+                name: document.getElementById(`swal-tag-name`).value.trim(),
+                color: document.getElementById(`swal-tag-color`).value
+            };
+        },
+        didOpen: () => {
+            document.getElementById(`swal-tag-name`).focus();
+            
+            var tags=[];
+            var colors={};
+            $.ajax({
+                url: `/api/tags`,
+                method: 'GET',
+                success: function(temp_response) {
+                    for (i in temp_response) {
+                        tags.push(temp_response[i]["name"]);
+                        colors[temp_response[i]["name"]] = temp_response[i]["color"]
+                    }
+                },
+            });
+
+            $("#swal-tag-name").autocomplete({
+                source: tags,
+                select: function(event, ui){
+                    document.getElementById(`swal-tag-color`).value = colors[ui.item.label]
+                }
+            });
+        }
+    }).then((result) => {
+        if(result.isConfirmed) {
+            addTagWithSweetAlert(sampleId, result.value.name, result.value.color);
+        }
+    });
+}
+
+// =============================================
+// tags managment
+// =============================================
+
+function addTagWithSweetAlert(sampleId, name, color) {
+    if (!name) {
+        Swal.fire('Info', 'Tag name is empty (cancel)', 'info');
+        return;
+    }
+
+    $.ajax({
+        url: `/api/tags?q=${encodeURIComponent(name)}&exclude_sample_id=${sampleId}`,
+        method: 'GET',
+        success: function(tags) {
+            const existingTag = tags.find(tag =>
+                tag.name.toLowerCase() === name.toLowerCase()
+            );
+
+            if (existingTag) {
+                addTagToSample(sampleId, existingTag.id, existingTag.name, existingTag.color);
+            } else {
+                $.ajax({
+                    url: '/api/tags',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ name: name, color: color }),
+                    success: function(newTag) {
+                        addTagToSample(sampleId, newTag.id, newTag.name, newTag.color);
+                    },
+                    error: function() {
+                        Swal.fire('Error', "Tag's creation is impossible", 'error');
+                    }
+                });
+            }
+        },
+        error: function() {
+            $.ajax({
+                url: '/api/tags',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ name: name, color: color }),
+                success: function(newTag) {
+                    addTagToSample(sampleId, newTag.id, newTag.name, newTag.color);
+                },
+                error: function() {
+                    Swal.fire('Error', "Tag's creation is impossible", 'error');
+                }
+            });
+        }
+    });
+}
+
+function addTagToSample(sampleId, tagId, name, color) {
+    $.ajax({
+        url: `/api/sample/${sampleId}/tags`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ tag_id: tagId }),
+        success: function(response) {
+            if (response.success) {
+                $(`#sample-tags-container-${sampleId} .sample-tag-add-button`).remove();
+
+                $(`#sample-tags-container-${sampleId}`).append(`
+                    <span class="w3-tag sample-tag w3-round"
+                          style="background-color: ${color}99;border:1px solid ${color}4D;
+                                color: ${getTextColor(color)};">
+                        ${name}
+                        <i class="fas fa-times" style="cursor: pointer;"
+                           onclick="removeTag(${sampleId}, ${tagId}, this)"></i>
+                    </span>
+                `);
+
+                $(`#sample-tags-container-${sampleId}`).append(`
+                    <span onclick="showAddTagAlert(${sampleId})"
+                            class="w3-tag sample-tag sample-tag-add-button w3-round w3-light-grey w3-hover-white w3-border"
+                            style="cursor: pointer; border: 1px dashed #ccc;">
+                        <i class="fas fa-plus"></i> Add a tag
+                    </span>
+                `);
+            }
+        },
+        error: function(xhr) {
+            if (xhr.responseJSON?.error === 'Tag already associated') {
+                Swal.fire('Info', 'This tag is already associated to this sample', 'info');
+            } else {
+                Swal.fire('Error', "Tag's creation is impossible", 'error');
+            }
+        }
+    });
+}
+
+function removeTag(sampleId, tagId, element) {
+    Swal.fire({
+        title: 'Delete this tag ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: `/api/sample/${sampleId}/tags`,
+                method: 'DELETE',
+                contentType: 'application/json',
+                data: JSON.stringify({ tag_id: tagId }),
+                success: function() {
+                    $(element).closest('.w3-tag').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function() {
+                    Swal.fire('Error', "Tag's creation is impossible", 'error');
+                }
+            });
+        }
+    });
+}
+
+function showExternalLinks(genome, hgvs, id) {
+    Swal.fire({
+        title: '<i class="fa-solid fa-arrow-up-right-from-square"></i> External Links',
+        html: `
+            <div style="text-align:left;">
+                <ul>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://mutalyzer.nl/favicon.ico");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="Mutalyzer3" href="https://mutalyzer.nl/normalizer/${genome}(${hgvs.split(":")[0]}):${hgvs.split(":")[1]}" class="w3-text-indigo w3-hover-text-black">Mutalyzer</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://genebe.net/favicon.ico");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="GeneBe" href="https://genebe.net/variant/${genome}/${hgvs}" class="w3-text-indigo w3-hover-text-black">GeneBe</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://franklin.genoox.com/assets/fav/fav-icon-48.png");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${id}-${genome}" class="w3-text-indigo w3-hover-text-black">Franklin</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://spliceailookup.broadinstitute.org/icon.png");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="spliceailookup" href="https://spliceailookup.broadinstitute.org/#variant=${id}" class="w3-text-indigo w3-hover-text-black">SpliceAI lookup</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://genome.ucsc.edu//favicon.ico");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="UCSC" href="https://genome.ucsc.edu/cgi-bin/hgTracks?db=${genome}&position=${hgvs.split(":")[0]}:${parseInt(id.split("-")[1])-50}-${parseInt(id.split("-")[1])+id.split("-")[2].length+50}&highlight=${genome}.${hgvs.split(":")[0]}:${id.split("-")[1]}-${parseInt(id.split("-")[1])+id.split("-")[2].length-1}#aac6ff" class="w3-text-indigo w3-hover-text-black">UCSC</a>
+                    </li>
+                </ul>
+            </div>
+        `,
+        confirmButtonColor: '#3085d6',
+    })
+}
+
+function getRandomColor() {
+  var letters = '0123456789ABCDEF';
+  var color = '#';
+  for (var i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+spans = document.querySelectorAll('span.sample-tag:not(.sample-tag-add-button)')
+// Source - https://stackoverflow.com/a/3627747
+// Posted by Erick Petrucelli, modified by community. See post 'Timeline' for change history
+// Retrieved 2026-10-30, License - CC BY-SA 4.0
+
+const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+
+function changeColor(coll){
+    for(var i=0, len=coll.length; i<len; i++)
+    {
+        coll[i].style["color"] = getTextColor(rgba2hex(coll[i].style["background-color"]));
+    }
+}
+changeColor(spans)
+
 function toggle_status(id, status) {
     $.ajax({
         type: "POST",
@@ -213,29 +616,38 @@ const consequences_dict = {
     }
 };
 
-const class_variant_html = [
-    '<span class="do-not-select"><i class="fas fa-ellipsis-h"></i></span>',
-    '<span class="do-not-select w3-text-flat-green-sea"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">1</span>'+
-    '</span> - Benign</span>',
-    '<span class="do-not-select w3-text-flat-nephritis"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">2</span>'+
-    '</span> - Likely Benign</span>',
-    '<span class="do-not-select w3-text-flat-belize-hole"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">3</span>'+
-    '</span> - VUS</span>',
-    '<span class="do-not-select w3-text-flat-pumpkin"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">4</span>'+
-    '</span> - Likely Pathogenic</span>',
-    '<span class="do-not-select w3-text-flat-pomegranate"><span class="fa-layers fa-fw">'+
-        '<i class="do-not-select fas fa-bookmark"></i>'+
-        '<span class="do-not-select fa-layers-text fa-inverse" data-fa-transform="shrink-8 up-2" style="font-weight:900">5</span>'+
-    '</span> - Pathogenic</span>',
-];
+const class_variant_text = [
+    '<i> - Not Classified</i>',
+    ' - Benign',
+    ' - Likely Benign',
+    ' - VUS',
+    ' - Likely Pathogenic',
+    ' - Pathogenic'
+]
+const class_variant_color = [
+    'asbestos',
+    'green-sea',
+    'nephritis',
+    'belize-hole',
+    'pumpkin',
+    'pomegranate'
+]
+const class_variant_color_hover = [
+    'concrete',
+    'turquoise',
+    'emerald',
+    'peter-river',
+    'carrot',
+    'alizarin'
+]
+function class_variant_html(class_acmg, text=false) {
+    return `
+        <span class="w3-text-flat-${class_variant_color[class_acmg]} w3-hover-text-flat-${class_variant_color_hover[class_acmg]}"><span class="fa-layers fa-fw">
+            <i class="fas fa-bookmark" data-fa-transform="grow-5"></i>
+            <span class="fa-layers-text fa-inverse" data-fa-transform="shrink-2 up-2" style="font-weight: 900;">${class_acmg}</span>
+        </span>${text ? class_variant_text[class_acmg]: ""}</span>
+    `
+}
 const class_clinvar = [
     "0 - Benign/Likely Benign",
     "1 - Conflicting (without Pathogenic)",
@@ -349,9 +761,9 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
 
                     // If this value was previously selected as indicated by preDefined, then select it again
                     if (preDefined !== null && opt.val() === preDefined[0]) {
-                    opt.prop('selected', true);
-                    el.removeClass($.fn.dataTable.Criteria.classes.italic);
-                    that.dom.valueTitle.removeProp('selected');
+                        opt.prop('selected', true);
+                        el.removeClass($.fn.dataTable.Criteria.classes.italic);
+                        that.dom.valueTitle.removeProp('selected');
                     }
                 }
             };
@@ -380,13 +792,18 @@ function BaseConditionsFilterSelect(values_options, condition="==", sort=true) {
         case "==":
             conditionName ="Is"
             search = function (value, comparison) {
-                v = value.split(",");
+                if (comparison[0] == 0) {
+                    return (value == comparison[0]) || (value == null) || (value == "")
+                }
                 return value == comparison[0];
             }
             break;
         case "!=":
             conditionName ="Is not"
             search = function (value, comparison) {
+                if (comparison[0] == 0) {
+                    return !((value == comparison[0]) || (value == null) || (value == ""))
+                }
                 return value != comparison[0];
             }
             break;
@@ -595,36 +1012,21 @@ $(document).ready(function() {
             },
             infoPostFix: " [Total variants: " + sample_variants_length + "]",
         },
-        dom: 'Blfrti<"toolbar-variants">',
+        dom: 'Blfrti',
         scrollY:        "40vh",
         scrollX:        true,
         scrollCollapse: true,
         scroller:       true,
         fixedColumns: {
             left:2,
-            right:1
+            right:2
         },
-        'createdRow': function (row, data, rowIndex) {
-            // Per-cell function to do whatever needed with cells
-            $.each($('td', row), function (colIndex) {
-                // For example, adding data-* attributes to the cell
-                if (dt_table[colIndex]["mytitle"]) {
-                    d2 = data;
-                    if (dt_table[colIndex]["data"]) {
-                        d2 = getValueFromHash(data, dt_table[colIndex]["data"]);
-                    }
-                    $(this).attr('title', dt_table[colIndex]["mytitle"](d2));
-                }
-                ;
-            });
-        },
-        select: {
-            style: 'multi',
-            selector: 'td:not(:last-child)'
-
+        'rowCallback': function (row, data) {
+            $(row).css('opacity', data.hide ? '0.3' : '1');
         },
         ajax: json_variants,
         columns: dt_table,
+        order: [[ 1, "asc" ]],
         initComplete: function(settings, json) {
             changeFilter(sample_filter_id, sample_id);
             if (sample_status != 4) {
@@ -650,7 +1052,6 @@ $(document).ready(function() {
                                 class_seal:  conditionsFilter(class_variant_export, ["==", "!="]),
                                 num: {"=":null, "!=": null},
                                 reported:  conditionsFilter(reported_v, ["isTrue", "isFalse"]),
-
                             }
                         },
                     },
@@ -680,9 +1081,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         },
                     },
@@ -692,9 +1090,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -704,9 +1099,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -719,9 +1111,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_defGen
                         },
                         fieldSeparator: ";",
@@ -736,9 +1125,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_defGen2
                         },
                         fieldSeparator: ";",
@@ -751,17 +1137,11 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
                                 }
                             }],
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -771,9 +1151,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitle"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
@@ -799,9 +1176,6 @@ $(document).ready(function() {
                                     return data+1;
                                 }
                             }],
-                            modifier: {
-                                selected: null
-                            },
                             columns: columns_export
                         }
                     },
@@ -814,9 +1188,6 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
@@ -836,85 +1207,11 @@ $(document).ready(function() {
                         exportOptions: {
                             orthogonal: 'export',
                             format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: null
-                            },
                             rows: [function(data, row, column, node) {
                                 if(row.reported) {
                                     return data+1;
                                 }
                             }],
-                            columns: columns_defGen2
-                        },
-                        fieldSeparator: ";",
-                        fieldBoundary: ''
-                    },
-                    '<h3>Selected</h3>',
-                    {
-                        extend: 'copy',
-                        text: 'Copy',
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitle"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_export
-                        }
-                    },
-                    {
-                        extend: 'excel',
-                        text: 'Excel',
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitle"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_export
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'CSV',
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitle"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_export
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'defGen',
-                        title: '',
-                        bom: false,
-                        createEmptyCells: true,
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: true
-                            },
-                            columns: columns_defGen
-                        },
-                        fieldSeparator: ";",
-                        fieldBoundary: ''
-                    },
-                    {
-                        extend: 'csv',
-                        text: 'defGen2',
-                        title: '',
-                        bom: false,
-                        createEmptyCells: true,
-                        exportOptions: {
-                            orthogonal: 'export',
-                            format: format_export("exportTitleDefGen"),
-                            modifier: {
-                                selected: true
-                            },
                             columns: columns_defGen2
                         },
                         fieldSeparator: ";",
@@ -922,14 +1219,8 @@ $(document).ready(function() {
                     },
                 ]
             });
-            hide_message(count_hide);
         }
     });
-    
- 
-	// $('a').on('click', function(e){
-    //     e.preventDefault()
-	// });
   
     table.on( 'user-select', function ( e, dt, type, cell, originalEvent ) {
         if ( originalEvent.target.classList.toString().match('do-not-select') ) {
@@ -939,31 +1230,30 @@ $(document).ready(function() {
     
 } );
 
-function hide_message(count_hide) {
-    if (count_hide > 0) {
-        $('.toolbar-variants').html('<span class="w3-text-flat-alizarin" style="margin-left:10px"><i class="fas fa-exclamation-triangle"></i> <span id="cpt-hide-row">' + count_hide + '</span> row(s) hidden (<b class="w3-hover-text-blue" onclick="showAllRows()" style="cursor:pointer">click here to show all</b>)<span>');
-    } else {
-        $('.toolbar-variants').html('');
+var k = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65],
+n = 0;
+$(document).keydown(function (e) {
+    if (e.keyCode === k[n++]) {
+        if (n === k.length) {
+            $(".fa-bug").removeClass("fa-bug").addClass("fa-poo")
+        }
     }
-}
+    else {
+        n = 0;
+    }
+});
 
-function hideRow(id_var, sample_id, item) {
+function artefact(id_var, sample_id) {
     Swal.fire({
         title: 'Are you sure?',
-        text: "You will hide a variant",
+        text: `You will switch artefact status of this variant : ${id_var}`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, hide it!'
+        confirmButtonText: 'Confirm'
     }).then((result) => {
         if (result.isConfirmed) {
-            $('#variants').DataTable()
-                .row($(item).parents('tr'))
-                .remove()
-                .draw();
-            var cpt = parseInt($('#cpt-hide-row').text()) || 0;
-            hide_message(cpt+1);
             $.ajax({
                 type: "POST",
                 url: "/toggle/samples/variant/hide",
@@ -971,30 +1261,25 @@ function hideRow(id_var, sample_id, item) {
                     id_var: id_var,
                     sample_id: sample_id
                 },
-                success: function() {
+                success: function(status) {
                     $('#tableHistorySample').DataTable().ajax.reload();
+                    const row = table.row((idx, data) => data.id == id_var);
+                    if (row.any()) {
+                        const data = row.data();
+                        data.hide = status == "True";
+                        data.inseal.hidden = Math.max(0, (data.inseal.hidden || 0) + (data.hide ? 1 : -1));
+                        row.invalidate('data').draw(false);
+                    }
+                    // const row = table.row((idx, data) => data.id == id_var);
+                    // if (row.any()) {
+                    //     const data = row.data();
+                    //     data.class_variant = parseInt(result.value, 10);
+                    //     row.invalidate('data').draw(false);
+                    // }
                 }
             })
         }
     })
-}
-
-function showAllRows() {
-    $('#variants').DataTable()
-        .clear()
-        .draw();
-    $.ajax({
-        type: "POST",
-        url: "/toggle/samples/variant/hide/all",
-        data: {
-            sample_id: sample_id
-        },
-        success: function() {
-            $('#tableHistorySample').DataTable().ajax.reload();
-            $('#variants').DataTable().ajax.reload();
-        }
-    })
-    hide_message(0);
 }
 
 function save_filters() {
@@ -1374,14 +1659,14 @@ function openDetailsVariantModal(id, sample_id) {
             }
             if (data["samples"][x]["current_family"]) {
                 family = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["family"] + '</span></b>';
-                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
+                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis w3-hover-text-flat-silver">' + data["samples"][x]["samplename"] + '</span></b>';
             } else {
                 family = data["samples"][x]["family"];
                 sample = data["samples"][x]["samplename"];
             }
             style=""
             if (data["samples"][x]["current"]) {
-                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis">' + data["samples"][x]["samplename"] + '</span></b>';
+                sample = '<b><span class="w3-tag w3-round w3-flat-nephritis w3-hover-text-flat-silver">' + data["samples"][x]["samplename"] + '</span></b>';
                 style =  "style='background-color:#85b3d5'"
             }
             teams=""
@@ -1389,8 +1674,8 @@ function openDetailsVariantModal(id, sample_id) {
                 teams += '<span class="w3-tag" style="max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;background-color:' + data["samples"][x]["teams"][i]["color"] + '">' + data["samples"][x]["teams"][i]["teamname"] + '</span> ';
             };
             inSeal = inSeal + '<tr>'+
-                '<td class="control-size-100" ' + style + '>' + sample + '</td>'+
-                '<td class="control-size-100" ' + style + '>' + family+ '</td>'+
+                '<td class="control-size-100" ' + style + '><a target="_blank" href="/sample/' + data["samples"][x]["id"] + '" class="w3-hover-text-flat-silver">' +  sample + '</a></td>'+
+                '<td class="control-size-100" ' + style + '>' + family + '</td>'+
                 '<td class="control-size-100" ' + style + '>' + teams + '</td>'+
                 '<td class="control-size-75 w3-center" ' + style + '>' + affected + '</td>'+
                 '<td class="control-size-75 w3-center" ' + style + '>' + data["samples"][x]["depth"] + '</td>'+
@@ -1777,21 +2062,68 @@ function edit_name() {
     })
 }
 
-function toggle_class(id_var, sample_id, class_variant, self) {
-    $.ajax({
-        type: "POST",
-        url: "/toggle/samples/variant/class",
-        data: {
-            "id_var": id_var,
-            "sample_id": sample_id,
-            "class_variant": class_variant
-        },
-        success: function() {
-            var cell = $('#variants').DataTable().cell(self.closest('td'))
-            cell.data(class_variant).draw();
-            // CREATE SWEET ALERT
+function switch_class(id_var, sample_id, current=0) {
+    var radioButtons = [];
+    for (i in [0,1,2,3,4,5]) {
+        var radioId = `radio-switch-class-${i}`;
+        var isSelected = i == current;
+        radioButtons.push(`
+            <label class="w3-bar-item" style="margin: 10px;text-align: left;display: block; cursor: pointer;"
+                ">
+                <input type="radio"
+                    name="class-variant"
+                    value="${i}"
+                    id="${radioId}"
+                    ${isSelected ? 'checked' : ''}
+                    style="margin-right: 8px;">
+                    ${class_variant_html(i, true)}
+            </label>
+        `)
+    }
+    radioButtons = radioButtons.join('');
+    Swal.fire({
+    title: `Switch variant classification ${id_var}`,
+    html: `
+        ${radioButtons}
+    `,
+    showCancelButton: true,
+    showConfirmButton: false,
+    cancelButtonText: 'Cancel',
+    didOpen: () => {
+        Swal.getPopup().querySelectorAll('input[name="class-variant"]').forEach((input) => {
+            input.addEventListener('click', () => Swal.clickConfirm());
+        });
+    },
+    preConfirm: () => {
+        const choice = document.querySelector(`input[name="class-variant"]:checked`);
+        if (!choice) {
+            Swal.showValidationMessage('Please choose an option !');
+            return false;
         }
-    })
+        return choice.value;
+    }
+    }).then((result) => {
+    if (result.isConfirmed) {
+        Swal.fire({title: 'Confirmed !', html: `${class_variant_html(result.value, true)}`, icon: 'success', timer: 1500, showConfirmButton: false});
+        $.ajax({
+            type: "POST",
+            url: "/toggle/samples/variant/class",
+            data: {
+                "id_var": id_var,
+                "sample_id": sample_id,
+                "class_variant": result.value
+            },
+            success: function() {
+                const row = table.row((idx, data) => data.id == id_var);
+                if (row.any()) {
+                    const data = row.data();
+                    data.class_variant = parseInt(result.value, 10);
+                    row.invalidate('data').draw(false);
+                }
+            }
+        })
+    }
+    });
 }
 
 function toggle_on_off(div) {
@@ -1837,7 +2169,7 @@ function toggle_var2sample_status(id, id_var, sample_id, type, self) {
             var cell = $('#variants').DataTable().cell(self.closest('td'))
             var data = cell.data();
             data["reported"]=!cell.data()["reported"];
-            cell.data(data).draw();
+            cell.data(data).draw(false);
         }
     })
 }
@@ -1964,9 +2296,8 @@ function applied_panel(id, sample_id) {
             "id_sample": sample_id,
             "id_panel": id
         },
-        success: function(count_hide) {
+        success: function() {
             $('#tableHistorySample').DataTable().ajax.reload();
-            hide_message(count_hide);
         }
     });
     table = $('#variants').DataTable();
@@ -1974,25 +2305,6 @@ function applied_panel(id, sample_id) {
     table.ajax.url( '/json/variants/sample/' + sample_id + '/bed/' + id ).load(function(){$("#variants").css('opacity', '1');});
 }
 $('.js-example-basic-multiple').select2();
-
-
-$(document).on("click", function(event){
-    if($(event.target).parents('.button-class').length || $(event.target).hasClass('button-class')) {
-        return;
-    }
-    $('.ClassVisible').toggle();
-    $('.ClassVisible').removeClass("ClassVisible");
-});
-function toggle_dd_class(id) {
-    if (! $('#' + id +'-content').hasClass("ClassVisible")) {
-        $('.ClassVisible').hide();
-        $('.ClassVisible').removeClass("ClassVisible");
-    }
-    right = $(window).width() - $('#' + id).offset().left - $('#' + id).outerWidth();
-    $('#' + id +'-content').css('margin-right', right);
-    $('#' + id +'-content').toggle();
-    $('#' + id +'-content').toggleClass("ClassVisible");
-}
 
 
 $('#tableCommentsSample').DataTable({
@@ -2075,6 +2387,62 @@ function edit_family() {
 }
 
 
+
+var runs=[];
+$.getJSON('/json/runs', function(data, status, xhr){
+    for (var i = 0; i < data['data'].length; i++ ) {
+        runs.push(data["data"][i]["name"]);
+    }
+});
+
+$('#edit-run').autocomplete({
+    source: runs,
+});
+
+$("#edit-run").keyup(function(event) {
+    if (event.keyCode === 13) {
+        edit_run()
+    }
+});
+
+function edit_run() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You change the run associated to the sample.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, change it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            Swal.fire(
+                'Changed!',
+                'The run will be changed.',
+                'success'
+            )
+            $.ajax({
+                type: "POST",
+                url: "/edit/sample/run",
+                data: {
+                    "sample_id": sample_id,
+                    "new_run": $('#edit-run').val()
+                },
+                success: function() {
+                    $( "#error-message-edit-run" ).remove();
+                    $('#tableHistorySample').DataTable().ajax.reload();
+                },
+                error: function(XMLHttpRequest) {
+                    $( "#error-message-edit-run" ).remove();
+                    msg = "<p id='error-message-edit-run' class='w3-small w3-text-flat-alizarin' style='margin:0px'><i class='fas fa-exclamation-circle'></i> " + XMLHttpRequest["responseJSON"]["message"] + "</p>"
+                    $( "#sample-run-sidebar" ).after( msg );
+                }
+            })
+        }
+    })
+}
+
+
 $(document).ready(function() {
     $('#tableHistorySample').DataTable({
         searching:true,
@@ -2095,9 +2463,12 @@ $(document).ready(function() {
             },
             {
                 data: "action",
+                "render":  function (data, type, row, meta) {
+				    return `<p style="max-width: 140px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${data}</p>`;
+                }
             },
             {
-                data: "date",
+                data: "date"
             }
         ]
     });

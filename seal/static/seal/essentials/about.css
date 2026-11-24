@@ -6,8 +6,13 @@
 }
 
 @media screen and (min-height:600px){
-    #releases-notes {
+    .scrollable {
         height: 50vh;
-        overflow: scroll;
+        overflow-y: scroll;
     }
+}
+
+pre.scrollable {
+    width: fit-content;
+    max-width: 100%;
 }

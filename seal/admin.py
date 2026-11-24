@@ -1,9 +1,9 @@
-# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 #
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
+# Copyright (C) 2025  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,22 +29,12 @@ from flask_login import current_user
 from seal import app, db, bcrypt
 from seal.models import (User, Team, Sample, Family, Variant, Comment_variant,
                          Comment_sample, Var2Sample, Filter, Transcript, Run,
-                         Region, Bed, Phenotype, Omim, History, Clinvar)
+                         Region, Bed, Phenotype, Omim, History, Clinvar, Tag, Hpo)
 
 ###############################################################################
 
 
 class MyAdminIndexView(AdminIndexView):
-    @expose('/')
-    def index(self):
-        cnt = {
-            "user": User.query.count(),
-            "sample": Sample.query.count(),
-            "variant": Variant.query.count(),
-            "family": Family.query.count(),
-            "bed": Bed.query.count(),
-        }
-        return self.render('admin/index.html', cnt=cnt)
     """
     Custom class for Flask-Admin index view.
 
@@ -57,6 +47,17 @@ class MyAdminIndexView(AdminIndexView):
         inaccessible_callback(name, **kwargs): Redirects to the login page if
                                                the user doesn't have access.
     """
+    @expose('/')
+    def index(self):
+        cnt = {
+            "user": User.query.count(),
+            "sample": Sample.query.count(),
+            "variant": Variant.query.count(),
+            "family": Family.query.count(),
+            "bed": Bed.query.count(),
+        }
+        return self.render('admin/index.html', cnt=cnt)
+        
     def is_accessible(self):
         """
         Determines if the current user has access to the admin view.
@@ -264,7 +265,7 @@ class UserView(CustomView):
 
 
 admin = Admin(app, index_view = MyAdminIndexView(), template_mode='bootstrap3')
-BCRYPT_PATTERN = re.compile("^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
+BCRYPT_PATTERN = re.compile(r"^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$")
 
 
 ###############################################################################
@@ -407,6 +408,15 @@ admin.add_view(
 )
 
 
+admin.add_view(
+    CustomView(
+        Tag,
+        db.session,
+        category="Analysis"
+    )
+)
+
+
 ###############################################################################
 
 
@@ -477,5 +487,17 @@ admin.add_view(
                                   'comments', 'computedCytoLocation',
                                   'cytoLocation', 'ensemblGeneID',
                                   'entrezGeneID']
+    )
+)
+
+
+admin.add_view(
+    CustomView(
+        Hpo,
+        db.session,
+        category="Genes",
+        column_searchable_list = ['label', "hpo"],
+        column_editable_list = ['hpo', 'label'],
+        form_excluded_columns = ['samples']
     )
 )

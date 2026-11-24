@@ -139,7 +139,7 @@ def random_color(format="HEX"):
     if format == "RGB":
         return f'rgb({red},{green},{blue})'
     if format == "RGBA":
-        alpha = random.random.uniform(0, 1)
+        alpha = random.uniform(0, 1)
         return f'rgba({red},{green},{blue},{alpha})'
 
 
@@ -252,7 +252,7 @@ def get_filter(id=1, name=None):
     return False
 
 
-def create_sample(data):
+def create_sample(data, wf_path=None):
     app.logger.info("---------------- Import Sample ----------------")
     if not "samplename" in data:
         raise KeyError
@@ -264,6 +264,10 @@ def create_sample(data):
         sample.affected = bool(data["affected"])
     if "index" in data:
         sample.index = bool(data["index"])
+    if "wf_path" in data:
+        sample.wf_path = data["wf_path"]
+    elif wf_path:
+        sample.wf_path = str(wf_path)
 
     if "family" in data:
         id = data["family"]["id"] if "id" in data["family"] else None
@@ -303,6 +307,7 @@ def create_sample(data):
         filter = get_filter(id, name)
         if filter:
             sample.filter = filter
+
     db.session.add(sample)
     db.session.commit()
     return sample
@@ -458,6 +463,7 @@ def importvcf():
                 app.logger.error(f'Path does not exist for : {vcf_path}')
                 # path_locker.unlink()
                 return
+            wf_path = vcf_path.parent
             status_final = False
             if "add_caller" in data and data["add_caller"] == True:
                 sample = get_sample(data)
@@ -468,7 +474,7 @@ def importvcf():
                 msg = "Add new caller"
                 status_final = sample.status
             else:
-                sample = create_sample(data)
+                sample = create_sample(data, wf_path)
                 msg = "Import Sample"
             
             call_name = "default"
@@ -601,8 +607,8 @@ def importvcf():
                             for value in SPLICEAI:
                                 spliceAI.append(annot[value])
                             spliceAI = numpy.array(spliceAI, dtype=numpy.float64)
-                            max = numpy.nanmax(spliceAI)
-                            annot["spliceAI"] = None if numpy.isnan(max) else max
+                            max_spliceai = numpy.nanmax(spliceAI)
+                            annot["spliceAI"] = None if numpy.isnan(max_spliceai) else max_spliceai
 
                             # max MaxEntScan
                             annot["MES_var"] = None
@@ -674,7 +680,7 @@ def importvcf():
                             date=datetime.now(),
                             userid=user_id)
                         db.session.add(comment)
-                        db.session.commit
+                        db.session.commit()
             db.session.commit()
             current_file.unlink()
             vcf_vep.unlink()
@@ -733,8 +739,8 @@ def update_clinvar(vcf, version, genome=config["GENOME"]):
         path_log = Path(app.root_path).joinpath('static/temp/clinvar/error')
         with open(path_log, "w") as log:
             log.write(f"Error on file: {new_clinvar}")
-            log.write(e)
-        app.logger.error(e)
+            log.write(str(e))
+        app.logger.error(str(e))
     finally:
         # Switch off maintenance mode
         app.config["MAINTENANCE"] = False

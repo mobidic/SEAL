@@ -1,9 +1,9 @@
-# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 #
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
+# Copyright (C) 2025  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ from seal import db, login_manager, bcrypt
 
 from flask_login import UserMixin
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -62,6 +62,52 @@ sample2team = db.Table(
         db.ForeignKey('sample.id'), primary_key=True
     )
 )
+
+sample2tag = db.Table(
+    'sample2tag',
+    db.Column('tag_ID', db.Integer, db.ForeignKey('tag.id'), primary_key=True),
+    db.Column('sample_ID', db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+)
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True, nullable=False)
+    color = db.Column(db.String(7), unique=False, nullable=False, default="#95A5A6")
+
+    samples = db.relationship(
+        'Sample', secondary=sample2tag, lazy='subquery',
+        backref=db.backref('tags', lazy=True)
+    )
+
+    def __repr__(self):
+        return f"Tag('{self.name}','{self.color}')"
+
+    def __str__(self):
+        return self.name
+
+
+sample2hpo = db.Table(
+    'sample2hpo',
+    db.Column('hpo_ID', db.Integer, db.ForeignKey('hpo.id'), primary_key=True),
+    db.Column('sample_ID', db.Integer, db.ForeignKey('sample.id'), primary_key=True)
+)
+
+class Hpo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    hpo = db.Column(db.String(10), unique=True, nullable=False)
+    label = db.Column(db.Text, nullable=True)
+
+    samples = db.relationship(
+        'Sample', secondary=sample2hpo, lazy='subquery',
+        backref=db.backref('hpos', lazy=True)
+    )
+
+    def __repr__(self):
+        return f"HPO('{self.hpo}: {self.label}')"
+
+    def __str__(self):
+        return f"{self.hpo}: {self.label}"
 
 
 class MutableList(Mutable, list):
@@ -171,6 +217,7 @@ class Sample(db.Model):
     affected = db.Column(db.Boolean(), default=False)
     index = db.Column(db.Boolean(), default=False)
     caller = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
+    wf_path = db.Column(db.String(500), unique=False, nullable=True)
 
     filter_id = db.Column(db.Integer, db.ForeignKey('filter.id'), nullable=True)
     filter = relationship("Filter", back_populates="samples")
@@ -298,13 +345,12 @@ class Var2Sample(db.Model):
     variant_ID = db.Column(db.Text, db.ForeignKey('variant.id'), primary_key=True)
     sample_ID = db.Column(db.Integer, db.ForeignKey('sample.id'), primary_key=True)
     
-    ## FAIRE EN JSON !!!!
     caller = db.Column(db.JSON, nullable=True)
     
     depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_depth = db.Column(db.Integer, nullable=True, unique=False)
     allelic_freq = db.Column(db.Float, nullable=True, unique=False)
-    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list()) # temporaire a supprimer
+    filter = db.Column(MutableList.as_mutable(db.ARRAY(db.String(30))), default=list())
     pass_filter = db.Column(db.Boolean, nullable=False, unique=False, default=False)
     
     reported = db.Column(db.Boolean, nullable=False, unique=False, default=False)
@@ -448,6 +494,19 @@ class Bed(db.Model):
             if region.varInRegion(variant):
                 return True
         return False
+
+    @classmethod
+    def varInBed_sql(cls, bed, variant_model):
+        conditions = []
+        for region in bed.regions:
+            conditions.append(
+                and_(
+                    variant_model.chr == region.chr,
+                    variant_model.pos >= region.start,
+                    variant_model.pos <= region.stop
+                )
+            )
+        return or_(*conditions) if conditions else False
 
 
 class Lane(db.Model):

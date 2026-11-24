@@ -19,7 +19,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import functools
+import glob
 import json
+import re
 import secrets
 import urllib
 
@@ -28,22 +30,24 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 from PIL import Image
+import markdown
 from flask import (flash, jsonify, redirect, render_template, request, url_for,
                    escape, abort)
 from flask_login import current_user, login_user, logout_user
 from flask_login.utils import EXEMPT_METHODS
 from flask_wtf.csrf import CSRFError
-from sqlalchemy import and_, or_
+from sqlalchemy import select, func, and_, or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload, selectinload, aliased
 from psycopg2.errors import UniqueViolation
 
 from seal import app, bcrypt, db, config
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
-                        UpdateAccountForm, UpdatePasswordForm, UploadClinvar)
+                        UpdateAccountForm, UpdatePasswordForm, UploadClinvarForm)
 from seal.models import (Bed, Comment_sample, Comment_variant, Family, Filter,
                          History, Omim, Region, Run, Sample, Team,
-                         Transcript, User, Variant, Var2Sample, Clinvar)
+                         Transcript, User, Variant, Var2Sample, Clinvar, Tag, Hpo)
 from seal.schedulers import update_clinvar
 
 
@@ -400,9 +404,35 @@ def about():
     Returns:
         A rendered template for the about page.
     """
+    releases = []
+    try:
+        with open(Path(app.root_path).parent.joinpath("RELEASE_NOTE.md"), "r") as release_file:
+            html = markdown.markdown(
+                release_file.read(),
+                extensions=["tables", "fenced_code"]
+            )
+        releases = [
+            {
+                "title": section[4:section.index("</h2>")],
+                "body": section[section.index("</h2>") + 5:]
+            }
+            for section in re.split(r"(?=<h2>)", html)
+            if section.startswith("<h2>")
+        ]
+    except Exception as error:
+        app.logger.warning(f"Unable to load release notes: {error}")
+    license_text = ""
+    try:
+        with open(Path(app.root_path).parent.joinpath("COPYING"), "r") as copying_file:
+            license_text = copying_file.read()
+    except Exception as error:
+        app.logger.warning(f"Unable to load license: {error}")
+
     return render_template(
         "essentials/about.html",
-        title="About"
+        title="About",
+        releases=releases,
+        license_text=license_text
     )
 
 
@@ -642,6 +672,12 @@ def sample(id):
 
     clinvar = Clinvar.query.filter(Clinvar.genome == config["GENOME"], Clinvar.current == True).one()
 
+    # Get BAM
+    bams = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(r'.*\.(cr|b)am$', files)]
+    beds = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(r'.*\.bed$', files)]
+    vcfs = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(rf'{sample.samplename}\.vcf$', files)]
+    covreport = [files for files in glob.iglob(f"{sample.wf_path}/**", recursive=True) if re.search(rf'{sample.samplename}_covreport\.pdf$', files)]
+
     return render_template(
         'analysis/sample.html', title=f'{sample.samplename}',
         sample=sample,
@@ -651,7 +687,12 @@ def sample(id):
         form=commentForm,
         saveFilterForm=saveFilterForm,
         clinvar = clinvar,
-        genome_version = config["GENOME"]
+        genome_version = config["GENOME"],
+        igv_path = config["IGV_PATH"],
+        bams = bams,
+        beds = beds,
+        vcfs = vcfs,
+        covreport = covreport
     )
 
 
@@ -768,8 +809,8 @@ def create_panel():
 @app.route("/update/clinvar", methods=['GET', 'POST'])
 @login_required
 @admin_required
-def update_clinvar():
-    UploadClinvarForm = UploadClinvar()
+def updload_clinvar():
+    UploadClinvarForm = UploadClinvarForm()
 
     if "submit" in request.form and UploadClinvarForm.validate_on_submit():
         version = int(UploadClinvarForm.version.data.strftime("%Y%m%d"))
@@ -870,32 +911,68 @@ def json_samples():
             - teams: a list of dictionaries, each containing the name and color
                      of a team associated with the sample
     """
+
+    # === 1. Subquery to retrieve the last action for each sample ===
+    last_action_cte = db.session.query(
+        History.sample_ID,
+        History.date,
+        History.user_ID,
+        History.action,
+        func.row_number().over(
+            partition_by=History.sample_ID,
+            order_by=History.date.desc()
+        ).label('row_num')
+    ).subquery()
+
+    last_action_subq = db.session.query(
+        last_action_cte.c.sample_ID,
+        last_action_cte.c.date.label('last_action_date'),
+        last_action_cte.c.user_ID.label('last_action_user_id'),
+        last_action_cte.c.action.label('last_action_action')
+    ).filter(
+        last_action_cte.c.row_num == 1
+    ).subquery()
+
+    last_action_alias = aliased(last_action_subq, name='last_action')
+
+    # === 2. Defining sortable columns ===
     key_list = {
         "asc": [
+            0,
             Sample.samplename.asc(),
             Family.family.asc(),
             Run.name.asc(),
             Run.alias.asc(),
             Sample.status.asc(),
-            Sample.lastAction.asc()
+            last_action_alias.c.last_action_date.asc()
         ],
         "desc": [
+            0,
             Sample.samplename.desc(),
             Family.family.desc(),
             Run.name.desc(),
             Run.alias.desc(),
             Sample.status.desc(),
-            Sample.lastAction.desc()
+            last_action_alias.c.last_action_date.desc()
         ]
     }
-    filters = or_(
-        Sample.samplename.op('~')(request.form['search[value]']),
-        Family.family.op('~')(request.form['search[value]']),
-        Run.name.op('~')(request.form['search[value]']),
-        Run.alias.op('~')(request.form['search[value]'])
+
+    # === 3. Main query with a join on last_action ===
+    base_query = Sample.query.outerjoin(
+        last_action_alias,
+        Sample.id == last_action_alias.c.sample_ID
+    ).add_columns(
+        last_action_alias.c.last_action_date,
+        last_action_alias.c.last_action_user_id,
+        last_action_alias.c.last_action_action
+    ).options(
+        joinedload(Sample.family),
+        joinedload(Sample.run),
+        joinedload(Sample.teams)
     )
 
-    samples = Sample.query
+    # === 4. Filters by teams (if user is not an admin) ===
+    samples = base_query
     if not current_user.admin:
         filter_samples_teams = or_(
             Sample.teams.any(Team.id.in_([t.id for t in current_user.teams])),
@@ -903,26 +980,56 @@ def json_samples():
         )
         samples = samples.filter(filter_samples_teams)
     recordsTotal = samples.count()
-    samples_filter = samples.outerjoin(Family, Sample.family)\
-                            .outerjoin(Run, Sample.run).filter(filters)
+
+    # === 5. Search filters and others ===
+    samples_filter = samples.outerjoin(Family, Sample.family).outerjoin(Run, Sample.run).outerjoin(Team, Sample.teams)
+    search_value = request.form.get('search[value]', '')
+    if search_value:
+        filters = or_(
+            Sample.samplename.op('~')(search_value),
+            Family.family.op('~')(search_value),
+            Run.name.op('~')(search_value),
+            Run.alias.op('~')(search_value)
+        )
+        samples_filter = samples_filter.filter(filters)
+
+    if request.form.get('index_filtering') in ('True', 'False'):
+        samples_filter = samples_filter.filter(
+            Sample.index == (request.form['index_filtering'] == 'True')
+        )
+    if request.form.get('affected_filtering') in ('True', 'False'):
+        samples_filter = samples_filter.filter(
+            Sample.affected == (request.form['affected_filtering'] == 'True')
+        )
+
     recordsFiltered = samples_filter.count()
-    samples = samples_filter\
-        .order_by(key_list[request.form['order[0][dir]']][int(request.form['order[0][column]'])])\
-        .offset(request.form["start"])\
-        .limit(request.form["length"])\
-        .all()
+
+    # === 6. Pagination and sorting (default: column 5 = lastAction.date, DESC) ===
+    start = int(request.form.get("start", 0))
+    length = int(request.form.get("length", 10))
+    order_dir = request.form.get('order[0][dir]', 'desc')
+    order_col = int(request.form.get('order[0][column]', 6))
+
+
+    ordered_samples = samples_filter.order_by(
+       key_list[order_dir][order_col]
+    ).offset(start).limit(length).all()
+
     samples_json = {
         "recordsTotal": recordsTotal,
         "recordsFiltered": recordsFiltered,
         "data": list()
     }
 
-    for sample in samples:
+    for sample_tuple in ordered_samples:
+        sample = sample_tuple[0]
         teams = []
         for team in sample.teams:
             teams.append({"teamname": team.teamname, "color": team.color})
         samples_json["data"].append({
             "id": sample.id,
+            "index": sample.index,
+            "affected": sample.affected,
             "samplename": sample.samplename,
             "family": sample.family.family if sample.familyid else None,
             "run": {
@@ -938,7 +1045,6 @@ def json_samples():
             "teams": teams
         })
     return jsonify(samples_json)
-
 
 
 @app.route("/json/comments/sample/<int:id>", methods=['GET', 'POST'])
@@ -983,7 +1089,7 @@ def json_comments_sample(id):
 @app.route("/json/variants/sample/<int:id>/bed/<int:idbed>", methods=['GET', 'POST'])
 @app.route("/json/variants/sample/<int:id>/version/<int:version>", methods=['GET', 'POST'])
 @login_required
-def json_variants(id, idbed=False, version=-1):
+def json_variants(id, idbed=None, version=-1):
     """
     Endpoint for retrieving all variants associated with a particular sample.
 
@@ -993,144 +1099,110 @@ def json_variants(id, idbed=False, version=-1):
                                Default is False.
         version (int, optional): The version number of the sample.
                                  Default is -1.
-
-
     Returns:
-        A JSON object with the following keys:
-        - data: A list of dictionaries, each representing a variant associated
-                with the sample.
-            Each dictionary has the following keys:
-            - annotations: A dictionary containing the main annotation for the
-                           variant.
-            - chr: The chromosome where the variant is located.
-            - id: The identifier of the variant.
-            - pos: The position of the variant.
-            - ref: The reference sequence for the variant.
-            - alt: The alternate sequence for the variant.
-            - filter: The filter status of the variant in the sample.
-            - depth: The sequencing depth of the variant in the sample.
-            - reported: A boolean indicating whether the variant was reported
-                        in the sample.
-            - class_variant: The class of the variant.
-            - allelic_depth: The allelic depth of the variant in the sample.
-            - allelic_frequency: The allelic frequency of the variant in the
-                                 sample.
-            - inseal: A dictionary containing information about the variant in
-                      SEAL database.
-                - occurrences: The number of occurrences of the variant.
-                - total_samples: The total number of samples.
-                - occurrences_family: The number of occurrences of the variant
-                                      within the same family.
-                - family_members: A list of family members with the variant.
-            - phenotypes: A list of phenotypes associated with the variant.
+        JSON: variants list with metadata
     """
-    sample = Sample.query.get(int(id))
+    # 1. Get sample with pre-loaded relations
+    sample = Sample.query.options(
+        selectinload(Sample.variants).selectinload(Var2Sample.variant),
+        joinedload(Sample.family).joinedload(Family.samples),
+        joinedload(Sample.run)
+    ).get(id)
+
     if not sample:
-        flash(f"Sample '{id}' not found! Please contact admin!",
-              category="error")
+        flash(f"Sample '{id}' not found! Please contact admin!", category="error")
         return redirect(url_for('index'))
 
-    if idbed >= 1:
-        bed = Bed.query.get(int(idbed))
+    # 2. Pre-loaded all sample variants
+    #    + bed filtering
+    bed = Bed.query.get(idbed) if idbed else None
+    query = Var2Sample.query.options(
+        joinedload(Var2Sample.variant),
+        joinedload(Var2Sample.sample)
+    ).filter(Var2Sample.sample_ID == id)
 
-    variants = {"data": list()}
+    if bed:
+        query = query.join(Variant).filter(
+            Bed.varInBed_sql(bed, Variant),
+        )
 
-    # Get all canonical trancripts
+    var2samples = query.all()
 
-    ##################################################
+    # 3. Pre-loaded all OMIM needed + max scores
+    all_symbols = set()
+    for v2s in var2samples:
+        if v2s.variant.annotations:
+            for annot in v2s.variant.annotations[version].get("ANN", []):
+                symbol = annot.get("SYMBOL")
+                if symbol:
+                    all_symbols.add(symbol)
 
-    for var2sample in sample.variants:
-        variant = var2sample.variant
-        try:
-            if bed and not bed.varInBed(variant):
-                continue
-        except NameError:
-            pass
-        if var2sample.hide:
-            continue
-        annotations = variant.annotations
-        main_annot = None
-        consequence_score = -999
-        canonical = False
-        refseq = False
-        protein_coding = False
-        preferred_transcript = False
-
-        for annot in annotations[version]["ANN"]:
-            current_consequence_score = annot['consequenceScore']
-            current_canonical = annot['canonical']
-            current_refseq = True if annot['SOURCE'] == 'RefSeq' else False
-            current_protein_coding = True if annot['BIOTYPE'] == 'protein_coding' else False
-            current_preferred_transcript = True if annot['Feature'] in current_user.transcripts else False
-
-            if preferred_transcript == current_preferred_transcript:
-                if refseq == current_refseq:
-                    if current_protein_coding and not protein_coding:
-                        canonical = current_canonical
-                        consequence_score = current_consequence_score
-                        refseq = current_refseq
-                        protein_coding = current_protein_coding
-                        preferred_transcript = current_preferred_transcript
-                        annot["preferred"] = preferred_transcript
-                        main_annot = annot
-                        continue
-                    if protein_coding and not current_protein_coding:
-                        continue
-                    if canonical and not current_canonical:
-                        continue
-                    if not canonical and current_canonical:
-                        canonical = current_canonical
-                        consequence_score = current_consequence_score
-                        refseq = current_refseq
-                        protein_coding = current_protein_coding
-                        preferred_transcript = current_preferred_transcript
-                        annot["preferred"] = preferred_transcript
-                        main_annot = annot
-                        continue
-                    if current_consequence_score > consequence_score:
-                        canonical = current_canonical
-                        consequence_score = current_consequence_score
-                        refseq = current_refseq
-                        protein_coding = current_protein_coding
-                        preferred_transcript = current_preferred_transcript
-                        annot["preferred"] = preferred_transcript
-                        main_annot = annot
-                        continue
-                    continue
-
-                if current_refseq:
-                    canonical = current_canonical
-                    consequence_score = current_consequence_score
-                    refseq = current_refseq
-                    protein_coding = current_protein_coding
-                    preferred_transcript = current_preferred_transcript
-                    annot["preferred"] = preferred_transcript
-                    main_annot = annot
-                    continue
-                continue
-
-            if current_preferred_transcript:
-                canonical = current_canonical
-                consequence_score = current_consequence_score
-                refseq = current_refseq
-                protein_coding = current_protein_coding
-                preferred_transcript = current_preferred_transcript
-                annot["preferred"] = preferred_transcript
-                main_annot = annot
-                continue
-
-            if main_annot is None:
-                canonical = current_canonical
-                consequence_score = current_consequence_score
-                refseq = current_refseq
-                protein_coding = current_protein_coding
-                preferred_transcript = current_preferred_transcript
-                annot["preferred"] = preferred_transcript
-                main_annot = annot
-                continue
-        omims = Omim.query.filter(or_(Omim.geneSymbols.contains([main_annot["SYMBOL"]]), Omim.approvedGeneSymbol==main_annot["SYMBOL"])).all()
-        phenotypes = list()
+    omims_dict = {}
+    if all_symbols:
+        omims = Omim.query.filter(
+            or_(
+                Omim.geneSymbols.contains(list(all_symbols)),
+                Omim.approvedGeneSymbol.in_(list(all_symbols))
+            )
+        ).all()
         for omim in omims:
+            for symbol in omim.geneSymbols:
+                omims_dict[symbol] = omim
+            omims_dict[omim.approvedGeneSymbol] = omim
+
+    # 4. Pre-computed occurences
+    occurrences_query = db.session.query(
+        Var2Sample.variant_ID,
+        func.count().label("total_occurrences"),
+        func.count().filter(Sample.runid == sample.runid).label("run_occurrences"),
+        func.count().filter(Var2Sample.hide == True).label("hidden_occurrences")
+    ).join(Sample, Var2Sample.sample_ID == Sample.id).group_by(Var2Sample.variant_ID)
+
+    occurrences_data = {row.variant_ID: {"total": row.total_occurrences, "run": row.run_occurrences, "hidden": row.hidden_occurrences}
+                        for row in occurrences_query.all()}
+
+    # 5. Get Main annotation
+    def get_main_annot(annotations, version, user_transcripts):
+        ann_list = annotations[version].get("ANN", [])
+        if not ann_list:
+            return None
+
+        def get_priority(annot):
+            priority = 0
+            annot["preferred"] = False
+            if annot.get("Feature") in user_transcripts:
+                annot["preferred"] = True
+                priority += 1000
+            if annot.get("canonical", False):
+                priority += 500
+            if annot.get("SOURCE") == "RefSeq":
+                priority += 200
+            if annot.get("BIOTYPE") == "protein_coding":
+                priority += 100
+            priority += annot.get("consequenceScore", 0)
+            return priority
+
+        sorted_ann = sorted(ann_list, key=get_priority, reverse=True)
+        return sorted_ann[0] if sorted_ann else None
+
+    # 6. Construct response
+    variants = {"data": []}
+    for var2sample in var2samples:
+        variant = var2sample.variant
+        main_annot = get_main_annot(variant.annotations, version, current_user.transcripts)
+        
+        missenses_max = max(
+            (float(annot["missensesMean"]) for annot in variant.annotations[version].get("ANN", [])
+            if annot.get("missensesMean") is not None),
+            default=None
+        )
+        if not main_annot:
+            continue
+
+        symbol = main_annot.get("SYMBOL")
+        omim_list = [omims_dict[symbol]] if symbol in omims_dict else []
+        phenotypes = []
+        for omim in omim_list:
             for pheno in omim.phenotypes:
                 phenotypes.append({
                     "id": pheno.id,
@@ -1139,79 +1211,88 @@ def json_variants(id, idbed=False, version=-1):
                     "inheritances": str(pheno.inheritances),
                     "phenotypeMappingKey": pheno.phenotypeMappingKey
                 })
-        members = []
-        t = dict()
-        if sample.familyid is not None:
+
+        family_members = {}
+        if sample.familyid:
             for s in sample.family.samples:
                 if s == sample or s.status < 1:
                     continue
-                t[str(s)] = dict()
-                req = Var2Sample.query.filter_by(variant_ID=var2sample.variant_ID, sample_ID=s.id).one_or_none()
-                if req:
-                    members.append(s.samplename)
-                    t[str(s)] = {
-                        "depth": f"{req.depth}",
-                        "allelic_depth": f"{req.allelic_depth}",
-                        "allelic_frequency": f"{req.allelic_freq}",
-                        "filter": req.filter,
+                v2s_family = Var2Sample.query.filter_by(
+                    variant_ID=var2sample.variant_ID,
+                    sample_ID=s.id
+                ).one_or_none()
+                if v2s_family:
+                    allelic_freq = v2s_family.allelic_depth / v2s_family.depth if v2s_family.depth > 0 else 0
+                    family_members[s.samplename] = {
+                        "depth": v2s_family.depth,
+                        "allelic_depth": v2s_family.allelic_depth,
+                        "allelic_frequency": f"{allelic_freq:.4f}",
+                        "filter": v2s_family.filter,
                     }
                 else:
-                    t[str(s)] = {
-                        "depth": f"NA",
-                        "allelic_depth": f"NA",
-                        "allelic_frequency": f"NA",
-                        "filter": f"NA",
+                    family_members[s.samplename] = {
+                        "depth": "NA",
+                        "allelic_depth": "NA",
+                        "allelic_frequency": "NA",
+                        "filter": "NA",
                     }
 
-        calls = dict()
-        for caller in var2sample.caller:
+        allelic_frequency = (
+            var2sample.allelic_freq
+            if var2sample.allelic_freq is not None
+            else (var2sample.allelic_depth / var2sample.depth if var2sample.depth > 0 else 0)
+        )
+
+        calls = {}
+        for caller, data in var2sample.caller.items():
             try:
-                c = var2sample.caller[caller]
-                allelic_frequency = c["allelic_depth"] / c["depth"]
-                calls[caller] = dict(
-                    {"filter": c["filter"],
-                    "depth": c["depth"],
-                    "allelic_depth": c["allelic_depth"],
-                    "allelic_frequency": f"{allelic_frequency:.4f}",
-                    "allelic_freq": f"{c['allelic_freq']:.4f}"}
-                )
-            except:
-                 calls[caller] = None
-        allelic_frequency = var2sample.allelic_freq if var2sample.allelic_freq else var2sample.allelic_depth / var2sample.depth
+                allelic_freq_caller = data["allelic_depth"] / data["depth"] if data["depth"] > 0 else 0
+                calls[caller] = {
+                    "filter": data["filter"],
+                    "depth": data["depth"],
+                    "allelic_depth": data["allelic_depth"],
+                    "allelic_frequency": f"{allelic_freq_caller:.4f}",
+                    "allelic_freq": f"{data.get('allelic_freq', allelic_freq_caller):.4f}"
+                }
+            except (TypeError, KeyError, ZeroDivisionError):
+                calls[caller] = None
+
+        variant_id = var2sample.variant_ID
+        total_occurrences = occurrences_data.get(variant_id, {}).get("total", 0)
+        run_occurrences = occurrences_data.get(variant_id, {}).get("run", 0)
+
         variants["data"].append({
             "annotations": main_annot,
-            "chr": f"{variant.chr}",
+            "chr": variant.chr,
             "clinvar": {
-                "VARID" : variant.clinvar_VARID,
-                "CLNSIG" : variant.clinvar_CLNSIG,
-                "CLNSIGCONF" : variant.clinvar_CLNSIGCONF,
-                "CLNREVSTAT" : variant.clinvar_CLNREVSTAT
+                "VARID": variant.clinvar_VARID,
+                "CLNSIG": variant.clinvar_CLNSIG,
+                "CLNSIGCONF": variant.clinvar_CLNSIGCONF,
+                "CLNREVSTAT": variant.clinvar_CLNREVSTAT
             },
-            # "scores": {
-            #     "MES_var" : variant.MES_var,
-            #     "spliceAI" : variant.spliceAI,
-            #     "missensesMean" : variant.missensesMean,
-            #     "gnomADg_AF" : variant.gnomADg_AF
-            # },
             "caller": calls,
-            "id": f"{variant.id}",
-            "pos": f"{variant.pos}",
-            "ref": f"{variant.ref}",
-            "alt": f"{variant.alt}",
+            "id": variant.id,
+            "pos": variant.pos,
+            "ref": variant.ref,
+            "alt": variant.alt,
             "filter": var2sample.filter,
-            "depth": f"{var2sample.depth}",
+            "depth": var2sample.depth,
             "reported": var2sample.reported,
             "class_variant": variant.class_variant,
-            "allelic_depth": f"{var2sample.allelic_depth}",
+            "allelic_depth": var2sample.allelic_depth,
             "allelic_frequency": f"{allelic_frequency:.4f}",
+            "missenses_max": missenses_max,
             "inseal": {
-                "occurrences": Var2Sample.query.filter(Var2Sample.variant == variant).count(),
-                "occurences_family": len(members),
-                "family_members": members
+                "hidden": occurrences_data.get(variant_id, {}).get("hidden", 0),
+                "occurrences": total_occurrences,
+                "occurrences_run": run_occurrences,
+                "occurrences_family": len(family_members),
+                "family_members": list(family_members.keys())
             },
+            "hide": var2sample.hide,
             "phenotypes": phenotypes,
-            "family": t,
-            "omims": [o.mimNumber for o in omims]
+            "family": family_members,
+            "omims": [o.mimNumber for o in omim_list]
         })
     return jsonify(variants)
 
@@ -1512,6 +1593,7 @@ def json_variant(id, version=-1, sample=None):
                 current = True
             allelic_frequency = v2s.allelic_depth / v2s.depth
             samples.append({
+                "id": v2s.sample.id,
                 "samplename": v2s.sample.samplename,
                 "affected": v2s.sample.affected,
                 "family": v2s.sample.family.family if v2s.sample.family else "",
@@ -1620,10 +1702,63 @@ def edit_family():
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"New Family created : '{family.family}' (id: {family.id})")
             db.session.add(history)
         if sample.family:
+            if sample.familyid == family.id:
+                return "ok"
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family edited : '{sample.family.family}' (id: {sample.familyid}) -> '{family.family}' (id: {family.id})")
         else:
             history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Family added : '{family.family}' (id: {family.id})")
         sample.familyid = family.id
+
+    db.session.add(history)
+    db.session.commit()
+
+    return "ok"
+
+
+@app.route("/edit/sample/run", methods=['POST'])
+@login_required
+def edit_run():
+    """
+    Edits the run associated to a sample.
+
+    This function handles a POST request to edit the run associated to a
+    sample. It gets the new name run from the request's form data and
+    updates the `run` field of the sample in the database. It also creates a
+    new `History` record in the database to log the action.
+
+    Returns:
+        str: "No Changes" if the new name is the same as the old name, "ok" if
+             the update was successful.
+
+    Raises:
+        InvalidAPIUsage: If the run name is less than 2 or more than 20
+                         characters long.
+    """
+    sample_id = request.form["sample_id"]
+    new_run = request.form["new_run"]
+    sample = Sample.query.get(sample_id)
+
+    if not new_run:
+        if sample.runid:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Run removed : '{sample.run.name}' (id: {sample.runid})")
+            sample.runid = None
+        else:
+            return "ok"
+    else:
+        run = Run.query.filter(Run.name == new_run).first()
+        if not run:
+            run = Run(name=new_run)
+            db.session.add(run)
+            db.session.commit()
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"New Run created : '{run.name}' (id: {run.id})")
+            db.session.add(history)
+        if sample.run:
+            if sample.runid == run.id:
+                return "ok"
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Run edited : '{sample.run.name}' (id: {sample.runid}) -> '{run.name}' (id: {run.id})")
+        else:
+            history = History(sample_ID=sample_id, user_ID=current_user.id, date=datetime.now(), action=f"Run added : '{run.name}' (id: {run.id})")
+        sample.runid = run.id
 
     db.session.add(history)
     db.session.commit()
@@ -1702,14 +1837,13 @@ def toggle_varhideall():
     Returns:
         str: The array of unhide variants
     """
-    var_hide=list()
     sample_id = request.form["sample_id"]
+    return_value = False
     for v2s in Sample.query.get(sample_id).variants:
         if not v2s.hide:
             continue
         v2s.hide = not v2s.hide
         return_value = v2s.hide
-        var_hide.append(str(v2s))
         db.session.commit()
 
         report = "Hide" if v2s.hide else "Show"
@@ -1998,33 +2132,234 @@ def toggle_user_sidebar():
     db.session.commit()
     return "OK"
 
-# from anacore.vcf import VCFIO, VCFRecord, HeaderInfoAttr, HeaderFormatAttr
-# import tempfile
-
-# @app.route("/variants/all/vcf")
-# def get_variant_vcf():
-#     """
-#     Send variant into vcf.
-
-#     Returns:
-#         str: Returns all variants into a vcf file.
-#     """
-#     handle, filepath = tempfile.mkstemp(suffix=".vcf.gz")
-#     with VCFIO(filepath, "w") as writer:
-#         writer.samples = ["my_sample"]
-#         writer.extra_header = [
-#             "##source=seal",
-#         ]
-#         writer.info = {
-#             "DB": HeaderInfoAttr("DB", "dbSNP membership, build 129", "Flag", 0)
-#         }
-#         writer.format = {
-#             "AF": HeaderFormatAttr("AF", "Allele Frequency", "Float", "A")
-#         }
-#         writer.writeHeader()
-#         writer.writer(VCFRecord("chr3", "12", '', "A", "T", 30, ["PASS"], {'DB':'T'}, ["AF"], {"10"}))
-#         # for record in vcf_record_list:
-#         #     writer.write(record)
-#     return send_file()
-
 ###############################################################################
+
+@app.route('/api/tags', methods=['GET', 'POST'])
+@login_required
+def api_tags():
+    if request.method == 'GET':
+        tags = Tag.query.all()
+        return jsonify([{
+            'id': tag.id,
+            'name': tag.name,
+            'color': tag.color
+        } for tag in tags])
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        name = data.get('name')
+        color = data.get('color', None)
+
+        if not name:
+            return jsonify({'error': 'Name is required'}), 400
+
+        existing_tag = Tag.query.filter_by(name=name).first()
+        if existing_tag:
+            return jsonify({
+                'id': existing_tag.id,
+                'name': existing_tag.name,
+                'color': existing_tag.color,
+                'exists': True
+            })
+
+        new_tag = Tag(name=name, color=color)
+        db.session.add(new_tag)
+        db.session.commit()
+
+        return jsonify({
+            'id': new_tag.id,
+            'name': new_tag.name,
+            'color': new_tag.color
+        })
+
+@app.route('/api/sample/<int:sample_id>/tags', methods=['POST', 'DELETE'])
+@login_required
+def manage_sample_tags(sample_id):
+    sample = Sample.query.get_or_404(sample_id)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        tag_id = data.get('tag_id')
+        if not tag_id:
+            return jsonify({'error': 'tag_id is required'}), 400
+
+        tag = Tag.query.get(tag_id)
+        if not tag:
+            return jsonify({'error': 'Tag not found'}), 404
+
+        if tag in sample.tags:
+            return jsonify({'error': 'Tag already associated'}), 400
+
+        sample.tags.append(tag)
+        db.session.commit()
+
+        history = History(
+            user_ID=current_user.id,
+            sample_ID=sample.id,
+            date=datetime.now(),
+            action=f"Added tag: {tag.name}"
+        )
+        db.session.add(history)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'tag': {
+                'id': tag.id,
+                'name': tag.name,
+                'color': tag.color
+            }
+        })
+
+    elif request.method == 'DELETE':
+        data = request.get_json()
+        tag_id = data.get('tag_id')
+        if not tag_id:
+            return jsonify({'error': 'tag_id is required'}), 400
+
+        tag = Tag.query.get(tag_id)
+        if not tag:
+            return jsonify({'error': 'Tag not found'}), 404
+
+        if tag in sample.tags:
+            sample.tags.remove(tag)
+            db.session.commit()
+
+            history = History(
+                user_ID=current_user.id,
+                sample_ID=sample.id,
+                date=datetime.now(),
+                action=f"Removed tag: {tag.name}"
+            )
+            db.session.add(history)
+            db.session.commit()
+
+        return jsonify({'success': True})
+
+
+# ===============================================================
+
+
+@app.route('/api/hpos', methods=['GET', 'POST'])
+@login_required
+def api_hpo():
+    if request.method == 'GET':
+        search_term = request.args.get('q', '').strip()
+        id_hpo = request.args.get('id', '').strip()
+
+        query = Hpo.query
+
+        if search_term:
+            query = query.filter(
+                or_(
+                    Hpo.hpo.ilike(f'%{search_term}%'),
+                    Hpo.label.ilike(f'%{search_term}%')
+                )
+            )
+        if id_hpo:
+            query = query.filter(
+                Hpo.id == int(id_hpo)
+            )
+
+        hpos = query.limit(10).all()
+
+        results = [{
+            'id': hpo.id,
+            'hpo': hpo.hpo,
+            'label': hpo.label,
+            'display': f"{hpo.hpo} : {hpo.label}"
+        } for hpo in hpos]
+
+        return jsonify(results)
+
+    elif request.method == 'POST':
+        data = request.get_json()
+        id = data.get('id')
+        hpo = data.get('hpo')
+        label = data.get('label', None)
+
+        if not id:
+            return jsonify({'error': 'ID is required'}), 400
+
+        existing_hpo = Hpo.query.filter_by(id=id).first()
+        if existing_hpo:
+            return jsonify({
+                'id': existing_hpo.id,
+                'hpo': existing_hpo.hpo,
+                'label': existing_hpo.label,
+                'exists': True
+            })
+
+        new_hpo = Hpo(id=id, label=label)
+        db.session.add(new_hpo)
+        db.session.commit()
+
+        return jsonify({
+            'id': new_hpo.id,
+            'hpo': new_hpo.hpo,
+            'label': new_hpo.label
+        })
+
+@app.route('/api/sample/<int:sample_id>/hpos', methods=['POST', 'DELETE'])
+@login_required
+def manage_sample_hpos(sample_id):
+    sample = Sample.query.get_or_404(sample_id)
+
+    if request.method == 'POST':
+        data = request.get_json()
+        hpo_id = data.get('hpo_id')
+        if not hpo_id:
+            return jsonify({'error': 'hpo_id is required'}), 400
+
+        hpo = Hpo.query.get(hpo_id)
+        if not hpo:
+            return jsonify({'error': 'HPO not found'}), 404
+
+        if hpo in sample.hpos:
+            return jsonify({'error': 'HPO already associated'}), 400
+
+        sample.hpos.append(hpo)
+        db.session.commit()
+
+        history = History(
+            user_ID=current_user.id,
+            sample_ID=sample.id,
+            date=datetime.now(),
+            action=f"Added HPO: {hpo.hpo}"
+        )
+        db.session.add(history)
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'hpo': {
+                'id': hpo.id,
+                'hpo': hpo.hpo,
+                'label': hpo.label,
+            }
+        })
+
+    elif request.method == 'DELETE':
+        data = request.get_json()
+        hpo_id = data.get('hpo_id')
+        if not hpo_id:
+            return jsonify({'error': 'hpo_id is required'}), 400
+
+        hpo = Hpo.query.get(hpo_id)
+        if not hpo:
+            return jsonify({'error': 'HPO not found'}), 404
+
+        if hpo in sample.hpos:
+            sample.hpos.remove(hpo)
+            db.session.commit()
+
+            history = History(
+                user_ID=current_user.id,
+                sample_ID=sample.id,
+                date=datetime.now(),
+                action=f"Removed HPO: {hpo.hpo}"
+            )
+            db.session.add(history)
+            db.session.commit()
+
+        return jsonify({'success': True})

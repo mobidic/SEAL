@@ -14,12 +14,50 @@
     <div class="w3-main {% if sample.status == 5 %}w3-disabled{% endif %}">
         <div class="w3-container">
             <div class="w3-center">
-                <h1>{{ sample.samplename}}</h1>
+                <h1>{{ sample.samplename }}</h1>
                 {% include 'includes/button-status-sample.j2' %}
             </div>
             <hr>
         </div>
         <div class="w3-padding w3-small">
+            <div class="w3-row">
+                <div class="w3-col s12 m6 l6">
+                    <h3><i class="w3-text-flat-green-sea fas fa-tags"></i> Tags</h3>
+                    <div id="sample-tags-container-{{ sample.id }}" class="w3-margin-top">
+                        {% for tag in sample.tags %}
+                        <span class="w3-tag sample-tag sample-tag-colors w3-round"
+                            style="background-color: {{ tag.color }}99;border:1px solid {{ tag.color }}4D;">
+                            {{ tag.name }}
+                            <i class="fas fa-times" style="cursor: pointer;"
+                            onclick="removeTag({{ sample.id }}, {{ tag.id }}, this)"></i>
+                        </span>
+                        {% endfor %}
+
+                        <span onclick="showAddTagAlert({{ sample.id }})"
+                                class="w3-tag sample-tag sample-tag-add-button w3-round">
+                            <i class="fas fa-plus"></i> Add a tag
+                        </span>
+                    </div>
+                </div>
+                <div class="w3-col s12 m6 l6">
+                    <h3><i class="w3-text-flat-green-sea fa-solid fa-shield-virus"></i> HPO</h3>
+                    <div id="sample-hpos-container-{{ sample.id }}" class="w3-margin-top">
+                        {% for hpo in sample.hpos %}
+                        <span class="w3-tag sample-hpo w3-round " aria-label="{{ hpo.label }}" data-balloon-pos="down">
+                            {{ hpo.hpo }}
+                            <i class="fas fa-times" style="cursor: pointer;"
+                            onclick="removeHPO({{ sample.id }}, {{ hpo.id }}, this)"></i>
+                        </span>
+                        {% endfor %}
+
+                        <span onclick="showAddHPOAlert({{ sample.id }})"
+                                class="w3-hpo sample-hpo sample-hpo-add-button w3-round">
+                            <i class="fas fa-plus"></i> Add HPO
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <div class="seal-form-report w3-row w3-padding {% if sample.status == 4 %}w3-disabled {% endif %}">
                 <div class="w3-col l4 m6 s12 w3-row w3-padding">
                     <div class="w3-col w3-text-flat-green-sea l6 m6 s6"><p><i class="fa fa-filter fa-xl"></i> <b>Choose a filter</b></p></div>
@@ -41,173 +79,385 @@
                         <tr>
                             <th rowspan="2" class='min-size-75'><span class="seal-display-middle-left w3-small">Gene</span></th>
                             <th rowspan="2" class='min-size-200 w3-border-right'><span class="seal-display-middle-left w3-small">HGVS</span></th>
-                            <th rowspan="2" class="min-size-75 w3-border-right"><span class="seal-display-middle-left w3-small" style="left:10px;">Exon/intron</span></th>
+                            <th rowspan="2" class="min-size-50 w3-border-right"><span class="seal-display-middle-left w3-small" style="left:10px;">Exon<br/>Intron</span></th>
                             <th colspan="{{ sample.caller|length }}" class="w3-border-right">Variant</th>
                             {% if family_members|length > 0 %}
                                 <th colspan="{{ family_members|length }}" class="w3-border-right">Family<br /><span class="w3-text-flat-pumpkin w3-tiny"><i class="fa-solid fa-triangle-exclamation"></i> Only max values</span></th>
                             {% endif %}
-                            <th rowspan="2" class="w3-border-right min-size-100"><span class="seal-display-middle-left w3-small">Population Frequency</span></th>
-                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
-                            <th rowspan="2" class="w3-border-right w3-small"><span class="seal-display-middle-left">Consequences</span></th>
+                            <th colspan="2" class="w3-border-right min-size-150"><span class="w3-small">Occurencies</span></th>
+                            <th rowspan="2" class="w3-border-right min-size-150"><span class="seal-display-middle-left w3-small">Clinical Informations<br /><span class="w3-tiny">Clinvar/OMIM</span></span></th>
+                            <th rowspan="2" class="w3-border-right w3-small min-size-150"><span class="seal-display-middle-left">Consequences</span></th>
                             <th colspan="2" class="w3-border-right">Predictions</th>
-                            <!-- <th  rowspan="2" class='min-size-2x5'><span class="seal-display-middle">R</span></th> -->
-                            <th  rowspan="2" class='min-size-75'><span class="seal-display-middle">Class</span></th>
+                            <th  rowspan="2" class='' style="max-width:13px !important; padding:10px !important;"><span class="seal-display-middle-left" style=" margin-left:-20px !important;transform: rotate(-90deg);">Class</span></th>
                             <th  rowspan="2" class=''></th>
                         </tr>
                         <tr>
-                            <!-- <th class='min-size-75'>HGVSg</th> -->
-                            <!-- <th class='min-size-200'>HGVS</th> -->
-                            <!-- <th class='min-size-75'>HGVSp</th> -->
-                            <!-- <th class='min-size-50'>E|I</th> -->
-                            <!-- <th class='min-size-75'>Filter</th> -->
                             {% for c in sample.caller %}
                                 <th class='min-size-75'>{{ c }}</th>
                             {% endfor %}
                             {% for s in family_members %}
                                 <th class='min-size-75'>{{ s }}</th>
                             {% endfor %}
-                            <!-- <th class='min-size-100'>GnomAD</th> -->
-                            <!-- <th class='min-size-75'>SEAL</th> -->
-                            <!-- <th class='min-size-100'>ClinVar</th>
-                            <th class='min-size-75'>Transmission</th> -->
-                            <!-- <th class='min-size-150'>Impact</th>
-                            <th class='min-size-75'>Consequence</th> -->
-                            <!-- <th class='min-size-50'>MaxEnt</th> -->
-                            <th class='min-size-50'>MaxEnt/SpliceAI</th>
-                            <th class='min-size-50'>Missense</th>
+                            <th class='min-size-100'>GnomAD</th>
+                            <th class='min-size-75'>Seal</th>
+                            <th class='min-size-100'>MaxEnt/SpliceAI</th>
+                            <th class='min-size-75'>Missense</th>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
                             <th>
-                                <span title="Help" onclick="openHelp(title='Gene', content='The gene symbol (e.g. HGNC) (where available) to the output.', footer='For more information see : <a  href=\'https://www.genenames.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>HGNC</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Gene',
+                                        content=`The gene symbol (e.g. HGNC) (where available) to the output.`,
+                                        footer=`For more information see : <a href='https://www.genenames.org/' target='_blank' style='text-decoration:underline'><i>HGNC</i></a>`
+                                    )"
+                                    class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 Gene
                             </th>
-                            <!-- <th></th> -->
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='HGVSg', content='The HGVS genomic sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                HGVSg
-                            </th> -->
                             <th class="">
-                                <span title="Help" onclick="openHelp(title='HGVS', content='The HGVS coding sequence name.<br /><br />Canonical transcript is defined by Ensembl algorithm following :<br /><ol><li>Longest CCDS translation with no stop codons.</li><li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li><li>If no (2), choose the longest translation with no stop codons.</li><li>If no translation, choose the longest non-protein-coding transcript.</li></ol><br /><ul><li>the transcript is the canonical transcript for the gene<ul><li><i class=\'fas fa-star\'></i> (<i>canonical</i>)</li><li><i class=\'far fa-star\'></i> (<i>non canonical</i>)</li></ul></li><li>the transcript is one of your selected transcripts<ul><li><i class=\'w3-text-flat-peter-river fas fa-tint\'></i> (<i>selected</i>)</li><li><i class=\'fas fa-tint\'></i> (<i>not selected</i>)</li></ul></li></ul>', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>, <a  href=\'http://www.ensembl.org/info/genome/genebuild/canonical.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'{{ url_for('transcripts') }}\' target=\'_blank\' style=\'text-decoration:underline\'><i>Transcripts in SEAL</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help" onclick="openHelp(
+                                        title='HGVS',
+                                        content=`
+                                            HGVS nomenclature.<br />
+                                            Canonical transcript is defined by Ensembl algorithm following :<br />
+                                            <ol>
+                                                <li>Longest CCDS translation with no stop codons.</li>
+                                                <li>If no (1), choose the longest Ensembl/Havana merged translation with no stop codons.</li>
+                                                <li>If no (2), choose the longest translation with no stop codons.</li>
+                                                <li>If no translation, choose the longest non-protein-coding transcript.</li>
+                                            </ol>
+                                            <ul>
+                                                <li>the transcript is the canonical transcript for the gene
+                                                    <ul>
+                                                        <li><i class='fas fa-star'></i> (<i>canonical</i>)</li>
+                                                        <li><i class='far fa-star'></i> (<i>non canonical</i>)</li>
+                                                    </ul>
+                                                </li>
+                                                <li>the transcript is one of your selected transcripts
+                                                    <ul>
+                                                        <li><i class='w3-text-flat-peter-river fas fa-tint'></i> (<i>selected</i>)</li>
+                                                        <li><i class='fas fa-tint'></i> (<i>not selected</i>)</li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        `,
+                                        footer=`For more information see : <a  href='https://varnomen.hgvs.org/' target='_blank' style='text-decoration:underline'><i>varnomen</i></a>, <a  href='http://www.ensembl.org/info/genome/genebuild/canonical.html' target='_blank' style='text-decoration:underline'><i>VEP documentation</i></a> & <a  href='{{ url_for('transcripts') }}' target='_blank' style='text-decoration:underline'><i>Transcripts in SEAL</i></a>`
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                HGVSc
+                                HGVS
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='HGVSp', content='The HGVS protein sequence name', footer='For more information see : <a  href=\'https://varnomen.hgvs.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>varnomen</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                HGVSp
-                            </th> -->
                             <th>
-                                <span title="Help" onclick="openHelp(title='Exon/Intron', content='The number of the exon or intron wich have the variant.<br/><b>Exons are in bold</b>, <i>introns in italics.</i>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Exon/Intron',
+                                        content=`The number of the exon or intron wich have the variant.<br />
+                                        <span class='w3-text-flat-nephritis'><b>Exons are in bold</b></span>, <span class='w3-text-flat-wisteria'><i>introns in italics.</i></span>`
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 E|I
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Filter', content='Filters applied to the variant.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                            {% for c in sample.caller %}
+                            <th>
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Variant Calling Informations',
+                                        content=`
+                                            Frequency of the observed allele for the sample, Allelic Depth/Depth and Filters<br />
+                                            Genotypes :
+                                            <ul>
+                                                <li><i class='fas fa-circle'></i> Homozygous alt/alt (>= 0.75)</li>
+                                                <li><i class='fas fa-adjust'></i> Heterozygous ref/alt (< 0.75)</li>
+                                                <li><i class='far fa-dot-circle'></i> Mosaicism (< 0.25)</li>
+                                                <li><i class='far fa-question-circle'></i> Unknown status</li>
+                                            </ul>
+                                            Filters :
+                                            <ul>
+                                                <li><i class='fas fa-flag w3-text-flat-green-sea'></i> PASS</li>
+                                                <li><i class='fas fa-flag w3-text-flat-pomegranate'></i> NOT PASS</li>
+                                            </ul>
+                                        `
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
-                                Filter
-                            </th> -->
-                            {% for c in sample.caller %}
-                                <th>
-                                    <span title="Help" onclick="openHelp(title='Allelic frequencie', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                        <i class="fas fa-question-circle w3-tiny"></i>
-                                    </span>
-                                    {{ c }}
-                                </th>
+                                {{ c }}
+                            </th>
                             {% endfor %}
                             {% for s in family_members %}
                                 <th>
-                                    <span title="Help" onclick="openHelp(title='{{ s }}', content='Frequence of the observed allele for the sample, and  Allelic Depth/Depth<br />Genotypes :<ul><li><i class=\'far fa-dot-circle\'></i> Mosaicism (< 0.25)</li><li><i class=\'fas fa-adjust\'></i> Heterozygous ref/alt (< 0.75)</li><li><i class=\'fas fa-circle\'></i> Homozygous alt/alt (>= 0.75)</li><li><i class=\'far fa-question-circle\'></i> Unknown status</li></ul>', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <span title="Help"
+                                        onclick="openHelp(
+                                            title='Variant Calling Informations (family member)',
+                                            content=`
+                                                Frequency of the observed allele for a family member, Allelic Depth/Depth and Filters<br />
+                                                Kee in mind that only highest contrast values are visibles. (highest DP, highest AD, highest genotypes)
+                                                Genotypes :
+                                                <ul>
+                                                    <li><i class='fas fa-circle'></i> Homozygous alt/alt (>= 0.75)</li>
+                                                    <li><i class='fas fa-adjust'></i> Heterozygous ref/alt (< 0.75)</li>
+                                                    <li><i class='far fa-dot-circle'></i> Mosaicism (< 0.25)</li>
+                                                    <li><i class='far fa-question-circle'></i> Unknown status</li>
+                                                </ul>
+                                                Filters (if at least one variant caller flag as PASS it is considered as PASS):
+                                                <ul>
+                                                    <li><i class='fas fa-flag w3-text-flat-green-sea'></i> PASS</li>
+                                                    <li><i class='fas fa-flag w3-text-flat-pomegranate'></i> NOT PASS</li>
+                                                </ul>
+                                            `
+                                        )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                         <i class="fas fa-question-circle w3-tiny"></i>
                                     </span>
                                     {{ s }}
                                 </th>
                             {% endfor %}
                             <th>
-                                <span title="Help" onclick="openHelp(title='GnomAD', content='The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.', footer='For more information see : <a  href=\'https://gnomad.broadinstitute.org\' target=\'_blank\' style=\'text-decoration:underline\'><i>GnomAD website</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help" 
+                                    onclick="openHelp(
+                                        title='Population Frequency',
+                                        content=`The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.<br />
+                                        You can see the highest population occurences.<br />
+                                        The number of occurences for this variant among all database and into the run are also visible here.`,
+                                        footer=`For more information see : <a  href='https://gnomad.broadinstitute.org' target='_blank' style='text-decoration:underline'><i>GnomAD website</i></a>`)" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                 <i class="fas fa-question-circle w3-tiny"></i>
                             </span>
                                 GnomAD
                             </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='SEAL', content='The number of occurences for this variant among all database.', footer='')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                SEAL
-                            </th> -->
                             <th>
-                                <span title="Help" onclick="openHelp(title='ClinVar', content='ClinVar clinical significance of the variant.<br /><ul><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i> : practice guideline</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : reviewed by expert panel</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, multiple submitters, no conflicts</li><li><i class=\'fa-solid fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : criteria provided, conflicting interpretations or single submitter</li><li><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i><i class=\'fa-regular fa-star fa-2xs\'></i> : no assertion </li></ul><br /><ul><li><span class=\'w3-tag w3-flat-turquoise\'>Benign\Likely Benign</span></li><li><span class=\'w3-tag w3-flat-peter-river\'>Conflicting (VUS/Benign)</span></li><li><span class=\'w3-tag w3-flat-sun-flower\'>Uncertain</span></li><li><span class=\'w3-tag w3-flat-carrot\'>Conflicting (with Pathogenic)</span></li><li><span class=\'w3-tag w3-flat-alizarin\'>Pathogenic/Likely pathogenic</span></li><li><span class=\'w3-tag w3-flat-silver\'>Other</span></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ClinSig documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                ClinVar
-                            </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Transmission', content='This column represent the transmission mode following OMIM data.<br /><ul><li><b>AD</b>: Autosomal dominant</li><li><b>AR</b>: Autosomal recessive</li><li><b>DD</b>: Digenic dominant</li><li><b>DR</b>: Digenic recessive</li><li><b>IC</b>: Isolated cases</li><li><b>Mito</b>: Mitochondrial</li><li><b>MF</b>: Multifactorial</li><li><b>PAD</b>: Pseudoautosomal dominant</li><li><b>PAR</b>: Pseudoautosomal recessive</li><li><b>SMos</b>: Somatic mosaicism</li><li><b>SMut</b>: Somatic mutation</li><li><b>XL</b>: X-linked</li><li><b>XLD</b>: X-linked dominant</li><li><b>XLR</b>: X-linked recessive</li><li><b>YL</b>: Y-linked</li></ul><br /><i class=\'fas fa-question-circle w3-tiny\'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional', footer='For more information see : <a  href=\'https://www.omim.org/\' target=\'_blank\' style=\'text-decoration:underline\'><i>OMIM</i></a>' )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help" 
+                                    onclick="openHelp(
+                                        title='Population Frequency',
+                                        content=`The Genome Aggregation Database (gnomAD) is a resource developed by an international coalition of investigators, with the goal of aggregating and harmonizing both exome and genome sequencing data from a wide variety of large-scale sequencing projects, and making summary data available for the wider scientific community.<br /> The dataset used is from release 2.1 genomes (GRCh37/hg19) spans 15,708 whole-genome sequences from unrelated individuals sequenced as part of various disease-specific and population genetic studies.<br />
+                                        You can see the highest population occurences.<br />
+                                        The number of occurences for this variant among all database and into the run are also visible here.`,
+                                        footer=`For more information see : <a  href='https://gnomad.broadinstitute.org' target='_blank' style='text-decoration:underline'><i>GnomAD website</i></a>`)" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                 <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Transmission
-                            </th> -->
-                            <th>
-                                <span title="Help" onclick="openHelp(title='Impact', content='IMPACT is calculated by VEP, based on consequences and compatibility with snpEff. <div class=\'w3-flash w3-warning\'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a> & <a  href=\'https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction\' target=\'_blank\' style=\'text-decoration:underline\'><i>snpEff documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Impact
-                            </th>
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='Consequence', content='Consequences are calculated by VEP following SO terms.', footer='For more information see : <a  href=\'https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP documentation</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Consequence
-                            </th> -->
-                            <!-- <th>
-                                <span title="Help" onclick="openHelp(title='MaxEntScan', content='Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5\' and 3\' splice sites. <br />We suggest this cutoff: <br /><ul><li class=\'w3-text-flat-pomegranate\'>|percent variation| &ge; 15\%</li></ul>', footer='For more information see : <a  href=\'https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP MES plugin</i></a> & <a  href=\'https://github.com/esebesty/maxentscan\' target=\'_blank\' style=\'text-decoration:underline\'><i>MaxEntScan</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                MaxEnt
-                            </th> -->
-                            <th>
-                                <span title="Help" onclick="openHelp(title='SpliceAI DeltaScore', content='Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are: <br /><ul><li class=\'w3-text-flat-sun-flower\'>0.2 (high recall)</li><li class=\'w3-text-flat-orange\'>0.5 (recommended)</li><li class=\'w3-text-flat-pomegranate\'>0.8 (high precision)</li></ul>', footer='For more information see : <a  href=\'https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm\' target=\'_blank\' style=\'text-decoration:underline\'><i>VEP plugins spliceAI</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                SpliceAI
+                            </span>
+                                SEAL
                             </th>
                             <th>
-                                <span title="Help" onclick="openHelp(title='Missense', content='This score represents the mean rank scores of the top 10 missense predictions tools from dbNSFP v4.<br /><ul><li>CADD</li><li>VEST4</li><li>MetaSVM</li><li>MetaLR</li><li>Eigen</li><li>Eigen-PC</li><li>REVEL</li><li>BayesDel_addAF</li><li>BayesDel_noAF</li><li>ClinPred</li></ul><br />The threshold are : <ul><li><span class=\'w3-tag w3-flat-pomegranate\'>0.95</span> <i>top 5% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-pomegranate\'>0.9</span> <i>top 10% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-orange\'>0.75</span> <i>top 25% deleteriousness of all missense variant</i></li><li><span class=\'w3-text-flat-sun-flower\'>0.5</span> <i>top 50% deleteriousness of all missense variant</i></li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/\' target=\'_blank\' style=\'text-decoration:underline\'><i>dbNSFP v4</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Clinical Informations',
+                                        content=`
+                                            ClinVar clinical significance of the variant.<br />
+                                            <ul>
+                                                <li><i class='fa-solid fa-star fa-2xs'></i><i class='fa-solid fa-star fa-2xs'></i><i class='fa-solid fa-star fa-2xs'></i><i class='fa-solid fa-star fa-2xs'></i> : practice guideline</li>
+                                                <li><i class='fa-solid fa-star fa-2xs'></i><i class='fa-solid fa-star fa-2xs'></i><i class='fa-solid fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i> : reviewed by expert panel</li>
+                                                <li><i class='fa-solid fa-star fa-2xs'></i><i class='fa-solid fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i> : criteria provided, multiple submitters, no conflicts</li>
+                                                <li><i class='fa-solid fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i> : criteria provided, conflicting interpretations or single submitter</li>
+                                                <li><i class='fa-regular fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i><i class='fa-regular fa-star fa-2xs'></i> : no assertion</li>
+                                            </ul>
+                                            <br />
+                                            <ul>
+                                                <li><span class='w3-tag w3-flat-turquoise'>BenignLikely Benign</span></li>
+                                                <li><span class='w3-tag w3-flat-peter-river'>Conflicting (VUS/Benign)</span></li>
+                                                <li><span class='w3-tag w3-flat-sun-flower'>Uncertain</span></li><li><span class='w3-tag w3-flat-carrot'>Conflicting (with Pathogenic)</span></li>
+                                                <li><span class='w3-tag w3-flat-alizarin'>Pathogenic/Likely pathogenic</span></li><li><span class='w3-tag w3-flat-silver'>Other</span></li>
+                                            </ul>
+                                            Transmission mode following OMIM data.<br />
+                                            <ul>
+                                                <li><b>AD</b>: Autosomal dominant</li>
+                                                <li><b>AR</b>: Autosomal recessive</li>
+                                                <li><b>DD</b>: Digenic dominant</li>
+                                                <li><b>DR</b>: Digenic recessive</li>
+                                                <li><b>IC</b>: Isolated cases</li>
+                                                <li><b>Mito</b>: Mitochondrial</li>
+                                                <li><b>MF</b>: Multifactorial</li>
+                                                <li><b>PAD</b>: Pseudoautosomal dominant</li>
+                                                <li><b>PAR</b>: Pseudoautosomal recessive</li>
+                                                <li><b>SMos</b>: Somatic mosaicism</li>
+                                                <li><b>SMut</b>: Somatic mutation</li>
+                                                <li><b>XL</b>: X-linked</li>
+                                                <li><b>XLD</b>: X-linked dominant</li>
+                                                <li><b>XLR</b>: X-linked recessive</li>
+                                                <li><b>YL</b>: Y-linked</li>
+                                            </ul><br />
+                                            <i class='fas fa-question-circle w3-tiny'></i> A question mark (?) indicates that the relationship between the phenotype and gene is provisional
+                                        `,
+                                        footer=`For more information see : <a  href='https://www.ncbi.nlm.nih.gov/clinvar/docs/clinsig/' target='_blank' style='text-decoration:underline'><i>ClinSig documentation</i></a> & <a  href='https://www.omim.org/' target='_blank' style='text-decoration:underline'><i>OMIM</i></a>`
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <i class="fas fa-question-circle w3-tiny"></i>
+                                </span>
+                                Clinical Informations
+                            </th>
+                            <th>
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Consequences & Impact',
+                                        content=`
+                                        Consequences are calculated by VEP following SO terms.<br />
+                                        IMPACT is calculated by VEP, based on consequences and compatibility with snpEff.
+                                        <div class='w3-flash w3-warning'><p>Impact categories must be used with care, they were created only to help and simplify the filtering process. Obviously, there is no way to predict whether a HIGH impact or a LOW impact variant is the one producing a phenotype of interest.</p></div>`,
+                                        footer=`For more information see : <a  href='https://m.ensembl.org/info/genome/variation/prediction/predicted_data.html' target='_blank' style='text-decoration:underline'><i>VEP documentation</i></a> & <a  href='https://pcingola.github.io/SnpEff/se_inputoutput/#impact-prediction' target='_blank' style='text-decoration:underline'><i>snpEff documentation</i></a>`
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <i class="fas fa-question-circle w3-tiny"></i>
+                                </span>
+                                Consequences
+                            </th>
+                            <th>
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Splicing scores',
+                                        content=`
+                                        <h3>MaxEntScan</h3>
+                                        Algorithms for derivation and scoring of constrained-marginal maximum entropy distributions, with applications to 5' and 3' splice sites. <br />
+                                        We suggest this cutoff:
+                                        <ul>
+                                            <li class='w3-text-flat-pomegranate'>|percent variation| &ge; 15%</li>
+                                        </ul>
+                                        <h3>SpliceAI</h3>
+                                        Delta score (DS) of a variant, defined as the maximum of ranges from 0 to 1 and can be interpreted as the probability of the variant being splice-altering. The author-suggested cutoffs are:
+                                        <ul>
+                                            <li class='w3-text-flat-sun-flower'>0.2 (high recall)</li>
+                                            <li class='w3-text-flat-orange'>0.5 (recommended)</li>
+                                            <li class='w3-text-flat-pomegranate'>0.8 (high precision)</li>
+                                        </ul>`,
+                                        footer=`For more information see : <a  href='https://github.com/guillermomarco/VEP_plugins/blob/master/MaxEntScan.pm' target='_blank' style='text-decoration:underline'><i>VEP MES plugin</i></a> & <a  href='https://github.com/esebesty/maxentscan' target='_blank' style='text-decoration:underline'><i>MaxEntScan</i></a> & <a  href='https://github.com/Ensembl/VEP_plugins/blob/release/104/SpliceAI.pm' target='_blank' style='text-decoration:underline'><i>VEP plugins spliceAI</i></a>`
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
+                                    <i class="fas fa-question-circle w3-tiny"></i>
+                                </span>
+                                Splice
+                            </th>
+                            <th>
+                                <span title="Help"
+                                    onclick="openHelp(
+                                        title='Missense',
+                                        content=`
+                                            This score represents the mean rank scores of the top 10 missense predictions tools from dbNSFP v4.
+                                            <ul>
+                                                <li>CADD</li>
+                                                <li>VEST4</li>
+                                                <li>MetaSVM</li>
+                                                <li>MetaLR</li>
+                                                <li>Eigen</li>
+                                                <li>Eigen-PC</li>
+                                                <li>REVEL</li>
+                                                <li>BayesDel_addAF</li>
+                                                <li>BayesDel_noAF</li>
+                                                <li>ClinPred</li>
+                                            </ul>
+                                            Thresholds are :
+                                            <ul>
+                                                <li><span class='w3-tag w3-flat-pomegranate'>0.95</span> <i>top 5% deleteriousness of all missense variant</i></li>
+                                                <li><span class='w3-text-flat-pomegranate'>0.9</span> <i>top 10% deleteriousness of all missense variant</i></li>
+                                                <li><span class='w3-text-flat-orange'>0.75</span> <i>top 25% deleteriousness of all missense variant</i></li>
+                                                <li><span class='w3-text-flat-sun-flower'>0.5</span> <i>top 50% deleteriousness of all missense variant</i></li>
+                                            </ul>
+                                            Furthermore we offer the abitlity to see the stdandard deviation (stdev) and the coefficient of variantion (CV) of those scores.<br />
+                                            Those thresholds are :
+                                            <ul>
+                                                <li>CV <= 0.15 : <b><span class='w3-text-flat-nephritis'>High confidence (all scores appear to be consistent)</span> <i class='w3-text-flat-nephritis fas fa-angles-up'></i></b></li>
+                                                <li>CV > 0.15 : span class='w3-text-flat-belize-hole'>Medium confidence (most scores appear to be consistent)</span> <i class='w3-text-flat-belize-hole fas fa-angle-up'></i></li>
+                                                <li>CV > 0.3 : <span class='w3-text-flat-wisteria'>Low confidence (scores vary significantly)</span> <i class='w3-text-flat-pomegranate fas fa-angles-down'></i></li>
+                                            </ul>
+                                        `,
+                                        footer=`For more information see : <a  href='https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7709417/' target='_blank' style='text-decoration:underline'><i>dbNSFP v4</i></a>`
+                                    )" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
                                     <i class="fas fa-question-circle w3-tiny"></i>
                                 </span>
                                 Missense
                             </th>
-                            <!-- <th>
-                                R
-                            </th> -->
-                            <th style="padding:10px 10px 6px 10px!important">
-                                <span title="Help" onclick="openHelp(title='Class', content='You can choose the classification:<ul><li class=\'w3-text-flat-green-sea\'>Benign</li><li class=\'w3-text-flat-nephritis\'>Likely Benign</li><li class=\'w3-text-flat-belize-hole\'>VUS</li><li class=\'w3-text-flat-pumpkin\'>Likely Pathogenic</li><li class=\'w3-text-flat-pomegranate\'>Pathogenic</li></ul>', footer='For more information see : <a  href=\'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4544753/\' target=\'_blank\' style=\'text-decoration:underline\'><i>ACMG guidelines</i></a>')" class="w3-opacity-max w3-hover-opacity" style="cursor:pointer">
-                                    <i class="fas fa-question-circle w3-tiny"></i>
-                                </span>
-                                Class
-                            </th>
+                            <th id="nd"></th>
                             <th></th>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
+
         <div class="w3-container w3-center">
             <hr>
         </div>
 
-        <div class="w3-container w3-padding">
-            <div id="comments_sample" class=" w3-container w3-border-right">
-                <h2><i class="w3-text-flat-green-sea w3-xxlarge fas fa-comment"></i> Comments (<span class="commentsCountSample">{{ sample.comments | length }}</span>)</h2>
+        <div class="w3-container w3-center">
+
+            <div id="igv-div" style="padding:1px 5px 5px 5px; border-radius: 3px; border:1px solid lightgray;"></div>
+            <div class="w3-bar w3-light-grey w3-border w3-border-bottom-0 w3-tiny w3-margin" style="padding:4px 8px;">
+                <input type="file" id="local-file-input" multiple style="display:none">
+                <button onclick="document.getElementById('local-file-input').click()"
+                        class="w3-button w3-white w3-border w3-round w3-hover-light-blue">
+                    <i class="fa fa-folder-open"></i> Load local tracks
+                </button>
+                <span class="w3-right w3-text-grey" style="padding:6px 4px;">
+                    <i class="fa fa-circle-info"></i> Select file and its corresponding index file together
+                </span>
+            </div>
+            
+            {% if not bams or not beds or not vcfs or bams|length > 1 or beds|length > 1 or vcfs|length > 1 %}
+            <div class='w3-small w3-left-align w3-flash w3-warning'>
+                {% if not bams %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        No alignment files available.
+                    </b></i></p>
+                {% endif %}
+                {% if not vcfs %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        No variants files available.
+                    </b></i></p>
+                {% endif %}
+                {% if not beds %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        No regions files available.
+                    </b></i></p>
+                {% endif %}
+                {% if bams|length > 1 %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        Multiple alignment files available, only the first one has been loaded. This is sufficient in most cases.
+                    </b></i></p>
+                {% endif %}
+                {% if vcfs|length > 1 %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        Multiple variants files available, only the first one has been loaded. This is sufficient in most cases.
+                    </b></i></p>
+                {% endif %}
+                {% if beds|length > 1 %}
+                    <p class="w3-text-flat-asbestos"><i><b></b>
+                    <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                        Multiple regions files available, only the first one has been loaded. This is sufficient in most cases.
+                    </b></i></p>
+                {% endif %}
+                <i>If you want more informations: contact your administrator.</i>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="w3-container w3-center">
+            <hr>
+        </div>
+
+        <div class="w3-container w3-padding w3-row">
+            {% if covreport %}
+            <div class=" w3-col s12 m6 l6">
+                <div class="w3-container w3-center">
+                    <h3><i class="w3-text-flat-green-sea fa-solid fa-file-pdf"></i> CovReport</h3>
+                    <object data="{{ covreport[0] }}" type="application/pdf" width="100%" style="height:80vh;">
+                        <p>Alternative text - include a link <a href="{{ covreport[0] }}">to the PDF!</a></p>
+                    </object>
+                    {% if covreport|length > 1 %}
+                    <div class='w3-small w3-left-align w3-flash w3-warning'>
+                            <p class="w3-text-flat-asbestos"><i><b></b>
+                            <i class="w3-text-flat-pumpkin fa-solid fa-triangle-exclamation"></i>
+                                Multiple covreport files available, only the first one has been loaded. This is sufficient in most cases.
+                            </b></i></p>
+                            <i>If you want more informations: contact your administrator.</i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div id="comments_sample" class=" w3-container w3-border-right{% if covreport %} w3-col s12 m6 l6{% endif %}">
+                <h3><i class="w3-text-flat-green-sea fas fa-comment"></i> Comments (<span class="commentsCountSample">{{ sample.comments | length }}</span>)</h3>
 
                 <div id="commentsTableSample" class="w3-small">
                     <table id="tableCommentsSample" class="display" style="width:100%">
@@ -241,9 +491,6 @@
                     {{ form.submit(id="submitCommentSample", class="w3-button w3-flat-green-sea w3-hover-flat-turquoise", onclick="send_comment();") }}
                 </div>
             </div>
-        </div>
-        <div class="w3-container w3-center">
-            <hr>
         </div>
     </div>
 
@@ -306,7 +553,7 @@
         </div>
     </div>
 
-    <div id="modal-details-variant" class="w3-modal">
+    <div id="modal-details-variant" class="w3-modal" style="z-index:10001">
         <div class="w3-modal-content w3-card-4 w3-animate-zoom">
             <header class="w3-container w3-flat-green-sea">
                 <span onclick="$('#modal-details-variant').toggle()"
@@ -332,6 +579,7 @@
 
             <div id="missense" class="w3-container detail">
                 <h3>Missense</h3>
+                <div class='w3-flash w3-warning'><p>Maximum scores are kept for these view (not transcript depending)</p></div>
                 <div class="w3-row">
                     <div id='radarMissense' class="w3-col l6 m12 s12"><!-- Plotly chart will be drawn inside this DIV --></div>
                     <div class="w3-col l6 m12 s12">
@@ -545,18 +793,33 @@
             createColumn({
                 id: "visible-SYMBOL",
                 title: "GENE",
-                data: "annotations",
-                myTitleFn: (data) => formatNA(data.SYMBOL),
+                data: null,
+                myTitleFn: (data) => formatNA(data.annotations.SYMBOL),
                 renderConfig: {
                     default: (data) => {
-                        return data.SYMBOL
+                        return data.annotations.SYMBOL
                     },
                     display: (data) => {
-                        return data.SYMBOL == null
-                        ? "<i>NA</i>"
+                        const testa = `<a href="#igv-div" title="MobiDetails" class="w3-text-flat-silver w3-hover-text-flat-concrete do-not-select" style="cursor: pointer;" onclick="changelocus('${data.chr}:${parseInt(data.pos) - 50}-${parseInt(data.pos) + Math.max(data.ref.length, data.alt.length)  + 49}', event)"><span class="do-not-select">
+                            <svg class="do-not-select" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="21.29px" height="10px" viewBox="0 0 690 324" version="1.1">
+                                <!-- Generator: Sketch 40.3 (33839) - http://www.bohemiancoding.com/sketch -->
+                                <title>IGV</title>
+                                <desc>Created with Sketch.</desc>
+                                <defs></defs>
+                                <g  class="do-not-select" id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                                    <g  class="do-not-select" id="IGV" fill="currentColor">
+                                        <polygon  class="do-not-select" id="Path" points="379.54574 8.00169252 455.581247 8.00169252 515.564813 188.87244 532.884012 253.529506 537.108207 253.529506 554.849825 188.87244 614.833392 8.00169252 689.60164 8.00169252 582.729511 320.722144 486.840288 320.722144"></polygon>
+                                        <path class="do-not-select"  d="M261.482414,323.793286 C207.975678,323.793286 168.339046,310.552102 142.571329,284.069337 C116.803612,257.586572 103.919946,217.158702 103.919946,162.784513 C103.919946,108.410325 117.437235,67.8415913 144.472217,41.0770945 C171.507199,14.3125977 212.903894,0.930550071 268.663545,0.930550071 C283.025879,0.930550071 298.232828,1.84616386 314.284849,3.6774189 C330.33687,5.50867394 344.839793,7.97378798 357.794056,11.072835 L357.794056,68.968378 C339.48912,65.869331 323.578145,63.5450806 310.060654,61.9955571 C296.543163,60.4460336 284.574731,59.6712835 274.154998,59.6712835 C255.850062,59.6712835 240.502308,61.4320792 228.111274,64.9537236 C215.720241,68.4753679 205.793482,74.2507779 198.330701,82.2801269 C190.867919,90.309476 185.587729,100.87425 182.48997,113.974767 C179.392212,127.075284 177.843356,143.345037 177.843356,162.784513 C177.843356,181.942258 179.251407,198.000716 182.067551,210.960367 C184.883695,223.920018 189.671068,234.41436 196.429813,242.443709 C203.188559,250.473058 212.059279,256.178037 223.042241,259.558815 C234.025202,262.939594 247.683295,264.629958 264.01693,264.629958 C268.241146,264.629958 273.098922,264.489094 278.590403,264.207362 C284.081883,263.925631 289.643684,263.50304 295.275972,262.939577 L295.275972,159.826347 L361.595831,159.826347 L361.595831,308.579859 C344.698967,313.087564 327.239137,316.750019 309.215815,319.567334 C291.192494,322.38465 275.281519,323.793286 261.482414,323.793286 L261.482414,323.793286 L261.482414,323.793286 Z" id="Path"></path>
+                                        <polygon class="do-not-select"  id="Path" points="0.81355666 5.00169252 73.0472883 5.00169252 73.0472883 317.722144 0.81355666 317.722144"></polygon>
+                                    </g>
+                                </g>
+                            </svg>
+                        </a>`
+                        return data.annotations.SYMBOL == null
+                        ? `<i>NA</i> + ${testa}`
                         : `<div class="w3-middle w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
-                                <p style="width: 75px;margin:0;word-break: break-word;white-space: normal;"><b>${data.SYMBOL}</b></p>
-                            </div>`
+                                <p style="width: 75px;margin:0;word-break: break-word;white-space: normal;"><b>${data.annotations.SYMBOL}</b></p>
+                            </div> ${testa}`
                     }
                 }
             }),
@@ -581,24 +844,18 @@
                     display: (data) => {
                         if (data.annotations == null) return "<i>NA</i>";
                         const genome = "{{ genome_version }}".toLowerCase() == "grch38" ? "hg38" : "hg19";
-                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.annotations.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        const mobidetails = (current_user_api_key_md !== "None") ? `<a target="_blank" title="MobiDetails" href="https://mobidetails.chu-montpellier.fr/api/variant/create?variant_chgvs=${encodeURIComponent(data.annotations.HGVSc)}&caller=browser&api_key=${current_user_api_key_md}" class="w3-text-flat-peter-river w3-hover-text-flat-carrot do-not-select" style="margin-left:4px; cursor: pointer;">
                             <span class="fa-layers do-not-select">
-                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
+                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-14"></i>
                                 <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">MD</span>
                             </span>
-                        </span></a><br />` : "";
-                        const genebe = `<a target="_blank" title="GeneBe" href="https://genebe.net/variant/${genome}/${data.annotations.HGVSg}" class="w3-text-flat-emerald w3-hover-text-flat-pumpkin do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
+                        </a><br />` : "";
+                        const external = `<span onclick="showExternalLinks('${genome}', '${data.annotations.HGVSg}', '${data.id}')" title="External links"  class="w3-text-flat-concrete w3-hover-text-flat-silver do-not-select" style="margin-left:4px; cursor: pointer;">
                             <span class="fa-layers do-not-select">
-                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
-                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">GB</span>
+                                <i class="fa-solid fa-circle do-not-select" data-fa-transform="grow-10"></i>
+                                <i class="fa-solid fa-plus fa-inverse do-not-select"></i>
                             </span>
-                        </span></a><br />`;
-                        const franklin = `<a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${data.id}-${genome}" class="w3-text-flat-midnight-blue w3-hover-text-flat-turquoise do-not-select" style="cursor: pointer;"><span class="fa-layers fa-fw do-not-select">
-                            <span class="fa-layers do-not-select">
-                                <i class="fa-solid fa-square do-not-select" data-fa-transform="grow-11"></i>
-                                <span class="fa-layers-text fa-inverse do-not-select" data-fa-transform="shrink-3" style="font-weight:900">F</span>
-                            </span>
-                        </span></a>`;
+                        </span><br />`;
 
                         const color = data.annotations.preferred ? "w3-text-flat-peter-river" : "";
                         const starIcon = data.annotations.canonical
@@ -611,12 +868,15 @@
                                     ${starIcon}
                                 </div>
                                 <div class="w3-container w3-cell" style="padding: 0px !important;">
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSg, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSc, "<i>NA</i>")}</p>
-                                    <p style="width: 180px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSp, "<i>NA</i>")}</p>
+                                    <p style="width: 170px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSg, "<i>NA</i>")}</p>
+                                    <p style="width: 170px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSc, "<i>NA</i>")}</p>
+                                    <p style="width: 170px;margin:0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">${formatNA(data.annotations.HGVSp, "<i>NA</i>")}</p>
                                 </div>
                                 <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0px !important;">
-                                    ${mobidetails}${genebe}${franklin}
+                                    ${mobidetails}
+                                </div>
+                                <div class="w3-center w3-container w3-cell" style="vertical-align: middle;padding: 0 0 0 5px !important;">
+                                    ${external}
                                 </div>
                             </div>
                         `;
@@ -659,13 +919,13 @@
                         return "NA";
                     },
                     display: (data) => {
-                        if (data.EXON != null) return `<b>Exon ${data.EXON}</b>`;
-                        if (data.INTRON != null) return `<i>Intron ${data.INTRON}</i>`;
+                        if (data.EXON != null) return `<span class="w3-text-flat-nephritis"><b>Exon<br />${data.EXON}</b></span>`;
+                        if (data.INTRON != null) return `<span class="w3-text-flat-wisteria"><i>Intron<br />${data.INTRON}</i></span>`;
                         return "<i>NA</i>";
                     },
                     sort: (data) => {
                         const ei = data.EXON != null ? data.EXON : (data.INTRON != null ? data.INTRON : "NA");
-                        return ei.toString().split(/\//)[0];
+                        return ei.toString().split(/\//)[0].padStart(3, "0");
                     }
                 }
             }),
@@ -792,7 +1052,7 @@
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
                     const gnomad = parseFloat(data.annotations?.gnomADg_AF);
-                    if (isNaN(gnomad)) return "NA";
+                    if (isNaN(gnomad)) return `GnomAD : NA`;
 
                     const pop = {
                         "gnomADg_AF_AFR": "African/African-American",
@@ -832,8 +1092,7 @@
                     },
                     display: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
-                        const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> SEAL: </span>${data.inseal?.occurrences || ''}</b>`;
-                        if (isNaN(gnomad)) return `<i>NA</i><br />${seal}`;
+                        if (isNaN(gnomad)) return `<i>NA</i>`;
 
                         const pop = {
                             "gnomADg_AF_AFR": "AFR",
@@ -881,13 +1140,47 @@
 
                         const gnomad_r = `<a target="_blank" href="https://gnomad.broadinstitute.org/variant/${data.id}?dataset=gnomad_${gnomad_version}" class="fa-fw w3-text-indigo w3-hover-text-black do-not-select" style="cursor: pointer;">${response}</a>`;
 
-                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}<br />${seal}`;
+                        return `<i title="${gnomad}">${gnomad_r}</i> (${gnomad_version})${pmax}`;
                     },
                     sort: (data) => {
                         const gnomad = parseFloat(data.annotations?.gnomADg_AF);
                         if (gnomad == null) return -1;
                         if (isNaN(gnomad)) return -0.5;
                         return gnomad;
+                    }
+                }
+            }),
+            // seal Column
+            createColumn({
+                id: "visible-seal",
+                data: null,
+                className: 'w3-border-right',
+                myTitleFn: (data) => {
+                    const seal = `SEAL: ${data.inseal?.occurrences || ''}`;
+                    const seal_run = {{ sample.run.samples|length }} > 0 ? `(Run ${data.inseal.occurrences_run}/{{ sample.run.samples|length }})`: '';
+                    return `${seal}\n${seal_run}`;
+                },
+                renderConfig: {
+                    default: (data) => {
+                        return `${data.inseal?.occurrences || 0}`;
+                    },
+                    display: (data) => {
+                        const seal = `<b><span class="w3-text-flat-green-sea"><span class="icon-seal"></span> </span>${data.inseal?.occurrences || ''}</b>`;
+                        const seal_run = {{ sample.run.samples|length }} > 0 ? `<span class="w3-text-flat-midnight-blue"><i class="fas fa-digital-tachograph"></i> ${data.inseal.occurrences_run}/{{ sample.run.samples|length }}</span>` : '';
+                        var color = "concrete";
+                        if (data.hide) {
+                            color = "pomegranate";
+                        } else if (data.inseal.hidden > 0) {
+                            color = "sun-flower";
+                        }
+                        const seal_artefact = `<span id="span_hidden-${data.id}" onclick="artefact('${data.id}', ${sample_id}, this)" class="w3-text-flat-${color} w3-hover-text-flat-carrot w3-tag w3-border w3-border-flat-${color} w3-round w3-hover-border-flat-carrot" style="cursor:pointer;display:block;background: rgba(0,0,0,0);"><i class="fas fa-bug"></i> <span id="val_hidden-${data.id}">${data.inseal.hidden}</span></span>`;
+                        return `${seal}<br />${seal_run}<br />${seal_artefact}`;
+                    },
+                    sort: (data) => {
+                        const seal = parseInt(data.inseal?.occurrences);
+                        if (seal == null) return -1;
+                        if (isNaN(seal)) return -0.5;
+                        return seal;
                     }
                 }
             }),
@@ -1042,9 +1335,9 @@
                 },
                 sType: "numeric"
             }),
-            // Predictions Column
+            // Splicing
             createColumn({
-                id: "visible-predictions",
+                id: "visible-splice",
                 data: "annotations",
                 className: 'w3-border-right',
                 renderConfig: {
@@ -1140,14 +1433,14 @@
             // Missense Column
             createColumn({
                 id: "visible-missense",
-                data: "annotations",
+                data: null,
                 className: 'w3-border-right',
                 myTitleFn: (data) => {
-                    if (data?.missensesMean == null) return null;
+                    if (data.annotations?.missensesMean == null) return null;
 
-                    const value = parseFloat(data.missensesMean);
+                    const value = parseFloat(data.annotations.missensesMean);
                     const array = MISSENSES
-                        .map(i => parseFloat(data[i]))
+                        .map(i => parseFloat(data.annotations[i]))
                         .filter(x => !isNaN(x));
 
                     const n = array.length;
@@ -1157,68 +1450,61 @@
                     return `${value.toFixed(4)}\nstdev: ${stdev.toFixed(2)}\ncv: ${cv.toFixed(2)}`;
                 },
                 renderConfig: {
-                    default: (data) => data?.missensesMean != null ? parseFloat(data.missensesMean).toFixed(4) : null,
+                    default: (data) => data.missenses_max != null ? parseFloat(data.missenses_max).toFixed(4) : null,
                     display: (data) => {
-                        if (data?.missensesMean == null) return "<i>NA</i>";
+                        if (data.missenses_max == null) return "<i>NA</i>";
 
-                        const value = parseFloat(data.missensesMean);
-                        let classw3css = "";
+                        if (data.annotations?.missensesMean != null) {
+                            const value = parseFloat(data.annotations.missensesMean);
+                            let classw3css = "";
 
-                        if (value >= 0.95) classw3css = "w3-tag w3-flat-pomegranate";
-                        else if (value >= 0.9) classw3css = "w3-text-flat-pomegranate";
-                        else if (value >= 0.75) classw3css = "w3-text-flat-orange";
-                        else if (value >= 0.5) classw3css = "w3-text-flat-sun-flower";
+                            if (value >= 0.95) classw3css = "w3-tag w3-flat-pomegranate";
+                            else if (value >= 0.9) classw3css = "w3-text-flat-pomegranate";
+                            else if (value >= 0.75) classw3css = "w3-text-flat-orange";
+                            else if (value >= 0.5) classw3css = "w3-text-flat-sun-flower";
 
-                        const array = MISSENSES
-                            .map(i => parseFloat(data[i]))
-                            .filter(x => !isNaN(x));
+                            const array = MISSENSES
+                                .map(i => parseFloat(data.annotations[i]))
+                                .filter(x => !isNaN(x));
 
-                        const n = array.length;
-                        const stdev = n > 0 ? Math.sqrt(array.map(x => Math.pow(x - value, 2)).reduce((a, b) => a + b, 0) / n) : 0;
-                        const cv = stdev / value;
+                            const n = array.length;
+                            const stdev = n > 0 ? Math.sqrt(array.map(x => Math.pow(x - value, 2)).reduce((a, b) => a + b, 0) / n) : 0;
+                            const cv = stdev / value;
 
-                        let stdev_resp, t;
-                        if (cv <= 0.15) {
-                            stdev_resp = `<b><span class="w3-text-flat-nephritis">${stdev.toFixed(2)}</span></b>`;
-                            t = '<b> <i class="w3-text-flat-nephritis fas fa-angles-up"></i></b>';
-                        } else if (cv <= 0.3) {
-                            stdev_resp = `<span class="w3-text-flat-belize-hole">${stdev.toFixed(2)}</span>`;
-                            t = ' <i class="w3-text-flat-belize-hole fas fa-angle-up"></i>';
-                        } else {
-                            stdev_resp = `<span class="w3-text-flat-wisteria">${stdev.toFixed(2)}</span>`;
-                            t = ' <i class="w3-text-flat-pomegranate fas fa-angles-down"></i>';
+                            let stdev_resp, t;
+                            if (cv <= 0.15) {
+                                stdev_resp = `<b><span class="w3-text-flat-nephritis">${stdev.toFixed(2)}</span></b>`;
+                                t = '<b> <i class="w3-text-flat-nephritis fas fa-angles-up"></i></b>';
+                            } else if (cv <= 0.3) {
+                                stdev_resp = `<span class="w3-text-flat-belize-hole">${stdev.toFixed(2)}</span>`;
+                                t = ' <i class="w3-text-flat-belize-hole fas fa-angle-up"></i>';
+                            } else {
+                                stdev_resp = `<span class="w3-text-flat-wisteria">${stdev.toFixed(2)}</span>`;
+                                t = ' <i class="w3-text-flat-pomegranate fas fa-angles-down"></i>';
+                            }
+                            return `<b><span style='display:inline-table;' class='${classw3css}'>${value.toFixed(4)}</span></b><br /><i>stdev: ${stdev_resp}${t}<br /><span style="opacity: 0.33;">Max: ${data.missenses_max.toFixed(4)}</span>`;
                         }
 
-                        return `<b><span style='display:inline-table;' class='${classw3css}'>${value.toFixed(4)}</span></b><br /><i>stdev: ${stdev_resp}${t}`;
+                        return `<i>NA</i><br /><span style="opacity: 0.33;">Max: ${data.missenses_max.toFixed(4)}</span>`;
                     },
-                    sort: (data) => data?.missensesMean != null ? parseFloat(data.missensesMean).toFixed(4) : -1
+                    sort: (data) => data.missenses_max != null ? parseFloat(data.missenses_max).toFixed(4) : -1,
                 }
             }),
             // Class Column
             createColumn({
                 id: "visible-class",
-                data: "class_variant",
-                className: `${disabled_class} no-padding seal-form-report showTitle w3-center w3-border-right`,
+                data: null,
+                orderable: true,
+                className: 'w3-border-left details-control w3-center',
                 renderConfig: {
-                    default: (data) => data ? data : 0,
+                    default: (data) => data.class_variant ? data.class_variant : 0,
                     display: (data, type, row) => {
                         const id_var = row.id;
-                        const class_variant = data ? data : 0;
-
-                        const dropdown = Object.entries(class_variant_html).map(([c, label]) =>
-                            `<a onclick="toggle_class('${id_var}', ${sample_id}, ${c}, this)" class="do-not-select w3-bar-item w3-button" style="width:inherit">${label}</a>`
-                        ).join('');
+                        const class_variant = data.class_variant ? data.class_variant : 0;
                         
-                        return `
-                            <div class="do-not-select w3-tiny w3-dropdown-click w3-right" style="background-color:transparent">
-                                <button class="do-not-select w3-button button-class w3-left-align" onclick="toggle_dd_class('button-class-${id_var}')" style="min-width:168px;" id="button-class-${id_var}">
-                                    ${class_variant_html[class_variant]}
-                                </button>
-                                <div class="do-not-select w3-dropdown-content w3-bar-block w3-border" style="min-width:200px" data-container="tbody" id="button-class-${id_var}-content">
-                                    ${dropdown}
-                                </div>
-                            </div>
-                        `;
+                        const swal_class = `<a onclick="switch_class('${id_var}', '${sample_id}', ${class_variant})" id="switch-${id_var}" style="cursor:pointer">${class_variant_html(class_variant)}</a>`
+
+                        return `${swal_class}`;
                     }
                 }
             }),
@@ -1232,11 +1518,10 @@
                     default: (data) => data?.id || '',
                     display: (data, type, row) => {
                         const details = `<i onclick="openDetailsVariantModal('${data.id}', ${sample_id})" class="w3-text-flat-turquoise w3-hover-text-flat-green-sea fas fa-plus-circle" style="cursor: pointer;" title="See details"></i>`;
-                        const hide = `<i onclick="hideRow('${data.id}', ${sample_id}, this)" class="w3-text-flat-pumpkin w3-hover-text-flat-carrot fas fa-eye-slash remove" style="cursor: pointer;" title="Hide row"></i>`;
                         const check = row.reported ? 'checked="checked"' : "";
                         const report = `<input id="${data.id}reported" type="checkbox" ${check} onclick="toggle_var2sample_status('${data.id}reported', '${data.id}', ${sample_id}, 'reported', this);">`;
 
-                        return `${details}<br />${hide}<br />${report}`;
+                        return `${details}<br />${report}`;
                     }
                 }
             }),
@@ -1482,13 +1767,6 @@
                 visible: false
             }),
             createColumn({
-                id: "filter-class",
-                data: "class_variant",
-                searchBuilderTitle:"Class Seal",
-                visible: false,
-                type: "class_seal"
-            }),
-            createColumn({
                 id: "export-filter-clinvar_revstat",
                 data: null,
                 searchBuilderTitle:"ClinVar",
@@ -1585,7 +1863,7 @@
             }),
             createColumn({
                 id: "export-filter-missenses",
-                data: "annotations.missensesMean",
+                data: "missenses_max",
                 searchBuilderTitle:"Prediction - Missenses",
                 visible: false,
                 renderConfig: {
@@ -1630,6 +1908,14 @@
                 searchBuilderTitle:"Sample filter",
                 exportTitle:"{{ sample.samplename }} - filter",
                 visible: false
+            }),
+            createColumn({
+                id: "filter-class",
+                data: "class_variant",
+                searchBuilderTitle:"Class",
+                exportTitle:"Class",
+                visible: false,
+                type: "class_seal"
             }),
             {% for c in sample.caller %}
             createColumn({
@@ -1676,11 +1962,14 @@
                 visible: false,
                 renderConfig: {
                     default: (data) => {
-                        const family = data["{{s}}"]
+                        const family = data["{{s.id}}"]
+                        if (isNaN(parseFloat(family))) {
+                            return "NA"
+                        }
                         if (isNaN(parseFloat(family.allelic_depth)) && isNaN(parseFloat(family.allelic_frequency))) {
                             return "NA"
                         }
-                        const af = (isNaN(parseFloat(family.allelic_frequency))) ? ((parseFloat(family.allelic_depth)/parseFloat(family.allelic_frequency))*100).toFixed(2) : parseFloat(family.allelic_frequency).toFixed(2);
+                        const af = (isNaN(parseFloat(family.allelic_frequency))) ? ((parseFloat(family.allelic_depth)/parseFloat(family.depth))*100).toFixed(2) : parseFloat(family.allelic_frequency).toFixed(2);
                         return `[${family.filter}] ${af} (${family.allelic_depth}/${family.depth})`;
                     },
                 }
@@ -1690,6 +1979,154 @@
 
         var number_family = {{ family_members|length }};
         var number_caller = {{ sample.caller|length }};
+    </script>
+    
+    <script type="text/javascript" src="{{ url_for('static', filename='igvjs/igv.min.js') }}"></script>
+
+    <script type="text/javascript">
+        // SEE : https://github.com/igvteam/igv-data/blob/HEAD/genomes/web/genomes.json
+        //   https://igv.org/app/ -> https://igv.org/app/igvwebConfig.js -> https://igv.org/genomes/genomes3.json -> https://github.com/igvteam/igv-data/blob/HEAD/genomes/web/genomes.json
+        var options_igv =
+        {
+            reference: {
+                "id": "hg38",
+                "name": "Human (GRCh38/hg38)",
+                "fastaURL": "{{ igv_path.fastaURL }}",
+                "indexURL": "{{ igv_path.indexURL }}",
+                "twoBitURL": "{{ igv_path.twoBitURL }}",
+                "wholeGenomeView": true,
+                "cytobandURL": "{{ igv_path.cytobandURL }}",
+                "aliasURL": "{{ igv_path.aliasURL }}",
+                "chromSizesURL": "{{ igv_path.chromSizesURL }}",
+                "chromosomeOrder": "chr1,chr2,chr3,chr4,chr5,chr6,chr7,chr8,chr9,chr10,chr11,chr12,chr13,chr14,chr15,chr16,chr17,chr18,chr19,chr20,chr21,chr22,chrX,chrY",
+                "maneBbURL": "{{ igv_path.maneBbURL }}",
+                "maneTrixURL": "{{ igv_path.maneTrixURL }}",
+                "rsdbURL": "{{ igv_path.rsdbURL }}",
+                "tracks": [
+                    {
+                        "id": "refseqAll",
+                        "name": "Refseq All",
+                        "url": "{{ igv_path.refseq }}",
+                        "indexed": false,
+                        "format": "refgene",
+                        "order": 100000
+                    }
+                ]
+            },
+            tracks: [
+                //{% if beds %}
+                {
+                    "name": "bed",
+                    "url": "{{ beds[0] }}",
+                    "displayMode": "COLLAPSED",
+                    "height": 40
+                },
+                // {% endif %}
+                // {% if vcfs %}
+                {
+                    "name": "vcf",
+                    "format": "vcf",
+                    "url": "{{ vcfs[0] }}"
+                },
+                // {% endif %}
+                // {% if bams %}
+                {
+                    "name": "{{ sample.samplename }}",
+                    "url": "{{ bams[0] }}",
+                    "indexURL": "{{ bams[0] }}{% if bams[0].split('.')[-1] == 'bam'  %}.bai{% else %}.crai{% endif %}"
+                },
+                // {% endif %}
+            ]
+        };
+
+
+        var igvDiv = document.getElementById("igv-div");
+
+        var browser = null;
+        igv.createBrowser(igvDiv, options_igv)
+        .then(function (b) {
+            browser = b; 
+        });
+
+        function changelocus(locus, event) {
+            if (!browser) {
+                console.warn("IGV browser not ready yet");
+                return;
+            }
+
+            if (event.ctrlKey) {
+                event.preventDefault(); 
+                loci = Array(browser.currentLoci()).flat()
+                loci.push(locus);
+                browser.search(loci.slice(-3).join(" "));
+            } else {
+                browser.search(locus);
+            }
+        }
+
+        document.getElementById("local-file-input").addEventListener("change", function (e) {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            const dataFile   = files.find(f => /\.(bam|cram|vcf\.gz|bed\.gz|gff\.gz|bgz)$/i.test(f.name));
+            const indexFile  = files.find(f => /\.(bai|csi|crai|tbi)$/i.test(f.name));
+            const plainFiles = files.filter(f => f !== dataFile && f !== indexFile);
+
+            // --- if index without file ---
+            if (dataFile && !indexFile) {
+                showLoadError(
+                    '<strong>' + escapeHtml(dataFile.name) + '</strong> requires its index file.<br>' +
+                    'Expected: <code>' + guessIndexName(dataFile.name) + '</code><br><br>' +
+                    'Please select both files together.'
+                );
+                e.target.value = "";
+                return;
+            }
+
+            // --- if index is missing ---
+            if (!dataFile && indexFile) {
+                showLoadError(
+                    'You selected an index file (<strong>' + escapeHtml(indexFile.name) + '</strong>) ' +
+                    'without its data file.<br>Please select both files together.'
+                );
+                e.target.value = "";
+                return;
+            }
+
+            if (dataFile) {
+                browser.loadTrack({
+                    name: dataFile.name,
+                    url: dataFile,
+                    indexURL: indexFile,
+                    format: /\.cram$/i.test(dataFile.name) ? "cram" : undefined
+                });
+            }
+            plainFiles.forEach(f => browser.loadTrack({ name: f.name, url: f }));
+
+            e.target.value = "";
+        });
+
+        // Tri to guess index file waiting
+        function guessIndexName(filename) {
+            if (/\.bam$/i.test(filename))     return filename + '.bai (or .csi)';
+            if (/\.cram$/i.test(filename))    return filename + '.crai';
+            if (/\.vcf\.gz$/i.test(filename)) return filename + '.tbi (or .csi)';
+            return 'a .bai / .csi / .crai / .tbi index';
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // SweetAlert for error on loading
+        function showLoadError(content) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cannot load tracks',
+                html: '<div class="w3-left-align">' + content + '</div>',
+                width: 'max(50%, 400px)'
+            });
+        }
     </script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='seal/analysis/sample.js') }}"></script>

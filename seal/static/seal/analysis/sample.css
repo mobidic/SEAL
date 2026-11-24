@@ -35,3 +35,57 @@ div.dataTables_processing span{
 #barPopulation > div > div > svg:nth-child(1) > g.cartesianlayer > g > g.plot > g > g > g > g > path {
     clip-path: inset(0% 0% round 50px 50px 0% 0%);
 }
+#variants_wrapper > .dataTables_scroll > .dataTables_scrollFoot > .dataTables_scrollFootInner {
+    box-sizing: content-box !important;
+}
+#variants_wrapper > .dataTables_scroll {
+    margin:0 -30px!important;
+} 
+.dtfc-right-bottom-blocker {
+    background-color: #ffffff;
+}
+
+.swal2-shown {
+    padding-right: 0px !important;
+}
+
+.ui-autocomplete {
+    z-index:10000
+}
+/* ===== tags style ===== */
+.sample-tag, .sample-hpo {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1;
+    margin: 4px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.sample-tag:hover, .sample-hpo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+/* ===== Style pour le bouton "+ Add a tag" ===== */
+
+.sample-tag-add-button, .sample-hpo-add-button {
+    background-color: #f0f0f0 !important;
+    border: 1px dashed #ccc !important;
+    color: #777 !important;
+    cursor: pointer;
+    border: 1px dashed #ccc !important;
+}
+
+.sample-tag-add-button:hover, .sample-hpo-add-button:hover {
+    background-color: #fcfcfc !important;
+    border: 1px dashed #aaa !important;
+}
+
+.sample-hpo {
+    background-color: #bdc3c733;
+    border:1px solid #2c3e50;
+    color: #2c3e50
+}

@@ -1,9 +1,9 @@
-# (c) 2023, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
+# (c) 2025, Charles VAN GOETHEM <c-vangoethem (at) chu-montpellier (dot) fr>
 #
 # This file is part of SEAL
 #
 # SEAL db - Simple, Efficient And Lite database for NGS
-# Copyright (C) 2023  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
+# Copyright (C) 2025  Charles VAN GOETHEM - MoBiDiC - CHU Montpellier
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ from wtforms import (StringField, PasswordField, SubmitField, BooleanField,
 from wtforms.validators import DataRequired, Length, Email, Optional, EqualTo
 
 from seal import bcrypt
-from seal.models import User, Sample, Run, Team, Bed, Region
+from seal.models import User, Sample, Run, Team, Bed, Region, Tag, Hpo
 
 ################################################################################
 # Authentication
@@ -144,6 +144,8 @@ class UploadVariantForm(FlaskForm):
     index = BooleanField('Index')
 
     teams = SelectMultipleField('Teams', coerce=int)
+    tags = SelectMultipleField('Tags', coerce=int)
+    hpos = SelectMultipleField('Hpos', coerce=int)
 
     submit = SubmitField('Create New Sample')
 
@@ -212,7 +214,7 @@ class SaveFilterForm(FlaskForm):
     submit = SubmitField('Add A New Filter')
 
 
-class UploadClinvar(FlaskForm):
+class UploadClinvarForm(FlaskForm):
     version = DateField(
         'Version',
         validators=[DataRequired()], format='%Y-%m-%d'
