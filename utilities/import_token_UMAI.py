@@ -167,11 +167,10 @@ def create_treat_files(input_file, output_dir):
 def main(args):
     csv_path = args.input
     output_dir = args.output
-    args.separator
     
     logging.basicConfig(level=int(args.log_level)*10)
     try:
-        dataframe = load_and_validate_csv(csv_path)
+        dataframe = load_and_validate_csv(csv_path, sep=args.separator)
         txt_file = generate_all_samples_txt(dataframe, "all_samples.txt", args.base_path)
         treat_files, temp_dir = create_treat_files(txt_file, output_dir)
 
