@@ -350,6 +350,34 @@ function removeTag(sampleId, tagId, element) {
     });
 }
 
+function showExternalLinks(genome, hgvs, id) {
+    Swal.fire({
+        title: '<i class="fa-solid fa-arrow-up-right-from-square"></i> External Links',
+        html: `
+            <div style="text-align:left;">
+                <ul>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://mutalyzer.nl/favicon.ico");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="Mutalyzer3" href="https://mutalyzer.nl/normalizer/${genome}(${hgvs.split(":")[0]}):${hgvs.split(":")[1]}" class="w3-text-indigo w3-hover-text-black">Mutalyzer</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://genebe.net/favicon.ico");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="GeneBe" href="https://genebe.net/variant/${genome}/${hgvs}" class="w3-text-indigo w3-hover-text-black">GeneBe</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://franklin.genoox.com/assets/fav/fav-icon-48.png");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="Franklin" href="https://franklin.genoox.com/clinical-db/variant/snp/${id}-${genome}" class="w3-text-indigo w3-hover-text-black">Franklin</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://spliceailookup.broadinstitute.org/icon.png");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="spliceailookup" href="https://spliceailookup.broadinstitute.org/#variant=${id}" class="w3-text-indigo w3-hover-text-black">SpliceAI lookup</a>
+                    </li>
+                    <li style='list-style: none;padding: 10px 30px;background-image: url("https://genome.ucsc.edu//favicon.ico");background-repeat: no-repeat;background-position: left center;background-size: 1em;'>
+                        <a target="_blank" title="UCSC" href="https://genome.ucsc.edu/cgi-bin/hgTracks?db=${genome}&position=${hgvs.split(":")[0]}:${parseInt(id.split("-")[1])-50}-${parseInt(id.split("-")[1])+id.split("-")[2].length+50}&highlight=${genome}.${hgvs.split(":")[0]}:${id.split("-")[1]}-${parseInt(id.split("-")[1])+id.split("-")[2].length-1}#aac6ff" class="w3-text-indigo w3-hover-text-black">UCSC</a>
+                    </li>
+                </ul>
+            </div>
+        `,
+        confirmButtonColor: '#3085d6',
+    })
+}
+
 function getRandomColor() {
   var letters = '0123456789ABCDEF';
   var color = '#';
