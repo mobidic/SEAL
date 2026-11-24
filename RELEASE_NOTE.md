@@ -1,6 +1,6 @@
 # Releases
 
-## v1.2.0 - *in-progress*
+## v1.2.0 - 2026-11-24
 
 This release features significant improvements, as well as a few fixes.
 
@@ -16,7 +16,6 @@ This release features significant improvements, as well as a few fixes.
 - **Tag system**: add tags to samples (#42)
 - **IGV.js**: fully local visualization of BAM, BED and VCF files
 - **CovReport**: new dedicated coverage report view
-- **Mutalyzer link**:  direct link to Mutalyzer3 from the variant details (#78)
 
 ### 🛠️ Improvements
 
@@ -27,6 +26,7 @@ This release features significant improvements, as well as a few fixes.
 - **Index / Affected status**: status added to the sample table, with dedicated filtering options
 - **Static cache busting**: assets URL now carry a version parameter to force browser reload after each deployment
 - **Highest missense score**: the highest missense mean score is now available 
+- **Add some links** : Mutalyzer3, spliceAI lookup, UCSC (#78)
 
 ### ⚡️ Performance
 
