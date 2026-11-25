@@ -28,56 +28,73 @@ log() {
 }
 
 list_panels() {
-    ls -d "${path_seq}"*/MobiDL/*/* 2>/dev/null \
+    if dirs=( "${path_seq}"/"$1"/MobiDL/* ) && [[ -d ${dirs[0]} ]]; then
+        ls -d "${path_seq}"/"$1"/MobiDL/*/* 2>/dev/null \
+            | xargs -n1 basename \
+            | sort -u
+    fi    
+}
+
+max_run_age=7   # in days
+
+list_recent_runs() {
+    local cutoff
+    cutoff=$(date -d "-${max_run_age} days" +%Y%m%d)
+
+    ls -d "${path_seq}"2*/ 2>/dev/null \
         | xargs -n1 basename \
-        | sort -u
+        | grep -E '^[0-9]{8}_' \
+        | awk -v c="${cutoff}" '{d=substr($0,1,8); if (d >= c) print $0}'
 }
 
 scan() {
-    while IFS= read -r panel; do
-        [ -z "$panel" ] && continue
+    while IFS= read -r run_name; do
+        [ -z "$run_name" ] && continue
+        log $run_name
 
-        tid="${panel_tid[$panel]:-}"
-        if [ -z "$tid" ]; then
-            log "Panel $panel : ignored (unknown)"
-            continue
-        fi
-        if [ "$tid" -eq 0 ]; then
-            log "Panel $panel : ignored (tid = 0)"
-            continue
-        fi
+        while IFS= read -r panel; do
+            [ -z "$panel" ] && continue
 
-        for cram in $(ls "${path_seq}"*/MobiDL/*/"${panel}"/*/panelCapture/*.cram 2>/dev/null); do
-            rel="${cram#"${path_seq}"}"
-            
-            run_name=$(echo "$rel"      | cut -d'/' -f1)
-            date_analysis=$(echo "$rel" | cut -d'/' -f3)
-            panel_found=$(echo "$rel"   | cut -d'/' -f4)
-            sample=$(echo "$rel"        | cut -d'/' -f5)
+            tid="${panel_tid[$panel]:-}"
+            if [ -z "$tid" ]; then
+                log "Panel $panel : ignored (unknown)"
+                continue
+            fi
+            if [ "$tid" -eq 0 ]; then
+                log "Panel $panel : ignored (tid = 0)"
+                continue
+            fi
 
-            lock_key="${run_name}-${panel_found}-${sample}"
-            grep -qF "$lock_key" "$state_file" && continue
+            for cram in $(ls "${path_seq}"/"${run_name}"/MobiDL/*/"${panel}"/*/panelCapture/*.cram 2>/dev/null); do
+                rel="${cram#"${path_seq}/${run_name}/MobiDL/"}"
+                
+                date_analysis=$(echo "$rel" | cut -d'/' -f1)
+                panel_found=$(echo "$rel"   | cut -d'/' -f2)
+                sample=$(echo "$rel"        | cut -d'/' -f3)
+                lock_key="${run_name}-${panel_found}-${sample}"
+                grep -qF "$lock_key" "$state_file" && continue
 
-            mtime=$(stat -c %Y "$cram" 2>/dev/null) || continue
-            now=$(date +%s)
-            (( now - mtime < min_age )) && continue
+                mtime=$(stat -c %Y "$cram" 2>/dev/null) || continue
+                now=$(date +%s)
+                (( now - mtime < min_age )) && continue
 
-            wf=$(dirname "$cram")
-            sn=${sample}
+                wf=$(dirname "$cram")
+                sn=${sample}
 
-            dv=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.dv.vcf" "MD_DV" false)
-            hc=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.hc.vcf" "MD_HC" true)
-            ds=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.ds.vcf" "MD_DS" true)
-            
-            echo "$dv" > "${path_token}/${run_name}-${tid}-${sn}-1-dv.token"
-            echo "$hc" > "${path_token}/${run_name}-${tid}-${sn}-2-hc.token2"
-            # echo "$ds" > "${path_token}/${run_name}-${tid}-${sn}-3-ds.token2"
+                dv=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.dv.vcf" "MD_DV" false)
+                hc=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.hc.vcf" "MD_HC" true)
+                ds=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.ds.vcf" "MD_DS" true)
+                
+                echo "$dv" > "${path_token}/${run_name}-${tid}-${sn}-1-dv.token"
+                echo "$hc" > "${path_token}/${run_name}-${tid}-${sn}-2-hc.token2"
+                echo "$ds" > "${path_token}/${run_name}-${tid}-${sn}-3-ds.token2"
 
-            log "Import ${run_name}/tid=${tid}/${sn} (panel ${panel_found}, date ${date_analysis})"
+                log "Import ${run_name}/${panel}/${sn} (team ${tid}, date ${date_analysis})"
 
-            echo "$lock_key" >> "$state_file"
-        done
-    done < <(list_panels)
+                echo "$lock_key" >> "$state_file"
+            done
+        done < <(list_panels "$run_name")
+    done < <(list_recent_runs)
 }
 
 mkdir -p "$(dirname "$state_file")" "$(dirname "$log_file")" "$path_token"
