@@ -12,6 +12,13 @@ declare -A panel_tid=(
     ["B"]=9
 )
 
+default_callers="MD_DV:dv MD_HC:hc"
+
+declare -A panel_callers=(
+    ["B"]="MD_DV:dv MD_HC:hc MD_DS:ds"
+)
+
+
 scan_interval=3600   # scan 1 per hour
 min_age=120 # cram stable
 
@@ -35,7 +42,7 @@ list_panels() {
     fi    
 }
 
-max_run_age=7   # in days
+max_run_age=5   # in days
 
 list_recent_runs() {
     local cutoff
@@ -81,13 +88,20 @@ scan() {
                 wf=$(dirname "$cram")
                 sn=${sample}
 
-                dv=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.dv.vcf" "MD_DV" false)
-                hc=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.hc.vcf" "MD_HC" true)
-                ds=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.ds.vcf" "MD_DS" true)
-                
-                echo "$dv" > "${path_token}/${run_name}-${tid}-${sn}-1-dv.token"
-                echo "$hc" > "${path_token}/${run_name}-${tid}-${sn}-2-hc.token2"
-                echo "$ds" > "${path_token}/${run_name}-${tid}-${sn}-3-ds.token2"
+                callers="${panel_callers[$panel]:-$default_callers}"
+                count=1
+                suffix=""
+                for spec in $callers; do
+                    caller="${spec%%:*}"
+                    ext="${spec##*:}"
+                    if [ $count -eq 1 ]; then
+                        add=true
+                    fi;
+                    token=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.${ext}.vcf" "${caller}" $add)
+                    echo "$token" > "${path_token}/${run_name}-${tid}-${sn}-${count}-${ext}.token${suffix}"
+                    let count++
+                    suffix="2"
+                done
 
                 log "Import ${run_name}/${panel}/${sn} (team ${tid}, date ${date_analysis})"
 
