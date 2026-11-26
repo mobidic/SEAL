@@ -42,7 +42,7 @@ list_panels() {
     fi    
 }
 
-max_run_age=5   # in days
+max_run_age=7   # in days
 
 list_recent_runs() {
     local cutoff
@@ -91,14 +91,13 @@ scan() {
                 callers="${panel_callers[$panel]:-$default_callers}"
                 count=1
                 suffix=""
+                add=false
                 for spec in $callers; do
                     caller="${spec%%:*}"
                     ext="${spec##*:}"
-                    if [ $count -eq 1 ]; then
-                        add=true
-                    fi;
                     token=$(build_basejson "$sn" "$run_name" "$tid" "$wf/$sn.${ext}.vcf" "${caller}" $add)
                     echo "$token" > "${path_token}/${run_name}-${tid}-${sn}-${count}-${ext}.token${suffix}"
+                    add=true
                     let count++
                     suffix="2"
                 done
