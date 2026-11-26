@@ -1,5 +1,19 @@
 # Releases
 
+## v1.2.1 - 2026-11-26
+
+### ✨ New Features
+
+- **Auto import**: utilities to import vcfs from [MobiDL workflow](https://github.com/mobidic/MobiDL)
+
+### 🛠️ Improvements
+
+- **Maintenance mode**: Replaced the process-local app.config["MAINTENANCE"] flag used by update_clinvar with a shared static/temp/.maintenance file, following the same approach as the VCF import lock file. The MAINTENANCE: true configuration option remains supported.
+
+### 🐞 Hot-Fixes
+
+- **Standalone scheduler**: Moved scheduled jobs out of the web application into a dedicated scheduler.py process, preventing duplicate job execution across workers (Gunicorn). Added job listing (--list), verbose logging (-v), graceful shutdown, and proper Flask application context and database session management.
+
 ## v1.2.0 - 2026-11-24
 
 This release features significant improvements, as well as a few fixes.
@@ -32,7 +46,6 @@ This release features significant improvements, as well as a few fixes.
 ### ⚡️ Performance
 
 - **Optimization**: some code and requests optimization
-
 
 ### 🐛 Fixes
 
