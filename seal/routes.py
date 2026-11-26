@@ -41,7 +41,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, selectinload, aliased
 from psycopg2.errors import UniqueViolation
 
-from seal import app, bcrypt, db, config
+from seal import app, bcrypt, db, config, get_maintenance
 from seal.forms import (AddCommentForm, LoginForm, SaveFilterForm,
                         UploadPanelForm, UploadVariantForm,
                         UpdateAccountForm, UpdatePasswordForm, UploadClinvarForm)
@@ -459,11 +459,12 @@ def maintenance():
     Returns:
         A rendered template for the maintenace page or redirect to index.
     """
-    if not app.config["MAINTENANCE"]:
+    in_maintenance, reason = get_maintenance()
+    if not in_maintenance:
         return redirect(url_for("index"))
     return render_template(
         "essentials/maintenance.html",
-        reason=app.config["MAINTENANCE_REASON"]
+        reason=reason
     )
 
 

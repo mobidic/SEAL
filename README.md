@@ -314,6 +314,38 @@ Finally, to launch the app, run the following command:
 flask --app seal --debug run
 ```
 
+#### Companion process
+Background jobs (VCF import every 20 s, daily ClinVar update) run in a
+
+**separate process**. Start exactly one instance of it next to the web app:
+```bash
+python scheduler.py           # add -v for debug logs
+python scheduler.py --list    # show registered jobs
+```
+
+The web app itself never starts a scheduler, so it can run with several
+workers in production, e.g.:
+```bash
+gunicorn -w 4 -b 127.0.0.1:5000 seal:app
+```
+
+Example systemd unit for the scheduler (`/etc/systemd/system/seal-scheduler.service`):
+```ini
+[Unit]
+Description=SEAL scheduler (VCF import, ClinVar update)
+After=network.target postgresql.service
+
+[Service]
+WorkingDirectory=/path/to/SEAL
+ExecStart=/path/to/conda/envs/seal/bin/python scheduler.py
+Restart=on-failure
+KillSignal=SIGTERM
+TimeoutStopSec=3600
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## Tips & Tricks
 
 Here are some useful *Tips & Tricks* working with SEAL:

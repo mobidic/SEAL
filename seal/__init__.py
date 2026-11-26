@@ -26,7 +26,6 @@ from pathlib import Path
 from datetime import timedelta
 
 from flask import Flask, session, g, request, redirect, url_for, Blueprint
-from flask_apscheduler import APScheduler
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, current_user
 from flask_migrate import Migrate
@@ -44,15 +43,12 @@ app.permanent_session_lifetime = timedelta(minutes=20)
 
 
 # Plugins initialization
-scheduler = APScheduler()
 csrf = CSRFProtect()
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
-scheduler.init_app(app)
-scheduler.start()
 csrf.init_app(app)
 migrate = Migrate(app, db, compare_type=True)
 
@@ -88,6 +84,39 @@ def get_asset_version():
 app.config["ASSET_VERSION"] = get_asset_version()
 
 
+# Maintenance mode shared between processes.
+# The web workers and the scheduler process (see scheduler.py) do not share
+# memory: a flag set in app.config by one process is invisible to the others.
+# A flag file on disk is used instead, next to the existing VCF lock file.
+MAINTENANCE_FLAG = Path(app.root_path).joinpath('static/temp/.maintenance')
+
+
+def set_maintenance(reason=""):
+    """Switch on maintenance mode for every process (web workers + scheduler)."""
+    MAINTENANCE_FLAG.write_text(reason)
+
+
+def clear_maintenance():
+    """Switch off maintenance mode set by set_maintenance()."""
+    try:
+        MAINTENANCE_FLAG.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def get_maintenance():
+    """
+    Returns:
+        tuple(bool, str): (is the website under maintenance, reason)
+    """
+    if app.config.get("MAINTENANCE"):
+        return True, app.config.get("MAINTENANCE_REASON", "")
+    try:
+        return True, MAINTENANCE_FLAG.read_text()
+    except FileNotFoundError:
+        return False, None
+
+
 @app.url_defaults
 def add_static_version(endpoint, values):
     """
@@ -113,7 +142,7 @@ def before_request():
     session.permanent = True
     session.modified = True
     g.user = current_user
-    if app.config["MAINTENANCE"] and request.path != url_for('maintenance'):
+    if get_maintenance()[0] and request.path != url_for('maintenance'):
         return redirect(url_for('maintenance'))
 
 
@@ -135,5 +164,5 @@ if 'GENOME' not in config or config['GENOME'] not in ['grch37', 'grch38']:
 
 
 from seal import routes
-from seal import schedulers
+# from seal import schedulers
 from seal import admin

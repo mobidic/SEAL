@@ -20,6 +20,7 @@
 
 import re
 import json
+import functools
 import time
 import numpy
 import random
@@ -30,7 +31,7 @@ from datetime import datetime
 
 from anacore import annotVcf
 
-from seal import app, scheduler, db, config
+from seal import app, db, config, set_maintenance, clear_maintenance
 from seal.models import (Sample, Variant, Family, Var2Sample, Run, Transcript,
                          Team, Bed, Filter, History, Comment_sample, Clinvar)
 
@@ -411,8 +412,6 @@ def create_and_execute_shell_command(json_file, values):
     return exit_code, output
 
 
-# cron examples
-@scheduler.task('cron', id='import vcf', second="*/20")
 def importvcf():
     # Check launchable
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
@@ -702,8 +701,7 @@ def importvcf():
 def update_clinvar(vcf, version, genome=config["GENOME"]):
     app.logger.info(f"ClinVar Version : '{version}' processing")
     # Switch on maintenance mode
-    app.config["MAINTENANCE"] = True
-    app.config["MAINTENANCE_REASON"] = "Update ClinVar"
+    set_maintenance("Update ClinVar")
 
     # Define paths
     new_clinvar = Path(vcf)
@@ -743,12 +741,10 @@ def update_clinvar(vcf, version, genome=config["GENOME"]):
         app.logger.error(str(e))
     finally:
         # Switch off maintenance mode
-        app.config["MAINTENANCE"] = False
-        del app.config["MAINTENANCE_REASON"]
+        clear_maintenance()
         return
 
 
-@scheduler.task('cron', id='update clinvar', day_of_week="*")
 def check_clinvar(genome=config["GENOME"]):
     path_inout = Path(app.root_path).joinpath('static/temp/vcf/')
     path_locker = path_inout.joinpath('.lock')
@@ -790,3 +786,49 @@ def check_clinvar(genome=config["GENOME"]):
     path_locker.unlink()
     return
 
+
+###############################################################################
+# Jobs definition
+#
+# Jobs are no longer registered at import time (no more @scheduler.task):
+# importing seal.schedulers from the web app (routes.py needs update_clinvar)
+# must not schedule anything. They are only registered by the dedicated
+# scheduler process (see scheduler.py at the root of the repository).
+###############################################################################
+
+JOBS = [
+    {
+        "id": "import vcf",
+        "func": importvcf,
+        "trigger": "cron",
+        "second": "*/20",
+    },
+    {
+        "id": "update clinvar",
+        "func": check_clinvar,
+        "trigger": "cron",
+        "day_of_week": "*",
+    },
+]
+
+
+def _with_app_context(func):
+    """Run a job inside a Flask application context (db, app.logger, ...)."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        with app.app_context():
+            try:
+                return func(*args, **kwargs)
+            finally:
+                # Never keep a broken/stale session between two runs
+                db.session.remove()
+    return wrapper
+
+
+def register_jobs(scheduler):
+    """Register all SEAL jobs on an APScheduler scheduler instance."""
+    for job in JOBS:
+        job = dict(job)
+        func = _with_app_context(job.pop("func"))
+        scheduler.add_job(func=func, name=job["id"], replace_existing=True, **job)
+        app.logger.info(f"Job registered: {job['id']}")
